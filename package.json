@@ -1,0 +1,17 @@
+{
+  "name": "share",
+  "version": "1.0.0",
+  "description": "Back-end for Share the Ride app",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon ./src/run/app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "path": "^0.12.7"
+  },
+  "author": "",
+  "license": "ISC"
+}
