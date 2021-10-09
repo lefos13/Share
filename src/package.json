@@ -4,13 +4,16 @@
   "description": "Back-end for Share the Ride app",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon ./src/run/app.js"
+    "start": "nodemon index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "http": "0.0.1-security",
-    "path": "^0.12.7"
+    "nodemailer": "^6.6.5",
+    "otp-generator": "^2.0.1",
+    "path": "^0.12.7",
+    "two-step-auth": "^1.1.2"
   },
   "author": "",
   "license": "ISC"
