@@ -1,17 +1,27 @@
-var path = require("path");
 var app = require("express")();
 var http = require("http").Server(app);
+
+//cors of course
 const cors = require("cors");
+
+//mysql package with util for promisify the results and wait for the quiries
 var mysql = require("mysql");
 const util = require("util");
+
+// package to send emails
 const nodemailer = require("nodemailer");
+
+// generator for otp codes
 var otpGenerator = require("otp-generator");
+
+// enviroment variables
 const dotenv = require("dotenv");
 dotenv.config();
 
-// .env
+// get the values from the .env file
 const { NODE_ENV, PORT, HOST, USER, PASS, DATABASE } = process.env;
 
+//cors configuration
 const whitelist = ["*"];
 const corsOptions = {
   credentials: true,
@@ -37,9 +47,10 @@ const corsOptions = {
   },
 };
 
-//Database connection
+//Database connection variable
 var con;
 
+//function that created a new connection with the db
 function newCon() {
   const connection = mysql.createConnection({
     host: HOST,
@@ -58,6 +69,7 @@ function newCon() {
   };
 }
 
+//function that get a list of users (unfinished)
 function getUser() {
   con.connect(function (err) {
     if (err) throw err;
@@ -71,7 +83,7 @@ function getUser() {
   });
 }
 
-// function that sends the email to the right user
+// function that sends the email to the right user (finished)
 async function verification(otp, email) {
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
@@ -95,27 +107,7 @@ async function verification(otp, email) {
   });
 }
 
-app.get(
-  "/run",
-  [
-    //check('access_token').isLength({ min: 40 }),
-    //check('llo').isBase64()
-  ],
-  cors(corsOptions),
-  (req, res, next) => {
-    var RES = new Object();
-    RES.code = req.query["code"];
-    console.error("socket GET from client " + RES.code);
-
-    RES.error = false;
-    RES.error_msg = "ok";
-
-    // io.emit("iotdata", RES);
-    // io.in("iot").emit("message", RES);
-    res.json(RES);
-  }
-);
-
+//rest api service that registers the user to the database, checks if he already exists and sends an otp for verification.
 app.get(
   "/register",
   [
@@ -178,32 +170,10 @@ app.get(
         body: body,
       },
     };
+
     res.json(data);
   }
 );
-
-app.get(
-  "/test",
-  [
-    //check('access_token').isLength({ min: 40 }),
-    //check('llo').isBase64()
-  ],
-  cors(corsOptions),
-  (req, res) => {
-    //generate the otp
-    var email = "cs141039@uniwa.gr";
-    var otp = otpGenerator.generate(4, {
-      digits: true,
-      upperCase: false,
-      alphabets: false,
-      specialChars: false,
-    });
-    verification(otp, email);
-    res.json("data");
-  }
-);
-
-console.log(HOST);
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
 console.error("Run demo project");
