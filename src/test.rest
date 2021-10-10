@@ -1,0 +1,52 @@
+
+GET http://localhost:3000/createtoken
+Content-Type: application/json
+
+{
+    "data":{
+        "email": "cs141039@uniwa.gr",
+        "pass": "asdas"
+    }
+}
+
+###
+
+GET http://localhost:3000/updateUserPass
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzODI1NzM2LCJleHAiOjE2MzM4MjU3NjF9.Gy6yw100WFKLSqv4IePmL5EeMo5FDgE52KFp5F0rPLg
+
+{
+    "data":{
+        "email": "cs141039@uniwa.gr",
+        "pass": "12"
+    }
+}
+
+###
+
+GET http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "data":{
+        "email": "cs141039@uniwa.gr",
+        "password": "123456",
+        "mobile": "12313",
+        "fullname": "lefos evan",
+        "car": "toyota",
+        "cardate": "1996",
+        "age": "26",
+        "photo": "12131231"
+    }
+}
+
+###
+
+GET http://localhost:3000/verify
+Content-Type: application/json
+
+{
+    "data":{
+        "email": "cs141039@uniwa.gr"
+    }
+}

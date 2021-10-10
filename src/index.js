@@ -1,4 +1,5 @@
-var app = require("express")();
+const express = require("express");
+const app = express();
 var http = require("http").Server(app);
 
 //cors of course
@@ -8,6 +9,11 @@ const cors = require("cors");
 var mysql = require("mysql");
 const util = require("util");
 
+//jwt
+const jwt = require("jsonwebtoken");
+
+app.use(express.json());
+
 // package to send emails
 const nodemailer = require("nodemailer");
 
@@ -16,10 +22,100 @@ var otpGenerator = require("otp-generator");
 
 // enviroment variables
 const dotenv = require("dotenv");
-dotenv.config();
 
+dotenv.config();
 // get the values from the .env file
-const { NODE_ENV, PORT, HOST, USER, PASS, DATABASE } = process.env;
+const { NODE_ENV, PORT, HOST, USER, PASS, DATABASE, TOKEN_KEY } = process.env;
+
+const bcrypt = require("bcrypt");
+
+//sequelize schema
+const { Sequelize, DataTypes } = require("sequelize");
+const { nextTick } = require("process");
+const sequelize = new Sequelize(DATABASE, USER, PASS, {
+  host: HOST,
+  dialect: "mysql",
+});
+const saltRounds = 10;
+
+const Users = sequelize.define(
+  "Users",
+  {
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      // set(value) {
+      //   this.setDataValue("password", hash(value));
+      // },
+    },
+    mobile: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    fullname: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    car: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    cardate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    age: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    photo: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    facebook: {
+      type: DataTypes.TEXT,
+    },
+    instagram: {
+      type: DataTypes.TEXT,
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: 0,
+    },
+  },
+  {
+    freezeTableName: true,
+    timestamps: false,
+  }
+);
+
+checkconnection();
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, TOKEN_KEY, (err, email) => {
+    if (err)
+      return res.json({
+        body: null,
+        error: {
+          code: 403,
+          body: "Token expired or didnt even exist",
+        },
+      });
+    console.log("inside auth: " + JSON.stringify(email));
+    req.body.data.email = email.email;
+    next();
+  });
+}
 
 //cors configuration
 const whitelist = ["*"];
@@ -47,43 +143,26 @@ const corsOptions = {
   },
 };
 
-//Database connection variable
-var con;
-
-//function that created a new connection with the db
-function newCon() {
-  const connection = mysql.createConnection({
-    host: HOST,
-    user: USER,
-    password: PASS,
-    database: DATABASE,
-  });
-
-  return {
-    query(sql, args) {
-      return util.promisify(connection.query).call(connection, sql, args);
-    },
-    close() {
-      return util.promisify(connection.end).call(connection);
-    },
-  };
-}
-
-//function that get a list of users (unfinished)
-function getUser() {
-  con.connect(function (err) {
-    if (err) throw err;
-    console.log("Connected!");
-    var sql = "SHOW tables";
-    con.query(sql, function (err, result) {
-      if (err) throw err;
-      console.log("Result: " + JSON.stringify(result));
-    });
-    con.end();
+function checkhash(pass, hash) {
+  bcrypt.compare(pass, hash, function (err, result) {
+    if (result == true) {
+      Promise.resolve(true);
+    } else Promise.resolve(false);
   });
 }
 
-// function that sends the email to the right user (finished)
+//check connection with the database
+async function checkconnection() {
+  try {
+    await sequelize.authenticate();
+    console.log("Connection has been established successfully.");
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
+  // sequelize.close()
+}
+
+// function that sends the otp to the email of the user (finished)
 async function verification(otp, email) {
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
@@ -107,73 +186,189 @@ async function verification(otp, email) {
   });
 }
 
-//rest api service that registers the user to the database, checks if he already exists and sends an otp for verification.
+//rest api service that registers the user to the database, checks if he already exists and sends an otp for verification. (finished)
+app.get("/register", [], cors(corsOptions), async (req, res) => {
+  // crypto the password
+  var data = req.body.data;
+  bcrypt.genSalt(saltRounds, function (err, salt) {
+    bcrypt.hash(data.password, salt, async function (err, hash) {
+      var data = req.body.data;
+      data.password = hash;
+
+      //generate otp to send to the user's mail
+      var otp = otpGenerator.generate(4, {
+        digits: true,
+        upperCase: false,
+        alphabets: false,
+        specialChars: false,
+      });
+
+      var code = null;
+      var body = null;
+      var results = null;
+
+      await Users.create(data)
+        .then((user) => {
+          // console.log(user);
+          results = {
+            status: 1,
+            otp: otp,
+            user: user.toJSON(),
+          };
+        })
+        .catch((err) => {
+          // console.log(err);
+          if (err.parent.errno === 1062) {
+            code = err.parent.errno;
+            body = "Dublicate entry";
+          } else {
+            code = 0;
+            body = err.parent.sqlMessage;
+          }
+        });
+
+      var data = {
+        body: results,
+        error: {
+          code: code,
+          body: body,
+        },
+      };
+
+      res.json(data);
+    });
+  });
+});
+
+//rest api service that creates the token for the user. Also checks if he is verified and sends the right message (finished)
+app.get("/createtoken", [], cors(corsOptions), async (req, res) => {
+  var code = null;
+  var body = null;
+  var results = null;
+  var email = req.body.data.email;
+  // console.log();
+  const user = await Users.findOne({
+    where: {
+      email: email,
+    },
+  }).catch((err) => {
+    console.log("Error:" + err);
+  });
+
+  if (user === null) {
+    code = 404;
+    body = "User not found";
+  } else {
+    if (user.verified === false) {
+      code = 350;
+      body = "User not verified";
+    } else {
+      //create token
+      payload = {
+        email: email,
+      };
+      const accessToken = jwt.sign(payload, TOKEN_KEY, { expiresIn: "60d" });
+      results = {
+        accessToken: accessToken,
+      };
+    }
+  }
+
+  var data = {
+    body: results,
+    error: {
+      code: code,
+      body: body,
+    },
+  };
+  res.json(data);
+});
+
+//service that updates the user's password (with encryption) - (finished)
 app.get(
-  "/register",
-  [
-    //check('access_token').isLength({ min: 40 }),
-    //check('llo').isBase64()
-  ],
+  "/updateUserPass",
+  [authenticateToken],
   cors(corsOptions),
   async (req, res) => {
-    var args = {
-      email: "cs141082@uniwa.gr",
-      password: "123456",
-      mobile: "12313",
-      fullname: "lefos evan",
-      car: "toyota",
-      cardate: "1996",
-      gender: "male",
-      age: "26",
-      photo: "12131231",
-    };
-
-    var email = args.email;
-
-    var otp = otpGenerator.generate(4, {
-      digits: true,
-      upperCase: false,
-      alphabets: false,
-      specialChars: false,
-    });
+    //console.log(req.body);
+    var email = req.body.data.email;
+    var password = req.body.data.pass;
+    // var email = "asdasd";
+    // var password = "asdasdd";
 
     var code = null;
     var body = null;
     var results = null;
 
-    con = newCon();
-    try {
-      var sql = "INSERT INTO Users SET ?";
-      await con.query(sql, args);
-      results = {
-        email: email,
-        otp: otp,
-      };
-      // verification(otp, email);
-    } catch (err) {
-      results = null;
-      if (err.errno == 1062) {
-        code = err.errno;
-        body = "Dublicate entry";
-      } else {
-        code = err.errno;
-        body = err;
-      }
-    } finally {
-      await con.close();
-    }
+    bcrypt.genSalt(saltRounds, function (err, salt) {
+      bcrypt.hash(password, salt, async function (err, hash) {
+        var newpass = hash;
+        const user = await Users.update(
+          { password: newpass },
+          { where: { email: email } }
+        ).catch((err) => {
+          console.log(err);
+        });
+        if (user === null) {
+          code = 404;
+          body = "User not found";
+        } else {
+          results = {
+            success: 200,
+            newpass: newpass,
+          };
+        }
 
-    var data = {
-      body: results,
-      error: {
-        code: code,
-        body: body,
-      },
-    };
-
-    res.json(data);
+        var data = {
+          body: results,
+          error: {
+            code: code,
+            body: body,
+          },
+        };
+        res.json(data);
+      });
+    });
   }
 );
+
+//service that updates the user's verification to true (almost finished)
+app.get("/verify", [], cors(corsOptions), async (req, res) => {
+  var email = req.body.data.email;
+
+  var code = null;
+  var body = null;
+  var results = null;
+
+  const user = await Users.update(
+    { verified: true },
+    {
+      where: {
+        email: email,
+      },
+    }
+  ).catch((err) => {
+    console.log("Error:" + err);
+  });
+
+  if (user === null) {
+    code = 404;
+    body = "User not found";
+  } else {
+    results = {
+      success: 200,
+    };
+  }
+
+  var data = {
+    body: results,
+    error: {
+      code: code,
+      body: body,
+    },
+  };
+  res.json(data);
+});
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
 console.error("Run demo project");
