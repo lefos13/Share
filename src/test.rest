@@ -18,7 +18,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 {
     "data":{
         "email": "cs141039@uniwa.gr",
-        "pass": "12"
+        "pass": "12345"
     }
 }
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 {
     "data":{
         "email": "cs141039@uniwa.gr",
-        "password": "123456",
+        "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
         "car": "toyota",
@@ -48,5 +48,17 @@ Content-Type: application/json
 {
     "data":{
         "email": "cs141039@uniwa.gr"
+    }
+}
+
+###
+GET http://localhost:3000/login
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzODcxMTIzLCJleHAiOjE2MzkwNTUxMjN9.jrJnq0bnC-Q_G967br4wZ-Pa1ePfE5N8PPbERQL0gfg
+
+{
+    "data":{
+        "email": "cs141039@uniwa.gr",
+        "pass": "12345"
     }
 }

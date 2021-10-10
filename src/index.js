@@ -2,12 +2,12 @@ const express = require("express");
 const app = express();
 var http = require("http").Server(app);
 
+//helmet for security
+const helmet = require("helmet");
+app.use(helmet());
+
 //cors of course
 const cors = require("cors");
-
-//mysql package with util for promisify the results and wait for the quiries
-var mysql = require("mysql");
-const util = require("util");
 
 //jwt
 const jwt = require("jsonwebtoken");
@@ -144,11 +144,7 @@ const corsOptions = {
 };
 
 function checkhash(pass, hash) {
-  bcrypt.compare(pass, hash, function (err, result) {
-    if (result == true) {
-      Promise.resolve(true);
-    } else Promise.resolve(false);
-  });
+  bcrypt.compare(pass, hash, function (err, result) {});
 }
 
 //check connection with the database
@@ -285,52 +281,47 @@ app.get("/createtoken", [], cors(corsOptions), async (req, res) => {
 });
 
 //service that updates the user's password (with encryption) - (finished)
-app.get(
-  "/updateUserPass",
-  [authenticateToken],
-  cors(corsOptions),
-  async (req, res) => {
-    //console.log(req.body);
-    var email = req.body.data.email;
-    var password = req.body.data.pass;
-    // var email = "asdasd";
-    // var password = "asdasdd";
+app.get("/updateUserPass", [], cors(corsOptions), async (req, res) => {
+  //console.log(req.body);
+  var email = req.body.data.email;
+  var password = req.body.data.pass;
+  // var email = "asdasd";
+  // var password = "asdasdd";
 
-    var code = null;
-    var body = null;
-    var results = null;
+  var code = null;
+  var body = null;
+  var results = null;
 
-    bcrypt.genSalt(saltRounds, function (err, salt) {
-      bcrypt.hash(password, salt, async function (err, hash) {
-        var newpass = hash;
-        const user = await Users.update(
-          { password: newpass },
-          { where: { email: email } }
-        ).catch((err) => {
-          console.log(err);
-        });
-        if (user === null) {
-          code = 404;
-          body = "User not found";
-        } else {
-          results = {
-            success: 200,
-            newpass: newpass,
-          };
-        }
-
-        var data = {
-          body: results,
-          error: {
-            code: code,
-            body: body,
-          },
-        };
-        res.json(data);
+  bcrypt.genSalt(saltRounds, function (err, salt) {
+    bcrypt.hash(password, salt, async function (err, hash) {
+      var newpass = hash;
+      const user = await Users.update(
+        { password: newpass },
+        { where: { email: email } }
+      ).catch((err) => {
+        console.log(err);
       });
+      if (user === null) {
+        code = 404;
+        body = "User not found";
+      } else {
+        results = {
+          success: 200,
+          newpass: newpass,
+        };
+      }
+
+      var data = {
+        body: results,
+        error: {
+          code: code,
+          body: body,
+        },
+      };
+      res.json(data);
     });
-  }
-);
+  });
+});
 
 //service that updates the user's verification to true (almost finished)
 app.get("/verify", [], cors(corsOptions), async (req, res) => {
@@ -367,6 +358,113 @@ app.get("/verify", [], cors(corsOptions), async (req, res) => {
       body: body,
     },
   };
+  res.json(data);
+});
+
+//service that verifies the login process of the user
+app.get("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
+  var email = req.body.data.email;
+  var pass = req.body.data.pass;
+  var code = null;
+  var body = null;
+  var results = null;
+  // console.log();
+  const user = await Users.findOne({
+    where: {
+      email: email,
+    },
+  }).catch((err) => {
+    console.log("Error:" + err);
+  });
+
+  if (user === null) {
+    code = 404;
+    body = "User not found";
+  } else {
+    if (user.verified === false) {
+      code = 350;
+      body = "User not verified";
+      var data = {
+        body: results,
+        error: {
+          code: code,
+          body: body,
+        },
+      };
+      res.json(data);
+    } else {
+      bcrypt.compare(pass, user.password, function (err, result) {
+        checkPass(result);
+      });
+    }
+  }
+
+  function checkPass(result) {
+    if (result) {
+      //console.log(user.toJSON());
+      var data = user.toJSON();
+      results = {
+        status: 200,
+        user: data,
+      };
+    } else {
+      //console.log("password not ok");
+      code = 450;
+      body = "Wrong password";
+    }
+    var data = {
+      body: results,
+      error: {
+        code: code,
+        body: body,
+      },
+    };
+    res.json(data);
+  }
+});
+
+//api that checks if the user exists and if he is verified and then it sends an otp for the reset of the password
+app.get("/passotp", [], cors(corsOptions), async (req, res) => {
+  var email = req.body.data.email;
+  var code = null;
+  var body = null;
+  var results = null;
+  // console.log();
+  const user = await Users.findOne({
+    where: {
+      email: email,
+    },
+  }).catch((err) => {
+    console.log("Error:" + err);
+  });
+
+  if (user === null) {
+    code = 404;
+    body = "User not found";
+  } else if (!user.verified) {
+    code = 350;
+    body = "User not verified";
+  } else {
+    var otp = otpGenerator.generate(4, {
+      digits: true,
+      upperCase: false,
+      alphabets: false,
+      specialChars: false,
+    });
+    //verification(otp, email);
+    results = {
+      status: 200,
+      otp: otp,
+    };
+  }
+  var data = {
+    body: results,
+    error: {
+      code: code,
+      body: body,
+    },
+  };
+
   res.json(data);
 });
 
