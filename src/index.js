@@ -38,62 +38,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 });
 const saltRounds = 10;
 
-const Users = sequelize.define(
-  "Users",
-  {
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      primaryKey: true,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      // set(value) {
-      //   this.setDataValue("password", hash(value));
-      // },
-    },
-    mobile: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    fullname: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    car: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    cardate: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    age: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    photo: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    facebook: {
-      type: DataTypes.TEXT,
-    },
-    instagram: {
-      type: DataTypes.TEXT,
-    },
-    verified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: 0,
-    },
-  },
-  {
-    freezeTableName: true,
-    timestamps: false,
-  }
-);
+const Users = require("./modules/user");
 
 checkconnection();
 
@@ -300,6 +245,8 @@ app.get("/updateUserPass", [], cors(corsOptions), async (req, res) => {
         { where: { email: email } }
       ).catch((err) => {
         console.log(err);
+        code = "unknown";
+        body = err;
       });
       if (user === null) {
         code = 404;
@@ -307,7 +254,6 @@ app.get("/updateUserPass", [], cors(corsOptions), async (req, res) => {
       } else {
         results = {
           success: 200,
-          newpass: newpass,
         };
       }
 
@@ -423,7 +369,7 @@ app.get("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
   }
 });
 
-//api that checks if the user exists and if he is verified and then it sends an otp for the reset of the password
+//api that checks if the user exists and if he is verified. Also, it sends an otp for the reset of his password
 app.get("/passotp", [], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
   var code = null;
@@ -435,6 +381,8 @@ app.get("/passotp", [], cors(corsOptions), async (req, res) => {
       email: email,
     },
   }).catch((err) => {
+    code = "unknown";
+    body = err;
     console.log("Error:" + err);
   });
 
@@ -453,7 +401,7 @@ app.get("/passotp", [], cors(corsOptions), async (req, res) => {
     });
     //verification(otp, email);
     results = {
-      status: 200,
+      success: 200,
       otp: otp,
     };
   }
