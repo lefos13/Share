@@ -150,6 +150,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
           verification(otp, data.email);
           results = {
             status: 1,
+            message: "Η Εγγραφή έγινε επιτυχώς.",
             otp: otp,
             user: user.toJSON(),
           };
@@ -207,6 +208,7 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
       };
       const accessToken = jwt.sign(payload, TOKEN_KEY, { expiresIn: "60d" });
       results = {
+        message: "Επιτυχής δημιουργία του token",
         accessToken: accessToken,
       };
     }
@@ -251,6 +253,7 @@ app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
       } else {
         results = {
           success: 200,
+          message: "Ο κωδικός ανανεώθηκε επιτυχώς.",
         };
       }
 
@@ -349,6 +352,7 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
       var data = user.toJSON();
       results = {
         status: 200,
+        message: "Επιτυχής είσοδος.",
         user: data,
       };
     } else {
@@ -400,6 +404,7 @@ app.post("/passotp", [], cors(corsOptions), async (req, res) => {
     verification(otp, email);
     results = {
       success: 200,
+      message: "Έλεγξε το email σου για τον ειδικό κωδικό.",
       otp: otp,
     };
   }
