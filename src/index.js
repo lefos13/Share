@@ -25,7 +25,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 // get the values from the .env file
-const { NODE_ENV, PORT, HOST, USER, PASS, DATABASE, TOKEN_KEY } = process.env;
+const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY } = process.env;
 
 const bcrypt = require("bcrypt");
 
@@ -146,7 +146,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
 
       await Users.create(data)
         .then((user) => {
-          //verification(otp,email);
+          verification(otp, data.email);
           results = {
             status: 1,
             otp: otp,
@@ -154,7 +154,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
           };
         })
         .catch((err) => {
-          // console.log(err);
+          console.log(err);
           if (err.parent.errno === 1062) {
             code = err.parent.errno;
             body = "Dublicate entry";
@@ -395,7 +395,7 @@ app.post("/passotp", [], cors(corsOptions), async (req, res) => {
       alphabets: false,
       specialChars: false,
     });
-    //verification(otp, email);
+    verification(otp, email);
     results = {
       success: 200,
       otp: otp,

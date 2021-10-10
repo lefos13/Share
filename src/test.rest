@@ -29,7 +29,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs14109@uniwa.gr",
+        "email": "asd@ASD.gr",
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
