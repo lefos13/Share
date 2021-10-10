@@ -146,7 +146,7 @@ app.get("/register", [], cors(corsOptions), async (req, res) => {
 
       await Users.create(data)
         .then((user) => {
-          // console.log(user);
+          //verification(otp,email);
           results = {
             status: 1,
             otp: otp,
