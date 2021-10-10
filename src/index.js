@@ -88,10 +88,6 @@ const corsOptions = {
   },
 };
 
-function checkhash(pass, hash) {
-  bcrypt.compare(pass, hash, function (err, result) {});
-}
-
 //check connection with the database
 async function checkconnection() {
   try {
