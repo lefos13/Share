@@ -24,9 +24,6 @@ const Users = sequelize.define(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-      // set(value) {
-      //   this.setDataValue("password", hash(value));
-      // },
     },
     mobile: {
       type: DataTypes.STRING,
@@ -41,6 +38,10 @@ const Users = sequelize.define(
       allowNull: false,
     },
     cardate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    gender: {
       type: DataTypes.STRING,
       allowNull: false,
     },

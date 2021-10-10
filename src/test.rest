@@ -33,6 +33,7 @@ Content-Type: application/json
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
+        "gender": "male",
         "car": "toyota",
         "cardate": "1996",
         "age": "26",
