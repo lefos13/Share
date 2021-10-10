@@ -27,6 +27,7 @@ dotenv.config();
 // get the values from the .env file
 const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY } = process.env;
 
+//console.log (EMAIL, PASSEMAIL);
 const bcrypt = require("bcrypt");
 
 //sequelize schema
@@ -99,14 +100,14 @@ async function checkconnection() {
   // sequelize.close()
 }
 
-// function that sends the otp to the email of the user (finished)
+// function that sends the otp to the email of the user
 async function verification(otp, email) {
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: "share.rideotp@gmail.com",
-      pass: "sharetheride1.13",
+      user: EMAIL,
+      pass: PASSEMAIL,
     },
   });
 
@@ -123,7 +124,7 @@ async function verification(otp, email) {
   });
 }
 
-//rest api service that registers the user to the database, checks if he already exists and sends an otp for verification. (finished)
+//rest api service that registers the user to the database, checks if he already exists and sends an otp for verification.
 app.post("/register", [], cors(corsOptions), async (req, res) => {
   // crypto the password
   var data = req.body.data;
@@ -177,7 +178,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
   });
 });
 
-//rest api service that creates the token for the user. Also checks if he is verified and sends the right message (finished)
+//rest api service that creates the token for the user. Also checks if he is verified and sends the right message
 app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   var code = null;
   var body = null;
@@ -221,7 +222,7 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   res.json(data);
 });
 
-//service that updates the user's password (with encryption) - (finished)
+//service that updates the user's password (with encryption)
 app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
   //console.log(req.body);
   var email = req.body.data.email;
@@ -265,7 +266,7 @@ app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
   });
 });
 
-//service that updates the user's verification to true (almost finished)
+//service that updates the user's verification to true
 app.post("/verify", [], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
 

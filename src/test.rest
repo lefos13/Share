@@ -29,7 +29,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "asd@ASD.gr",
+        "email": "cs141082@uniwa.gr",
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
@@ -48,18 +48,29 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141039@uniwa.gr"
+        "email": "cs141082@uniwa.gr"
     }
 }
 
 ###
 POST http://localhost:3000/login
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzODcxMTIzLCJleHAiOjE2MzkwNTUxMjN9.jrJnq0bnC-Q_G967br4wZ-Pa1ePfE5N8PPbERQL0gfg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzOTA0Mzc3LCJleHAiOjE2MzkwODgzNzd9.gca_86jwWOpVujOSo25W1DOz2A0wXZ7JgbrkWOhqCSA
 
 {
     "data":{
         "email": "cs141039@uniwa.gr",
         "pass": "12345"
+    }
+}
+
+###
+
+POST http://localhost:3000/passotp
+Content-Type: application/json
+
+{
+    "data": {
+        "email": "cs141082@uniwa.gr"
     }
 }
