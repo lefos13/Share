@@ -158,10 +158,10 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
           console.log(err);
           if (err.parent.errno === 1062) {
             code = err.parent.errno;
-            body = "Dublicate entry";
+            body = "Βρέθηκε λογαριασμός με το ίδιο email.";
           } else {
             code = 0;
-            body = err.parent.sqlMessage;
+            body = "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.";
           }
         });
 
@@ -195,11 +195,11 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
 
   if (user === null) {
     code = 404;
-    body = "User not found";
+    body = "Ο χρήστης δεν βρέθηκε.";
   } else {
     if (user.verified === false) {
       code = 350;
-      body = "User not verified";
+      body = "Πρέπει να επιβεβαιώσεις το email σου.";
     } else {
       //create token
       payload = {
@@ -242,12 +242,12 @@ app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
         { where: { email: email } }
       ).catch((err) => {
         console.log(err);
-        code = "unknown";
-        body = err;
+        code = 500;
+        body = "Κάτι πήγε στραβά.";
       });
       if (user === null) {
         code = 404;
-        body = "User not found";
+        body = "Ο χρήστης δεν βρέθηκε";
       } else {
         results = {
           success: 200,
@@ -287,7 +287,7 @@ app.post("/verify", [], cors(corsOptions), async (req, res) => {
 
   if (user === null) {
     code = 404;
-    body = "User not found";
+    body = "Ο χρήστης δεν βρέθηκε.";
   } else {
     results = {
       success: 200,
@@ -322,11 +322,11 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
 
   if (user === null) {
     code = 404;
-    body = "User not found";
+    body = "Ο χρήστης δεν βρέθηκε.";
   } else {
     if (user.verified === false) {
       code = 350;
-      body = "User not verified";
+      body = "Πρέπει να επιβεβαιώσεις το email σου.";
       var data = {
         body: results,
         error: {
@@ -353,7 +353,7 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
     } else {
       //console.log("password not ok");
       code = 450;
-      body = "Wrong password";
+      body = "Λάθος κωδικός.";
     }
     var data = {
       body: results,
@@ -379,16 +379,16 @@ app.post("/passotp", [], cors(corsOptions), async (req, res) => {
     },
   }).catch((err) => {
     code = "unknown";
-    body = err;
+    body = "Κάτι πήγε στραβά. Παρακαλούμε προσπαθήστε ξανά αργότερα!";
     console.log("Error:" + err);
   });
 
   if (user === null) {
     code = 404;
-    body = "User not found";
+    body = "Ο χρήστης δεν βρέθηκε.";
   } else if (!user.verified) {
     code = 350;
-    body = "User not verified";
+    body = "Πρέπει να επιβεβαιώσεις πρώτα το email σου.";
   } else {
     var otp = otpGenerator.generate(4, {
       digits: true,
