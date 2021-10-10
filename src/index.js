@@ -291,6 +291,7 @@ app.post("/verify", [], cors(corsOptions), async (req, res) => {
   } else {
     results = {
       success: 200,
+      body: "Το email επιβεβαιώθηκε με επιτυχία.",
     };
   }
 
