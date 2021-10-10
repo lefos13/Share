@@ -1,5 +1,5 @@
 
-GET http://localhost:3000/createtoken
+POST http://localhost:3000/createtoken
 Content-Type: application/json
 
 {
@@ -11,7 +11,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/updateUserPass
+POST http://localhost:3000/updateUserPass
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzODI1NzM2LCJleHAiOjE2MzM4MjU3NjF9.Gy6yw100WFKLSqv4IePmL5EeMo5FDgE52KFp5F0rPLg
 
@@ -24,12 +24,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 ###
 
-GET http://localhost:3000/register
+POST  http://localhost:3000/register
 Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141039@uniwa.gr",
+        "email": "cs14109@uniwa.gr",
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
@@ -43,7 +43,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/verify
+POST http://localhost:3000/verify
 Content-Type: application/json
 
 {
@@ -53,7 +53,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/login
+POST http://localhost:3000/login
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzODcxMTIzLCJleHAiOjE2MzkwNTUxMjN9.jrJnq0bnC-Q_G967br4wZ-Pa1ePfE5N8PPbERQL0gfg
 

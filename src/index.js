@@ -124,7 +124,7 @@ async function verification(otp, email) {
 }
 
 //rest api service that registers the user to the database, checks if he already exists and sends an otp for verification. (finished)
-app.get("/register", [], cors(corsOptions), async (req, res) => {
+app.post("/register", [], cors(corsOptions), async (req, res) => {
   // crypto the password
   var data = req.body.data;
   bcrypt.genSalt(saltRounds, function (err, salt) {
@@ -178,7 +178,7 @@ app.get("/register", [], cors(corsOptions), async (req, res) => {
 });
 
 //rest api service that creates the token for the user. Also checks if he is verified and sends the right message (finished)
-app.get("/createtoken", [], cors(corsOptions), async (req, res) => {
+app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   var code = null;
   var body = null;
   var results = null;
@@ -222,7 +222,7 @@ app.get("/createtoken", [], cors(corsOptions), async (req, res) => {
 });
 
 //service that updates the user's password (with encryption) - (finished)
-app.get("/updateUserPass", [], cors(corsOptions), async (req, res) => {
+app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
   //console.log(req.body);
   var email = req.body.data.email;
   var password = req.body.data.pass;
@@ -266,7 +266,7 @@ app.get("/updateUserPass", [], cors(corsOptions), async (req, res) => {
 });
 
 //service that updates the user's verification to true (almost finished)
-app.get("/verify", [], cors(corsOptions), async (req, res) => {
+app.post("/verify", [], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
 
   var code = null;
@@ -304,7 +304,7 @@ app.get("/verify", [], cors(corsOptions), async (req, res) => {
 });
 
 //service that verifies the login process of the user
-app.get("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
+app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
   var pass = req.body.data.pass;
   var code = null;
@@ -366,7 +366,7 @@ app.get("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
 });
 
 //api that checks if the user exists and if he is verified. Also, it sends an otp for the reset of his password
-app.get("/passotp", [], cors(corsOptions), async (req, res) => {
+app.post("/passotp", [], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
   var code = null;
   var body = null;
@@ -413,5 +413,3 @@ app.get("/passotp", [], cors(corsOptions), async (req, res) => {
 });
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
-console.error("Run demo project");
-console.log("Hello World!");
