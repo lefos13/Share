@@ -41,6 +41,7 @@ const saltRounds = 10;
 
 const Users = require("./modules/user");
 const Posts = require("./modules/post");
+const PostInterested = require("./modules/postinterested");
 
 checkconnection();
 
@@ -185,6 +186,7 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   var code = null;
   var body = null;
   var results = null;
+  var more = null;
   var email = req.body.data.email;
   // console.log();
   const user = await Users.findOne({
@@ -202,6 +204,17 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
     if (user.verified === false) {
       code = 350;
       body = "Πρέπει να επιβεβαιώσεις το email σου.";
+      var otp = otpGenerator.generate(4, {
+        digits: true,
+        upperCase: false,
+        alphabets: false,
+        specialChars: false,
+      });
+      more = {
+        email: email,
+        otp: otp,
+      };
+      verification(otp, email);
     } else {
       //create token
       payload = {
@@ -221,6 +234,7 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
       code: code,
       body: body,
     },
+    more: more,
   };
   res.json(data);
 });
@@ -462,35 +476,38 @@ app.post(
   [authenticateToken],
   cors(corsOptions),
   async (req, res) => {
-    var email = req.body.data.email;
-    var postid = req.body.data.postid;
     //console.log(postid);
+    var row = req.body.data;
     var code = null;
     var body = null;
     var results = null;
-
-    await Posts.findOne({
+    await PostInterested.findOne({
       where: {
-        postid: postid,
+        email: row.email,
+        postid: row.postid,
       },
     })
-      .then((post) => {
-        results = post;
+      .then(async (found) => {
+        if (found != null) {
+          res.status(405).send("Έχεις ενδιαφερθεί ήδη");
+        } else {
+          await PostInterested.create(req.body.data)
+            .then((results) => {
+              results = results;
+              var data = {
+                body: results,
+                message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
+              };
+              res.json(data);
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(500).send("Κάτι πήγε στραβά!");
+            });
+        }
       })
       .catch((err) => {
-        // console.log(err);
-        code = err;
-        body = "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα!";
-      })
-      .finally(() => {
-        var data = {
-          body: results,
-          error: {
-            code: code,
-            body: body,
-          },
-        };
-        res.json(data);
+        res.status(500).send("Κάτι πήγε στραβά: " + err);
       });
   }
 );
