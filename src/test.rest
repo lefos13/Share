@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "cs@cs.com",
         "pass": "asdas"
     }
 }
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "cs@cs.com",
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
@@ -48,14 +48,14 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "cs@cs.com"
     }
 }
 
 ###
 POST http://localhost:3000/login
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTg0MzU1LCJleHAiOjE2MzkxNjgzNTV9.dOEvr13PkuNVQweOMmcR4x6WfPkbyhccY1BoQyTZ-zM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzQGNzLmNvbSIsImlhdCI6MTYzMzk4ODkyMywiZXhwIjoxNjM5MTcyOTIzfQ.5iJ7P5dgY6AwMv06E0d2Cy6FAdRGP24lRMvf_aiXCAw
 
 {
     "data":{
@@ -71,7 +71,7 @@ Content-Type: application/json
 
 {
     "data": {
-        "email": "cs141082@uniwa.gr"
+        "email": "cs@cs.com"
     }
 }
 

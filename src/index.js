@@ -393,9 +393,6 @@ app.post("/passotp", [], cors(corsOptions), async (req, res) => {
   if (user === null) {
     code = 404;
     body = "Ο χρήστης δεν βρέθηκε.";
-  } else if (!user.verified) {
-    code = 350;
-    body = "Πρέπει να επιβεβαιώσεις πρώτα το email σου.";
   } else {
     var otp = otpGenerator.generate(4, {
       digits: true,
