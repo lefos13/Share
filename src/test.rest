@@ -83,7 +83,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "cs141039",
+        "email": "cs141039@uniwa.gr",
         "startplace": "volos",
         "endplace": "Athens",
         "numseats": "3",
@@ -105,7 +105,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "postid": "6",
-        "email": "cs141039"
+        "postid": "9",
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }

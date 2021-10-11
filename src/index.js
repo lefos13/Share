@@ -462,7 +462,7 @@ app.post(
   [authenticateToken],
   cors(corsOptions),
   async (req, res) => {
-    var data = req.body.data.email;
+    var email = req.body.data.email;
     var postid = req.body.data.postid;
     //console.log(postid);
     var code = null;
@@ -475,7 +475,7 @@ app.post(
       },
     })
       .then((post) => {
-        console.log(post);
+        results = post;
       })
       .catch((err) => {
         // console.log(err);
