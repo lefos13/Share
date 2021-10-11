@@ -40,6 +40,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 const saltRounds = 10;
 
 const Users = require("./modules/user");
+const Posts = require("./modules/post");
 
 checkconnection();
 
@@ -150,9 +151,9 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
           verification(otp, data.email);
           results = {
             status: 1,
-            message: "Η Εγγραφή έγινε επιτυχώς.",
+            message: "Εγγραφήκατε επιτυχώς. Πάμε για την εξακρίβωση του email!",
             otp: otp,
-            user: user.toJSON(),
+            user: data,
           };
         })
         .catch((err) => {
@@ -418,5 +419,41 @@ app.post("/passotp", [], cors(corsOptions), async (req, res) => {
 
   res.json(data);
 });
+
+//service that creates a post
+app.post(
+  "/createpost",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    var data = req.body.data;
+    var code = null;
+    var body = null;
+    var results = null;
+
+    await Posts.create(data)
+      .then((post) => {
+        results = {
+          status: 1,
+          message: "Η Εγγραφή του post έγινε επιτυχώς.",
+          post: post.toJSON(),
+        };
+      })
+      .catch((err) => {
+        //console.log(err);
+        body = err;
+      })
+      .finally(() => {
+        var data = {
+          body: results,
+          error: {
+            code: code,
+            body: body,
+          },
+        };
+        res.json(data);
+      });
+  }
+);
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));

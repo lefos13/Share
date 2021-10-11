@@ -13,56 +13,51 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   dialect: "mysql",
 });
 
-const Users = sequelize.define(
-  "Users",
+const Posts = sequelize.define(
+  "Posts",
   {
+    postid: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: false,
+      primaryKey: true,
+      unique: true,
+      autoIncrement: true,
+    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true,
     },
-    password: {
+    startplace: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    mobile: {
+    endplace: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    fullname: {
-      type: DataTypes.STRING,
+    numseats: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    car: {
-      type: DataTypes.STRING,
+    startdate: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
-    cardate: {
-      type: DataTypes.STRING,
+    enddate: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
-    gender: {
-      type: DataTypes.STRING,
+    costperseat: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    age: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    photo: {
+    comment: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
-    facebook: {
-      type: DataTypes.TEXT,
-    },
-    instagram: {
-      type: DataTypes.TEXT,
-    },
-    verified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: 0,
+    moreplaces: {
+      type: DataTypes.JSON,
+      allowNull: true,
     },
   },
   {
@@ -71,4 +66,4 @@ const Users = sequelize.define(
   }
 );
 
-module.exports = Users;
+module.exports = Posts;
