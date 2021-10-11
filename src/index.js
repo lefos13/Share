@@ -351,6 +351,7 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
     if (result) {
       //console.log(user.toJSON());
       var data = user.toJSON();
+      data.password = pass;
       results = {
         status: 200,
         message: "Επιτυχής είσοδος.",
@@ -438,10 +439,51 @@ app.post(
           message: "Η Εγγραφή του post έγινε επιτυχώς.",
           post: post.toJSON(),
         };
+        // console.log(post.moreplaces);
       })
       .catch((err) => {
         //console.log(err);
-        body = err;
+        code = err;
+        body = "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα!";
+      })
+      .finally(() => {
+        var data = {
+          body: results,
+          error: {
+            code: code,
+            body: body,
+          },
+        };
+        res.json(data);
+      });
+  }
+);
+
+//service that is being called when someone is interested for a post
+app.post(
+  "/interested",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    var data = req.body.data.email;
+    var postid = req.body.data.postid;
+    //console.log(postid);
+    var code = null;
+    var body = null;
+    var results = null;
+
+    await Posts.findOne({
+      where: {
+        postid: postid,
+      },
+    })
+      .then((post) => {
+        console.log(post);
+      })
+      .catch((err) => {
+        // console.log(err);
+        code = err;
+        body = "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα!";
       })
       .finally(() => {
         var data = {

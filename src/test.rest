@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141039@uniwa.gr",
+        "email": "lefterisevagelinos1996@gmail.com",
         "pass": "asdas"
     }
 }
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141082@uniwa.gr",
+        "email": "lefterisevagelinos1996@gmail.com",
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
@@ -48,18 +48,18 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141082@uniwa.gr"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
 ###
 POST http://localhost:3000/login
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzOTA0Mzc3LCJleHAiOjE2MzkwODgzNzd9.gca_86jwWOpVujOSo25W1DOz2A0wXZ7JgbrkWOhqCSA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTg0MzU1LCJleHAiOjE2MzkxNjgzNTV9.dOEvr13PkuNVQweOMmcR4x6WfPkbyhccY1BoQyTZ-zM
 
 {
     "data":{
-        "email": "cs141039@uniwa.gr",
+        "email": "lefterisevagelinos1996@gmail.com",
         "pass": "12345"
     }
 }
@@ -94,5 +94,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "moreplaces": {
             "places": "Larisa-Trikala-Lamia"
         }
+    }
+}
+
+###
+
+POST http://localhost:3000/interested
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzOTA0Mzc3LCJleHAiOjE2MzkwODgzNzd9.gca_86jwWOpVujOSo25W1DOz2A0wXZ7JgbrkWOhqCSA
+
+{
+    "data": {
+        "postid": "6",
+        "email": "cs141039"
     }
 }
