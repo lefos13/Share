@@ -1,4 +1,4 @@
-
+#service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
 POST http://localhost:3000/createtoken
 Content-Type: application/json
 
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ###
-
+#service pou kanei update to password you user sth vash
 POST http://localhost:3000/updateUserPass
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiaWF0IjoxNjMzOTkyOTg3LCJleHAiOjE2MzkxNzY5ODd9.cScBdSAXzH2qrljnvWdROnof4rTu1hrWInb6A-rvhFU
@@ -24,13 +24,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 }
 
 ###
-
+#service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
 POST  http://localhost:3000/register
 Content-Type: application/json
 
 {
     "data":{
-        "email": "cs@cs.com",
+        "email": "cs141082@cs.com",
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
@@ -43,7 +43,7 @@ Content-Type: application/json
 }
 
 ###
-
+#service pou kanei verify to xrhsth sth vash dedomenwn, afou kanei epibebaiwsh to otp tou ston client
 POST http://localhost:3000/verify
 Content-Type: application/json
 
@@ -54,6 +54,7 @@ Content-Type: application/json
 }
 
 ###
+#service pou elegxei ta stoixeia tou xrhsth otan kanei login
 POST http://localhost:3000/login
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkwMDI0LCJleHAiOjE2MzkxNzQwMjR9.0FS15t42ID5bVuKuw6P88AtxJCHEyMJobjnhccBvwHk
@@ -66,7 +67,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 }
 
 ###
-
+#service poy stelnei otp ston xrhsth kai ston client gia epibebaiwsh
 POST http://localhost:3000/passotp
 Content-Type: application/json
 
@@ -85,7 +86,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "cs141039@uniwa.gr",
+        "email": "cs141082@uniwa.gr",
+        "date": "2021-11-03",
         "startplace": "volos",
         "endplace": "Athens",
         "numseats": "3",
@@ -102,13 +104,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 ###
 
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
-POST http://localhost:3000/interested
+POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=16
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+###
+
+POST http://localhost:3000/searchposts
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
 {
     "data": {
-        "postid": "9",
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "volos",
+        "endplace": "Athens",
+        "startdate": "2021-11-25",
+        "enddate": "2021-11-26",
+        "page": 2
     }
 }

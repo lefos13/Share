@@ -59,6 +59,10 @@ const Posts = sequelize.define(
       type: DataTypes.JSON,
       allowNull: true,
     },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

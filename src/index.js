@@ -33,6 +33,7 @@ const bcrypt = require("bcrypt");
 //sequelize schema
 const { Sequelize, DataTypes } = require("sequelize");
 const { nextTick } = require("process");
+const { Op } = require("sequelize");
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
@@ -60,7 +61,6 @@ function authenticateToken(req, res, next) {
         },
       });
     console.log("inside auth: " + JSON.stringify(email));
-    req.body.data.email = email.email;
     next();
   });
 }
@@ -482,10 +482,8 @@ app.post(
   [authenticateToken],
   cors(corsOptions),
   async (req, res) => {
-    //console.log(postid);
-    var row = req.body.data;
-    var code = null;
-    var body = null;
+    // console.log(req.query);
+    var row = req.query;
     var results = null;
     await PostInterested.findOne({
       where: {
@@ -497,9 +495,9 @@ app.post(
         if (found != null) {
           res.status(405).send("Έχεις ενδιαφερθεί ήδη");
         } else {
-          await PostInterested.create(req.body.data)
-            .then((results) => {
-              results = results;
+          await PostInterested.create(row)
+            .then((inter) => {
+              results = inter;
               var data = {
                 body: results,
                 message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
@@ -510,6 +508,98 @@ app.post(
               console.log(err);
               res.status(500).send("Κάτι πήγε στραβά!");
             });
+        }
+      })
+      .catch((err) => {
+        res.status(500).send("Κάτι πήγε στραβά: " + err);
+      });
+  }
+);
+
+//service that is searching posts
+app.post(
+  "/searchposts",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.body.data;
+    var results = null;
+    var array = [];
+    var test = null;
+    await Posts.findAndCountAll({
+      where: {
+        startplace: data.startplace,
+        endplace: data.endplace,
+      },
+      order: [["date", "ASC"]],
+    })
+      .then(async (found) => {
+        if (found.count == 0) {
+          res.status(404).send("Δεν υπάρχει καμία διαδρομή.");
+        } else {
+          var pointer = 0;
+          var checker = 20;
+          var counter = 0;
+          if (found.count > 20 && data.page > 1) {
+            counter = data.page * 20 - 20;
+            checker = data.page * 20;
+            // pointer = counter;
+          }
+          console.log(
+            "Counter:" +
+              counter +
+              " Checker: " +
+              checker +
+              " pointer: " +
+              pointer +
+              "  " +
+              data.page +
+              " count: " +
+              found.count
+          );
+          for await (fnd of found.rows) {
+            pointer++;
+            if (pointer > counter && pointer <= checker) {
+              await Users.findOne({
+                attributes: ["fullname", "email", "photo"],
+                where: {
+                  email: fnd.email,
+                },
+              })
+                .then(async (user) => {
+                  var flag;
+                  await PostInterested.findOne({
+                    where: {
+                      email: data.email,
+                      postid: fnd.postid,
+                    },
+                  }).then((interested) => {
+                    if (interested === null) {
+                      flag = false;
+                    } else {
+                      flag = true;
+                    }
+                    results = {
+                      user: user,
+                      post: fnd,
+                      interested: flag,
+                    };
+                    array.push(results);
+                  });
+                })
+                .catch((err) => {
+                  res.status(500).send("Κάτι πήγε στραβά");
+                });
+            }
+
+            // console.log(fnd.email);
+          }
+          results = {
+            array: array,
+            length: array.length,
+          };
+          res.json(results);
         }
       })
       .catch((err) => {
