@@ -292,26 +292,23 @@ app.post("/verify", [], cors(corsOptions), async (req, res) => {
   var body = null;
   var results = null;
 
-  const user = await Users.update(
+  await Users.update(
     { verified: true },
     {
       where: {
         email: email,
       },
     }
-  ).catch((err) => {
-    console.log("Error:" + err);
-  });
-
-  if (user === null) {
-    code = 404;
-    body = "Ο χρήστης δεν βρέθηκε.";
-  } else {
-    results = {
-      success: 200,
-      body: "Το email επιβεβαιώθηκε με επιτυχία.",
-    };
-  }
+  )
+    .catch((err) => {
+      console.log("Error:" + err);
+    })
+    .then((user) => {
+      results = {
+        success: 200,
+        body: "Το email επιβεβαιώθηκε με επιτυχία.",
+      };
+    });
 
   var data = {
     body: results,
@@ -402,6 +399,15 @@ app.post("/passotp", [], cors(corsOptions), async (req, res) => {
     code = "unknown";
     body = "Κάτι πήγε στραβά. Παρακαλούμε προσπαθήστε ξανά αργότερα!";
     console.log("Error:" + err);
+    var data = {
+      body: results,
+      error: {
+        code: code,
+        body: body,
+      },
+    };
+
+    res.json(data);
   });
 
   if (user === null) {
