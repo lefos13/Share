@@ -12,6 +12,11 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: false,
+  dialectOptions: {
+    timezone: "+03:00",
+    dateStrings: true,
+    typeCast: true,
+  },
 });
 
 Date.prototype.addHours = function (h) {
