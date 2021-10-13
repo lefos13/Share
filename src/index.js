@@ -6,6 +6,11 @@ var http = require("http").Server(app);
 const helmet = require("helmet");
 app.use(helmet());
 
+//fileserver option
+// var op = {
+//   dotfiles: "ignore",
+//   extensions: ["jpeg", "jpg"],
+// };
 app.use("/images", express.static("uploads"));
 
 //cors of course
@@ -811,7 +816,7 @@ app.post("/upload", upload.single("upload"), function (req, res) {
   console.log(req.file);
   console.log(req.body);
 
-  res.sendStatus(200).send({ message: "Έγινε επιτυχώς το upload" });
+  res.status(200).json({ message: "Το upload έγινε επιτυχώς" });
 });
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
