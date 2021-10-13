@@ -6,6 +6,8 @@ var http = require("http").Server(app);
 const helmet = require("helmet");
 app.use(helmet());
 
+app.use("/images", express.static("uploads"));
+
 //cors of course
 const cors = require("cors");
 
