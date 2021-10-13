@@ -20,6 +20,20 @@ const nodemailer = require("nodemailer");
 // generator for otp codes
 var otpGenerator = require("otp-generator");
 
+//middleware for handling multipart
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    console.log(file, req.body);
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
+
 // enviroment variables
 const dotenv = require("dotenv");
 
@@ -788,5 +802,12 @@ app.get(
       });
   }
 );
+
+app.post("/upload", upload.single("filePart"), function (req, res) {
+  // req.file is the name of your file in the form above, here 'uploaded_file'
+  // req.body will hold the text fields, if there were any
+  console.log(req.file, req.body);
+  res.sendStatus(200);
+});
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
