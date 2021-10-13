@@ -800,7 +800,7 @@ app.get(
       })
       .catch((err) => {
         console.error(err);
-        res.status(500).send("Κάτι πήγε στραβά: " + err);
+        res.status(500).send({ message: "Ωχ! κάτι πήγε στραβά!", body: err });
       });
   }
 );
@@ -811,7 +811,7 @@ app.post("/upload", upload.single("upload"), function (req, res) {
   console.log(req.file);
   console.log(req.body);
 
-  res.sendStatus(200);
+  res.sendStatus(200).send({ message: "Έγινε επιτυχώς το upload" });
 });
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
