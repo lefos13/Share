@@ -479,28 +479,23 @@ app.post(
   cors(corsOptions),
   async (req, res) => {
     var data = req.body.data;
-    var code = null;
-    var body = null;
     var results = null;
 
     await Posts.create(data)
       .then((post) => {
         results = {
-          status: 1,
           message: "Η Εγγραφή του post έγινε επιτυχώς.",
           post: post.toJSON(),
         };
         // console.log(post.moreplaces);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("Κάτι πήγε στραβά.");
-      })
-      .finally(() => {
         var data = {
           body: results,
         };
         res.json(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });
   }
 );
@@ -522,12 +517,13 @@ app.post(
     })
       .then(async (found) => {
         if (found != null) {
-          res.status(405).send("Έχεις ενδιαφερθεί ήδη");
+          res.status(400).json({ message: "Έχεις ενδιαφερθεί ήδη" });
         } else {
           await PostInterested.create(row)
             .then((inter) => {
               results = inter;
               var data = {
+                found: found,
                 body: results,
                 message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
               };
@@ -535,12 +531,12 @@ app.post(
             })
             .catch((err) => {
               console.log(err);
-              res.status(500).send("Κάτι πήγε στραβά!");
+              res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
             });
         }
       })
       .catch((err) => {
-        res.status(500).send("Κάτι πήγε στραβά: " + err);
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });
   }
 );
@@ -565,7 +561,7 @@ app.post(
     })
       .then(async (found) => {
         if (found.count == 0) {
-          res.status(404).send("Δεν υπάρχει καμία διαδρομή.");
+          res.status(404).json({ message: "Δεν υπάρχει καμία διαδρομή" });
         } else {
           var pointer = 0;
           var checker = 20;
@@ -591,7 +587,7 @@ app.post(
             pointer++;
             if (pointer > counter && pointer <= checker) {
               await Users.findOne({
-                attributes: ["fullname", "email", "photo"],
+                attributes: ["fullname", "email"],
                 where: {
                   email: fnd.email,
                 },
@@ -603,22 +599,31 @@ app.post(
                       email: data.email,
                       postid: fnd.postid,
                     },
-                  }).then((interested) => {
-                    if (interested === null) {
-                      flag = false;
-                    } else {
-                      flag = true;
-                    }
-                    results = {
-                      user: user,
-                      post: fnd,
-                      interested: flag,
-                    };
-                    array.push(results);
-                  });
+                  })
+                    .then((interested) => {
+                      if (interested === null) {
+                        flag = false;
+                      } else {
+                        flag = true;
+                      }
+                      results = {
+                        user: user,
+                        imagepath: "images/" + fnd.email + ".jpeg",
+                        post: fnd,
+                        interested: flag,
+                      };
+                      array.push(results);
+                    })
+                    .catch((err) => {
+                      res
+                        .status(400)
+                        .json({ message: "Κάτι πήγε στραβά.", body: err });
+                    });
                 })
                 .catch((err) => {
-                  res.status(500).send("Κάτι πήγε στραβά");
+                  res
+                    .status(400)
+                    .json({ message: "Κάτι πήγε στραβά.", body: err });
                 });
             }
 
@@ -626,18 +631,18 @@ app.post(
           }
           results = {
             array: array,
-            length: array.length,
+            length: found.count,
           };
           res.json(results);
         }
       })
       .catch((err) => {
-        res.status(500).send("Κάτι πήγε στραβά: " + err);
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });
   }
 );
 
-//service pou anazhth enan xrhsth
+//service pou anazhta enan xrhsth
 app.get(
   "/searchuser",
   [authenticateToken],
@@ -679,24 +684,28 @@ app.get(
                 res.json({
                   average: average,
                   user: found,
+                  image: "images/" + data.email + ".jpeg",
                   reviews: rev,
                   message: "Ο χρήστης βρέθηκε",
                 });
               })
               .catch((err) => {
                 console.error(err);
-                res.status(500).send("Ωχ κάτι πήγε στραβά.");
+                res
+                  .status(400)
+                  .json({ message: "Κάτι πήγε στραβά.", body: err });
               });
           })
           .catch((err) => {
             console.error(err);
-            res
-              .status(500)
-              .send("Ωχ! Κάτι πήγε στραβά στην αναζήτηση της αξιολόγησης.");
+            res.status(400).json({
+              message: "Κάτι πήγε στραβά κατά την αναζήτηση.",
+              body: err,
+            });
           });
       })
       .catch((err) => {
-        res.status(500).send("Κάτι πήγε στραβά: " + err);
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });
   }
 );
@@ -713,7 +722,7 @@ app.post(
     await Reviews.create(data)
       .then((review) => {
         results = {
-          message: "Η εγγραφή του review έγινε επιτυχώς.",
+          message: "Η αξιολόγηση έγινε επιτυχώς!.",
           review: review.toJSON(),
         };
         res.json({
@@ -723,8 +732,11 @@ app.post(
       .catch((err) => {
         console.error(err);
         if (err.original.code == "ER_DUP_ENTRY")
-          res.status(450).send("Έχεις κάνει ήδη review σε αυτόν τον χρήστη");
-        res.status(500).send("Ωχ! Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα");
+          res.status(405).json({
+            message: "Έχεις κάνει ήδη αξιολόγηση σε αυτόν τον χρήστη.",
+            body: err,
+          });
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });
   }
 );
@@ -748,7 +760,7 @@ app.get(
         });
       })
       .catch((err) => {
-        res.status(500).send("Κάτι πήγε στραβά: " + err);
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });
   }
 );
@@ -761,18 +773,18 @@ app.get(
   async (req, res) => {
     // console.log(req.query);
     var data = req.query;
-    await PostInterested.findAll({
+    await PostInterested.findOne({
       where: {
         postid: data.postid,
       },
     })
-      .then(async (found) => {
+      .then((found) => {
         res.json({
-          body: found,
+          body: found.toJSON(),
         });
       })
       .catch((err) => {
-        res.status(500).send("Κάτι πήγε στραβά: " + err);
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });
   }
 );
@@ -797,26 +809,31 @@ app.get(
             where: {
               postid: fnd.postid,
             },
-          }).then((count) => {
-            finalcount = finalcount + count;
-          });
+          })
+            .then((count) => {
+              finalcount = finalcount + count;
+            })
+            .catch((err) => {
+              res.status(400).json({ message: "Bad request", body: err });
+            });
         }
-        res.status(200).send(finalcount.toString());
+        res.json({ length: finalcount });
       })
       .catch((err) => {
         console.error(err);
-        res.status(500).send({ message: "Ωχ! κάτι πήγε στραβά!", body: err });
+        res.status(400).send({ message: "Ωχ! κάτι πήγε στραβά!", body: err });
       });
   }
 );
 
+//service poy anevazei eikona sto server
 app.post("/upload", upload.single("upload"), function (req, res) {
   // req.file is the name of your file in the form above, here 'uploaded_file'
   // req.body will hold the text fields, if there were any
   console.log(req.file);
   console.log(req.body);
 
-  res.status(200).json({ message: "Το upload έγινε επιτυχώς" });
+  res.json({ message: "Το upload έγινε επιτυχώς" });
 });
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));

@@ -91,7 +91,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail",
+        "email": "lefterisevagelinos1996@gmail.com",
         "date": "2021-11-03",
         "startplace": "volos",
         "endplace": "Athens",
@@ -109,7 +109,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 ###
 
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
-POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=28
+POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=55
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
@@ -164,14 +164,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service epistrefei lista me endiaferomenous apo ena post
-GET http://localhost:3000/getinterested?postid=45
+GET http://localhost:3000/getinterested?postid=55
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
 ###
 
 #service poy epistrfei to plithos ton endiaferomenwn olwn twn post enos user
-GET http://localhost:3000/getlofinterested?email=cs141082@uniwa.gr
+GET http://localhost:3000/getlofinterested?email=lefterisevagelinos1996@gmail.com
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
