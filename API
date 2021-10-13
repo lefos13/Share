@@ -1,0 +1,200 @@
+#service pou ftiaxneis ena post
+POST http://localhost:3000/createpost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzOTA0Mzc3LCJleHAiOjE2MzkwODgzNzd9.gca_86jwWOpVujOSo25W1DOz2A0wXZ7JgbrkWOhqCSA
+
+#to moreplaces einai akoma upo kataskeuh. Den exoume dei pws akrivws tha mou ta stelneis
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail",
+        "date": "2021-11-03",
+        "startplace": "volos",
+        "endplace": "Athens",
+        "numseats": "3",
+        "startdate": "2021-11-25",
+        "enddate": "2021-11-26",
+        "costperseat": "20",
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": {
+            "places": "Larisa-Trikala-Lamia"
+        }
+    }
+}
+
+RESPONSE EXAMPLE:
+{
+  "body": {
+    "status": 1,
+    "message": "Η Εγγραφή του post έγινε επιτυχώς.",
+    "post": {
+      "postid": 46,
+      "email": "lefterisevagelinos1996@gmail",
+      "date": "2021-11-03T00:00:00.000Z",
+      "startplace": "volos",
+      "endplace": "Athens",
+      "numseats": "3",
+      "startdate": "2021-11-25T00:00:00.000Z",
+      "enddate": "2021-11-26T00:00:00.000Z",
+      "costperseat": "20",
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": {
+        "places": "Larisa-Trikala-Lamia"
+      }
+    }
+  }
+}
+
+###
+
+#service poy kaleis gia na deiksei kapoios endiaferon gia ena post
+POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=28
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+RESPONSE EXAMPLE:
+{
+  "body": {
+    "piid": 12,
+    "email": "lefterisevagelinos1996@gmail.com",
+    "postid": "29"
+  },
+  "message": "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες"
+}
+
+###
+
+#service pou sou epistrefei lista me posts (paginated ana 20 kai ordered me vasi imeromhnia)
+POST http://localhost:3000/searchposts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "volos",
+        "endplace": "Athens",
+        "startdate": "2021-11-25",
+        "enddate": "2021-11-26",
+        "page": 1
+    }
+}
+
+RESPONSE:
+#afto eksartatai akoma giati den exei teleiwsei
+
+###
+
+#service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
+GET http://localhost:3000/searchuser?email=lefterisevagelinos1996@gmail.gr
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+RESPONSE: 
+{
+  "average": 5,
+  "user": null,
+  "reviews": [
+    {
+      "email": "lefterisevagelinos1996@gmail.gr",
+      "emailreviewer": "cs141082.com",
+      "rating": 5,
+      "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+      "createdAt": "2021-10-13 09:07:47",
+      "updatedAt": "2021-10-13 06:09:35"
+    },
+    {
+      "email": "lefterisevagelinos1996@gmail.gr",
+      "emailreviewer": "cs141082@uniwa.gr",
+      "rating": 5,
+      "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+      "createdAt": "2021-10-13 09:57:49",
+      "updatedAt": "2021-10-13 06:58:39"
+    }
+  ],
+  "message": "Ο χρήστης βρέθηκε"
+}
+###
+
+#Service pou eisagei ena review sth vash
+POST http://localhost:3000/createreview
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.gr",
+        "emailreviewer": "cs141082@uniwa.gr",
+        "rating": 5,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
+    }
+}
+
+Response: 
+{
+  "body": {
+    "message": "Η εγγραφή του review έγινε επιτυχώς.",
+    "review": {
+      "createdAt": "2021-10-13T19:56:17.960Z",
+      "email": "lefterisvagelinos1996@gmail.gr",
+      "emailreviewer": "cs141082@uniwa.gr",
+      "rating": 5,
+      "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
+    }
+  }
+}
+
+###
+
+#service epistrefei lista me posts enos xrhsth
+GET http://localhost:3000/getpostsperuser?email=lefterisevagelinos1996@gmail.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+response: 
+{
+  "body": [
+    {
+      "postid": 45,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "volos",
+      "endplace": "Athens",
+      "numseats": 3,
+      "startdate": "2021-11-25",
+      "enddate": "2021-11-26",
+      "costperseat": 20,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": {
+        "places": "Larisa-Trikala-Lamia"
+      },
+      "date": "2021-11-03"
+    }
+  ]
+}
+###
+
+#service epistrefei lista me endiaferomenous apo ena post
+GET http://localhost:3000/getinterested?postid=45
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+response:
+{
+  "body": [
+    {
+      "piid": 9,
+      "postid": 45,
+      "email": "lefterisevagelinos1996@gmail.com"
+    }
+  ]
+}
+###
+
+#service poy epistrfei to plithos ton endiaferomenwn olwn twn post enos user
+GET http://localhost:3000/getlofinterested?email=cs141082@uniwa.gr
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+response:
+5 
+#dhladh enan arithmo = me to plithos twn endiaferomenwn
+###
