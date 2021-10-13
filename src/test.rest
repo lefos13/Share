@@ -95,10 +95,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "date": "2021-11-03",
         "startplace": "volos",
         "endplace": "Athens",
-        "numseats": "3",
+        "numseats": 3,
         "startdate": "2021-11-25",
         "enddate": "2021-11-26",
-        "costperseat": "20",
+        "costperseat": 20,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": {
             "places": "Larisa-Trikala-Lamia"
@@ -134,7 +134,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
-GET http://localhost:3000/searchuser?email=lefterisevagelinos1996@gmail.gr
+GET http://localhost:3000/searchuser?email=lefterisevagelinos1996@gmail.com
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
@@ -147,7 +147,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.gr",
+        "email": "lefterisevagelinos1996@gmail.com",
         "emailreviewer": "cs141082@uniwa.gr",
         "rating": 5,
         "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"

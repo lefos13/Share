@@ -1,19 +1,22 @@
+#GLOBAL SXOLIO. OLA TA ERROR EPISTREFOUN ME KATALILO STATUS
+
 #service pou ftiaxneis ena post
 POST http://localhost:3000/createpost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzOTA0Mzc3LCJleHAiOjE2MzkwODgzNzd9.gca_86jwWOpVujOSo25W1DOz2A0wXZ7JgbrkWOhqCSA
 
 #to moreplaces einai akoma upo kataskeuh. Den exoume dei pws akrivws tha mou ta stelneis
+#ta stardate kai to enddate tha voleue na einai se afto to format akrivws gia na anagnwrizetai apo tin vasi
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail",
         "date": "2021-11-03",
         "startplace": "volos",
         "endplace": "Athens",
-        "numseats": "3",
+        "numseats": 3,
         "startdate": "2021-11-25",
         "enddate": "2021-11-26",
-        "costperseat": "20",
+        "costperseat": 20,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": {
             "places": "Larisa-Trikala-Lamia"
@@ -47,6 +50,7 @@ RESPONSE EXAMPLE:
 ###
 
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
+#douleuei me url params
 POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=28
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
@@ -80,7 +84,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 }
 
 RESPONSE:
-#afto eksartatai akoma giati den exei teleiwsei
+#afto eksartatai akoma giati den exei teleiwsei me ta kritiria anazhthshs
 
 ###
 
@@ -89,26 +93,33 @@ GET http://localhost:3000/searchuser?email=lefterisevagelinos1996@gmail.gr
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
+#average einai o mesos oros kritikwn. The epistrefei null an den exei kritikes
+#to reviews einai array me tis kritikes tou xrhsth. tha epistrefei adeio array otan den exei kritikes
 RESPONSE: 
 {
   "average": 5,
-  "user": null,
+  "user": {
+    "email": "lefterisevagelinos1996@gmail.com",
+    "password": "$2b$10$.EKf1Dx3SBUaf0y5vIMiOerbhgmT2NJ14qghzG44YEqmi99LoXd9O",
+    "mobile": "6975620785",
+    "fullname": "Lefos Evan",
+    "car": "NISSAN",
+    "cardate": "2000",
+    "gender": "male",
+    "age": "25",
+    "photo": "1",
+    "facebook": null,
+    "instagram": null,
+    "verified": true
+  },
   "reviews": [
     {
-      "email": "lefterisevagelinos1996@gmail.gr",
-      "emailreviewer": "cs141082.com",
-      "rating": 5,
-      "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-      "createdAt": "2021-10-13 09:07:47",
-      "updatedAt": "2021-10-13 06:09:35"
-    },
-    {
-      "email": "lefterisevagelinos1996@gmail.gr",
+      "email": "lefterisevagelinos1996@gmail.com",
       "emailreviewer": "cs141082@uniwa.gr",
       "rating": 5,
       "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-      "createdAt": "2021-10-13 09:57:49",
-      "updatedAt": "2021-10-13 06:58:39"
+      "createdAt": "2021-10-13 20:38:45",
+      "updatedAt": "2021-10-13 17:55:53"
     }
   ],
   "message": "Ο χρήστης βρέθηκε"
@@ -120,6 +131,8 @@ POST http://localhost:3000/createreview
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
+#email: einai autos gia ton opoio ginetai to review
+#emailreviewer: einai autos poy kanei to review
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.gr",
@@ -129,6 +142,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
     }
 }
 
+#to createdAt einai timestamp pou krataei pote ginetai to review. Ginetai generate apo emena automata
+# (skeftika mporei na xrhsimeusei sthn poreia)
 Response: 
 {
   "body": {
@@ -177,6 +192,8 @@ GET http://localhost:3000/getinterested?postid=45
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
+#sthn ousia epistrefei ena array me ta eimail twn endiaferomenwn. Endexomenws edw na itheles perissotera stoixeia gia ton kathena
+#alla sto plano eixame shmeiwsei mono auta
 response:
 {
   "body": [
