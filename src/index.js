@@ -805,10 +805,12 @@ app.get(
   }
 );
 
-app.post("/upload", upload.single("filePart"), function (req, res) {
+app.post("/upload", upload.single("upload"), function (req, res) {
   // req.file is the name of your file in the form above, here 'uploaded_file'
   // req.body will hold the text fields, if there were any
-  // console.log(req.file, req.body);
+  console.log(req.file);
+  console.log(req.body);
+
   res.sendStatus(200);
 });
 
