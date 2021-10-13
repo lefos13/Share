@@ -10,6 +10,7 @@ Content-Type: application/json
 }
 
 ###
+
 #service pou kanei update to password you user sth vash
 POST http://localhost:3000/updateUserPass
 Content-Type: application/json
@@ -24,6 +25,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 }
 
 ###
+
 #service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
 POST  http://localhost:3000/register
 Content-Type: application/json
@@ -43,6 +45,7 @@ Content-Type: application/json
 }
 
 ###
+
 #service pou kanei verify to xrhsth sth vash dedomenwn, afou kanei epibebaiwsh to otp tou ston client
 POST http://localhost:3000/verify
 Content-Type: application/json
@@ -54,6 +57,7 @@ Content-Type: application/json
 }
 
 ###
+
 #service pou elegxei ta stoixeia tou xrhsth otan kanei login
 POST http://localhost:3000/login
 Content-Type: application/json
@@ -67,6 +71,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 }
 
 ###
+
 #service poy stelnei otp ston xrhsth kai ston client gia epibebaiwsh
 POST http://localhost:3000/passotp
 Content-Type: application/json
@@ -86,7 +91,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "cs141082@uniwa.gr",
+        "email": "lefterisevagelinos1996@gmail",
         "date": "2021-11-03",
         "startplace": "volos",
         "endplace": "Athens",
@@ -104,12 +109,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 ###
 
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
-POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=16
+POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=28
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
 ###
 
+#service pou sou epistrefei lista me posts (paginated ana 20 kai ordered me vasi imeromhnia)
 POST http://localhost:3000/searchposts
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
@@ -121,6 +127,52 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "endplace": "Athens",
         "startdate": "2021-11-25",
         "enddate": "2021-11-26",
-        "page": 2
+        "page": 1
     }
 }
+
+###
+
+#service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
+GET http://localhost:3000/searchuser?email=lefterisevagelinos1996@gmail.gr
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+###
+
+#Service pou eisagei ena review sth vash
+POST http://localhost:3000/createreview
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.gr",
+        "emailreviewer": "cs141082.com",
+        "rating": 5,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
+    }
+}
+
+###
+
+#service epistrefei lista me posts enos xrhsth
+GET http://localhost:3000/getpostsperuser?email=lefterisevagelinos1996@gmail.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+###
+
+#service epistrefei lista me endiaferomenous apo ena post
+GET http://localhost:3000/getinterested?postid=45
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+###
+
+#service poy epistrfei to plithos ton endiaferomenwn olwn twn post enos user
+GET http://localhost:3000/getlofinterested?email=cs141082@uniwa.gr
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+###

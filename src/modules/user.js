@@ -11,6 +11,7 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
+  logging: false,
 });
 
 const Users = sequelize.define(

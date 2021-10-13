@@ -14,23 +14,42 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   logging: false,
 });
 
-const PostInterested = sequelize.define(
-  "PostInterested",
+Date.prototype.addHours = function (h) {
+  this.setTime(this.getTime() + h * 60 * 60 * 1000);
+  return this;
+};
+
+const Reviews = sequelize.define(
+  "Reviews",
   {
-    piid: {
+    email: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
-      unique: true,
-      autoIncrement: true,
     },
-    postid: {
+    emailreviewer: {
       type: DataTypes.BIGINT,
       allowNull: false,
+      primaryKey: true,
+      // set(value) {
+      //   this.setDataValue("emailreviewer", "testest");
+      // },
     },
-    email: {
-      type: DataTypes.STRING,
+    rating: {
+      type: DataTypes.FLOAT,
       allowNull: false,
+    },
+    text: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: new Date().addHours(3),
+      // allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
     },
   },
   {
@@ -39,4 +58,4 @@ const PostInterested = sequelize.define(
   }
 );
 
-module.exports = PostInterested;
+module.exports = Reviews;

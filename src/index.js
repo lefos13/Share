@@ -30,19 +30,32 @@ const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY } = process.env;
 //console.log (EMAIL, PASSEMAIL);
 const bcrypt = require("bcrypt");
 
+Date.prototype.addHours = function (h) {
+  this.setTime(this.getTime() + h * 60 * 60 * 1000);
+  return this;
+};
+
 //sequelize schema
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
+  logging: false,
+  dialectOptions: {
+    timezone: "+03:00",
+    dateStrings: true,
+    typeCast: true,
+  },
+  timezone: "+03:00",
 });
 const saltRounds = 10;
 
 const Users = require("./modules/user");
 const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
+const Reviews = require("./modules/review");
 
 checkconnection();
 
@@ -459,17 +472,12 @@ app.post(
         // console.log(post.moreplaces);
       })
       .catch((err) => {
-        //console.log(err);
-        code = err;
-        body = "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα!";
+        console.log(err);
+        res.status(500).send("Κάτι πήγε στραβά.");
       })
       .finally(() => {
         var data = {
           body: results,
-          error: {
-            code: code,
-            body: body,
-          },
         };
         res.json(data);
       });
@@ -603,6 +611,179 @@ app.post(
         }
       })
       .catch((err) => {
+        res.status(500).send("Κάτι πήγε στραβά: " + err);
+      });
+  }
+);
+
+//service pou anazhth enan xrhsth
+app.get(
+  "/searchuser",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    console.log(req.query);
+    var data = req.query;
+    await Users.findOne({
+      where: {
+        email: data.email,
+      },
+    })
+      .then(async (found) => {
+        await Reviews.findAndCountAll({
+          attributes:
+            // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+            [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+          where: {
+            email: data.email,
+          },
+        })
+          .then(async (revfound) => {
+            var rows = revfound.rows;
+            // var reviews = [];
+            var total = null;
+            for await (r of rows) {
+              //console.log(r.toJSON().total);
+              total = r.toJSON().total;
+            }
+            var average = total / revfound.count;
+            // console.log("total: " + total + " count: " + revfound.count);
+            await Reviews.findAll({
+              where: {
+                email: data.email,
+              },
+              timezone: "+03:00",
+            })
+              .then((rev) => {
+                res.json({
+                  average: average,
+                  user: found,
+                  reviews: rev,
+                  message: "Ο χρήστης βρέθηκε",
+                });
+              })
+              .catch((err) => {
+                console.error(err);
+                res.status(500).send("Ωχ κάτι πήγε στραβά.");
+              });
+          })
+          .catch((err) => {
+            console.error(err);
+            res
+              .status(500)
+              .send("Ωχ! Κάτι πήγε στραβά στην αναζήτηση της αξιολόγησης.");
+          });
+      })
+      .catch((err) => {
+        res.status(500).send("Κάτι πήγε στραβά: " + err);
+      });
+  }
+);
+
+//service poy kanei review enas xrhsths se enan allon
+app.post(
+  "/createreview",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    var data = req.body.data;
+    var results = null;
+
+    await Reviews.create(data)
+      .then((review) => {
+        results = {
+          message: "Η εγγραφή του review έγινε επιτυχώς.",
+          review: review.toJSON(),
+        };
+        res.json({
+          body: results,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        if (err.original.code == "ER_DUP_ENTRY")
+          res.status(450).send("Έχεις κάνει ήδη review σε αυτόν τον χρήστη");
+        res.status(500).send("Ωχ! Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα");
+      });
+  }
+);
+
+//service that return a list of posts for
+app.get(
+  "/getpostsperuser",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.query;
+    await Posts.findAll({
+      where: {
+        email: data.email,
+      },
+    })
+      .then(async (found) => {
+        res.json({
+          body: found,
+        });
+      })
+      .catch((err) => {
+        res.status(500).send("Κάτι πήγε στραβά: " + err);
+      });
+  }
+);
+
+// epistrefei lista me endiaferomenous apo ena post
+app.get(
+  "/getinterested",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.query;
+    await PostInterested.findAll({
+      where: {
+        postid: data.postid,
+      },
+    })
+      .then(async (found) => {
+        res.json({
+          body: found,
+        });
+      })
+      .catch((err) => {
+        res.status(500).send("Κάτι πήγε στραβά: " + err);
+      });
+  }
+);
+
+//epistrefei to plithos twn endiaferomenwn twn post enos xrhsth
+app.get(
+  "/getlofinterested",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.query;
+    await Posts.findAll({
+      where: {
+        email: data.email,
+      },
+    })
+      .then(async (found) => {
+        var finalcount = 0;
+        for await (fnd of found) {
+          await PostInterested.count({
+            where: {
+              postid: fnd.postid,
+            },
+          }).then((count) => {
+            finalcount = finalcount + count;
+          });
+        }
+        res.status(200).send(finalcount.toString());
+      })
+      .catch((err) => {
+        console.error(err);
         res.status(500).send("Κάτι πήγε στραβά: " + err);
       });
   }
