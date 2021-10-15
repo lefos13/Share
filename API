@@ -90,15 +90,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "volos",
+        "startplace": "olos",
         "startcoord": "123",
         "endplace": "lamia",
         "endcoord": "1",
         "startdate": "2021-11-05",
         "enddate": "2021-11-20",
         "page": 1,
-        "age": 100, 
-        "cost": 30
+        "cost": 20,
+        "age": null,
+        "car": null,
+        "cardate": null,
+        "gender": null
     }
 }
 
@@ -109,14 +112,24 @@ RESPONSE:
     "postuser": [
       {
         "user": {
+          "email": "lefterisevagelinos1996@gmail.com",
+          "password": "$2b$10$Fuf84d20auAPClGnqlf0UOVCtSbl9XJLJAiDaffRbtkS5PRIiqO9C",
+          "mobile": "6975620785",
           "fullname": "lefos evan",
-          "email": "lefterisevagelinos1996@gmail.com"
+          "car": "TOYOTA",
+          "cardate": "1999",
+          "gender": "male",
+          "age": "25",
+          "photo": "1",
+          "facebook": null,
+          "instagram": null,
+          "verified": true
         },
         "imagepath": "images/lefterisevagelinos1996@gmail.com.jpeg",
         "post": {
-          "postid": 72,
+          "postid": 78,
           "email": "lefterisevagelinos1996@gmail.com",
-          "startplace": "volos",
+          "startplace": "olos",
           "startcoord": "23",
           "endplace": "Athens",
           "endcoord": "23",
@@ -135,7 +148,7 @@ RESPONSE:
               "placecoords": "123"
             }
           ],
-          "date": "2021-10-31"
+          "date": "2021-11-25"
         },
         "interested": false
       }
