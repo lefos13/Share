@@ -10,14 +10,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "date": "2021-11-03",
+        "date": "2021-11-1",
         "startplace": "volos",
         "startcoord": "23",
         "endplace": "Athens",
         "endcoord": "23",
         "numseats": 3,
-        "startdate": "2021-11-25",
-        "enddate": "2021-11-26",
+        "startdate": "2021-11-15",
+        "enddate": "2021-11-17",
         "costperseat": 20,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": [
@@ -36,16 +36,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 RESPONSE EXAMPLE:
 {
   "body": {
-    "postid": 59,
+    "postid": 74,
     "email": "lefterisevagelinos1996@gmail.com",
-    "date": "2021-11-03T00:00:00.000Z",
+    "date": "2021-10-31T22:00:00.000Z",
     "startplace": "volos",
     "startcoord": "23",
     "endplace": "Athens",
     "endcoord": "23",
     "numseats": 3,
-    "startdate": "2021-11-25T00:00:00.000Z",
-    "enddate": "2021-11-26T00:00:00.000Z",
+    "startdate": "2021-11-15",
+    "enddate": "2021-11-17",
     "costperseat": 20,
     "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
     "moreplaces": [
