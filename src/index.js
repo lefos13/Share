@@ -605,34 +605,8 @@ app.post(
         if (found.count == 0) {
           res.status(404).json({ message: "Δεν υπάρχει καμία διαδρομή" });
         } else {
-          // for await (row of found.rows) {
-
-          // }
-          // var pointer = 0;
-          // var checker = 20;
-          // var counter = 0;
-          // if (found.count > 20 && data.page > 1) {
-          //   counter = data.page * 20 - 20;
-          //   checker = data.page * 20;
-          //   // pointer = counter;
-          // }
-          // console.log(
-          //   "Counter:" +
-          //     counter +
-          //     " Checker: " +
-          //     checker +
-          //     " Pointer: " +
-          //     pointer +
-          //     "  " +
-          //     data.page +
-          //     " count: " +
-          //     found.count
-          // );
           for await (fnd of found.rows) {
-            // pointer++;
-            // if (pointer > counter && pointer <= checker) {
             await Users.findOne({
-              // attributes: ["fullname", "email"],
               where: {
                 email: fnd.email,
               },
