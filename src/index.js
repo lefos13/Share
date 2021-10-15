@@ -677,32 +677,32 @@ app.post(
           var arr;
           if (data.age != null) {
             // afairese ta post twn xrhstwn pou einai panw apo data.age
-            arr = _.filter(array, (obj) => {
+            array = _.filter(array, (obj) => {
               return parseInt(obj.user.age) <= data.age;
             });
           }
           if (data.car != null) {
             //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
-            arr = _.filter(arr, (obj) => {
+            array = _.filter(array, (obj) => {
               return obj.user.car == data.car;
             });
           }
           if (data.cardate != null) {
             //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
-            arr = _.filter(arr, (obj) => {
+            array = _.filter(array, (obj) => {
               return parseInt(obj.user.cardate) >= data.cardate;
             });
           }
           if (data.gender != null) {
             //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
-            arr = _.filter(arr, (obj) => {
+            array = _.filter(array, (obj) => {
               return obj.user.gender == data.gender;
             });
           }
           var skipcount = 0;
           var takecount = 20;
           if (data.page > 1) skipcount = data.page * 20;
-          const finalarr = _.take(_.drop(arr, skipcount), takecount);
+          const finalarr = _.take(_.drop(array, skipcount), takecount);
           results = {
             postuser: finalarr,
             length: finalarr.length,
