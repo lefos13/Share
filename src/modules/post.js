@@ -11,7 +11,7 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
-  logging: false,
+  // logging: true,
 });
 
 const Posts = sequelize.define(
@@ -32,8 +32,16 @@ const Posts = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    startcoord: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
     endplace: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    endcoord: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     numseats: {
@@ -41,11 +49,11 @@ const Posts = sequelize.define(
       allowNull: false,
     },
     startdate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     enddate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     costperseat: {

@@ -9,42 +9,57 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 #ta stardate kai to enddate tha voleue na einai se afto to format akrivws gia na anagnwrizetai apo tin vasi
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail",
+        "email": "lefterisevagelinos1996@gmail.com",
         "date": "2021-11-03",
         "startplace": "volos",
+        "startcoord": "23",
         "endplace": "Athens",
+        "endcoord": "23",
         "numseats": 3,
         "startdate": "2021-11-25",
         "enddate": "2021-11-26",
         "costperseat": 20,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-        "moreplaces": {
-            "places": "Larisa-Trikala-Lamia"
-        }
+        "moreplaces": [
+            {
+                    "place": "lamia",
+                    "placecoords": "123"
+            },
+            {
+                    "place": "lamia",
+                    "placecoords": "123"
+            }
+        ]
     }
 }
 
 RESPONSE EXAMPLE:
 {
   "body": {
-    "status": 1,
-    "message": "Η Εγγραφή του post έγινε επιτυχώς.",
-    "post": {
-      "postid": 46,
-      "email": "lefterisevagelinos1996@gmail",
-      "date": "2021-11-03T00:00:00.000Z",
-      "startplace": "volos",
-      "endplace": "Athens",
-      "numseats": "3",
-      "startdate": "2021-11-25T00:00:00.000Z",
-      "enddate": "2021-11-26T00:00:00.000Z",
-      "costperseat": "20",
-      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-      "moreplaces": {
-        "places": "Larisa-Trikala-Lamia"
+    "postid": 59,
+    "email": "lefterisevagelinos1996@gmail.com",
+    "date": "2021-11-03T00:00:00.000Z",
+    "startplace": "volos",
+    "startcoord": "23",
+    "endplace": "Athens",
+    "endcoord": "23",
+    "numseats": 3,
+    "startdate": "2021-11-25T00:00:00.000Z",
+    "enddate": "2021-11-26T00:00:00.000Z",
+    "costperseat": 20,
+    "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+    "moreplaces": [
+      {
+        "place": "lamia",
+        "placecoords": "123"
+      },
+      {
+        "place": "lamia",
+        "placecoords": "123"
       }
-    }
-  }
+    ]
+  },
+  "message": "Η Εγγραφή του post έγινε επιτυχώς."
 }
 
 ###
@@ -76,15 +91,59 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
         "startplace": "volos",
-        "endplace": "Athens",
-        "startdate": "2021-11-25",
-        "enddate": "2021-11-26",
-        "page": 1
+        "startcoord": "123",
+        "endplace": "lamia",
+        "endcoord": "1",
+        "startdate": "2021-11-05",
+        "enddate": "2021-11-20",
+        "page": 1,
+        "age": 100, 
+        "cost": 30
     }
 }
 
 RESPONSE:
-#afto eksartatai akoma giati den exei teleiwsei me ta kritiria anazhthshs
+#afto tha to doume ligo mazi ama exeis apories gia ta pedia giati exei polla stoixeia pou sou epistrefw
+{
+  "body": {
+    "postuser": [
+      {
+        "user": {
+          "fullname": "lefos evan",
+          "email": "lefterisevagelinos1996@gmail.com"
+        },
+        "imagepath": "images/lefterisevagelinos1996@gmail.com.jpeg",
+        "post": {
+          "postid": 72,
+          "email": "lefterisevagelinos1996@gmail.com",
+          "startplace": "volos",
+          "startcoord": "23",
+          "endplace": "Athens",
+          "endcoord": "23",
+          "numseats": 3,
+          "startdate": "2021-11-15",
+          "enddate": "2021-11-17",
+          "costperseat": 20,
+          "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+          "moreplaces": [
+            {
+              "place": "lamia",
+              "placecoords": "123"
+            },
+            {
+              "place": "lamia",
+              "placecoords": "123"
+            }
+          ],
+          "date": "2021-10-31"
+        },
+        "interested": false
+      }
+    ],
+    "length": 1
+  },
+  "message": null
+}
 
 ###
 

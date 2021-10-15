@@ -69,7 +69,6 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
     dateStrings: true,
     typeCast: true,
   },
-  timezone: "+03:00",
 });
 const saltRounds = 10;
 
@@ -253,6 +252,7 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
       //create token
       payload = {
         email: email,
+        data: new Date(),
       };
       const accessToken = jwt.sign(payload, TOKEN_KEY, { expiresIn: "60d" });
       results = {
@@ -483,13 +483,10 @@ app.post(
 
     await Posts.create(data)
       .then((post) => {
-        results = {
-          message: "Η Εγγραφή του post έγινε επιτυχώς.",
-          post: post.toJSON(),
-        };
         // console.log(post.moreplaces);
         var data = {
-          body: results,
+          body: post.toJSON(),
+          message: "Η Εγγραφή του post έγινε επιτυχώς.",
         };
         res.json(data);
       })
@@ -554,8 +551,51 @@ app.post(
     var test = null;
     await Posts.findAndCountAll({
       where: {
-        startplace: data.startplace,
-        endplace: data.endplace,
+        // elaxisto kostos
+        costperseat: { [Op.lte]: data.cost },
+        [Op.and]: [
+          // arxikos proorismos h syntetagmenes
+          {
+            [Op.or]: [
+              { startplace: data.startplace },
+              { startcoord: data.startcoord },
+            ],
+          },
+          // elegxos na peftei h arxikh hmeromhnia tou post anamesa sthn arxikh kai telikh toy xrhsth
+          // ή na peftei h telikh hmeromhnia tou post anamesa sthn arxikh h telikh hmeromhnia tou xrhsth
+          // ή na peftei h arxikh KAI h telikh hmeromhnia toy xrhsth na peftei anamesa sthn arxikh KAI telikh hmeromhnia tou post
+          {
+            [Op.or]: [
+              { startdate: { [Op.between]: [data.startdate, data.enddate] } },
+              { enddate: { [Op.between]: [data.startdate, data.enddate] } },
+              {
+                [Op.and]: [
+                  { startdate: { [Op.lte]: data.startdate } },
+                  { enddate: { [Op.gte]: data.enddate } },
+                ],
+              },
+            ],
+          },
+          // elegxos an o telikos proorismos einai proorismos pou uparxei entos twn stasewn tou xrhsth
+          // h an o telikos proorismos tou xrhsth einai telikos proorismos tou post antistoixa oi syntetagmenes
+          {
+            [Op.or]: [
+              sequelize.literal(
+                `json_contains(moreplaces->'$[*].place', json_array("` +
+                  data.endplace +
+                  `")) OR json_contains(moreplaces->'$[*].placecoords', json_array("` +
+                  data.endcoord +
+                  `"))`
+              ),
+              {
+                [Op.or]: [
+                  { endplace: data.endplace },
+                  { endcoord: data.endcoord },
+                ],
+              },
+            ],
+          },
+        ],
       },
       order: [["date", "ASC"]],
     })
@@ -563,6 +603,20 @@ app.post(
         if (found.count == 0) {
           res.status(404).json({ message: "Δεν υπάρχει καμία διαδρομή" });
         } else {
+          // for await (row of found.rows) {
+          //   if (data.age != null) {
+          //     // afairese ta post twn xrhstwn pou einai panw apo data.age
+          //   }
+          //   if (data.typecar != null) {
+          //     //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
+          //   }
+          //   if (data.agecar != null) {
+          //     //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
+          //   }
+          //   if (data.gender != null) {
+          //     //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
+          //   }
+          // }
           var pointer = 0;
           var checker = 20;
           var counter = 0;
@@ -630,10 +684,10 @@ app.post(
             // console.log(fnd.email);
           }
           results = {
-            array: array,
+            postuser: array,
             length: found.count,
           };
-          res.json(results);
+          res.json({ body: results, message: null });
         }
       })
       .catch((err) => {

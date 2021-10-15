@@ -89,20 +89,48 @@ POST http://localhost:3000/createpost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDM5QHVuaXdhLmdyIiwiaWF0IjoxNjMzOTA0Mzc3LCJleHAiOjE2MzkwODgzNzd9.gca_86jwWOpVujOSo25W1DOz2A0wXZ7JgbrkWOhqCSA
 
+# {
+#     "data": {
+#         "email": "lefterisevagelinos1996@gmail.com",
+#         "date": "2021-11-1",
+#         "startplace": "volos",
+#         "startcoord": "23",
+#         "endplace": "Athens",
+#         "endcoord": "23",
+#         "numseats": 3,
+#         "startdate": "2021-11-15",
+#         "enddate": "2021-11-17",
+#         "costperseat": 20,
+#         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+#         "moreplaces": {
+#             "places": ["lamia","larisa","trikala"]
+#         }
+#     }
+# }
+
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "date": "2021-11-03",
+        "date": "2021-11-1",
         "startplace": "volos",
+        "startcoord": "23",
         "endplace": "Athens",
+        "endcoord": "23",
         "numseats": 3,
-        "startdate": "2021-11-25",
-        "enddate": "2021-11-26",
+        "startdate": "2021-11-15",
+        "enddate": "2021-11-17",
         "costperseat": 20,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-        "moreplaces": {
-            "places": "Larisa-Trikala-Lamia"
-        }
+        "moreplaces": [
+            {
+                    "place": "lamia",
+                    "placecoords": "123"
+            },
+            {
+                    "place": "lamia",
+                    "placecoords": "123"
+            }
+        ]
     }
 }
 
@@ -124,10 +152,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
         "startplace": "volos",
-        "endplace": "Athens",
-        "startdate": "2021-11-25",
-        "enddate": "2021-11-26",
-        "page": 1
+        "startcoord": "123",
+        "endplace": "lamia",
+        "endcoord": "1",
+        "startdate": "2021-11-05",
+        "enddate": "2021-11-20",
+        "page": 1,
+        "age": 100, 
+        "cost": 30
     }
 }
 
