@@ -6,6 +6,8 @@ var http = require("http").Server(app);
 const helmet = require("helmet");
 app.use(helmet());
 
+var where = require("lodash.where");
+var _ = require("lodash");
 //fileserver option
 // var op = {
 //   dotfiles: "ignore",
@@ -604,94 +606,115 @@ app.post(
           res.status(404).json({ message: "Δεν υπάρχει καμία διαδρομή" });
         } else {
           // for await (row of found.rows) {
-          //   if (data.age != null) {
-          //     // afairese ta post twn xrhstwn pou einai panw apo data.age
-          //   }
-          //   if (data.typecar != null) {
-          //     //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
-          //   }
-          //   if (data.agecar != null) {
-          //     //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
-          //   }
-          //   if (data.gender != null) {
-          //     //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
-          //   }
+
           // }
-          var pointer = 0;
-          var checker = 20;
-          var counter = 0;
-          if (found.count > 20 && data.page > 1) {
-            counter = data.page * 20 - 20;
-            checker = data.page * 20;
-            // pointer = counter;
-          }
-          console.log(
-            "Counter:" +
-              counter +
-              " Checker: " +
-              checker +
-              " pointer: " +
-              pointer +
-              "  " +
-              data.page +
-              " count: " +
-              found.count
-          );
+          // var pointer = 0;
+          // var checker = 20;
+          // var counter = 0;
+          // if (found.count > 20 && data.page > 1) {
+          //   counter = data.page * 20 - 20;
+          //   checker = data.page * 20;
+          //   // pointer = counter;
+          // }
+          // console.log(
+          //   "Counter:" +
+          //     counter +
+          //     " Checker: " +
+          //     checker +
+          //     " Pointer: " +
+          //     pointer +
+          //     "  " +
+          //     data.page +
+          //     " count: " +
+          //     found.count
+          // );
           for await (fnd of found.rows) {
-            pointer++;
-            if (pointer > counter && pointer <= checker) {
-              await Users.findOne({
-                attributes: ["fullname", "email"],
-                where: {
-                  email: fnd.email,
-                },
-              })
-                .then(async (user) => {
-                  var flag;
-                  await PostInterested.findOne({
-                    where: {
-                      email: data.email,
-                      postid: fnd.postid,
-                    },
-                  })
-                    .then((interested) => {
-                      if (interested === null) {
-                        flag = false;
-                      } else {
-                        flag = true;
-                      }
-                      results = {
-                        user: user,
-                        imagepath: "images/" + fnd.email + ".jpeg",
-                        post: fnd,
-                        interested: flag,
-                      };
-                      array.push(results);
-                    })
-                    .catch((err) => {
-                      res
-                        .status(400)
-                        .json({ message: "Κάτι πήγε στραβά.", body: err });
-                    });
+            // pointer++;
+            // if (pointer > counter && pointer <= checker) {
+            await Users.findOne({
+              // attributes: ["fullname", "email"],
+              where: {
+                email: fnd.email,
+              },
+            })
+              .then(async (user) => {
+                var flag;
+                await PostInterested.findOne({
+                  where: {
+                    email: data.email,
+                    postid: fnd.postid,
+                  },
                 })
-                .catch((err) => {
-                  res
-                    .status(400)
-                    .json({ message: "Κάτι πήγε στραβά.", body: err });
-                });
-            }
+                  .then((interested) => {
+                    if (interested === null) {
+                      flag = false;
+                    } else {
+                      flag = true;
+                    }
+                    results = {
+                      user: user,
+                      imagepath: "images/" + fnd.email + ".jpeg",
+                      post: fnd,
+                      interested: flag,
+                    };
+                    array.push(results);
+                  })
+                  .catch((err) => {
+                    res
+                      .status(400)
+                      .json({ message: "Κάτι πήγε στραβά.", body: err });
+                  });
+              })
+              .catch((err) => {
+                res
+                  .status(400)
+                  .json({ message: "Κάτι πήγε στραβά.", body: err });
+              });
+            // }
 
             // console.log(fnd.email);
           }
+          var arr;
+          if (data.age != null) {
+            // afairese ta post twn xrhstwn pou einai panw apo data.age
+            arr = _.filter(array, (obj) => {
+              return parseInt(obj.user.age) <= data.age;
+            });
+          }
+          if (data.car != null) {
+            //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
+            arr = _.filter(arr, (obj) => {
+              return obj.user.car == data.car;
+            });
+          }
+          if (data.cardate != null) {
+            //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
+            arr = _.filter(arr, (obj) => {
+              return parseInt(obj.user.cardate) >= data.cardate;
+            });
+          }
+          if (data.gender != null) {
+            //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
+            arr = _.filter(arr, (obj) => {
+              return obj.user.gender == data.gender;
+            });
+          }
+          var skipcount = 0;
+          var takecount = 20;
+          if (data.page > 1) skipcount = data.page * 20;
+          const finalarr = _.take(_.drop(arr, skipcount), takecount);
           results = {
-            postuser: array,
-            length: found.count,
+            postuser: finalarr,
+            length: finalarr.length,
           };
+
           res.json({ body: results, message: null });
         }
       })
       .catch((err) => {
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+        res
+          .status(400)
+          .json({ message: "Κάτι πήγε στραβά στα posts.", body: err });
       });
   }
 );
