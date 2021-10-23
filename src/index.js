@@ -483,12 +483,37 @@ app.post(
     var data = req.body.data;
     var results = null;
 
+    // await Posts.count({ where: { date: data.date, email: data.email } }).then(
+    //   async (count) => {
+    //     console.log(count);
+    //     if (count >= 3) {
+    //       res.status(405).json({
+    //         message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
+    //         body: null,
+    //       });
+    //     } else {
+    //       await Posts.create(data)
+    //         .then((post) => {
+    //           // console.log(post.moreplaces);
+    //           var data = {
+    //             body: post.toJSON(),
+    //             message: "Η Εγγραφή του post έγινε επιτυχώς.",
+    //           };
+    //           res.json(data);
+    //         })
+    //         .catch((err) => {
+    //           console.log(err);
+    //           res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+    //         });
+    //     }
+    //   }
+    // );
     await Posts.create(data)
       .then((post) => {
         // console.log(post.moreplaces);
         var data = {
           body: post.toJSON(),
-          message: "Η Εγγραφή του post έγινε επιτυχώς.",
+          message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
         };
         res.json(data);
       })
@@ -679,7 +704,8 @@ app.post(
           const finalarr = _.take(_.drop(array, skipcount), takecount);
           results = {
             postuser: finalarr,
-            length: finalarr.length,
+            length: array.length,
+            pagelength: finalarr.length,
           };
 
           res.json({ body: results, message: null });
@@ -792,7 +818,7 @@ app.post(
   }
 );
 
-//service that return a list of posts for
+//service pou epistrefei mia lista apo ta posts tou user
 app.get(
   "/getpostsperuser",
   [authenticateToken],

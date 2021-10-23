@@ -92,7 +92,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "date": "2021-11-05",
+        "date": "2021-10-23",
         "startplace": "volos",
         "startcoord": "31",
         "endplace": "Athens",
@@ -132,14 +132,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "olos",
+        "startplace": "volos",
         "startcoord": "123",
         "endplace": "lamia",
         "endcoord": "1",
         "startdate": "2021-11-05",
         "enddate": "2021-11-20",
         "page": 1,
-        "cost": 20,
+        "cost": 40,
         "age": null,
         "car": null,
         "cardate": null,
