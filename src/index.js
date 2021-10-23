@@ -496,7 +496,7 @@ app.post(
               // console.log(post.moreplaces);
               var data = {
                 body: post.toJSON(),
-                message: "Η Εγγραφή του post έγινε επιτυχώς.",
+                message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
               };
               res.json(data);
             })
@@ -634,6 +634,7 @@ app.post(
         } else {
           for await (fnd of found.rows) {
             await Users.findOne({
+              attributes: { exclude: ["password", "verified"] },
               where: {
                 email: fnd.email,
               },

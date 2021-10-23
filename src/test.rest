@@ -132,9 +132,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "volos",
+        "startplace": "Τρίκαλα",
         "startcoord": "123",
-        "endplace": "Athens",
+        "endplace": "Γαλατάς",
         "endcoord": "1",
         "startdate": "2021-10-05",
         "enddate": "2021-12-20",
