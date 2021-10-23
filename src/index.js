@@ -481,46 +481,48 @@ app.post(
   cors(corsOptions),
   async (req, res) => {
     var data = req.body.data;
-    var results = null;
 
-    // await Posts.count({ where: { date: data.date, email: data.email } }).then(
-    //   async (count) => {
-    //     console.log(count);
-    //     if (count >= 3) {
-    //       res.status(405).json({
-    //         message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
-    //         body: null,
-    //       });
-    //     } else {
-    //       await Posts.create(data)
-    //         .then((post) => {
-    //           // console.log(post.moreplaces);
-    //           var data = {
-    //             body: post.toJSON(),
-    //             message: "Η Εγγραφή του post έγινε επιτυχώς.",
-    //           };
-    //           res.json(data);
-    //         })
-    //         .catch((err) => {
-    //           console.log(err);
-    //           res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
-    //         });
-    //     }
-    //   }
-    // );
-    await Posts.create(data)
-      .then((post) => {
-        // console.log(post.moreplaces);
-        var data = {
-          body: post.toJSON(),
-          message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-        };
-        res.json(data);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
-      });
+    await Posts.count({ where: { date: data.date, email: data.email } }).then(
+      async (count) => {
+        console.log(count);
+        if (count >= 3) {
+          res.status(405).json({
+            message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
+            body: null,
+          });
+        } else {
+          await Posts.create(data)
+            .then((post) => {
+              // console.log(post.moreplaces);
+              var data = {
+                body: post.toJSON(),
+                message: "Η Εγγραφή του post έγινε επιτυχώς.",
+              };
+              res.json(data);
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+            });
+        }
+      }
+    );
+
+    // auto to kommati kanei mono eggrafi opote vgalto apo sxolio otan theliseis
+
+    // await Posts.create(data)
+    //   .then((post) => {
+    //     // console.log(post.moreplaces);
+    //     var data = {
+    //       body: post.toJSON(),
+    //       message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+    //     };
+    //     res.json(data);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+    //   });
   }
 );
 
