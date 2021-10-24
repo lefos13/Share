@@ -141,6 +141,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "page": 1,
         "cost": 100,
         "age": null,
+        "age_end": null,
         "car": null,
         "cardate": null,
         "gender": null

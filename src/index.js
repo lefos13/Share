@@ -678,9 +678,13 @@ app.post(
           }
           var arr;
           if (data.age != null) {
-            // afairese ta post twn xrhstwn pou einai panw apo data.age
+            // afairese ta post twn xrhstwn pou einai panw apo data.age_end
             array = _.filter(array, (obj) => {
-              return parseInt(obj.user.age) <= data.age;
+              return parseInt(obj.user.age) <= data.age_end;
+            });
+            // afairese ta post twn xrhstwn pou einai katw apo data.age
+            array = _.filter(array, (obj) => {
+              return parseInt(obj.user.age) >= data.age;
             });
           }
           if (data.car != null) {
