@@ -92,14 +92,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "date": "2021-10-23",
-        "startplace": "volos",
+        "date": "2021-10-05",
+        "startplace": "Volos",
         "startcoord": "31",
         "endplace": "Athens",
         "endcoord": "23",
         "numseats": 2,
-        "startdate": "2021-11-16",
-        "enddate": "2021-11-17",
+        "startdate": "2021-12-15",
+        "enddate": "2021-12-16",
         "costperseat": 40,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": [
@@ -132,11 +132,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "Τρίκαλα",
+        "startplace": "Volos",
         "startcoord": "123",
-        "endplace": "Γαλατάς",
+        "endplace": "Athens",
         "endcoord": "1",
-        "startdate": "2021-10-05",
+        "startdate": null,
         "enddate": "2021-12-20",
         "page": 1,
         "cost": 100,

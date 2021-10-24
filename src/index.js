@@ -577,7 +577,18 @@ app.post(
     var data = req.body.data;
     var results = null;
     var array = [];
-    var test = null;
+    if (data.startdate == null) {
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, "0");
+      var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+      var mm2 = String(today.getMonth() + 2).padStart(2, "0"); //January is 0!
+      var yyyy = today.getFullYear();
+
+      today = yyyy + "-" + mm + "-" + dd;
+      var lastday = yyyy + "-" + mm2 + "-" + dd;
+      data.startdate = today;
+      data.enddate = lastday;
+    }
     await Posts.findAndCountAll({
       where: {
         // elaxisto kostos

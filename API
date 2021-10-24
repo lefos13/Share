@@ -90,15 +90,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "olos",
+        "startplace": "Τρίκαλα",
         "startcoord": "123",
-        "endplace": "lamia",
+        "endplace": "Γαλατάς",
         "endcoord": "1",
-        "startdate": "2021-11-05",
-        "enddate": "2021-11-20",
+        "startdate": "2021-10-05",
+        "enddate": "2021-12-20",
         "page": 1,
-        "cost": 20,
+        "cost": 100,
         "age": null,
+        "age_end": null,
         "car": null,
         "cardate": null,
         "gender": null
