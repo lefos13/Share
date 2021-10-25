@@ -78,8 +78,118 @@ const Users = require("./modules/user");
 const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
 const Reviews = require("./modules/review");
+const { values } = require("lodash");
 
 checkconnection();
+// instertPosts();
+
+async function instertPosts() {
+  try {
+    var array = [];
+    var data = {
+      email: "lefterisevagelinos1996@gmail.com",
+      date: "2021-10-06",
+      startplace: "Volos",
+      startcoord: "31",
+      endplace: "Athens",
+      endcoord: "23",
+      numseats: 2,
+      startdate: "2021-12-15",
+      enddate: "2021-12-16",
+      costperseat: 40,
+      comment: "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      moreplaces: [
+        {
+          place: "lamia",
+          placecoords: "123",
+        },
+        {
+          place: "lamia",
+          placecoords: "123",
+        },
+      ],
+    };
+
+    var startplace = "Lafkos";
+    var endplace = "Volos";
+    var numseats = 1;
+    var costperseat = 0;
+    var moreplaces = [
+      {
+        place: "Larisa",
+        placecoords: "123",
+      },
+      {
+        place: "Halandri",
+        placecoords: "123",
+      },
+    ];
+
+    // dates(data);
+    var counter = 0;
+    for (var i = 0; i <= 75; i++) {
+      if (numseats < 7) numseats++;
+      else numseats = 0;
+      data.numseats = numseats;
+
+      costperseat++;
+      data.costperseat = costperseat;
+
+      if (i > 25) {
+        data.email = "cs141082@uniwa.gr";
+        data.startplace = startplace;
+        data.endplace = endplace;
+        data.moreplaces = moreplaces;
+      }
+
+      var today = new Date();
+      dates();
+      await Posts.create(data)
+        .then((data) => {
+          // console.log(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    // await Posts.bulkCreate(array).catch((err) => {
+    //   console.error(err);
+    // });
+  } catch (error) {
+    console.error("Something Went wrong: " + error);
+  }
+
+  function dates() {
+    if (counter + today.getDate() <= 25) {
+      var dd = String(today.getDate() + counter).padStart(2, "0");
+      var dd2 = String(today.getDate() + counter + 5).padStart(2, "0");
+      var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+      var mm2 = String(today.getMonth() + 2).padStart(2, "0"); //January is 0!
+      var yyyy = today.getFullYear();
+
+      today = yyyy + "-" + mm + "-" + dd;
+      var lastday = yyyy + "-" + mm2 + "-" + dd2;
+      data.date = today;
+      data.startdate = today;
+      data.enddate = lastday;
+      counter++;
+      // console.log(data);
+    } else {
+      var dd = String(today.getDate() - counter).padStart(2, "0");
+      var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+      var mm2 = String(today.getMonth() + 2).padStart(2, "0"); //January is 0!
+      var yyyy = today.getFullYear();
+
+      today = yyyy + "-" + mm + "-" + dd;
+      var lastday = yyyy + "-" + mm2 + "-" + dd;
+      data.date = today;
+      data.startdate = today;
+      data.enddate = lastday;
+      counter = counter - 20;
+      // console.log(data2);
+    }
+  }
+}
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -620,12 +730,19 @@ app.post(
           // h an o telikos proorismos tou xrhsth einai telikos proorismos tou post antistoixa oi syntetagmenes
           {
             [Op.or]: [
+              // sequelize.literal(
+              //   `json_contains(moreplaces->'$[*].place', json_array("` +
+              //     data.endplace +
+              //     `")) OR json_contains(moreplaces->'$[*].placecoords', json_array("` +
+              //     data.endcoord +
+              //     `"))`
+              // ),
               sequelize.literal(
-                `json_contains(moreplaces->'$[*].place', json_array("` +
+                `JSON_CONTAINS(JSON_EXTRACT(moreplaces, "$[*].place"), '"` +
                   data.endplace +
-                  `")) OR json_contains(moreplaces->'$[*].placecoords', json_array("` +
+                  `"') OR json_contains(JSON_EXTRACT(moreplaces, '$[*].placecoords'), '"` +
                   data.endcoord +
-                  `"))`
+                  `"')`
               ),
               {
                 [Op.or]: [
@@ -645,7 +762,15 @@ app.post(
         } else {
           for await (fnd of found.rows) {
             await Users.findOne({
-              attributes: { exclude: ["password", "verified"] },
+              attributes: {
+                exclude: [
+                  "password",
+                  "verified",
+                  "facebook",
+                  "instagram",
+                  "mobile",
+                ],
+              },
               where: {
                 email: fnd.email,
               },
@@ -720,13 +845,19 @@ app.post(
           var takecount = 20;
           if (data.page > 1) skipcount = data.page * 20;
           const finalarr = _.take(_.drop(array, skipcount), takecount);
-          results = {
-            postuser: finalarr,
-            length: array.length,
-            pagelength: finalarr.length,
-          };
+          if (finalarr.length == 0) {
+            res
+              .status(404)
+              .json({ message: "Δεν υπάρχει διαδρομή.", body: null });
+          } else {
+            results = {
+              postuser: finalarr,
+              length: array.length,
+              pagelength: finalarr.length,
+            };
 
-          res.json({ body: results, message: null });
+            res.json({ body: results, message: null });
+          }
         }
       })
       .catch((err) => {
