@@ -91,7 +91,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "cs141082@uniwa.gr",
         "date": "2021-10-05",
         "startplace": "Volos",
         "startcoord": "31",
@@ -132,11 +132,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "Lafkos",
+        "startplace": "Volos",
         "startcoord": "123",
-        "endplace": "Larisa",
+        "endplace": "Athens",
         "endcoord": "1",
-        "startdate": null,
+        "startdate": "2021-12-14",
         "enddate": "2021-12-20",
         "page": 1,
         "cost": 100,

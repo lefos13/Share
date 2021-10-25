@@ -592,31 +592,41 @@ app.post(
   async (req, res) => {
     var data = req.body.data;
 
-    await Posts.count({ where: { date: data.date, email: data.email } }).then(
-      async (count) => {
-        console.log(count);
-        if (count >= 3) {
-          res.status(405).json({
-            message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
-            body: null,
+    setTime(0);
+    var datetime = new Date().today() + " " + new Date().timeNow();
+    console.log(datetime);
+    setTime(1);
+    var firsttime = new Date().today() + " " + new Date().timeNow();
+    console.log(firsttime);
+    data.date = datetime;
+    await Posts.count({
+      where: {
+        date: { [Op.between]: [firsttime, datetime] },
+        email: data.email,
+      },
+    }).then(async (count) => {
+      console.log(count);
+      if (count >= 3) {
+        res.status(405).json({
+          message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
+          body: null,
+        });
+      } else {
+        await Posts.create(data)
+          .then((post) => {
+            // console.log(post.moreplaces);
+            var data = {
+              body: post.toJSON(),
+              message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+            };
+            res.json(data);
+          })
+          .catch((err) => {
+            console.log(err);
+            res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
           });
-        } else {
-          await Posts.create(data)
-            .then((post) => {
-              // console.log(post.moreplaces);
-              var data = {
-                body: post.toJSON(),
-                message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-              };
-              res.json(data);
-            })
-            .catch((err) => {
-              console.log(err);
-              res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
-            });
-        }
       }
-    );
+    });
 
     // auto to kommati kanei mono eggrafi opote vgalto apo sxolio otan theliseis
 
@@ -754,7 +764,7 @@ app.post(
           },
         ],
       },
-      order: [["date", "ASC"]],
+      order: [["date", "DESC"]],
     })
       .then(async (found) => {
         if (found.count == 0) {
@@ -1063,3 +1073,29 @@ app.post("/upload", upload.single("upload"), function (req, res) {
 });
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
+function setTime(extrad) {
+  Date.prototype.today = function () {
+    return (
+      this.getFullYear() +
+      "-" +
+      (this.getMonth() + 1 < 10 ? "0" : "") +
+      (this.getMonth() + 1) +
+      "-" +
+      (this.getDate() - extrad < 10 ? "0" : "") +
+      (this.getDate() - extrad)
+    );
+  };
+  // For the time now
+  Date.prototype.timeNow = function () {
+    return (
+      (this.getHours() < 10 ? "0" : "") +
+      this.getHours() +
+      ":" +
+      (this.getMinutes() < 10 ? "0" : "") +
+      this.getMinutes() +
+      ":" +
+      (this.getSeconds() < 10 ? "0" : "") +
+      this.getSeconds()
+    );
+  };
+}
