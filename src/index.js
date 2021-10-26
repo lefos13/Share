@@ -81,6 +81,7 @@ const Reviews = require("./modules/review");
 const { values } = require("lodash");
 
 checkconnection();
+
 // instertPosts();
 
 async function instertPosts() {
@@ -104,14 +105,14 @@ async function instertPosts() {
           placecoords: "123",
         },
         {
-          place: "lamia",
+          place: "Larisa",
           placecoords: "123",
         },
       ],
     };
 
-    var startplace = "Lafkos";
-    var endplace = "Volos";
+    var startplace = "Aθήνα";
+    var endplace = "Θεσσαλονίκη";
     var numseats = 1;
     var costperseat = 0;
     var moreplaces = [
@@ -127,8 +128,8 @@ async function instertPosts() {
 
     // dates(data);
     var counter = 0;
-    for (var i = 0; i <= 75; i++) {
-      if (numseats < 7) numseats++;
+    for (var i = 0; i <= 50; i++) {
+      if (numseats < 3) numseats++;
       else numseats = 0;
       data.numseats = numseats;
 
@@ -144,6 +145,7 @@ async function instertPosts() {
 
       var today = new Date();
       dates();
+
       await Posts.create(data)
         .then((data) => {
           // console.log(data);
@@ -152,9 +154,6 @@ async function instertPosts() {
           console.log(err);
         });
     }
-    // await Posts.bulkCreate(array).catch((err) => {
-    //   console.error(err);
-    // });
   } catch (error) {
     console.error("Something Went wrong: " + error);
   }
@@ -169,7 +168,12 @@ async function instertPosts() {
 
       today = yyyy + "-" + mm + "-" + dd;
       var lastday = yyyy + "-" + mm2 + "-" + dd2;
-      data.date = today;
+
+      var tempdate = new Date();
+      setTime(tempdate.getDate() > counter && counter < 0 ? -counter : 0);
+      // setTime(2);
+      data.date = new Date().today() + " " + new Date().timeNow();
+      console.log(data.date + "    " + counter);
       data.startdate = today;
       data.enddate = lastday;
       counter++;
@@ -182,7 +186,8 @@ async function instertPosts() {
 
       today = yyyy + "-" + mm + "-" + dd;
       var lastday = yyyy + "-" + mm2 + "-" + dd;
-      data.date = today;
+      setTime(0);
+      data.date = new Date().today() + " " + new Date().timeNow();
       data.startdate = today;
       data.enddate = lastday;
       counter = counter - 20;
