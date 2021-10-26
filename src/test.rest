@@ -129,42 +129,28 @@ POST http://localhost:3000/searchposts
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
-{
-    "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "Volos",
-        "startcoord": "123",
-        "endplace": "Athens",
-        "endcoord": "1",
-        "startdate": "2021-10-14",
-        "enddate": "2021-12-20",
-        "page": 1,
-        "cost": 1,
-        "age": null,
-        "age_end": null,
-        "car": null,
-        "cardate": null,
-        "gender": "male"
-    }
-}
+{"data":{"age":"18","age_end":"70","cost":"20","email":"cs141082@uniwa.gr","endcoord":"40.6400629,22.9444191","endplace":"Θεσσαλονίκη","page":1,"startcoord":"37.9838096,23.7275388","startplace":"Αθήνα"}}
 
 # {
 #     "data": {
 #         "email": "lefterisevagelinos1996@gmail.com",
-#         "startplace": "volos",
+#         "startplace": "Volos",
 #         "startcoord": "123",
-#         "endplace": "lamia",
+#         "endplace": "Athens",
 #         "endcoord": "1",
-#         "startdate": "2021-11-05",
-#         "enddate": "2021-11-20",
+#         "startdate": "2021-10-14",
+#         "enddate": "2021-12-20",
 #         "page": 1,
-#         "age": 25, 
-#         "cost": 30,
-#         "car": "TOYOTA",
-#         "cardate": 1998,
+#         "cost": 1,
+#         "age": null,
+#         "age_end": null,
+#         "car": null,
+#         "cardate": null,
 #         "gender": "male"
 #     }
 # }
+
+
 
 ###
 

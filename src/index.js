@@ -90,45 +90,39 @@ async function instertPosts() {
     var data = {
       email: "lefterisevagelinos1996@gmail.com",
       date: "2021-10-06",
-      startplace: "Volos",
-      startcoord: "31",
-      endplace: "Athens",
-      endcoord: "23",
+      startplace: "Τρίκαλα",
+      startcoord: "39.5557317,21.7678951",
+      endplace: "Γαλατάς",
+      endcoord: "35.498456,23.9630835",
       numseats: 2,
       startdate: "2021-12-15",
       enddate: "2021-12-16",
-      costperseat: 40,
+      costperseat: 25,
       comment: "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
       moreplaces: [
         {
-          place: "lamia",
-          placecoords: "123",
-        },
-        {
-          place: "Larisa",
-          placecoords: "123",
+          place: "Αθήνα",
+          placecoords: "37.9838096,23.7275388",
         },
       ],
     };
 
-    var startplace = "Aθήνα";
+    var startplace = "Αθήνα";
     var endplace = "Θεσσαλονίκη";
+    var startcoord = "37.9838096,23.7275388";
+    var endcoord = "40.6400629,22.9444191";
     var numseats = 1;
     var costperseat = 0;
     var moreplaces = [
       {
-        place: "Larisa",
-        placecoords: "123",
-      },
-      {
-        place: "Halandri",
-        placecoords: "123",
+        place: "Γαλατάς",
+        placecoords: "35.498456,23.9630835",
       },
     ];
 
     // dates(data);
     var counter = 0;
-    for (var i = 0; i <= 50; i++) {
+    for (var i = 0; i <= 100; i++) {
       if (numseats < 3) numseats++;
       else numseats = 0;
       data.numseats = numseats;
@@ -136,8 +130,10 @@ async function instertPosts() {
       costperseat++;
       data.costperseat = costperseat;
 
-      if (i > 25) {
+      if (i > 49) {
         data.email = "cs141082@uniwa.gr";
+        data.startcoord = startcoord;
+        data.endcoord = endcoord;
         data.startplace = startplace;
         data.endplace = endplace;
         data.moreplaces = moreplaces;
