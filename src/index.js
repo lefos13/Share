@@ -823,6 +823,7 @@ app.post(
             // console.log(fnd.email);
           }
           var arr;
+
           if (data.age != null) {
             // afairese ta post twn xrhstwn pou einai panw apo data.age_end
             array = _.filter(array, (obj) => {
@@ -851,19 +852,48 @@ app.post(
               return obj.user.gender == data.gender;
             });
           }
+
+          //PAGINATION
           var skipcount = 0;
           var takecount = 20;
           if (data.page > 1) skipcount = data.page * 20;
-          const finalarr = _.take(_.drop(array, skipcount), takecount);
+          var finalarr = _.take(_.drop(array, skipcount), takecount);
+          var counter = 0;
+          //FORMAT CHANGE OF TIMSTAMP
+          for await (ps of finalarr) {
+            // console.log(ps.post.date.getFullYear());
+            var tempd = ps.post.date;
+            // console.log(tempd);
+            var dateonly =
+              (tempd.getDate() < 10 ? "0" : "") +
+              tempd.getDate() +
+              "-" +
+              (tempd.getMonth() + 1 < 10 ? "0" : "") +
+              (tempd.getMonth() + 1) +
+              "-" +
+              tempd.getFullYear();
+            var newtime =
+              (tempd.getHours() < 10 ? "0" : "") +
+              tempd.getHours() +
+              ":" +
+              (tempd.getMinutes() < 10 ? "0" : "") +
+              tempd.getMinutes();
+            finalarr[counter]["creationDate"] = dateonly + " " + newtime;
+
+            counter++;
+          }
+          //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
           if (finalarr.length == 0) {
             res
               .status(404)
               .json({ message: "Δεν υπάρχει διαδρομή.", body: null });
           } else {
+            // console.log(array[0].post.newdate);
             results = {
               postuser: finalarr,
               length: array.length,
               pagelength: finalarr.length,
+              // test: array,
             };
 
             res.json({ body: results, message: null });
@@ -1071,6 +1101,14 @@ app.post("/upload", upload.single("upload"), function (req, res) {
 
   res.json({ message: "Το upload έγινε επιτυχώς" });
 });
+
+// var tempd = "2021-10-06T00:00:00.000Z";
+// tempd = tempd.split("T");
+// var dateonly = tempd[0].split("-");
+// var newdate = dateonly[2] + "-" + dateonly[1] + "-" + dateonly[0];
+// var temptime = tempd[1].replace("Z", "").split(":");
+// var newtime = temptime[0] + ":" + temptime[1];
+// console.log(newdate + " " + newtime);
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
 function setTime(extrad) {

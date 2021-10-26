@@ -114,30 +114,25 @@ RESPONSE:
       {
         "user": {
           "email": "lefterisevagelinos1996@gmail.com",
-          "password": "$2b$10$Fuf84d20auAPClGnqlf0UOVCtSbl9XJLJAiDaffRbtkS5PRIiqO9C",
-          "mobile": "6975620785",
           "fullname": "lefos evan",
           "car": "TOYOTA",
           "cardate": "1999",
           "gender": "male",
           "age": "25",
-          "photo": "1",
-          "facebook": null,
-          "instagram": null,
-          "verified": true
+          "photo": "1"
         },
         "imagepath": "images/lefterisevagelinos1996@gmail.com.jpeg",
         "post": {
-          "postid": 78,
+          "postid": 230,
           "email": "lefterisevagelinos1996@gmail.com",
-          "startplace": "olos",
-          "startcoord": "23",
+          "startplace": "Volos",
+          "startcoord": "31",
           "endplace": "Athens",
           "endcoord": "23",
-          "numseats": 3,
-          "startdate": "2021-11-15",
-          "enddate": "2021-11-17",
-          "costperseat": 20,
+          "numseats": 2,
+          "startdate": "2021-10-25",
+          "enddate": "2021-11-30",
+          "costperseat": 1,
           "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
           "moreplaces": [
             {
@@ -149,12 +144,14 @@ RESPONSE:
               "placecoords": "123"
             }
           ],
-          "date": "2021-11-25"
+          "date": "2021-10-06T00:00:00.000Z"
         },
-        "interested": false
+        "interested": false,
+        "creationDate": "06-10-2021 03:00"
       }
     ],
-    "length": 1
+    "length": 1,
+    "pagelength": 1
   },
   "message": null
 }
