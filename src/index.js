@@ -772,6 +772,10 @@ app.post(
           res.status(404).json({ message: "Δεν υπάρχει καμία διαδρομή" });
         } else {
           for await (fnd of found.rows) {
+            if (IsJsonString(fnd.moreplaces)) {
+              fnd.moreplaces = JSON.parse(fnd.moreplaces);
+            }
+
             await Users.findOne({
               attributes: {
                 exclude: [
@@ -909,6 +913,14 @@ app.post(
   }
 );
 
+function IsJsonString(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
 //service pou anazhta enan xrhsth
 app.get(
   "/searchuser",
