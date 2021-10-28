@@ -600,50 +600,50 @@ app.post(
     var firsttime = new Date().today() + " " + new Date().timeNow();
     console.log(firsttime);
     data.date = datetime;
-    await Posts.count({
-      where: {
-        date: { [Op.between]: [firsttime, datetime] },
-        email: data.email,
-      },
-    }).then(async (count) => {
-      console.log(count);
-      if (count >= 3) {
-        res.status(405).json({
-          message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
-          body: null,
-        });
-      } else {
-        await Posts.create(data)
-          .then((post) => {
-            // console.log(post.moreplaces);
-            var data = {
-              body: post.toJSON(),
-              message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-            };
-            res.json(data);
-          })
-          .catch((err) => {
-            console.log(err);
-            res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
-          });
-      }
-    });
+    // await Posts.count({
+    //   where: {
+    //     date: { [Op.between]: [firsttime, datetime] },
+    //     email: data.email,
+    //   },
+    // }).then(async (count) => {
+    //   console.log(count);
+    //   if (count >= 3) {
+    //     res.status(405).json({
+    //       message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
+    //       body: null,
+    //     });
+    //   } else {
+    //     await Posts.create(data)
+    //       .then((post) => {
+    //         // console.log(post.moreplaces);
+    //         var data = {
+    //           body: post.toJSON(),
+    //           message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+    //         };
+    //         res.json(data);
+    //       })
+    //       .catch((err) => {
+    //         console.log(err);
+    //         res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+    //       });
+    //   }
+    // });
 
     // auto to kommati kanei mono eggrafi opote vgalto apo sxolio otan theliseis
 
-    // await Posts.create(data)
-    //   .then((post) => {
-    //     // console.log(post.moreplaces);
-    //     var data = {
-    //       body: post.toJSON(),
-    //       message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-    //     };
-    //     res.json(data);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
-    //   });
+    await Posts.create(data)
+      .then((post) => {
+        // console.log(post.moreplaces);
+        var data = {
+          body: post.toJSON(),
+          message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+        };
+        res.json(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+      });
   }
 );
 
@@ -894,9 +894,14 @@ app.post(
               .json({ message: "Δεν υπάρχει διαδρομή.", body: null });
           } else {
             // console.log(array[0].post.newdate);
+            var mod = array.length % 20;
+            var totallength = 1;
+            mod == 0
+              ? (totallength = array.length / 20)
+              : (totallength = array.length / 20 - mod / 20 + 1);
             results = {
               postuser: finalarr,
-              length: array.length,
+              total_pages: totallength,
               pagelength: finalarr.length,
               // test: array,
             };
