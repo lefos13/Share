@@ -654,7 +654,7 @@ app.post(
   cors(corsOptions),
   async (req, res) => {
     // console.log(req.query);
-    var row = req.body.data;
+    var row = req.query;
     var results = null;
     await PostInterested.findOne({
       where: {

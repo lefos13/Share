@@ -66,24 +66,16 @@ RESPONSE EXAMPLE:
 
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
 #douleuei me url params
-#service poy kaleis gia na deiksei kapoios endiaferon gia ena post
-POST http://localhost:3000/interested
+POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=28
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
+RESPONSE EXAMPLE:
 {
-    "data": {
-        "email": "cs141082@uniwa.gr",
-        "postid": 411
-    }
-}
-
-response: 
-  {
   "body": {
-    "piid": 26,
-    "email": "cs141082@uniwa.gr",
-    "postid": 852
+    "piid": 12,
+    "email": "lefterisevagelinos1996@gmail.com",
+    "postid": "29"
   },
   "message": "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες"
 }
