@@ -664,7 +664,17 @@ app.post(
     })
       .then(async (found) => {
         if (found != null) {
-          res.status(400).json({ message: "Έχεις ενδιαφερθεί ήδη" });
+          await PostInterested.destroy({
+            where: {
+              email: row.email,
+              postid: row.postid,
+            },
+          }).then(() => {
+            res.status(201).json({
+              body: null,
+              message: "Ακυρώθηκε το ενδιαφέρον σου",
+            });
+          });
         } else {
           await PostInterested.create(row)
             .then((inter) => {
