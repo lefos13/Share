@@ -654,7 +654,7 @@ app.post(
   cors(corsOptions),
   async (req, res) => {
     // console.log(req.query);
-    var row = req.query;
+    var row = req.body.data;
     var results = null;
     await PostInterested.findOne({
       where: {
@@ -670,7 +670,6 @@ app.post(
             .then((inter) => {
               results = inter;
               var data = {
-                found: found,
                 body: results,
                 message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
               };
