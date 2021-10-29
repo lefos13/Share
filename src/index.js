@@ -654,8 +654,20 @@ app.post(
   cors(corsOptions),
   async (req, res) => {
     // console.log(req.query);
-    var row = req.query;
+
     var results = null;
+    setTime(0);
+    var curtime = new Date().today() + " " + new Date().timeNow();
+    // console.log(curtime);
+    setTime(1);
+    var starttime = new Date().today() + " " + new Date().timeNow();
+    // console.log(starttime);
+    var row = {
+      email: req.query.email,
+      postid: req.query.postid,
+      date: curtime,
+    };
+    row["date"] = curtime;
     await PostInterested.findOne({
       where: {
         email: row.email,
@@ -676,18 +688,43 @@ app.post(
             });
           });
         } else {
-          await PostInterested.create(row)
-            .then((inter) => {
-              results = inter;
-              var data = {
-                body: results,
-                message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
-              };
-              res.json(data);
+          await PostInterested.count({
+            where: {
+              email: row.email,
+              date: { [Op.between]: [starttime, curtime] },
+            },
+          })
+            .then(async (count) => {
+              // console.log("COUNT INTERESTED: ", res);
+              if (count == 9) {
+                res.status(405).json({
+                  message:
+                    "Έχεις δηλώσει ήδη 10 φορές ενδιαφέρον. Δοκίμασε πάλι αύριο!",
+                  body: null,
+                });
+              } else {
+                await PostInterested.create(row)
+                  .then((inter) => {
+                    results = inter;
+                    var data = {
+                      body: results,
+                      message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
+                    };
+                    res.json(data);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    res
+                      .status(400)
+                      .json({ message: "Κάτι πήγε στραβά.", body: err });
+                  });
+              }
             })
             .catch((err) => {
-              console.log(err);
-              res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+              res.status(500).json({
+                message: "Κάτι πήγε στραβά.",
+                body: "Επίπεδο count" + err,
+              });
             });
         }
       })
@@ -1119,6 +1156,42 @@ app.get(
   }
 );
 
+//test api async await functions
+app.get("/test", [authenticateToken], cors(corsOptions), async (req, res) => {
+  var now = "now";
+  now = await test(now);
+
+  await prom(false)
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((rej) => {
+      console.error("error arpagmeno: " + rej);
+    });
+  console.log(now);
+  res.json(now);
+});
+
+//test function for await
+async function test(now) {
+  for (var i = 0; i <= 10000; i++) {
+    var date = new Date();
+    // i == 10000 ? await sleep(1000) : "";
+  }
+  now = "not now";
+  return now;
+}
+
+//function for the usage of then and catch
+async function prom(param) {
+  if (param) return Promise.resolve(true);
+  else return Promise.reject(false);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 //service poy anevazei eikona sto server
 app.post("/upload", upload.single("upload"), function (req, res) {
   // req.file is the name of your file in the form above, here 'uploaded_file'
@@ -1136,8 +1209,6 @@ app.post("/upload", upload.single("upload"), function (req, res) {
 // var temptime = tempd[1].replace("Z", "").split(":");
 // var newtime = temptime[0] + ":" + temptime[1];
 // console.log(newdate + " " + newtime);
-
-http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
 function setTime(extrad) {
   Date.prototype.today = function () {
     return (
@@ -1164,3 +1235,5 @@ function setTime(extrad) {
     );
   };
 }
+
+http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));

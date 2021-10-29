@@ -150,7 +150,7 @@ RESPONSE:
         "creationDate": "06-10-2021 03:00"
       }
     ],
-    "length": 1,
+    "total_pages": 1,
     "pagelength": 1
   },
   "message": null
