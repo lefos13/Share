@@ -973,7 +973,7 @@ function IsJsonString(str) {
   return true;
 }
 //service pou anazhta enan xrhsth
-app.get(
+app.post(
   "/searchuser",
   [authenticateToken],
   cors(corsOptions),
