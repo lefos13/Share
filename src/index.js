@@ -663,8 +663,8 @@ app.post(
     var starttime = new Date().today() + " " + new Date().timeNow();
     // console.log(starttime);
     var row = {
-      email: req.query.email,
-      postid: req.query.postid,
+      email: req.body.data.email,
+      postid: req.body.data.postid,
       date: curtime,
     };
     row["date"] = curtime;

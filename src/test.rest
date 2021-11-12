@@ -118,9 +118,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 ###
 
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
-POST http://localhost:3000/interested?email=lefterisevagelinos1996@gmail.com&postid=879
+POST http://localhost:3000/interested
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "postid": 650
+    }
+}
 
 ###
 
