@@ -159,9 +159,15 @@ RESPONSE:
 ###
 
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
-GET http://localhost:3000/searchuser?email=lefterisevagelinos1996@gmail.gr
+GET http://localhost:3000/searchuser
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+{
+    "data": {
+        "email": "cs141082@uniwa.gr"
+    }
+}
 
 #average einai o mesos oros kritikwn. The epistrefei null an den exei kritikes
 #to reviews einai array me tis kritikes tou xrhsth. tha epistrefei adeio array otan den exei kritikes
@@ -182,6 +188,7 @@ RESPONSE:
     "instagram": null,
     "verified": true
   },
+  "image": "images/cs141082@uniwa.gr.jpeg",
   "reviews": [
     {
       "email": "lefterisevagelinos1996@gmail.com",

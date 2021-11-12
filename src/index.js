@@ -978,8 +978,8 @@ app.get(
   [authenticateToken],
   cors(corsOptions),
   async (req, res) => {
-    console.log(req.query);
-    var data = req.query;
+    // console.log(req.query);
+    var data = req.body.data;
     await Users.findOne({
       where: {
         email: data.email,
