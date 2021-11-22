@@ -907,7 +907,7 @@ app.post(
           //PAGINATION
           var skipcount = 0;
           var takecount = 20;
-          if (data.page > 1) skipcount = data.page * 20;
+          if (data.page > 1) skipcount = data.page * 20 - 20;
           var finalarr = _.take(_.drop(array, skipcount), takecount);
           var counter = 0;
           //FORMAT CHANGE OF TIMSTAMP
@@ -1004,27 +1004,12 @@ app.post(
             }
             var average = total / revfound.count;
             // console.log("total: " + total + " count: " + revfound.count);
-            await Reviews.findAll({
-              where: {
-                email: data.email,
-              },
-              timezone: "+03:00",
-            })
-              .then((rev) => {
-                res.json({
-                  average: average,
-                  user: found,
-                  image: "images/" + data.email + ".jpeg",
-                  reviews: rev,
-                  message: "Ο χρήστης βρέθηκε",
-                });
-              })
-              .catch((err) => {
-                console.error(err);
-                res
-                  .status(400)
-                  .json({ message: "Κάτι πήγε στραβά.", body: err });
-              });
+            res.json({
+              average: average,
+              user: found,
+              image: "images/" + data.email + ".jpeg",
+              message: "Ο χρήστης βρέθηκε",
+            });
           })
           .catch((err) => {
             console.error(err);
@@ -1036,6 +1021,67 @@ app.post(
       })
       .catch((err) => {
         res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+      });
+  }
+);
+
+//service pou epistrefei ta reviews paginated
+app.post(
+  "/getReviews",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.body.data;
+    await Reviews.findAndCountAll({
+      attributes:
+        // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+        [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+      where: {
+        email: data.email,
+      },
+    })
+      .then(async (revfound) => {
+        var rows = revfound.rows;
+        // var reviews = [];
+        var total = null;
+        for await (r of rows) {
+          //console.log(r.toJSON().total);
+          total = r.toJSON().total;
+        }
+        var average = total / revfound.count;
+        console.log("total: " + total + " count: " + revfound.count);
+        await Reviews.findAll({
+          where: {
+            email: data.email,
+          },
+          // timezone: "+03:00",
+        })
+          .then((rev) => {
+            //PAGINATION
+            var skipcount = 0;
+            var takecount = 20;
+            if (data.page > 1) skipcount = data.page * 20 - 20;
+            var finalarr = _.take(_.drop(rev, skipcount), takecount);
+            res.json({
+              body: {
+                reviews: finalarr,
+                average: average,
+              },
+              message: "Αξιολογήσεις, Page: " + data.page,
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+            res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(400).json({
+          message: "Κάτι πήγε στραβά κατά την αναζήτηση.",
+          body: err,
+        });
       });
   }
 );
@@ -1064,7 +1110,7 @@ app.post(
         if (err.original.code == "ER_DUP_ENTRY")
           res.status(405).json({
             message: "Έχεις κάνει ήδη αξιολόγηση σε αυτόν τον χρήστη.",
-            body: err,
+            body: null,
           });
         res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
       });

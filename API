@@ -212,6 +212,68 @@ RESPONSE:
 }
 ###
 
+#get reviews
+POST http://localhost:3000/getReviews
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "page": 2
+    }
+}
+
+RESPONSE:
+{
+  "body": {
+    "reviews": [
+      {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "emailreviewer": "cs141096@uniwa.gr",
+        "rating": 5,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+        "createdAt": "2021-11-22 22:15:00",
+        "updatedAt": "2021-11-22 19:16:31"
+      },
+      {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "emailreviewer": "cs1410965@uniwa.gr",
+        "rating": 5,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+        "createdAt": "2021-11-22 22:15:00",
+        "updatedAt": "2021-11-22 19:16:27"
+      },
+      {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "emailreviewer": "cs141097@uniwa.gr",
+        "rating": 5,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+        "createdAt": "2021-11-22 22:15:00",
+        "updatedAt": "2021-11-22 19:16:34"
+      },
+      {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "emailreviewer": "cs141098@uniwa.gr",
+        "rating": 5,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+        "createdAt": "2021-11-22 22:15:00",
+        "updatedAt": "2021-11-22 19:16:38"
+      },
+      {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "emailreviewer": "cs141099@uniwa.gr",
+        "rating": 5,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+        "createdAt": "2021-11-22 22:15:00",
+        "updatedAt": "2021-11-22 19:15:59"
+      }
+    ],
+    "average": 5
+  },
+  "message": "Αξιολογήσεις, Page: 2"
+}
+
 #Service pou eisagei ena review sth vash
 POST http://localhost:3000/createreview
 Content-Type: application/json
