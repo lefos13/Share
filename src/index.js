@@ -206,7 +206,10 @@ function authenticateToken(req, res, next) {
           body: "Token expired or didnt even exist",
         },
       });
-    console.log("inside auth: " + JSON.stringify(email));
+    else {
+      console.log("inside auth: " + JSON.stringify(req.body.data));
+      req.body["extra"] = email.email;
+    }
     next();
   });
 }
@@ -474,38 +477,44 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
   var code = null;
   var body = null;
   var results = null;
-  // console.log();
-  const user = await Users.findOne({
+  // console.log("I AM IN: " + email);
+  await Users.findOne({
     where: {
       email: email,
     },
-  }).catch((err) => {
-    console.log("Error:" + err);
-  });
+  })
+    .then((user) => {
+      // console.log(user);
+      if (user == null) {
+        code = 404;
+        body = "Ο χρήστης δεν βρέθηκε.";
+        // console.log("I AM IN user === null");
+      } else {
+        if (user.verified === false) {
+          code = 350;
+          body = "Πρέπει να επιβεβαιώσεις το email σου.";
+          var data = {
+            body: results,
+            error: {
+              code: code,
+              body: body,
+            },
+          };
+          // console.log("I AM IN user.verified === false");
+          res.json(data);
+        } else {
+          // console.log("I AM IN user.verified === false ELSE");
+          bcrypt.compare(pass, user.password, function (err, result) {
+            checkPass(result, user);
+          });
+        }
+      }
+    })
+    .catch((err) => {
+      console.log("Error:" + err);
+    });
 
-  if (user === null) {
-    code = 404;
-    body = "Ο χρήστης δεν βρέθηκε.";
-  } else {
-    if (user.verified === false) {
-      code = 350;
-      body = "Πρέπει να επιβεβαιώσεις το email σου.";
-      var data = {
-        body: results,
-        error: {
-          code: code,
-          body: body,
-        },
-      };
-      res.json(data);
-    } else {
-      bcrypt.compare(pass, user.password, function (err, result) {
-        checkPass(result);
-      });
-    }
-  }
-
-  function checkPass(result) {
+  function checkPass(result, user) {
     if (result) {
       //console.log(user.toJSON());
       var data = user.toJSON();
@@ -624,7 +633,7 @@ app.post(
     //       })
     //       .catch((err) => {
     //         console.log(err);
-    //         res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+    //         res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
     //       });
     //   }
     // });
@@ -642,7 +651,7 @@ app.post(
       })
       .catch((err) => {
         console.log(err);
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
 );
@@ -716,7 +725,7 @@ app.post(
                     console.log(err);
                     res
                       .status(400)
-                      .json({ message: "Κάτι πήγε στραβά.", body: err });
+                      .json({ message: "Κάτι πήγε στραβά.", body: null });
                   });
               }
             })
@@ -729,7 +738,7 @@ app.post(
         }
       })
       .catch((err) => {
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
 );
@@ -861,13 +870,13 @@ app.post(
                   .catch((err) => {
                     res
                       .status(400)
-                      .json({ message: "Κάτι πήγε στραβά.", body: err });
+                      .json({ message: "Κάτι πήγε στραβά.", body: null });
                   });
               })
               .catch((err) => {
                 res
                   .status(400)
-                  .json({ message: "Κάτι πήγε στραβά.", body: err });
+                  .json({ message: "Κάτι πήγε στραβά.", body: null });
               });
             // }
 
@@ -957,9 +966,7 @@ app.post(
         }
       })
       .catch((err) => {
-        res
-          .status(400)
-          .json({ message: "Κάτι πήγε στραβά στα posts.", body: err });
+        res.status(400).json({ message: "Κάτι πήγε στραβά", body: null });
       });
   }
 );
@@ -980,6 +987,17 @@ app.post(
   async (req, res) => {
     // console.log(req.query);
     var data = req.body.data;
+    var tokenEmail = req.body.extra;
+    // console.log("Token Email: " + JSON.stringify(tokenEmail));
+    // let isUserReviwable = await Posts.findOne({
+    //   where: {
+    //     email: tokenEmail,
+    //     emailreviewer: data.emailreviewer,
+    //   },
+    // }).catch((err) => {
+    //   res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
+    // });
+
     await Users.findOne({
       where: {
         email: data.email,
@@ -1006,7 +1024,9 @@ app.post(
             // console.log("total: " + total + " count: " + revfound.count);
             res.json({
               average: average,
+              count: revfound.count,
               user: found,
+              reviewAble: true, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
               image: "images/" + data.email + ".jpeg",
               message: "Ο χρήστης βρέθηκε",
             });
@@ -1015,12 +1035,12 @@ app.post(
             console.error(err);
             res.status(400).json({
               message: "Κάτι πήγε στραβά κατά την αναζήτηση.",
-              body: err,
+              body: null,
             });
           });
       })
       .catch((err) => {
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
 );
@@ -1073,14 +1093,14 @@ app.post(
           })
           .catch((err) => {
             console.error(err);
-            res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+            res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
           });
       })
       .catch((err) => {
         console.error(err);
         res.status(400).json({
           message: "Κάτι πήγε στραβά κατά την αναζήτηση.",
-          body: err,
+          body: null,
         });
       });
   }
@@ -1096,14 +1116,35 @@ app.post(
     var results = null;
 
     await Reviews.create(data)
-      .then((review) => {
-        results = {
-          message: "Η αξιολόγηση έγινε επιτυχώς!.",
-          review: review.toJSON(),
-        };
-        res.json({
-          body: results,
-        });
+      .then(async (review) => {
+        await Reviews.findAndCountAll({
+          attributes:
+            // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+            [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+          where: {
+            email: data.email,
+          },
+        })
+          .then(async (results) => {
+            var rows = results.rows;
+
+            var total = null;
+            for await (r of rows) {
+              // console.log(results.count);
+              total = r.toJSON().total;
+            }
+            var average = total / results.count;
+            res.json({
+              review: review,
+              average: average,
+              count: results.count,
+              message: "Η αξιολόγηση έγινε επιτυχώς!",
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+            res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+          });
       })
       .catch((err) => {
         console.error(err);
@@ -1112,7 +1153,7 @@ app.post(
             message: "Έχεις κάνει ήδη αξιολόγηση σε αυτόν τον χρήστη.",
             body: null,
           });
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
 );
@@ -1136,7 +1177,7 @@ app.get(
         });
       })
       .catch((err) => {
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
 );
@@ -1149,18 +1190,18 @@ app.get(
   async (req, res) => {
     // console.log(req.query);
     var data = req.query;
-    await PostInterested.findOne({
+    await PostInterested.findAll({
       where: {
         postid: data.postid,
       },
     })
       .then((found) => {
         res.json({
-          body: found.toJSON(),
+          body: found,
         });
       })
       .catch((err) => {
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: err });
+        res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
 );
@@ -1190,14 +1231,14 @@ app.get(
               finalcount = finalcount + count;
             })
             .catch((err) => {
-              res.status(400).json({ message: "Bad request", body: err });
+              res.status(400).json({ message: "Bad request", body: null });
             });
         }
         res.json({ length: finalcount });
       })
       .catch((err) => {
         console.error(err);
-        res.status(400).send({ message: "Ωχ! κάτι πήγε στραβά!", body: err });
+        res.status(400).send({ message: "Ωχ! κάτι πήγε στραβά!", body: null });
       });
   }
 );

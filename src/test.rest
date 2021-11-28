@@ -19,7 +19,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data":{
-        "email": "cs141082@uniwa.gr",
+        "email": "lefterisevagelinos1996@gmail.com",
         "pass": "12345"
     }
 }
@@ -61,11 +61,11 @@ Content-Type: application/json
 #service pou elegxei ta stoixeia tou xrhsth otan kanei login
 POST http://localhost:3000/login
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkwMDI0LCJleHAiOjE2MzkxNzQwMjR9.0FS15t42ID5bVuKuw6P88AtxJCHEyMJobjnhccBvwHk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
 {
     "data":{
-        "email": "lefterisevaglinos1996@gmail.com",
+        "email": "lefterisevagelinos1996@gmail.com",
         "pass": "12345"
     }
 }
@@ -125,7 +125,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "postid": 650
+        "postid": 849
     }
 }
 
@@ -195,8 +195,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "emailreviewer": "cs141019@uniwa.gr",
+        "email": "lefterisevagelinos19961@gmail.com",
+        "emailreviewer": "cs141082@uniwa.gr",
         "rating": 5,
         "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
     }
@@ -212,7 +212,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service epistrefei lista me endiaferomenous apo ena post
-GET http://localhost:3000/getinterested?postid=55
+GET http://localhost:3000/getinterested?postid=849
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 
@@ -220,7 +220,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 #service poy epistrfei to plithos ton endiaferomenwn olwn twn post enos user
 GET http://localhost:3000/getlofinterested?email=lefterisevagelinos1996@gmail.com
-
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
 

@@ -183,13 +183,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 RESPONSE: 
 {
   "average": 5,
+  "count": 35,
   "user": {
     "email": "lefterisevagelinos1996@gmail.com",
-    "password": "$2b$10$.EKf1Dx3SBUaf0y5vIMiOerbhgmT2NJ14qghzG44YEqmi99LoXd9O",
+    "password": "$2b$10$Fuf84d20auAPClGnqlf0UOVCtSbl9XJLJAiDaffRbtkS5PRIiqO9C",
     "mobile": "6975620785",
-    "fullname": "Lefos Evan",
-    "car": "NISSAN",
-    "cardate": "2000",
+    "fullname": "lefos evan",
+    "car": "TOYOTA",
+    "cardate": "1999",
     "gender": "male",
     "age": "25",
     "photo": "1",
@@ -197,17 +198,8 @@ RESPONSE:
     "instagram": null,
     "verified": true
   },
-  "image": "images/cs141082@uniwa.gr.jpeg",
-  "reviews": [
-    {
-      "email": "lefterisevagelinos1996@gmail.com",
-      "emailreviewer": "cs141082@uniwa.gr",
-      "rating": 5,
-      "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-      "createdAt": "2021-10-13 20:38:45",
-      "updatedAt": "2021-10-13 17:55:53"
-    }
-  ],
+  "reviewAble": true,
+  "image": "images/lefterisevagelinos1996@gmail.com.jpeg",
   "message": "Ο χρήστης βρέθηκε"
 }
 ###
@@ -294,16 +286,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 # (skeftika mporei na xrhsimeusei sthn poreia)
 Response: 
 {
-  "body": {
-    "message": "Η εγγραφή του review έγινε επιτυχώς.",
-    "review": {
-      "createdAt": "2021-10-13T19:56:17.960Z",
-      "email": "lefterisvagelinos1996@gmail.gr",
-      "emailreviewer": "cs141082@uniwa.gr",
-      "rating": 5,
-      "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
-    }
-  }
+  "review": {
+    "createdAt": "2021-11-28T18:58:23.276Z",
+    "email": "lefterisevagelinos19961@gmail.com",
+    "emailreviewer": "cs141082@uniwa.gr",
+    "rating": 5,
+    "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
+  },
+  "average": 5,
+  "count": 1,
+  "message": "Η αξιολόγηση έγινε επιτυχώς!"
 }
 
 ###
@@ -346,15 +338,17 @@ response:
 {
   "body": [
     {
-      "piid": 9,
-      "postid": 45,
-      "email": "lefterisevagelinos1996@gmail.com"
+      "piid": 70,
+      "postid": 849,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-11-28T16:58:26.000Z"
     }
   ]
 }
 ###
 
 #service poy epistrfei to plithos ton endiaferomenwn olwn twn post enos user
+#auto to api paizei na einai entelws axristo. Den kserw kan giati to eftiaksa otan to eftiaksa
 GET http://localhost:3000/getlofinterested?email=cs141082@uniwa.gr
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
