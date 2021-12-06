@@ -4,8 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com",
-        "pass": "12345"
+        "email": "cs141082@uniwa.gr"
     }
 }
 
@@ -19,8 +18,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com",
-        "pass": "12345"
+        "email": "cs141082@uniwa.gr",
+        "pass": "123456"
     }
 }
 
@@ -32,7 +31,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141082@cs.com",
+        "email": "cs141082@uniwa.gr",
         "password": "12345",
         "mobile": "12313",
         "fullname": "lefos evan",
@@ -52,7 +51,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs@cs.com"
+        "email": "cs141082@uniwa.gr"
     }
 }
 
@@ -65,7 +64,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "cs141082@uniwa.gr",
         "pass": "12345"
     }
 }
@@ -78,7 +77,7 @@ Content-Type: application/json
 
 {
     "data": {
-        "email": "cs@cs.com"
+        "email": "cs141082@uniwa.gr"
     }
 }
 

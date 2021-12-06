@@ -1,5 +1,154 @@
 #GLOBAL SXOLIO. OLA TA ERROR EPISTREFOUN ME KATALILO STATUS
 
+#service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
+POST http://localhost:3000/createtoken
+Content-Type: application/json
+
+{
+    "data":{
+        "email": "cs141082@uniwa.gr"
+    }
+}
+
+RESPONSE: 
+{
+  "message": "Επιτυχής δημιουργία του token",
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMDZUMjE6MjY6MDQuNjI3WiIsImlhdCI6MTYzODgyNTk2NCwiZXhwIjoxNjQ0MDA5OTY0fQ.hAHANlGIr5M-kvtikronwbhjSoIxmqhugUPj-q2JQ-A"
+}
+
+###
+
+#service pou kanei update to password you user sth vash
+POST http://localhost:3000/updateUserPass
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiaWF0IjoxNjMzOTkyOTg3LCJleHAiOjE2MzkxNzY5ODd9.cScBdSAXzH2qrljnvWdROnof4rTu1hrWInb6A-rvhFU
+
+
+{
+    "data":{
+        "email": "cs141082@uniwa.gr",
+        "pass": "123456"
+    }
+}
+
+RESPONSE:
+{
+  "message": "Ο κωδικός ανανεώθηκε."
+}
+
+
+###
+
+#service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
+POST  http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "data":{
+        "email": "cs141082@uniwa.gr",
+        "password": "12345",
+        "mobile": "12313",
+        "fullname": "lefos evan",
+        "gender": "male",
+        "car": "toyota",
+        "cardate": "1996",
+        "age": "26",
+        "photo": "12131231"
+    }
+}
+
+RESPONSE:
+{
+  "body": {
+    "message": "Εγγραφήκατε επιτυχώς. Πάμε για την εξακρίβωση του email!",
+    "otp": "5568"
+  }
+}
+
+RESPONSE ERROR 405:
+{
+  "message": "Βρέθηκε λογαριασμός με το ίδιο email."
+}
+
+###
+
+#service pou kanei verify to xrhsth sth vash dedomenwn, afou kanei epibebaiwsh to otp tou ston client
+POST http://localhost:3000/verify
+Content-Type: application/json
+
+{
+    "data":{
+        "email": "cs141082@uniwa.gr"
+    }
+}
+
+RESPONSE:
+{
+  "message": "Το email επιβεβαιώθηκε με επιτυχία."
+}
+
+###
+
+#service pou elegxei ta stoixeia tou xrhsth otan kanei login
+POST http://localhost:3000/login
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+
+{
+    "data":{
+        "email": "cs141082@uniwa.gr",
+        "pass": "123456"
+    }
+}
+
+RESPONSE:
+{
+  "message": "Επιτυχής είσοδος.",
+  "user": {
+    "email": "cs141082@uniwa.gr",
+    "password": null,
+    "mobile": "12313",
+    "fullname": "lefos evan",
+    "car": "toyota",
+    "cardate": "1996",
+    "gender": "male",
+    "age": "26",
+    "photo": "12131231",
+    "facebook": null,
+    "instagram": null,
+    "verified": true
+  }
+}
+
+RESPONSE ERROR 405:
+{
+  "message": "Λάθος κωδικός."
+}
+
+###
+
+#service poy stelnei otp ston xrhsth kai ston client gia epibebaiwsh
+POST http://localhost:3000/passotp
+Content-Type: application/json
+
+{
+    "data": {
+        "email": "cs141082@uniwa.gr"
+    }
+}
+
+RESPONSE:
+{
+  "message": "Έλεγξε το email σου για τον ειδικό κωδικό.",
+  "otp": "6768"
+}
+
+###
+
+
+
+
+
 #service pou ftiaxneis ena post
 POST http://localhost:3000/createpost
 Content-Type: application/json

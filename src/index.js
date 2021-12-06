@@ -281,8 +281,9 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
   var data = req.body.data;
   bcrypt.genSalt(saltRounds, function (err, salt) {
     bcrypt.hash(data.password, salt, async function (err, hash) {
-      var data = req.body.data;
-      data.password = hash;
+      var data2 = req.body.data;
+      data2.password = hash;
+      console.log(data.email);
 
       //generate otp to send to the user's mail
       var otp = otpGenerator.generate(4, {
@@ -298,44 +299,40 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
 
       await Users.create(data)
         .then((user) => {
-          verification(otp, data.email);
+          console.log("inside query email: " + data2.email);
+          verification(otp, data2.email);
           results = {
-            status: 1,
             message: "Εγγραφήκατε επιτυχώς. Πάμε για την εξακρίβωση του email!",
             otp: otp,
             user: data,
           };
+          var data = {
+            body: results,
+          };
+
+          res.json(data);
         })
         .catch((err) => {
-          console.log(err);
-          if (err.parent.errno === 1062) {
-            code = err.parent.errno;
-            body = "Βρέθηκε λογαριασμός με το ίδιο email.";
+          // console.log(err);
+          // res.json(err);
+          if (err.parent.errno == 1062) {
+            let data = {
+              message: "Βρέθηκε λογαριασμός με το ίδιο email.",
+            };
+            res.status(405).json(data);
           } else {
-            code = 0;
-            body = "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.";
+            let data = {
+              message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+            };
+            res.status(500).json(data);
           }
         });
-
-      var data = {
-        body: results,
-        error: {
-          code: code,
-          body: body,
-        },
-      };
-
-      res.json(data);
     });
   });
 });
 
 //rest api service that creates the token for the user. Also checks if he is verified and sends the right message
 app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
-  var code = null;
-  var body = null;
-  var results = null;
-  var more = null;
   var email = req.body.data.email;
   // console.log();
   const user = await Users.findOne({
@@ -347,23 +344,26 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   });
 
   if (user === null) {
-    code = 404;
-    body = "Ο χρήστης δεν βρέθηκε.";
+    res.status(404).json({
+      message: "Ο χρήστης δεν βρέθηκε.",
+    });
   } else {
     if (user.verified === false) {
-      code = 350;
-      body = "Πρέπει να επιβεβαιώσεις το email σου.";
       var otp = otpGenerator.generate(4, {
         digits: true,
         upperCase: false,
         alphabets: false,
         specialChars: false,
       });
-      more = {
+
+      let response = {
+        message: "Πρέπει να επιβεβαιώσεις το email σου.",
         email: email,
         otp: otp,
       };
       verification(otp, email);
+
+      res.json(response);
     } else {
       //create token
       payload = {
@@ -371,22 +371,12 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
         data: new Date(),
       };
       const accessToken = jwt.sign(payload, TOKEN_KEY, { expiresIn: "60d" });
-      results = {
+      res.json({
         message: "Επιτυχής δημιουργία του token",
         accessToken: accessToken,
-      };
+      });
     }
   }
-
-  var data = {
-    body: results,
-    error: {
-      code: code,
-      body: body,
-    },
-    more: more,
-  };
-  res.json(data);
 });
 
 //service that updates the user's password (with encryption)
@@ -397,10 +387,6 @@ app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
   // var email = "asdasd";
   // var password = "asdasdd";
 
-  var code = null;
-  var body = null;
-  var results = null;
-
   bcrypt.genSalt(saltRounds, function (err, salt) {
     bcrypt.hash(password, salt, async function (err, hash) {
       var newpass = hash;
@@ -409,27 +395,18 @@ app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
         { where: { email: email } }
       ).catch((err) => {
         console.log(err);
-        code = 500;
-        body = "Κάτι πήγε στραβά.";
+        res.status(500).json("Κάτι πήγε στραβά!");
       });
-      if (user === null) {
-        code = 404;
-        body = "Ο χρήστης δεν βρέθηκε";
-      } else {
-        results = {
-          success: 200,
-          message: "Ο κωδικός ανανεώθηκε επιτυχώς.",
-        };
-      }
 
-      var data = {
-        body: results,
-        error: {
-          code: code,
-          body: body,
-        },
-      };
-      res.json(data);
+      if (user === null) {
+        res.status(404).json({
+          message: "Ο χρήστης δεν βρέθηκε.",
+        });
+      } else {
+        res.json({
+          message: "Ο κωδικός ανανεώθηκε.",
+        });
+      }
     });
   });
 });
@@ -437,10 +414,6 @@ app.post("/updateUserPass", [], cors(corsOptions), async (req, res) => {
 //service that updates the user's verification to true
 app.post("/verify", [], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
-
-  var code = null;
-  var body = null;
-  var results = null;
 
   await Users.update(
     { verified: true },
@@ -452,32 +425,22 @@ app.post("/verify", [], cors(corsOptions), async (req, res) => {
   )
     .catch((err) => {
       console.log("Error:" + err);
+      res.status(500).json({ message: "Κάτι πήγε στραβά." });
     })
     .then((user) => {
-      results = {
-        success: 200,
-        body: "Το email επιβεβαιώθηκε με επιτυχία.",
-      };
+      res.json({
+        message: "Το email επιβεβαιώθηκε με επιτυχία.",
+      });
     });
-
-  var data = {
-    body: results,
-    error: {
-      code: code,
-      body: body,
-    },
-  };
-  res.json(data);
 });
 
 //service that verifies the login process of the user
 app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
   var pass = req.body.data.pass;
-  var code = null;
+
   var body = null;
-  var results = null;
-  // console.log("I AM IN: " + email);
+
   await Users.findOne({
     where: {
       email: email,
@@ -486,22 +449,15 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
     .then((user) => {
       // console.log(user);
       if (user == null) {
-        code = 404;
-        body = "Ο χρήστης δεν βρέθηκε.";
-        // console.log("I AM IN user === null");
+        res.status(404).json({
+          message: "Ο Χρήστης δεν βρέθηκε.",
+        });
       } else {
         if (user.verified === false) {
-          code = 350;
-          body = "Πρέπει να επιβεβαιώσεις το email σου.";
-          var data = {
-            body: results,
-            error: {
-              code: code,
-              body: body,
-            },
-          };
-          // console.log("I AM IN user.verified === false");
-          res.json(data);
+          message = "Πρέπει να επιβεβαιώσεις το email σου.";
+          res.json({
+            message: message,
+          });
         } else {
           // console.log("I AM IN user.verified === false ELSE");
           bcrypt.compare(pass, user.password, function (err, result) {
@@ -517,81 +473,58 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
   function checkPass(result, user) {
     if (result) {
       //console.log(user.toJSON());
-      var data = user.toJSON();
-      data.password = pass;
-      results = {
-        status: 200,
+      let data = user.toJSON();
+      data.password = null;
+      res.json({
         message: "Επιτυχής είσοδος.",
         user: data,
-      };
+      });
     } else {
-      //console.log("password not ok");
-      code = 450;
       body = "Λάθος κωδικός.";
+      res.status(405).json({ message: body });
     }
-    var data = {
-      body: results,
-      error: {
-        code: code,
-        body: body,
-      },
-    };
-    res.json(data);
   }
 });
 
 //api that checks if the user exists and if he is verified. Also, it sends an otp for the reset of his password
 app.post("/passotp", [], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
-  var code = null;
+
   var body = null;
-  var results = null;
+
   // console.log();
   const user = await Users.findOne({
     where: {
       email: email,
     },
-  }).catch((err) => {
-    code = "unknown";
-    body = "Κάτι πήγε στραβά. Παρακαλούμε προσπαθήστε ξανά αργότερα!";
-    console.log("Error:" + err);
-    var data = {
-      body: results,
-      error: {
-        code: code,
-        body: body,
-      },
-    };
-
-    res.json(data);
-  });
-
-  if (user === null) {
-    code = 404;
-    body = "Ο χρήστης δεν βρέθηκε.";
-  } else {
-    var otp = otpGenerator.generate(4, {
-      digits: true,
-      upperCase: false,
-      alphabets: false,
-      specialChars: false,
+  })
+    .catch((err) => {
+      console.log("Error:" + err);
+      body = "Κάτι πήγε στραβά. Παρακαλούμε προσπαθήστε ξανά αργότερα!";
+      res.status(500).json({
+        message: body,
+      });
+    })
+    .then((user) => {
+      if (user === null) {
+        res.status(404).json({
+          message: "Ο χρήστης δεν βρέθηκε",
+        });
+      } else {
+        var otp = otpGenerator.generate(4, {
+          digits: true,
+          upperCase: false,
+          alphabets: false,
+          specialChars: false,
+        });
+        // send email for verification
+        verification(otp, email);
+        res.json({
+          message: "Έλεγξε το email σου για τον ειδικό κωδικό.",
+          otp: otp,
+        });
+      }
     });
-    verification(otp, email);
-    results = {
-      success: 200,
-      message: "Έλεγξε το email σου για τον ειδικό κωδικό.",
-      otp: otp,
-    };
-  }
-  var data = {
-    body: results,
-    error: {
-      code: code,
-      body: body,
-    },
-  };
-
-  res.json(data);
 });
 
 //service that creates a post
