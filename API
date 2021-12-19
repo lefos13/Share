@@ -370,49 +370,19 @@ RESPONSE:
   "body": {
     "reviews": [
       {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "emailreviewer": "cs141096@uniwa.gr",
+        "email": "cs141082@uniwa.gr",
+        "emailreviewer": "giannisfragoulis21@gmail.com",
         "rating": 5,
-        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-        "createdAt": "2021-11-22 22:15:00",
-        "updatedAt": "2021-11-22 19:16:31"
-      },
-      {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "emailreviewer": "cs1410965@uniwa.gr",
-        "rating": 5,
-        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-        "createdAt": "2021-11-22 22:15:00",
-        "updatedAt": "2021-11-22 19:16:27"
-      },
-      {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "emailreviewer": "cs141097@uniwa.gr",
-        "rating": 5,
-        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-        "createdAt": "2021-11-22 22:15:00",
-        "updatedAt": "2021-11-22 19:16:34"
-      },
-      {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "emailreviewer": "cs141098@uniwa.gr",
-        "rating": 5,
-        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-        "createdAt": "2021-11-22 22:15:00",
-        "updatedAt": "2021-11-22 19:16:38"
-      },
-      {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "emailreviewer": "cs141099@uniwa.gr",
-        "rating": 5,
-        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
-        "createdAt": "2021-11-22 22:15:00",
-        "updatedAt": "2021-11-22 19:15:59"
+        "text": "",
+        "createdAt": "2021-11-28 13:30:34",
+        "updatedAt": "2021-11-28 11:25:13"
       }
     ],
-    "average": 5
+    "average": 5,
+    "total_pages": 1,
+    "page_length": 1
   },
-  "message": "Αξιολογήσεις, Page: 2"
+  "message": "Αξιολογήσεις, Page: 1"
 }
 
 #Service pou eisagei ena review sth vash
@@ -449,30 +419,176 @@ Response:
 
 ###
 
-#service epistrefei lista me posts enos xrhsth
-GET http://localhost:3000/getpostsperuser?email=lefterisevagelinos1996@gmail.com
+#service epistrefei lista me posts enos xrhsth (paginated)
+GET http://localhost:3000/getPostsUser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "page": 8
+    }
+}
+
 
 response: 
 {
   "body": [
     {
-      "postid": 45,
+      "postid": 1092,
       "email": "lefterisevagelinos1996@gmail.com",
-      "startplace": "volos",
-      "endplace": "Athens",
-      "numseats": 3,
-      "startdate": "2021-11-25",
-      "enddate": "2021-11-26",
-      "costperseat": 20,
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 2,
+      "startdate": "2021-10-25",
+      "enddate": "2021-11-30",
+      "costperseat": 41,
       "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-      "moreplaces": {
-        "places": "Larisa-Trikala-Lamia"
-      },
-      "date": "2021-11-03"
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-25T13:41:52.000Z"
+    },
+    {
+      "postid": 1093,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 3,
+      "startdate": "2021-10-28",
+      "enddate": "2021-11-28",
+      "costperseat": 42,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-27T13:41:52.000Z"
+    },
+    {
+      "postid": 1094,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 0,
+      "startdate": "2021-10-06",
+      "enddate": "2021-11-11",
+      "costperseat": 43,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-06T13:41:52.000Z"
+    },
+    {
+      "postid": 1095,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 1,
+      "startdate": "2021-10-07",
+      "enddate": "2021-11-12",
+      "costperseat": 44,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-07T13:41:52.000Z"
+    },
+    {
+      "postid": 1096,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 2,
+      "startdate": "2021-10-08",
+      "enddate": "2021-11-13",
+      "costperseat": 45,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-08T13:41:52.000Z"
+    },
+    {
+      "postid": 1097,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 3,
+      "startdate": "2021-10-09",
+      "enddate": "2021-11-14",
+      "costperseat": 46,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-09T13:41:52.000Z"
+    },
+    {
+      "postid": 1098,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 0,
+      "startdate": "2021-10-10",
+      "enddate": "2021-11-15",
+      "costperseat": 47,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-10T13:41:52.000Z"
+    },
+    {
+      "postid": 1099,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 1,
+      "startdate": "2021-10-11",
+      "enddate": "2021-11-16",
+      "costperseat": 48,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-11T13:41:52.000Z"
+    },
+    {
+      "postid": 1100,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 2,
+      "startdate": "2021-10-12",
+      "enddate": "2021-11-17",
+      "costperseat": 49,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-12T13:41:52.000Z"
+    },
+    {
+      "postid": 1101,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "startplace": "Τρίκαλα",
+      "startcoord": "39.5557317,21.7678951",
+      "endplace": "Γαλατάς",
+      "endcoord": "35.498456,23.9630835",
+      "numseats": 3,
+      "startdate": "2021-10-13",
+      "enddate": "2021-11-18",
+      "costperseat": 50,
+      "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+      "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+      "date": "2021-10-13T13:41:52.000Z"
     }
-  ]
+  ],
+  "total_pages": 8,
+  "total_length": 150,
+  "page_length": 10
 }
 ###
 

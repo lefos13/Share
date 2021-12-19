@@ -1004,7 +1004,8 @@ app.post(
         }
         var average = total / revfound.count;
         console.log("total: " + total + " count: " + revfound.count);
-        await Reviews.findAll({
+
+        await Reviews.findAndCountAll({
           where: {
             email: data.email,
           },
@@ -1015,11 +1016,19 @@ app.post(
             var skipcount = 0;
             var takecount = 20;
             if (data.page > 1) skipcount = data.page * 20 - 20;
-            var finalarr = _.take(_.drop(rev, skipcount), takecount);
+            var finalarr = _.take(_.drop(rev.rows, skipcount), takecount);
+            let mod = rev.count % 20;
+            // console.log(mod);
+            let totallength = 1;
+            mod == 0
+              ? (totallength = rev.count / 20)
+              : (totallength = rev.count / 20 - mod / 20 + 1);
             res.json({
               body: {
                 reviews: finalarr,
                 average: average,
+                total_pages: totallength,
+                page_length: finalarr.length,
               },
               message: "Αξιολογήσεις, Page: " + data.page,
             });
@@ -1093,24 +1102,48 @@ app.post(
 
 //service pou epistrefei mia lista apo ta posts tou user
 app.get(
-  "/getpostsperuser",
+  "/getPostsUser",
   [authenticateToken],
   cors(corsOptions),
   async (req, res) => {
     // console.log(req.query);
-    var data = req.query;
-    await Posts.findAll({
+    var data = req.body.data;
+    await Posts.findAndCountAll({
       where: {
         email: data.email,
       },
     })
       .then(async (found) => {
+        //console.log(found);
+        let rows = found.rows;
+        let count = found.count;
+        // console.log(count);
+        // for await (r of rows) {
+        //   // console.log(r.toJSON());
+        //   // let total = r.toJSON().total;
+        //   // console.log(total);
+        // }
+        let skipcount = 0;
+        let takecount = 20;
+        if (data.page > 1) skipcount = data.page * 20 - 20;
+        let finalarr = _.take(_.drop(rows, skipcount), takecount);
+        let mod = count % 20;
+        // console.log(mod);
+        let totallength = 1;
+        mod == 0
+          ? (totallength = count / 20)
+          : (totallength = count / 20 - mod / 20 + 1);
         res.json({
-          body: found,
+          body: finalarr,
+          total_pages: totallength,
+          total_length: count,
+          page_length: finalarr.length,
         });
+        // res.json({ ok: "ok" });
       })
       .catch((err) => {
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+        console.error(err);
+        res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
 );
