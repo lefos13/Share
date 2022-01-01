@@ -331,13 +331,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 #to reviews einai array me tis kritikes tou xrhsth. tha epistrefei adeio array otan den exei kritikes
 RESPONSE: 
 {
-  "average": 5,
-  "count": 35,
   "user": {
-    "email": "lefterisevagelinos1996@gmail.com",
-    "password": "$2b$10$Fuf84d20auAPClGnqlf0UOVCtSbl9XJLJAiDaffRbtkS5PRIiqO9C",
+    "email": "cs141082@uniwa.gr",
+    "password": "$2b$10$SvBAxdRWTLGACTbn26STXOk.mP0DRsWEboilElvI5zq73K5wp278.",
     "mobile": "6975620785",
-    "fullname": "lefos evan",
+    "fullname": "Lefos Evan",
     "car": "TOYOTA",
     "cardate": "1999",
     "gender": "male",
@@ -347,8 +345,12 @@ RESPONSE:
     "instagram": null,
     "verified": true
   },
+  "average": 5,
+  "count": 1,
+  "hasPosts": true,
+  "hasInterested": true,
   "reviewAble": true,
-  "image": "images/lefterisevagelinos1996@gmail.com.jpeg",
+  "image": "images/cs141082@uniwa.gr.jpeg",
   "message": "Ο χρήστης βρέθηκε"
 }
 ###
@@ -375,7 +377,9 @@ RESPONSE:
         "rating": 5,
         "text": "",
         "createdAt": "2021-11-28 13:30:34",
-        "updatedAt": "2021-11-28 11:25:13"
+        "updatedAt": "2021-11-28 11:25:13",
+        "fullname": "giannis fragoulis",
+        "imagepath": "images/giannisfragoulis21@gmail.com.jpeg"
       }
     ],
     "average": 5,
@@ -622,3 +626,80 @@ response:
 5 
 #dhladh enan arithmo = me to plithos twn endiaferomenwn
 ###
+
+#service poy epistrefei ta post gia ta opoia einai interested o user
+GET http://localhost:3000/getInterestedPerUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
+
+Response:
+{
+  "body": [
+    {
+      "piid": 55,
+      "postid": 861,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:31:10.000Z"
+    },
+    {
+      "piid": 56,
+      "postid": 862,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:36:14.000Z"
+    },
+    {
+      "piid": 57,
+      "postid": 863,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:36:16.000Z"
+    },
+    {
+      "piid": 58,
+      "postid": 864,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:36:19.000Z"
+    },
+    {
+      "piid": 59,
+      "postid": 865,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:36:22.000Z"
+    },
+    {
+      "piid": 60,
+      "postid": 866,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:36:25.000Z"
+    },
+    {
+      "piid": 61,
+      "postid": 867,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:36:31.000Z"
+    },
+    {
+      "piid": 62,
+      "postid": 868,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:36:34.000Z"
+    },
+    {
+      "piid": 66,
+      "postid": 869,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-10-29T21:48:49.000Z"
+    },
+    {
+      "piid": 67,
+      "postid": 879,
+      "email": "lefterisevagelinos1996@gmail.com",
+      "date": "2021-11-12T20:47:42.000Z"
+    }
+  ]
+}

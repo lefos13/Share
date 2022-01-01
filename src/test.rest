@@ -211,7 +211,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "page": 8
+        "page": 1
+    }
+}
+
+###
+
+#service poy epistrefei ta post gia ta opoia einai interested o user
+GET http://localhost:3000/getInterestedPerUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 

@@ -1187,6 +1187,30 @@ app.get(
   }
 );
 
+//service poy epistrefei ta post gia ta opoia einai interested o user
+app.get(
+  "/getInterestedPerUser",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.body.data;
+    await PostInterested.findAll({
+      where: {
+        email: data.email,
+      },
+    })
+      .then((found) => {
+        res.json({
+          body: found,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
+      });
+  }
+);
 // epistrefei lista me endiaferomenous apo ena post
 app.get(
   "/getinterested",
