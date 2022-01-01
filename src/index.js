@@ -78,7 +78,7 @@ const Users = require("./modules/user");
 const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
 const Reviews = require("./modules/review");
-const { values } = require("lodash");
+const { values, hasIn } = require("lodash");
 
 checkconnection();
 
@@ -271,7 +271,7 @@ async function verification(otp, email) {
     html:
       "Παρακάτω μπορείς να αντιγράψεις το κωδικό για να τον εισάγεις στην εφαρμογή σου: <br><h1><b>" +
       otp +
-      "</b></h1>", // html body
+      "</b></h1>", // html body bale enan diko s xristi tha kanw ena register
   });
 }
 
@@ -334,7 +334,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
 //rest api service that creates the token for the user. Also checks if he is verified and sends the right message
 app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   var email = req.body.data.email;
-  // console.log();
+  console.log(req.body);
   const user = await Users.findOne({
     where: {
       email: email,
@@ -955,10 +955,34 @@ app.post(
             }
             var average = total / revfound.count;
             // console.log("total: " + total + " count: " + revfound.count);
+            const post = await Posts.findOne({
+              where: {
+                email: data.email,
+              },
+            });
+
+            const interested = await PostInterested.findOne({
+              where: {
+                email: data.email,
+              },
+            }).catch((err) => {
+              console.error(err);
+            });
+
+            let hasPosts;
+            post == null ? (hasPosts = false) : (hasPosts = true);
+
+            let hasInterested;
+            interested == null
+              ? (hasInterested = false)
+              : (hasInterested = true);
+
             res.json({
+              user: found,
               average: average,
               count: revfound.count,
-              user: found,
+              hasPosts: hasPosts,
+              hasInterested: hasInterested,
               reviewAble: true, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
               image: "images/" + data.email + ".jpeg",
               message: "Ο χρήστης βρέθηκε",
@@ -1011,7 +1035,22 @@ app.post(
           },
           // timezone: "+03:00",
         })
-          .then((rev) => {
+          .then(async (rev) => {
+            let newarr = [];
+            for await (r of rev.rows) {
+              console.log(r.emailreviewer);
+              let user = await Users.findOne({
+                where: {
+                  email: r.emailreviewer,
+                },
+              }).catch((err) => {
+                console.error(err);
+              });
+              r.dataValues["fullname"] = user.fullname;
+              r.dataValues.imagepath = "images/" + r.emailreviewer + ".jpeg";
+              console.log(r);
+            }
+
             //PAGINATION
             var skipcount = 0;
             var takecount = 20;
