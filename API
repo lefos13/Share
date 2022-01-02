@@ -681,31 +681,6 @@ response:
   ],
   "message": "Βρέθηκαν ενδιαφερόμενοι"
 }
-
-#sthn ousia epistrefei ena array me ta eimail twn endiaferomenwn. Endexomenws edw na itheles perissotera stoixeia gia ton kathena
-#alla sto plano eixame shmeiwsei mono auta
-response:
-{
-  "body": [
-    {
-      "piid": 70,
-      "postid": 849,
-      "email": "lefterisevagelinos1996@gmail.com",
-      "date": "2021-11-28T16:58:26.000Z"
-    }
-  ]
-}
-###
-
-#service poy epistrfei to plithos ton endiaferomenwn olwn twn post enos user
-#auto to api paizei na einai entelws axristo. Den kserw kan giati to eftiaksa otan to eftiaksa
-GET http://localhost:3000/getlofinterested?email=cs141082@uniwa.gr
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiaWF0IjoxNjMzOTkxNjI1LCJleHAiOjE2MzkxNzU2MjV9.HJLfuo2HWDb8KpdRQRgajL3bk67fdFBI0j5WbkEZIkM
-
-response:
-5 
-#dhladh enan arithmo = me to plithos twn endiaferomenwn
 ###
 
 #service poy epistrefei ta post gia ta opoia einai interested o user
