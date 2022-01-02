@@ -892,9 +892,7 @@ app.post(
               ":" +
               (tempd.getMinutes() < 10 ? "0" : "") +
               tempd.getMinutes();
-            finalarr[counter]["creationDate"] = dateonly + " " + newtime;
-
-            counter++;
+            ps.post.dataValues.date = dateonly + " " + newtime;
           }
           //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
           if (finalarr.length == 0) {
@@ -1211,6 +1209,28 @@ app.post(
         mod == 0
           ? (totallength = count / 20)
           : (totallength = count / 20 - mod / 20 + 1);
+
+        for await (post of finalarr) {
+          let tempd = post.date;
+
+          let dateonly =
+            (tempd.getDate() < 10 ? "0" : "") +
+            tempd.getDate() +
+            "-" +
+            (tempd.getMonth() + 1 < 10 ? "0" : "") +
+            (tempd.getMonth() + 1) +
+            "-" +
+            tempd.getFullYear();
+          let newtime =
+            (tempd.getHours() < 10 ? "0" : "") +
+            tempd.getHours() +
+            ":" +
+            (tempd.getMinutes() < 10 ? "0" : "") +
+            tempd.getMinutes();
+
+          post.dataValues.date = dateonly + " " + newtime;
+        }
+
         res.json({
           body: finalarr,
           total_pages: totallength,
@@ -1239,9 +1259,43 @@ app.post(
         email: data.email,
       },
     })
-      .then((found) => {
+      .then(async (found) => {
+        let obj = [];
+        let counter = 0;
+        for await (postI of found) {
+          let post = await Posts.findOne({
+            where: {
+              postid: postI.postid,
+            },
+          }).catch((err) => {
+            console.error(err);
+            res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+          });
+          let tempd = post.date;
+
+          let dateonly =
+            (tempd.getDate() < 10 ? "0" : "") +
+            tempd.getDate() +
+            "-" +
+            (tempd.getMonth() + 1 < 10 ? "0" : "") +
+            (tempd.getMonth() + 1) +
+            "-" +
+            tempd.getFullYear();
+          let newtime =
+            (tempd.getHours() < 10 ? "0" : "") +
+            tempd.getHours() +
+            ":" +
+            (tempd.getMinutes() < 10 ? "0" : "") +
+            tempd.getMinutes();
+
+          post.dataValues.date = dateonly + " " + newtime;
+          // console.log(postI);
+          obj[counter] = { ...postI.dataValues, ...post.dataValues };
+          // console.log(obj[counter]);
+          counter++;
+        }
         res.json({
-          body: found,
+          body: obj,
         });
       })
       .catch((err) => {
@@ -1250,22 +1304,54 @@ app.post(
       });
   }
 );
-// epistrefei lista me endiaferomenous apo ena post
-app.get(
-  "/getinterested",
+// epistrefei lista twn endiaferomenwn twn post enos xrhsth
+app.post(
+  "/getInterested",
   [authenticateToken],
   cors(corsOptions),
   async (req, res) => {
     // console.log(req.query);
-    var data = req.query;
-    await PostInterested.findAll({
+    var data = req.body.data;
+    await Posts.findAll({
       where: {
-        postid: data.postid,
+        email: data.email,
       },
     })
-      .then((found) => {
+      .then(async (posts) => {
+        let array = [];
+        let obj;
+        for await (post of posts) {
+          const interested = await PostInterested.findAll({
+            where: {
+              postid: post.postid,
+            },
+          }).catch((err) => {
+            console.error(err);
+          });
+          let userOfInterested = [];
+          // console.log(interested);
+          if (interested.length != 0) {
+            for await (one of interested) {
+              const user = await Users.findOne({
+                where: {
+                  email: one.email,
+                },
+              }).catch((err) => {
+                console.error(err);
+              });
+              let fullpost = { ...one.dataValues, ...post.dataValues };
+              userOfInterested.push({
+                user: user.dataValues,
+                post: fullpost,
+              });
+            }
+            array.push(userOfInterested);
+          }
+        }
+
         res.json({
-          body: found,
+          data: array,
+          message: "Βρέθηκαν ενδιαφερόμενοι",
         });
       })
       .catch((err) => {

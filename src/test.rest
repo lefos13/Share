@@ -19,7 +19,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 {
     "data":{
         "email": "cs141082@uniwa.gr",
-        "pass": "123456"
+        "pass": "12356"
     }
 }
 
@@ -65,7 +65,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 {
     "data":{
         "email": "cs141082@uniwa.gr",
-        "pass": "12345"
+        "pass": "12356"
     }
 }
 
@@ -135,7 +135,7 @@ POST http://localhost:3000/searchposts
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
 
-{"data":{"age":"18","age_end":"70","cost":"100","email":"cs141082@uniwa.gr","endcoord":"35.498456,23.9630835","enddate":"2021-10-27","endplace":"Γαλατάς","page":2,"startcoord":"39.5557317,21.7678951","startdate":"2021-10-27","startplace":"Τρίκαλα"}}
+{"data":{"age":"18","age_end":"70","cost":"100","email":"cs141082@uniwa.gr","endcoord":"35.498456,23.9630835","enddate":"2022-02-27","endplace":"Γαλατάς","page":2,"startcoord":"39.5557317,21.7678951","startdate":"2021-10-27","startplace":"Τρίκαλα"}}
 
 # {
 #     "data": {
@@ -230,11 +230,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 ###
 
-#service epistrefei lista me endiaferomenous apo ena post
-GET http://localhost:3000/getinterested?postid=849
+#service epistrefei lista me endiaferomenous gia ta posts enos user
+POST http://localhost:3000/getInterested
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
 
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
 ###
 
 #service poy epistrfei to plithos ton endiaferomenwn olwn twn post enos user
