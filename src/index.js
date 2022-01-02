@@ -225,10 +225,7 @@ function authenticateToken(req, res, next) {
     if (err)
       return res.json({
         body: null,
-        error: {
-          code: 403,
-          body: "Token expired or didnt even exist",
-        },
+        message: "Token expired or didnt even exist",
       });
     else {
       console.log("inside auth: " + JSON.stringify(req.body.data));
@@ -1182,7 +1179,7 @@ app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
 });
 
 //service pou epistrefei mia lista apo ta posts tou user
-app.get(
+app.post(
   "/getPostsUser",
   [authenticateToken],
   cors(corsOptions),
