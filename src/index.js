@@ -83,12 +83,30 @@ const { values, hasIn } = require("lodash");
 checkconnection();
 
 // instertPosts();
-
-async function instertPosts() {
+const insertReviews = async (main, second) => {
+  let pseudo = 0;
+  let data = {
+    email: main,
+    emailreviewer: second + pseudo,
+    rating: 5,
+    text: "Generated text for testing",
+  };
+  for (let i = 0; i <= 100; i++) {
+    await Reviews.create(data)
+      .then((res) => {
+        data.rating >= 5 ? (data.rating = 1) : data.rating++;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    pseudo++;
+    data.emailreviewer = second + pseudo;
+  }
+};
+async function insertPosts(email) {
   try {
-    var array = [];
     var data = {
-      email: "lefterisevagelinos1996@gmail.com",
+      email: email,
       date: "2021-10-06",
       startplace: "Τρίκαλα",
       startcoord: "39.5557317,21.7678951",
@@ -120,9 +138,13 @@ async function instertPosts() {
       },
     ];
 
+    setTime(0);
+    var datetime = new Date().today() + " " + new Date().timeNow();
+    data.date = datetime;
+
     // dates(data);
     var counter = 0;
-    for (var i = 0; i <= 100; i++) {
+    for (var i = 0; i <= 50; i++) {
       if (numseats < 3) numseats++;
       else numseats = 0;
       data.numseats = numseats;
@@ -130,7 +152,7 @@ async function instertPosts() {
       costperseat++;
       data.costperseat = costperseat;
 
-      if (i > 49) {
+      if (i > 24) {
         data.email = "cs141082@uniwa.gr";
         data.startcoord = startcoord;
         data.endcoord = endcoord;
@@ -155,7 +177,7 @@ async function instertPosts() {
   }
 
   function dates() {
-    if (counter + today.getDate() <= 25) {
+    if (counter + today.getDate() <= 21) {
       var dd = String(today.getDate() + counter).padStart(2, "0");
       var dd2 = String(today.getDate() + counter + 5).padStart(2, "0");
       var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
@@ -169,12 +191,12 @@ async function instertPosts() {
       setTime(tempdate.getDate() > counter && counter < 0 ? -counter : 0);
       // setTime(2);
       data.date = new Date().today() + " " + new Date().timeNow();
-      console.log(data.date + "    " + counter);
       data.startdate = today;
       data.enddate = lastday;
       counter++;
       // console.log(data);
     } else {
+      counter = counter - 20;
       var dd = String(today.getDate() - counter).padStart(2, "0");
       var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
       var mm2 = String(today.getMonth() + 2).padStart(2, "0"); //January is 0!
@@ -184,9 +206,11 @@ async function instertPosts() {
       var lastday = yyyy + "-" + mm2 + "-" + dd;
       setTime(0);
       data.date = new Date().today() + " " + new Date().timeNow();
+      console.log("data.date: " + data.date + " counter: " + counter);
+      console.log("today: " + today + " counter: " + counter);
+      console.log("lastday: " + lastday + " counter: " + counter);
       data.startdate = today;
       data.enddate = lastday;
-      counter = counter - 20;
       // console.log(data2);
     }
   }
@@ -1038,7 +1062,7 @@ app.post(
           .then(async (rev) => {
             let newarr = [];
             for await (r of rev.rows) {
-              console.log(r.emailreviewer);
+              // console.log(r.emailreviewer);
               let user = await Users.findOne({
                 where: {
                   email: r.emailreviewer,
@@ -1046,9 +1070,14 @@ app.post(
               }).catch((err) => {
                 console.error(err);
               });
-              r.dataValues["fullname"] = user.fullname;
-              r.dataValues.imagepath = "images/" + r.emailreviewer + ".jpeg";
-              console.log(r);
+              if (user == null) {
+                r.dataValues["fullname"] = "Ο χρήστης δεν υπάρχει";
+                r.dataValues.imagepath = "Η εικόνα δεν υπάρχει";
+              } else {
+                r.dataValues["fullname"] = user.fullname;
+                r.dataValues.imagepath = "images/" + r.emailreviewer + ".jpeg";
+                // console.log(r);
+              }
             }
 
             //PAGINATION
@@ -1138,6 +1167,19 @@ app.post(
       });
   }
 );
+
+//database posts and reviews population
+app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
+  try {
+    var data = req.body.data;
+    insertPosts(data.mainEmail);
+    insertReviews(data.mainEmail, data.secondaryEmail);
+    res.send("σωστο");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Λαθος");
+  }
+});
 
 //service pou epistrefei mia lista apo ta posts tou user
 app.get(
