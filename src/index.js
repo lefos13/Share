@@ -1227,7 +1227,7 @@ app.post(
 );
 
 //service poy epistrefei ta post gia ta opoia einai interested o user
-app.get(
+app.post(
   "/getInterestedPerUser",
   [authenticateToken],
   cors(corsOptions),
