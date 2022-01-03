@@ -610,74 +610,68 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 response:
 {
   "data": [
-    [
-      {
-        "user": {
+    {
+      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
+      "post": {
+        "piid": 55,
+        "postid": 1562,
+        "email": "lefterisevagelinos1996@gmail.com",
+        "date": "2022-01-02T10:24:26.000Z",
+        "startplace": "Τρίκαλα",
+        "startcoord": "39.5557317,21.7678951",
+        "endplace": "Γαλατάς",
+        "endcoord": "35.498456,23.9630835",
+        "numseats": 2,
+        "startdate": "2022-01-02",
+        "enddate": "2022-02-07",
+        "costperseat": 1,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]"
+      },
+      "users": [
+        {
           "email": "lefterisevagelinos1996@gmail.com",
-          "password": "$2b$10$jq7N95aLNUV6cpGG4y1xBOeFO5FT14yWKxqb1L.wQ.HE1N23cMPS2",
-          "mobile": "6975620785",
           "fullname": "lefos evan",
           "car": "BMW",
           "cardate": "2016",
           "gender": "male",
           "age": "25",
           "photo": "1",
-          "facebook": null,
-          "instagram": null,
-          "verified": true
-        },
-        "post": {
-          "piid": 55,
-          "postid": 1562,
-          "email": "lefterisevagelinos1996@gmail.com",
-          "date": "2022-01-02T10:24:26.000Z",
-          "startplace": "Τρίκαλα",
-          "startcoord": "39.5557317,21.7678951",
-          "endplace": "Γαλατάς",
-          "endcoord": "35.498456,23.9630835",
-          "numseats": 2,
-          "startdate": "2022-01-02",
-          "enddate": "2022-02-07",
-          "costperseat": 1,
-          "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-          "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]"
+          "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
         }
-      }
-    ],
-    [
-      {
-        "user": {
+      ]
+    },
+    {
+      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
+      "post": {
+        "piid": 56,
+        "postid": 1563,
+        "email": "lefterisevagelinos1996@gmail.com",
+        "date": "2022-01-02T10:24:26.000Z",
+        "startplace": "Τρίκαλα",
+        "startcoord": "39.5557317,21.7678951",
+        "endplace": "Γαλατάς",
+        "endcoord": "35.498456,23.9630835",
+        "numseats": 3,
+        "startdate": "2022-01-03",
+        "enddate": "2022-02-08",
+        "costperseat": 2,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]"
+      },
+      "users": [
+        {
           "email": "lefterisevagelinos1996@gmail.com",
-          "password": "$2b$10$jq7N95aLNUV6cpGG4y1xBOeFO5FT14yWKxqb1L.wQ.HE1N23cMPS2",
-          "mobile": "6975620785",
           "fullname": "lefos evan",
           "car": "BMW",
           "cardate": "2016",
           "gender": "male",
           "age": "25",
           "photo": "1",
-          "facebook": null,
-          "instagram": null,
-          "verified": true
-        },
-        "post": {
-          "piid": 56,
-          "postid": 1563,
-          "email": "lefterisevagelinos1996@gmail.com",
-          "date": "2022-01-02T10:24:26.000Z",
-          "startplace": "Τρίκαλα",
-          "startcoord": "39.5557317,21.7678951",
-          "endplace": "Γαλατάς",
-          "endcoord": "35.498456,23.9630835",
-          "numseats": 3,
-          "startdate": "2022-01-03",
-          "enddate": "2022-02-08",
-          "costperseat": 2,
-          "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-          "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]"
+          "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
         }
-      }
-    ]
+      ]
+    }
   ],
   "message": "Βρέθηκαν ενδιαφερόμενοι"
 }

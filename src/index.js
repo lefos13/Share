@@ -1414,6 +1414,7 @@ app.post(
               }).catch((err) => {
                 console.error(err);
               });
+              user.dataValues.imagePath = "images/" + user.email + ".jpeg";
               allUsers.push(user);
               fullpost = { ...one.dataValues, ...post.dataValues };
             }
