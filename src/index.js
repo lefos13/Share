@@ -815,7 +815,7 @@ app.post(
                     }
                     results = {
                       user: user,
-                      imagepath: "images/" + fnd.email + ".jpeg",
+                      imagePath: "images/" + fnd.email + ".jpeg",
                       post: fnd,
                       interested: flag,
                     };
@@ -907,9 +907,9 @@ app.post(
               ? (totallength = array.length / 20)
               : (totallength = array.length / 20 - mod / 20 + 1);
             results = {
-              postuser: finalarr,
-              total_pages: totallength,
-              pagelength: finalarr.length,
+              postUser: finalarr,
+              totalPages: totallength,
+              pageLength: finalarr.length,
               // test: array,
             };
 
@@ -1209,7 +1209,7 @@ app.post(
         mod == 0
           ? (totallength = count / 20)
           : (totallength = count / 20 - mod / 20 + 1);
-
+        let array = [];
         for await (post of finalarr) {
           let tempd = post.date;
 
@@ -1229,13 +1229,51 @@ app.post(
             tempd.getMinutes();
 
           post.dataValues.date = dateonly + " " + newtime;
+          let image = "images/" + post.email + ".jpeg";
+
+          //find user of post
+          let user = await Users.findOne({
+            attributes: {
+              exclude: [
+                "password",
+                "verified",
+                "facebook",
+                "instagram",
+                "mobile",
+              ],
+            },
+            where: {
+              email: post.email,
+            },
+          }).catch((err) => {
+            console.error(err);
+          });
+
+          let interested = await PostInterested.findOne({
+            where: {
+              email: post.email,
+              postid: post.postid,
+            },
+          }).catch((err) => {
+            console.error("provlima sto postinterested line 1258");
+          });
+          let flag;
+          interested === null ? (flag = false) : (flag = true);
+
+          let results = {
+            user: user,
+            imagePath: image,
+            post: post,
+            interested: flag,
+          };
+          array.push(results);
         }
 
         res.json({
-          body: finalarr,
-          total_pages: totallength,
-          total_length: count,
-          page_length: finalarr.length,
+          postUser: array,
+          totalPages: totallength,
+          totalLength: count,
+          pageLength: finalarr.length,
         });
         // res.json({ ok: "ok" });
       })
@@ -1262,6 +1300,7 @@ app.post(
       .then(async (found) => {
         let obj = [];
         let counter = 0;
+        let array = [];
         for await (postI of found) {
           let post = await Posts.findOne({
             where: {
@@ -1290,12 +1329,37 @@ app.post(
 
           post.dataValues.date = dateonly + " " + newtime;
           // console.log(postI);
-          obj[counter] = { ...postI.dataValues, ...post.dataValues };
+          let tempPost = { ...postI.dataValues, ...post.dataValues };
           // console.log(obj[counter]);
-          counter++;
+          let user = await Users.findOne({
+            attributes: {
+              exclude: [
+                "password",
+                "verified",
+                "facebook",
+                "instagram",
+                "mobile",
+              ],
+            },
+            where: {
+              email: post.dataValues.email,
+            },
+          }).catch((err) => {
+            console.error("line 1344 " + err);
+          });
+          let image = "images/" + post.email + ".jpeg";
+          let results = {
+            user: user,
+            imagePath: image,
+            post: tempPost,
+            interested: true,
+          };
+          array.push(results);
         }
+
         res.json({
-          body: obj,
+          postUser: array,
+          message: "No pagination",
         });
       })
       .catch((err) => {
@@ -1328,24 +1392,38 @@ app.post(
           }).catch((err) => {
             console.error(err);
           });
-          let userOfInterested = [];
+          let fullpost;
+          let allUsers = [];
+
           // console.log(interested);
           if (interested.length != 0) {
             for await (one of interested) {
               const user = await Users.findOne({
+                attributes: {
+                  exclude: [
+                    "password",
+                    "verified",
+                    "facebook",
+                    "instagram",
+                    "mobile",
+                  ],
+                },
                 where: {
                   email: one.email,
                 },
               }).catch((err) => {
                 console.error(err);
               });
-              let fullpost = { ...one.dataValues, ...post.dataValues };
-              userOfInterested.push({
-                user: user.dataValues,
-                post: fullpost,
-              });
+              allUsers.push(user);
+              fullpost = { ...one.dataValues, ...post.dataValues };
             }
-            array.push(userOfInterested);
+            let image = "images/" + post.email + ".jpeg";
+            let results = {
+              imagePath: image,
+              post: fullpost,
+              users: allUsers,
+            };
+            array.push(results);
           }
         }
 
