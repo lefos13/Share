@@ -214,6 +214,28 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "page": 4
     }
 }
+###
+
+POST http://localhost:3000/deletePost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "postid": 1562
+    }
+}
+###
+
+POST http://localhost:3000/deleteInterested
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "piid": 91
+    }
+}
 
 ###
 
@@ -264,6 +286,6 @@ Content-Type: application/json
 {
     "data": {
         "mainEmail": "lefterisevagelinos1996@gmail.com",
-        "secondaryEmail": "cs141082@uniwa.gr"
+        "secondaryEmail": "cs1410823@uniwa.gr"
     }
 }

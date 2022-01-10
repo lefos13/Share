@@ -89,9 +89,10 @@ const insertReviews = async (main, second) => {
     email: main,
     emailreviewer: second + pseudo,
     rating: 5,
-    text: "Generated text for testing",
+    text: "",
   };
   for (let i = 0; i <= 100; i++) {
+    data.text = " FAKE REVIEW NUMBER: " + i;
     await Reviews.create(data)
       .then((res) => {
         data.rating >= 5 ? (data.rating = 1) : data.rating++;
@@ -1167,7 +1168,7 @@ app.post(
 app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
   try {
     var data = req.body.data;
-    insertPosts(data.mainEmail);
+    // insertPosts(data.mainEmail);
     insertReviews(data.mainEmail, data.secondaryEmail);
     res.send("σωστο");
   } catch (err) {
@@ -1439,6 +1440,66 @@ app.post(
   }
 );
 
+//delete a post from database
+app.post(
+  "/deletePost",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.body.data;
+    await Posts.destroy({
+      where: {
+        postid: data.postid,
+      },
+    })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+      })
+      .then((results) => {
+        console.log(results);
+        if (results == 0) {
+        }
+        results == 0
+          ? res.status(404).json({ message: "Το post δεν υπάρχει" })
+          : res.json({ message: "Το post διαγράφηκε" });
+      });
+  }
+);
+
+//service that deletes an interested from the db
+app.post(
+  "/deleteInterested",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      var data = req.body.data;
+      await PostInterested.destroy({
+        where: {
+          piid: data.piid,
+        },
+      })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+        })
+        .then((results) => {
+          console.log(results);
+          if (results == 0) {
+          }
+          results == 0
+            ? res.status(404).json({ message: "Ο ενδιαφερόμενος δεν υπάρχει" })
+            : res.json({ message: "Ο ενδιαφερόμενος διαγράφηκε" });
+        });
+    } catch (err) {
+      console.error("sto try and catch");
+      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+    }
+    // console.log(req.query);
+  }
+);
 //epistrefei to plithos twn endiaferomenwn twn post enos xrhsth
 app.get(
   "/getlofinterested",
