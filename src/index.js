@@ -1384,6 +1384,8 @@ app.post(
     })
       .then(async (posts) => {
         let array = [];
+        let message = "Βρέθηκαν ενδιαφερόμενοι";
+        let isAny = 0;
         let obj;
         for await (post of posts) {
           const interested = await PostInterested.findAll({
@@ -1398,6 +1400,7 @@ app.post(
 
           // console.log(interested);
           if (interested.length != 0) {
+            isAny++;
             for await (one of interested) {
               const user = await Users.findOne({
                 attributes: {
@@ -1428,10 +1431,12 @@ app.post(
             array.push(results);
           }
         }
-
+        isAny > 0
+          ? (message = "Βρέθηκαν ενδιαφερόμενοι")
+          : (message = "Δεν βρέθηκαν ενδιαφερόμενοι");
         res.json({
           data: array,
-          message: "Βρέθηκαν ενδιαφερόμενοι",
+          message: message,
         });
       })
       .catch((err) => {
