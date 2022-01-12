@@ -727,17 +727,22 @@ Response:
 }
 
 
+###
 // mainEmail: se afto to email tha ginontai generated ta posts. 
 // Epishs to idio email tha einai to pathitiko eimail twn reviews. (dhladh se afton tha kanoyn to review)
 // To secondaryEmail einai o emailReviewer dhladh aftow poy tha kanei to review
 // Gia na treksei duo fores h perissoteres to api prepei na allazei kathe fora to secondary email. (Den einai aparaithto na einai uparkto email)
+// postid: dineis to id apo to post sto opoio thes na ginoun generated polloi endiaferomenoi
+// postidList: lista me postid poy thes enas user na endiaferetai gia afta
 POST http://localhost:3000/dbMigration
 Content-Type: application/json
 
 {
     "data": {
         "mainEmail": "lefterisevagelinos1996@gmail.com",
-        "secondaryEmail": "cs141082@uniwa.gr"
+        "secondaryEmail": "cs1410823@uniwa.gr",
+        "postid": 1563,
+        "postidList": [1564,1565,1566,1567,1568]
     }
 }
 

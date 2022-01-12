@@ -217,6 +217,52 @@ async function insertPosts(email) {
   }
 }
 
+//eisagwgh endiaferomenwn gia ena post
+const insertInterested = async (postid) => {
+  try {
+    setTime(0);
+    var curtime = new Date().today() + " " + new Date().timeNow();
+    let data = {
+      email: "lefterisevagelinos@gmail.com",
+      postid: postid,
+      date: curtime,
+    };
+    for (let i = 0; i < 70; i++) {
+      data.email = "lefterisevagelinos1996@gmail.com" + i;
+      await PostInterested.create(data).catch((err) => {
+        console.error(err);
+        return 0;
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    return 0;
+  }
+};
+
+//eisagwgh endiaferwn gia enan xrhsth se polla post
+const insertInterested2 = async (postidList, mainEmail) => {
+  try {
+    setTime(0);
+    var curtime = new Date().today() + " " + new Date().timeNow();
+    let data = {
+      email: mainEmail,
+      postid: 0,
+      date: curtime,
+    };
+    for await (id of postidList) {
+      data.postid = id;
+      await PostInterested.create(data).catch((err) => {
+        console.error(err);
+        return 0;
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    return 0;
+  }
+};
+
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -1169,7 +1215,9 @@ app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
   try {
     var data = req.body.data;
     // insertPosts(data.mainEmail);
-    insertReviews(data.mainEmail, data.secondaryEmail);
+    // insertReviews(data.mainEmail, data.secondaryEmail);
+    insertInterested(data.postid);
+    insertInterested2(data.postidList, data.mainEmail);
     res.send("σωστο");
   } catch (err) {
     console.error(err);
@@ -1349,6 +1397,18 @@ app.post(
             console.error("line 1344 " + err);
           });
           let image = "images/" + post.email + ".jpeg";
+          // if (user==null){
+          //   user = {
+          //     "email": "lefterisevagelinos1996@gmail.com",
+          //     "fullname": "lefos evan",
+          //     "car": "BMW",
+          //     "cardate": "2016",
+          //     "gender": "male",
+          //     "age": "25",
+          //     "photo": "1",
+          //     "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
+          //   }
+          // }
           let results = {
             user: user,
             imagePath: image,
@@ -1418,8 +1478,21 @@ app.post(
               }).catch((err) => {
                 console.error(err);
               });
-              user.dataValues.imagePath = "images/" + user.email + ".jpeg";
-              allUsers.push(user);
+              if (user != null) {
+                user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+                allUsers.push(user);
+              } else {
+                allUsers.push({
+                  email: "Fake User",
+                  fullname: one.email,
+                  car: "BMW",
+                  cardate: "2016",
+                  gender: "male",
+                  age: "25",
+                  photo: "1",
+                  imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
+                });
+              }
               fullpost = { ...one.dataValues, ...post.dataValues };
             }
             let image = "images/" + post.email + ".jpeg";
@@ -1440,6 +1513,7 @@ app.post(
         });
       })
       .catch((err) => {
+        console.error(err);
         res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
