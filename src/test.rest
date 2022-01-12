@@ -123,8 +123,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "cs141082@uniwa.gr",
-        "postid": 849
+        "email": "lefterisevagelinos1996@gmail.com",
+        "postid": 1563
     }
 }
 
@@ -259,7 +259,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com",
+        "page": 1
     }
 }
 ###

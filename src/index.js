@@ -1504,13 +1504,32 @@ app.post(
             array.push(results);
           }
         }
-        isAny > 0
-          ? (message = "Βρέθηκαν ενδιαφερόμενοι")
-          : (message = "Δεν βρέθηκαν ενδιαφερόμενοι");
-        res.json({
-          data: array,
-          message: message,
-        });
+
+        if (isAny > 0) {
+          message = "Βρέθηκαν ενδιαφερόμενοι";
+          let skipcount = 0;
+          let takecount = 20;
+          if (data.page > 1) skipcount = data.page * 20 - 20;
+          let finalarr = _.take(_.drop(array, skipcount), takecount);
+          let mod = isAny % 20;
+          // console.log(mod);
+          let totallength = 1;
+          mod == 0
+            ? (totallength = isAny / 20)
+            : (totallength = isAny / 20 - mod / 20 + 1);
+          res.json({
+            postUser: finalarr,
+            totalPages: totallength,
+            totalLength: isAny,
+            pageLength: finalarr.length,
+            message: message,
+          });
+        } else {
+          message = "Δεν βρέθηκαν ενδιαφερόμενοι";
+          res.status(404).json({
+            message: message,
+          });
+        }
       })
       .catch((err) => {
         console.error(err);
