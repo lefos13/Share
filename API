@@ -609,22 +609,21 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 response:
 {
-  "data": [
+  "postUser": [
     {
-      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
       "post": {
-        "piid": 55,
-        "postid": 1562,
+        "piid": 189,
+        "postid": 1566,
         "email": "lefterisevagelinos1996@gmail.com",
-        "date": "2022-01-02T10:24:26.000Z",
+        "date": "02-01-2022 12:24",
         "startplace": "Τρίκαλα",
         "startcoord": "39.5557317,21.7678951",
         "endplace": "Γαλατάς",
         "endcoord": "35.498456,23.9630835",
         "numseats": 2,
-        "startdate": "2022-01-02",
-        "enddate": "2022-02-07",
-        "costperseat": 1,
+        "startdate": "2022-01-06",
+        "enddate": "2022-02-11",
+        "costperseat": 5,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]"
       },
@@ -639,23 +638,24 @@ response:
           "photo": "1",
           "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
         }
-      ]
+      ],
+      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
+      "hasMoreUsers": false
     },
     {
-      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
       "post": {
-        "piid": 56,
-        "postid": 1563,
+        "piid": 190,
+        "postid": 1567,
         "email": "lefterisevagelinos1996@gmail.com",
-        "date": "2022-01-02T10:24:26.000Z",
+        "date": "02-01-2022 12:24",
         "startplace": "Τρίκαλα",
         "startcoord": "39.5557317,21.7678951",
         "endplace": "Γαλατάς",
         "endcoord": "35.498456,23.9630835",
         "numseats": 3,
-        "startdate": "2022-01-03",
-        "enddate": "2022-02-08",
-        "costperseat": 2,
+        "startdate": "2022-01-07",
+        "enddate": "2022-02-12",
+        "costperseat": 6,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]"
       },
@@ -670,9 +670,46 @@ response:
           "photo": "1",
           "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
         }
-      ]
+      ],
+      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
+      "hasMoreUsers": false
+    },
+    {
+      "post": {
+        "piid": 191,
+        "postid": 1568,
+        "email": "lefterisevagelinos1996@gmail.com",
+        "date": "02-01-2022 12:24",
+        "startplace": "Τρίκαλα",
+        "startcoord": "39.5557317,21.7678951",
+        "endplace": "Γαλατάς",
+        "endcoord": "35.498456,23.9630835",
+        "numseats": 0,
+        "startdate": "2022-01-08",
+        "enddate": "2022-02-13",
+        "costperseat": 7,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]"
+      },
+      "users": [
+        {
+          "email": "lefterisevagelinos1996@gmail.com",
+          "fullname": "lefos evan",
+          "car": "BMW",
+          "cardate": "2016",
+          "gender": "male",
+          "age": "25",
+          "photo": "1",
+          "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
+        }
+      ],
+      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
+      "hasMoreUsers": false
     }
   ],
+  "totalPages": 1,
+  "totalLength": 3,
+  "pageLength": 3,
   "message": "Βρέθηκαν ενδιαφερόμενοι"
 }
 ###
@@ -779,4 +816,54 @@ response:
 
 {
   "message": "Ο ενδιαφερόμενος διαγράφηκε"
+}
+
+#service epistrefei lista me endiaferomenous gia ena post
+POST http://localhost:3000/getIntPost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "postid": 1563,
+        "page": 4
+    }
+}
+
+response: 
+
+{
+  "users": [
+    {
+      "email": "lefterisevagelinos1996@gmail.com",
+      "fullname": "lefos evan",
+      "car": "BMW",
+      "cardate": "2016",
+      "gender": "male",
+      "age": "25",
+      "photo": "1",
+      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
+    }
+  ],
+  "post": {
+    "postid": 1563,
+    "email": "giannisferagoulis21@gmail.com",
+    "startplace": "Τρίκαλα",
+    "startcoord": "39.5557317,21.7678951",
+    "endplace": "Γαλατάς",
+    "endcoord": "35.498456,23.9630835",
+    "numseats": 1,
+    "startdate": "2022-01-13",
+    "enddate": "2022-02-18",
+    "costperseat": 12,
+    "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+    "moreplaces": "[{\"place\":\"Αθήνα\",\"placecoords\":\"37.9838096,23.7275388\"}]",
+    "date": "02-01-2022 12:24"
+  },
+  "postImage": "images/undefined.jpeg",
+  "totalPages": 4,
+  "totalLength": 61,
+  "pageLength": 1,
+  "curPage": 4,
+  "message": "Βρέθηκαν ενδιαφερόμενοι"
 }

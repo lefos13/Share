@@ -1429,6 +1429,7 @@ app.post(
       });
   }
 );
+
 // epistrefei lista twn endiaferomenwn twn post enos xrhsth
 app.post(
   "/getInterested",
@@ -1448,6 +1449,24 @@ app.post(
         let isAny = 0;
         let obj;
         for await (post of posts) {
+          let tempd = post.date;
+
+          let dateonly =
+            (tempd.getDate() < 10 ? "0" : "") +
+            tempd.getDate() +
+            "-" +
+            (tempd.getMonth() + 1 < 10 ? "0" : "") +
+            (tempd.getMonth() + 1) +
+            "-" +
+            tempd.getFullYear();
+          let newtime =
+            (tempd.getHours() < 10 ? "0" : "") +
+            tempd.getHours() +
+            ":" +
+            (tempd.getMinutes() < 10 ? "0" : "") +
+            tempd.getMinutes();
+
+          post.dataValues.date = dateonly + " " + newtime;
           const interested = await PostInterested.findAll({
             where: {
               postid: post.postid,
@@ -1457,11 +1476,17 @@ app.post(
           });
           let fullpost;
           let allUsers = [];
+          let moreUsers = false;
+          let finalInt = _.take(_.drop(interested, 0), 20);
+
+          if (interested.length > 20) {
+            moreUsers = true;
+          }
 
           // console.log(interested);
           if (interested.length != 0) {
             isAny++;
-            for await (one of interested) {
+            for await (one of finalInt) {
               const user = await Users.findOne({
                 attributes: {
                   exclude: [
@@ -1497,9 +1522,10 @@ app.post(
             }
             let image = "images/" + post.email + ".jpeg";
             let results = {
-              imagePath: image,
               post: fullpost,
               users: allUsers,
+              imagePath: image,
+              hasMoreUsers: moreUsers,
             };
             array.push(results);
           }
@@ -1538,6 +1564,136 @@ app.post(
   }
 );
 
+// epistrefei lista twn endiaferomenwn enos post
+app.post(
+  "/getIntPost",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    // console.log(req.query);
+    var data = req.body.data;
+    var extra = req.body.extra;
+    let tempPost;
+    await Posts.findOne({
+      where: {
+        postid: data.postid,
+      },
+    })
+      .then(async (posts) => {
+        tempPost = posts;
+        let tempd = posts.date;
+
+        let dateonly =
+          (tempd.getDate() < 10 ? "0" : "") +
+          tempd.getDate() +
+          "-" +
+          (tempd.getMonth() + 1 < 10 ? "0" : "") +
+          (tempd.getMonth() + 1) +
+          "-" +
+          tempd.getFullYear();
+        let newtime =
+          (tempd.getHours() < 10 ? "0" : "") +
+          tempd.getHours() +
+          ":" +
+          (tempd.getMinutes() < 10 ? "0" : "") +
+          tempd.getMinutes();
+
+        posts.dataValues.date = dateonly + " " + newtime;
+        let message = "Βρέθηκαν ενδιαφερόμενοι";
+        let isAny = 0;
+        // euresh endiafermonwn gia to post
+        const interested = await PostInterested.findAll({
+          where: {
+            postid: posts.postid,
+          },
+        }).catch((err) => {
+          console.error(err);
+        });
+
+        let fullpost;
+        let allUsers = [];
+        let results;
+
+        // ean vrethikan endiaferomenoi
+        if (interested.length != 0) {
+          //gia kathe endiaferomeno
+          for await (one of interested) {
+            isAny++;
+            // pare ta stoixeia tou endiaferomenou
+            const user = await Users.findOne({
+              attributes: {
+                exclude: [
+                  "password",
+                  "verified",
+                  "facebook",
+                  "instagram",
+                  "mobile",
+                ],
+              },
+              where: {
+                email: one.email,
+              },
+            }).catch((err) => {
+              console.error(err);
+            });
+
+            if (user != null) {
+              user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+              allUsers.push(user);
+            } else {
+              allUsers.push({
+                email: "Fake User",
+                fullname: one.email,
+                car: "BMW",
+                cardate: "2016",
+                gender: "male",
+                age: "25",
+                photo: "1",
+                imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
+              });
+            }
+            fullpost = { ...one.dataValues, ...posts.dataValues };
+          }
+        }
+
+        let image = "images/" + extra.email + ".jpeg";
+
+        if (isAny > 0) {
+          message = "Βρέθηκαν ενδιαφερόμενοι";
+          let skipcount = 0;
+          let takecount = 20;
+          if (data.page > 1) skipcount = data.page * 20 - 20;
+          let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
+          let mod = isAny % 20;
+          // console.log(mod);
+          let totallength = 1;
+          mod == 0
+            ? (totallength = isAny / 20)
+            : (totallength = isAny / 20 - mod / 20 + 1);
+          res.json({
+            users: finalarr,
+            post: tempPost,
+            postImage: image,
+            totalPages: totallength,
+            totalLength: isAny,
+            pageLength: finalarr.length,
+            curPage: data.page,
+            message: message,
+          });
+        } else {
+          message = "Δεν βρέθηκαν ενδιαφερόμενοι";
+          res.status(404).json({
+            message: message,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
+      });
+  }
+);
+
 //delete a post from database
 app.post(
   "/deletePost",
@@ -1555,8 +1711,15 @@ app.post(
         console.error(err);
         res.status(500).json({ message: "Κάτι πήγε στραβά!" });
       })
-      .then((results) => {
+      .then(async (results) => {
         console.log(results);
+        await PostInterested.destroy({
+          where: {
+            postid: data.postid,
+          },
+        }).catch((err) => {
+          console.log(err);
+        });
         if (results == 0) {
         }
         results == 0
@@ -1598,6 +1761,7 @@ app.post(
     // console.log(req.query);
   }
 );
+
 //epistrefei to plithos twn endiaferomenwn twn post enos xrhsth
 app.get(
   "/getlofinterested",
