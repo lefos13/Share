@@ -1035,6 +1035,31 @@ app.post(
               console.error(err);
             });
 
+            const posts = await Posts.findAll({
+              where: {
+                email: data.email,
+              },
+            }).catch((err) => {
+              console.error(err);
+            });
+            let isAny = 0;
+            for await (one of posts) {
+              const interested = await PostInterested.findOne({
+                where: {
+                  postid: one.postid,
+                },
+              }).catch((err) => {
+                console.error(err);
+              });
+
+              if (interested != null) {
+                isAny++;
+                break;
+              }
+            }
+            let hasIntPosts;
+            isAny > 0 ? (hasIntPosts = true) : (hasIntPosts = false);
+
             let hasPosts;
             post == null ? (hasPosts = false) : (hasPosts = true);
 
@@ -1049,6 +1074,7 @@ app.post(
               count: revfound.count,
               hasPosts: hasPosts,
               hasInterested: hasInterested,
+              interestedForYourPosts: hasIntPosts, //4th tab
               reviewAble: true, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
               image: "images/" + data.email + ".jpeg",
               message: "Ο χρήστης βρέθηκε",
