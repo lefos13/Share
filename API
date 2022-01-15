@@ -349,6 +349,7 @@ RESPONSE:
   "count": 1,
   "hasPosts": true,
   "hasInterested": true,
+  "interestedForYourPosts": true,
   "reviewAble": true,
   "image": "images/cs141082@uniwa.gr.jpeg",
   "message": "Ο χρήστης βρέθηκε"
