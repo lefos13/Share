@@ -194,9 +194,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "lefterisevagelinos19961@gmail.com",
-        "emailreviewer": "cs141082@uniwa.gr",
-        "rating": 5,
+        "email": "giannisferagoulis21@gmail.com",
+        "emailreviewer": "giannisferagxsoulis21@gmail.com",
+        "rating": 4,
         "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
     }
 }
@@ -210,8 +210,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "page": 4
+        "email": "giannisferagoulis21@gmail.com",
+        "page": 1
     }
 }
 ###

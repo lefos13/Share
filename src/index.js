@@ -1230,12 +1230,14 @@ app.post(
       })
       .catch((err) => {
         console.error(err);
-        if (err.original.code == "ER_DUP_ENTRY")
+        if (err.original.code == "ER_DUP_ENTRY") {
           res.status(405).json({
             message: "Έχεις κάνει ήδη αξιολόγηση σε αυτόν τον χρήστη.",
             body: null,
           });
-        res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+        } else {
+          res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+        }
       });
   }
 );
@@ -1900,7 +1902,8 @@ const insertAver = async (user) => {
         total = r.toJSON().total;
       }
       let average = total / results.count;
-      let rounded = Math.round(average);
+      let rounded = average.toFixed(1);
+      rounded = parseFloat(rounded);
       let count = results.count;
       return {
         average: rounded,
