@@ -848,6 +848,10 @@ app.post(
             })
               .then(async (user) => {
                 var flag;
+                let extraData = await insertAver(user);
+                user.dataValues = { ...user.dataValues, ...extraData };
+                // console.log(user);
+
                 await PostInterested.findOne({
                   where: {
                     email: data.email,
@@ -861,7 +865,7 @@ app.post(
                       flag = true;
                     }
                     results = {
-                      user: user,
+                      user: user.toJSON(),
                       imagePath: "images/" + fnd.email + ".jpeg",
                       post: fnd,
                       interested: flag,
@@ -1324,6 +1328,10 @@ app.post(
             console.error(err);
           });
 
+          // insert review data to user data
+          let extraData = await insertAver(user);
+          user.dataValues = { ...user.dataValues, ...extraData };
+
           let interested = await PostInterested.findOne({
             where: {
               email: post.email,
@@ -1422,6 +1430,8 @@ app.post(
           }).catch((err) => {
             console.error("line 1344 " + err);
           });
+          let extraData = await insertAver(user);
+          user.dataValues = { ...user.dataValues, ...extraData };
           let image = "images/" + post.email + ".jpeg";
           // if (user==null){
           //   user = {
@@ -1531,6 +1541,8 @@ app.post(
               });
               if (user != null) {
                 user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+                let extraData = await insertAver(user);
+                user.dataValues = { ...user.dataValues, ...extraData };
                 allUsers.push(user);
               } else {
                 allUsers.push({
@@ -1542,6 +1554,8 @@ app.post(
                   age: "25",
                   photo: "1",
                   imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
+                  average: 5,
+                  count: 100,
                 });
               }
               fullpost = { ...one.dataValues, ...post.dataValues };
@@ -1665,6 +1679,9 @@ app.post(
 
             if (user != null) {
               user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+              let testdata = await insertAver(user);
+              user.dataValues = { ...user.dataValues, ...testdata };
+              // console.log(JSON.stringify(testdata));
               allUsers.push(user);
             } else {
               allUsers.push({
@@ -1676,6 +1693,8 @@ app.post(
                 age: "25",
                 photo: "1",
                 imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
+                average: 5,
+                count: 100,
               });
             }
             fullpost = { ...one.dataValues, ...posts.dataValues };
@@ -1788,43 +1807,6 @@ app.post(
   }
 );
 
-//epistrefei to plithos twn endiaferomenwn twn post enos xrhsth
-app.get(
-  "/getlofinterested",
-  [authenticateToken],
-  cors(corsOptions),
-  async (req, res) => {
-    // console.log(req.query);
-    var data = req.query;
-    await Posts.findAll({
-      where: {
-        email: data.email,
-      },
-    })
-      .then(async (found) => {
-        var finalcount = 0;
-        for await (fnd of found) {
-          await PostInterested.count({
-            where: {
-              postid: fnd.postid,
-            },
-          })
-            .then((count) => {
-              finalcount = finalcount + count;
-            })
-            .catch((err) => {
-              res.status(400).json({ message: "Bad request", body: null });
-            });
-        }
-        res.json({ length: finalcount });
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(400).send({ message: "Ωχ! κάτι πήγε στραβά!", body: null });
-      });
-  }
-);
-
 //test api async await functions
 app.get("/test", [authenticateToken], cors(corsOptions), async (req, res) => {
   var now = "now";
@@ -1871,13 +1853,6 @@ app.post("/upload", upload.single("upload"), function (req, res) {
   res.json({ message: "Το upload έγινε επιτυχώς" });
 });
 
-// var tempd = "2021-10-06T00:00:00.000Z";
-// tempd = tempd.split("T");
-// var dateonly = tempd[0].split("-");
-// var newdate = dateonly[2] + "-" + dateonly[1] + "-" + dateonly[0];
-// var temptime = tempd[1].replace("Z", "").split(":");
-// var newtime = temptime[0] + ":" + temptime[1];
-// console.log(newdate + " " + newtime);
 function setTime(extrad) {
   Date.prototype.today = function () {
     return (
@@ -1904,5 +1879,44 @@ function setTime(extrad) {
     );
   };
 }
+
+const insertAver = async (user) => {
+  try {
+    let results = await Reviews.findAndCountAll({
+      attributes:
+        // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+        [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+      where: {
+        email: user.email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    if (results.count != 0) {
+      let rows = results.rows;
+      let total = null;
+      for await (r of rows) {
+        total = r.toJSON().total;
+      }
+      let average = total / results.count;
+      let rounded = Math.round(average);
+      let count = results.count;
+      return {
+        average: rounded,
+        count: count,
+      };
+    } else {
+      let average = 0;
+      let count = 0;
+      return {
+        average: rounded,
+        count: count,
+      };
+    }
+  } catch (err) {
+    console.error("inside InsertAver()" + err);
+  }
+};
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
