@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141082@uniwa.gr"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -272,8 +272,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "postid": 1563,
-        "page": 4
+        "postid": 1566,
+        "page": 1
     }
 }
 ###
@@ -281,6 +281,26 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 GET http://localhost:3000/test
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+###
+// verify an insterested user to a post
+POST http://localhost:3000/verInterested
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "postid": 1566,
+        "piid": 189
+    }
+}
+
+###
+
+//service to notify someone that has been verified for a post that he is interested
+POST http://localhost:3000/notifyMe
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDEtMTZUMjM6MjA6MjIuNzcwWiIsImlhdCI6MTY0MjM3NTIyMiwiZXhwIjoxNjQ3NTU5MjIyfQ.jYERrohu2ZxGreYE3hlHEFeUwF-JzXdqRB9u-BlQCWo
 
 ###
 // mainEmail: se afto to email tha ginontai generated ta posts. 
@@ -300,3 +320,5 @@ Content-Type: application/json
         "postidList": [1564,1565,1566,1567,1568]
     }
 }
+
+###

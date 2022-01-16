@@ -868,3 +868,33 @@ response:
   "curPage": 4,
   "message": "Βρέθηκαν ενδιαφερόμενοι"
 }
+
+// verify an insterested user to a post
+POST http://localhost:3000/verInterested
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+
+{
+    "data": {
+        "postid": 1563,
+        "piid": 124
+    }
+}
+
+response:
+
+{
+  "message": "Ακύρωση έγκρισης ενδιαφερόμενου!"
+}
+
+other success response:
+
+{
+  "message": "Επιτυχής έγκριση ενδιαφερόμενου!"
+}
+
+other status 405 response:
+
+{
+  "message": "Έχεις καλύψει πλήρως τις διαθέσιμες θέσεις!"
+}

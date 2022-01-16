@@ -1530,6 +1530,7 @@ app.post(
             tempd.getMinutes();
 
           post.dataValues.date = dateonly + " " + newtime;
+          // endiaferomoi gia ena sygekrimeno post
           const interested = await PostInterested.findAll({
             where: {
               postid: post.postid,
@@ -1537,6 +1538,7 @@ app.post(
           }).catch((err) => {
             console.error(err);
           });
+
           let fullpost;
           let allUsers = [];
           let moreUsers = false;
@@ -1566,13 +1568,17 @@ app.post(
               }).catch((err) => {
                 console.error(err);
               });
+
               if (user != null) {
                 user.dataValues.imagePath = "images/" + user.email + ".jpeg";
                 let extraData = await insertAver(user);
                 user.dataValues = { ...user.dataValues, ...extraData };
+                user.dataValues.isVerified = one.isVerified;
+                user.dataValues.piid = one.piid;
                 allUsers.push(user);
               } else {
                 allUsers.push({
+                  piid: one.piid,
                   email: "Fake User",
                   fullname: one.email,
                   car: "BMW",
@@ -1583,13 +1589,14 @@ app.post(
                   imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
                   average: 5,
                   count: 100,
+                  isVerified: one.isVerified,
                 });
               }
-              fullpost = { ...one.dataValues, ...post.dataValues };
             }
+
             let image = "images/" + post.email + ".jpeg";
             let results = {
-              post: fullpost,
+              post: posts,
               users: allUsers,
               imagePath: image,
               hasMoreUsers: moreUsers,
@@ -1640,14 +1647,13 @@ app.post(
     // console.log(req.query);
     var data = req.body.data;
     var extra = req.body.extra;
-    let tempPost;
+    // console.log(req.body.extra, extra);
     await Posts.findOne({
       where: {
         postid: data.postid,
       },
     })
       .then(async (posts) => {
-        tempPost = posts;
         let tempd = posts.date;
 
         let dateonly =
@@ -1679,7 +1685,6 @@ app.post(
 
         let fullpost;
         let allUsers = [];
-        let results;
 
         // ean vrethikan endiaferomenoi
         if (interested.length != 0) {
@@ -1708,6 +1713,7 @@ app.post(
               user.dataValues.imagePath = "images/" + user.email + ".jpeg";
               let testdata = await insertAver(user);
               user.dataValues = { ...user.dataValues, ...testdata };
+              user.dataValues.isVerified = one.isVerified;
               // console.log(JSON.stringify(testdata));
               allUsers.push(user);
             } else {
@@ -1722,13 +1728,14 @@ app.post(
                 imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
                 average: 5,
                 count: 100,
+                isVerified: one.isVerified,
               });
             }
-            fullpost = { ...one.dataValues, ...posts.dataValues };
+            fullpost = { ...{ piid: one.piid }, ...posts.dataValues };
           }
         }
 
-        let image = "images/" + extra.email + ".jpeg";
+        let image = "images/" + extra + ".jpeg";
 
         if (isAny > 0) {
           message = "Βρέθηκαν ενδιαφερόμενοι";
@@ -1744,7 +1751,7 @@ app.post(
             : (totallength = isAny / 20 - mod / 20 + 1);
           res.json({
             users: finalarr,
-            post: tempPost,
+            post: fullpost,
             postImage: image,
             totalPages: totallength,
             totalLength: isAny,
@@ -1851,6 +1858,16 @@ app.post(
         throw err;
       });
 
+      const allIntersted = await PostInterested.count({
+        where: {
+          postid: data.postid,
+          isVerified: true,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      // console.log(allIntersted);
       const post = await Posts.findOne({
         where: {
           postid: data.postid,
@@ -1858,14 +1875,90 @@ app.post(
       }).catch((err) => {
         throw err;
       });
-
-      if (results.isVerified == false) {
-        results.update({ isVerified: true });
+      if (allIntersted < post.numseats || results.isVerified == true) {
+        if (results.isVerified == false) {
+          results.update({ isVerified: true });
+          res.json({
+            message: "Επιτυχής έγκριση ενδιαφερόμενου!",
+          });
+        } else {
+          results.update({ isVerified: false });
+          res.json({
+            message: "Ακύρωση έγκρισης ενδιαφερόμενου!",
+          });
+        }
       } else {
-        results.update({ isVerified: false });
+        res.status(405).json({
+          message: "Έχεις καλύψει πλήρως τις διαθέσιμες θέσεις!",
+        });
       }
     } catch (err) {
       console.error("!!!!!!!!!!!!!!sto verInterested: ", err);
+      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+    }
+    // console.log(req.query);
+  }
+);
+
+//service for notification if someone has verified me
+app.post(
+  "/notifyMe",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      // let data = req.body.data;
+      let extra = req.body.extra;
+      let flag = false;
+      let body = null;
+      let message = "Καμία νέα έγκριση!";
+      let posts = [];
+      const allInt = await PostInterested.findAll({
+        where: {
+          email: extra,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      for await (one of allInt) {
+        if (one.isVerified == true) {
+          flag = true;
+          message = "Έχεις πάρει έγκριση!";
+          const post = await Posts.findOne({
+            where: {
+              postid: one.postid,
+            },
+          }).catch((err) => {
+            throw err;
+          });
+
+          post.dataValues = { ...post.dataValues, ...{ piid: one.piid } };
+          const userPost = await Users.findOne({
+            attributes: {
+              exclude: ["password"],
+            },
+            where: {
+              email: post.email,
+            },
+          }).catch((err) => {
+            throw err;
+          });
+
+          posts.push({
+            post: post,
+            userOwner: userPost,
+          });
+        }
+      }
+
+      res.json({
+        notify: flag,
+        postUsers: posts,
+        message: message,
+      });
+    } catch (err) {
+      console.error("!!!!!!!!!!!!!!sto notifyme: ", err);
       res.status(500).json({ message: "Κάτι πήγε στραβά" });
     }
     // console.log(req.query);
