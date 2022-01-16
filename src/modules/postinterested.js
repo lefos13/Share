@@ -36,6 +36,10 @@ const PostInterested = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

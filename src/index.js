@@ -282,6 +282,30 @@ function authenticateToken(req, res, next) {
   });
 }
 
+// sunarthsh poy eisagei fake users (70) ---- gia testing --- password 123456
+const insertUsers = async () => {
+  let arr = [];
+  for (let i = 0; i < 70; i++) {
+    arr.push({
+      email: "user" + i + "@gmail.com",
+      password: "$2b$10$GsLPti1c129vcZdPdK8gk.VDX1oSHyWfg.I7Rh77tKvtZEWtl9nJ.",
+      mobile: "12313",
+      fullname: "lefos evan",
+      gender: "male",
+      car: "toyota",
+      cardate: "1996",
+      age: "26",
+      photo: "12131231",
+      verified: true,
+    });
+  }
+
+  // console.log(arr);
+  Users.bulkCreate(arr).catch((err) => {
+    console.error(err);
+  });
+};
+
 //cors configuration
 const whitelist = ["*"];
 const corsOptions = {
@@ -1248,8 +1272,9 @@ app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
     var data = req.body.data;
     // insertPosts(data.mainEmail);
     // insertReviews(data.mainEmail, data.secondaryEmail);
-    insertInterested(data.postid);
-    insertInterested2(data.postidList, data.mainEmail);
+    // insertInterested(data.postid);
+    // insertInterested2(data.postidList, data.mainEmail);
+    insertUsers();
     res.send("σωστο");
   } catch (err) {
     console.error(err);
@@ -1803,6 +1828,44 @@ app.post(
         });
     } catch (err) {
       console.error("sto try and catch");
+      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+    }
+    // console.log(req.query);
+  }
+);
+
+//service that verifies an insterested or unverfies him if already verified
+app.post(
+  "/verInterested",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      var data = req.body.data;
+      var extra = req.body.extra;
+      const results = await PostInterested.findOne({
+        where: {
+          piid: data.piid,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      const post = await Posts.findOne({
+        where: {
+          postid: data.postid,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      if (results.isVerified == false) {
+        results.update({ isVerified: true });
+      } else {
+        results.update({ isVerified: false });
+      }
+    } catch (err) {
+      console.error("!!!!!!!!!!!!!!sto verInterested: ", err);
       res.status(500).json({ message: "Κάτι πήγε στραβά" });
     }
     // console.log(req.query);
