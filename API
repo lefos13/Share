@@ -898,3 +898,96 @@ other status 405 response:
 {
   "message": "Έχεις καλύψει πλήρως τις διαθέσιμες θέσεις!"
 }
+
+POST http://localhost:3000/notifyMe
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDEtMTZUMjM6MjA6MjIuNzcwWiIsImlhdCI6MTY0MjM3NTIyMiwiZXhwIjoxNjQ3NTU5MjIyfQ.jYERrohu2ZxGreYE3hlHEFeUwF-JzXdqRB9u-BlQCWo
+
+response:
+
+{
+  "notify": true,
+  "postUsers": [
+    {
+      "post": {
+        "postid": 1721,
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "Volos",
+        "startcoord": "31",
+        "endplace": "Athens",
+        "endcoord": "23",
+        "numseats": 2,
+        "startdate": "2021-12-15",
+        "enddate": "2021-12-16",
+        "costperseat": 40,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": "[{\"place\":\"lamia\",\"placecoords\":\"123\"},{\"place\":\"lamia\",\"placecoords\":\"123\"}]",
+        "date": "2022-01-17T13:45:58.000Z",
+        "piid": 198
+      },
+      "userOwner": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "mobile": "6975620785",
+        "fullname": "lefos evan",
+        "car": "BMW",
+        "cardate": "2016",
+        "gender": "male",
+        "age": "25",
+        "photo": "1",
+        "facebook": null,
+        "instagram": null,
+        "verified": true
+      }
+    }
+  ],
+  "alreadyNotified": [],
+  "message": "Έχεις πάρει έγκριση!"
+}
+
+alter response:
+
+{
+  "notify": false,
+  "postUsers": [],
+  "alreadyNotified": [
+    {
+      "post": {
+        "postid": 1721,
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "Volos",
+        "startcoord": "31",
+        "endplace": "Athens",
+        "endcoord": "23",
+        "numseats": 2,
+        "startdate": "2021-12-15",
+        "enddate": "2021-12-16",
+        "costperseat": 40,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": "[{\"place\":\"lamia\",\"placecoords\":\"123\"},{\"place\":\"lamia\",\"placecoords\":\"123\"}]",
+        "date": "2022-01-17T13:45:58.000Z"
+      },
+      "userOwner": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "mobile": "6975620785",
+        "fullname": "lefos evan",
+        "car": "BMW",
+        "cardate": "2016",
+        "gender": "male",
+        "age": "25",
+        "photo": "1",
+        "facebook": null,
+        "instagram": null,
+        "verified": true
+      }
+    }
+  ],
+  "message": "Καμία νέα έγκριση!"
+}
+
+alter response (no history):
+{
+  "notify": false,
+  "postUsers": [],
+  "alreadyNotified": [],
+  "message": "Καμία νέα έγκριση!"
+}

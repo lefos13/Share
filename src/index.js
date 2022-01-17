@@ -67,7 +67,6 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   dialect: "mysql",
   logging: false,
   dialectOptions: {
-    timezone: "+03:00",
     dateStrings: true,
     typeCast: true,
   },
@@ -672,7 +671,7 @@ app.post(
           body: post.toJSON(),
           message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
         };
-        res.json(data);
+        res.json({ message: "Επιτυχής δημιουργία!" });
       })
       .catch((err) => {
         console.log(err);
@@ -700,6 +699,8 @@ app.post(
       email: req.body.data.email,
       postid: req.body.data.postid,
       date: curtime,
+      isVerified: false,
+      isNotified: false,
     };
     row["date"] = curtime;
     await PostInterested.findOne({
@@ -716,7 +717,7 @@ app.post(
               postid: row.postid,
             },
           }).then(() => {
-            res.status(201).json({
+            res.status(200).json({
               body: null,
               message: "Ακυρώθηκε το ενδιαφέρον σου",
             });
@@ -763,6 +764,7 @@ app.post(
         }
       })
       .catch((err) => {
+        console.error(err);
         res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
       });
   }
@@ -950,24 +952,10 @@ app.post(
           var counter = 0;
           //FORMAT CHANGE OF TIMSTAMP
           for await (ps of finalarr) {
-            // console.log(ps.post.date.getFullYear());
-            var tempd = ps.post.date;
-            // console.log(tempd);
-            var dateonly =
-              (tempd.getDate() < 10 ? "0" : "") +
-              tempd.getDate() +
-              "-" +
-              (tempd.getMonth() + 1 < 10 ? "0" : "") +
-              (tempd.getMonth() + 1) +
-              "-" +
-              tempd.getFullYear();
-            var newtime =
-              (tempd.getHours() < 10 ? "0" : "") +
-              tempd.getHours() +
-              ":" +
-              (tempd.getMinutes() < 10 ? "0" : "") +
-              tempd.getMinutes();
-            ps.post.dataValues.date = dateonly + " " + newtime;
+            const fixedDate = await fixDate(ps.post.date);
+
+            ps.post.dataValues.date =
+              fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
           }
           //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
           if (finalarr.length == 0) {
@@ -1153,7 +1141,6 @@ app.post(
           where: {
             email: data.email,
           },
-          // timezone: "+03:00",
         })
           .then(async (rev) => {
             let newarr = [];
@@ -1240,6 +1227,7 @@ app.post(
               total = r.toJSON().total;
             }
             var average = total / results.count;
+
             res.json({
               review: review,
               average: average,
@@ -1249,7 +1237,7 @@ app.post(
           })
           .catch((err) => {
             console.error(err);
-            res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+            res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
           });
       })
       .catch((err) => {
@@ -1260,7 +1248,7 @@ app.post(
             body: null,
           });
         } else {
-          res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+          res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
         }
       });
   }
@@ -1317,24 +1305,10 @@ app.post(
           : (totallength = count / 20 - mod / 20 + 1);
         let array = [];
         for await (post of finalarr) {
-          let tempd = post.date;
+          const fixedDate = await fixDate(post.date);
 
-          let dateonly =
-            (tempd.getDate() < 10 ? "0" : "") +
-            tempd.getDate() +
-            "-" +
-            (tempd.getMonth() + 1 < 10 ? "0" : "") +
-            (tempd.getMonth() + 1) +
-            "-" +
-            tempd.getFullYear();
-          let newtime =
-            (tempd.getHours() < 10 ? "0" : "") +
-            tempd.getHours() +
-            ":" +
-            (tempd.getMinutes() < 10 ? "0" : "") +
-            tempd.getMinutes();
-
-          post.dataValues.date = dateonly + " " + newtime;
+          post.dataValues.date =
+            fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
           let image = "images/" + post.email + ".jpeg";
 
           //find user of post
@@ -1420,26 +1394,19 @@ app.post(
             console.error(err);
             res.status(500).json({ message: "Κάτι πήγε στραβά!" });
           });
-          let tempd = post.date;
-
-          let dateonly =
-            (tempd.getDate() < 10 ? "0" : "") +
-            tempd.getDate() +
-            "-" +
-            (tempd.getMonth() + 1 < 10 ? "0" : "") +
-            (tempd.getMonth() + 1) +
-            "-" +
-            tempd.getFullYear();
-          let newtime =
-            (tempd.getHours() < 10 ? "0" : "") +
-            tempd.getHours() +
-            ":" +
-            (tempd.getMinutes() < 10 ? "0" : "") +
-            tempd.getMinutes();
-
-          post.dataValues.date = dateonly + " " + newtime;
+          const fixedDate = await fixDate(post.date);
+          post.dataValues.date =
+            fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
           // console.log(postI);
-          let tempPost = { ...postI.dataValues, ...post.dataValues };
+
+          const intDate = await fixDate(postI.date);
+          postI.dataValues.date =
+            intDate.dateMonthDay + " " + intDate.hoursMinutes;
+
+          let tempPost = {
+            ...post.dataValues,
+            ...{ piid: postI.piid, dateOfInterest: postI.date },
+          };
           // console.log(obj[counter]);
           let user = await Users.findOne({
             attributes: {
@@ -1460,18 +1427,7 @@ app.post(
           let extraData = await insertAver(user);
           user.dataValues = { ...user.dataValues, ...extraData };
           let image = "images/" + post.email + ".jpeg";
-          // if (user==null){
-          //   user = {
-          //     "email": "lefterisevagelinos1996@gmail.com",
-          //     "fullname": "lefos evan",
-          //     "car": "BMW",
-          //     "cardate": "2016",
-          //     "gender": "male",
-          //     "age": "25",
-          //     "photo": "1",
-          //     "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg"
-          //   }
-          // }
+
           let results = {
             user: user,
             imagePath: image,
@@ -1512,24 +1468,10 @@ app.post(
         let isAny = 0;
         let obj;
         for await (post of posts) {
-          let tempd = post.date;
+          let fixedDate = await fixDate(post.date);
 
-          let dateonly =
-            (tempd.getDate() < 10 ? "0" : "") +
-            tempd.getDate() +
-            "-" +
-            (tempd.getMonth() + 1 < 10 ? "0" : "") +
-            (tempd.getMonth() + 1) +
-            "-" +
-            tempd.getFullYear();
-          let newtime =
-            (tempd.getHours() < 10 ? "0" : "") +
-            tempd.getHours() +
-            ":" +
-            (tempd.getMinutes() < 10 ? "0" : "") +
-            tempd.getMinutes();
-
-          post.dataValues.date = dateonly + " " + newtime;
+          post.dataValues.date =
+            fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
           // endiaferomoi gia ena sygekrimeno post
           const interested = await PostInterested.findAll({
             where: {
@@ -1542,9 +1484,9 @@ app.post(
           let fullpost;
           let allUsers = [];
           let moreUsers = false;
-          let finalInt = _.take(_.drop(interested, 0), 20);
+          let finalInt = _.take(_.drop(interested, 0), 10);
 
-          if (interested.length > 20) {
+          if (interested.length > 10) {
             moreUsers = true;
           }
 
@@ -1568,13 +1510,25 @@ app.post(
               }).catch((err) => {
                 console.error(err);
               });
+              let dateData = await fixDate(one.date);
+              console.log(dateData);
+              one.dataValues.date =
+                dateData.dateMonthDay + " " + dateData.hoursMinutes;
 
               if (user != null) {
                 user.dataValues.imagePath = "images/" + user.email + ".jpeg";
                 let extraData = await insertAver(user);
-                user.dataValues = { ...user.dataValues, ...extraData };
-                user.dataValues.isVerified = one.isVerified;
-                user.dataValues.piid = one.piid;
+                user.dataValues = {
+                  ...user.dataValues,
+                  ...extraData,
+                  ...{
+                    isVerified: one.isVerified,
+                    piid: one.piid,
+                    dateOfInterest: one.date,
+                  },
+                };
+                // user.dataValues.isVerified = one.isVerified;
+                // user.dataValues.piid = one.piid;
                 allUsers.push(user);
               } else {
                 allUsers.push({
@@ -1654,24 +1608,9 @@ app.post(
       },
     })
       .then(async (posts) => {
-        let tempd = posts.date;
-
-        let dateonly =
-          (tempd.getDate() < 10 ? "0" : "") +
-          tempd.getDate() +
-          "-" +
-          (tempd.getMonth() + 1 < 10 ? "0" : "") +
-          (tempd.getMonth() + 1) +
-          "-" +
-          tempd.getFullYear();
-        let newtime =
-          (tempd.getHours() < 10 ? "0" : "") +
-          tempd.getHours() +
-          ":" +
-          (tempd.getMinutes() < 10 ? "0" : "") +
-          tempd.getMinutes();
-
-        posts.dataValues.date = dateonly + " " + newtime;
+        const fixedDate = await fixDate(posts.date);
+        posts.dataValues.date =
+          fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
         let message = "Βρέθηκαν ενδιαφερόμενοι";
         let isAny = 0;
         // euresh endiafermonwn gia to post
@@ -1739,10 +1678,11 @@ app.post(
 
         if (isAny > 0) {
           message = "Βρέθηκαν ενδιαφερόμενοι";
-          let skipcount = 0;
+          let skipcount = 10;
           let takecount = 20;
-          if (data.page > 1) skipcount = data.page * 20 - 20;
+          if (data.page > 1) skipcount = data.page * 20 - 10;
           let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
+          isAny = isAny - 10;
           let mod = isAny % 20;
           // console.log(mod);
           let totallength = 1;
@@ -1882,7 +1822,7 @@ app.post(
             message: "Επιτυχής έγκριση ενδιαφερόμενου!",
           });
         } else {
-          results.update({ isVerified: false });
+          results.update({ isVerified: false, isNotified: false });
           res.json({
             message: "Ακύρωση έγκρισης ενδιαφερόμενου!",
           });
@@ -1913,6 +1853,7 @@ app.post(
       let body = null;
       let message = "Καμία νέα έγκριση!";
       let posts = [];
+      let history = [];
       const allInt = await PostInterested.findAll({
         where: {
           email: extra,
@@ -1922,30 +1863,47 @@ app.post(
       });
 
       for await (one of allInt) {
-        if (one.isVerified == true) {
+        const post = await Posts.findOne({
+          where: {
+            postid: one.postid,
+          },
+        }).catch((err) => {
+          throw err;
+        });
+
+        const userPost = await Users.findOne({
+          attributes: {
+            exclude: ["password"],
+          },
+          where: {
+            email: post.email,
+          },
+        }).catch((err) => {
+          throw err;
+        });
+
+        if (one.isVerified == true && one.isNotified == false) {
           flag = true;
           message = "Έχεις πάρει έγκριση!";
-          const post = await Posts.findOne({
-            where: {
-              postid: one.postid,
-            },
-          }).catch((err) => {
-            throw err;
-          });
-
           post.dataValues = { ...post.dataValues, ...{ piid: one.piid } };
-          const userPost = await Users.findOne({
-            attributes: {
-              exclude: ["password"],
-            },
-            where: {
-              email: post.email,
-            },
-          }).catch((err) => {
-            throw err;
-          });
-
           posts.push({
+            post: post,
+            userOwner: userPost,
+          });
+          await PostInterested.update(
+            { isNotified: true },
+            {
+              where: {
+                piid: one.piid,
+              },
+            }
+          );
+        } else if (
+          one.isNotified == true &&
+          one.isVerified == true &&
+          history.length < 5
+        ) {
+          history.push({
             post: post,
             userOwner: userPost,
           });
@@ -1955,6 +1913,7 @@ app.post(
       res.json({
         notify: flag,
         postUsers: posts,
+        alreadyNotified: history,
         message: message,
       });
     } catch (err) {
@@ -2069,13 +2028,36 @@ const insertAver = async (user) => {
       let average = 0;
       let count = 0;
       return {
-        average: rounded,
+        average: average,
         count: count,
       };
     }
   } catch (err) {
     console.error("inside InsertAver()" + err);
   }
+};
+
+const fixDate = async (date) => {
+  let tempd = date;
+
+  let dateonly =
+    (tempd.getDate() < 10 ? "0" : "") +
+    tempd.getDate() +
+    "-" +
+    (tempd.getMonth() + 1 < 10 ? "0" : "") +
+    (tempd.getMonth() + 1) +
+    "-" +
+    tempd.getFullYear();
+  let newtime =
+    (tempd.getHours() < 10 ? "0" : "") +
+    tempd.getHours() +
+    ":" +
+    (tempd.getMinutes() < 10 ? "0" : "") +
+    tempd.getMinutes();
+  return {
+    dateMonthDay: dateonly,
+    hoursMinutes: newtime,
+  };
 };
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));

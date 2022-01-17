@@ -11,6 +11,7 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
+  timezone: "+02:00",
   logging: false,
 });
 
@@ -37,6 +38,10 @@ const PostInterested = sequelize.define(
       allowNull: false,
     },
     isVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    isNotified: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },

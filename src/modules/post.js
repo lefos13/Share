@@ -11,7 +11,11 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
-  // logging: true,
+  // dialectOptions: {
+  //   useUTC: false, // for reading from database
+  // },
+  timezone: "+02:00", // for writing to database
+  // logging: false,
 });
 
 const Posts = sequelize.define(

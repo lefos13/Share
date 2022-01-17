@@ -12,8 +12,8 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: false,
+  timezone: "+02:00",
   dialectOptions: {
-    timezone: "+03:00",
     dateStrings: true,
     typeCast: true,
   },
@@ -50,7 +50,7 @@ const Reviews = sequelize.define(
     },
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: new Date().addHours(3),
+      // defaultValue: new Date().addHours(3),
       // allowNull: false,
     },
     updatedAt: {
