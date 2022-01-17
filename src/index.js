@@ -856,6 +856,14 @@ app.post(
           for await (fnd of found.rows) {
             if (IsJsonString(fnd.moreplaces)) {
               fnd.moreplaces = JSON.parse(fnd.moreplaces);
+
+              let testDate = new Date(fnd.startdate);
+
+              fnd.dataValues.startdate = await fixOnlyMonth(testDate);
+
+              testDate = new Date(fnd.enddate);
+
+              fnd.dataValues.enddate = await fixOnlyMonth(testDate);
             }
 
             await Users.findOne({
@@ -899,12 +907,14 @@ app.post(
                     array.push(results);
                   })
                   .catch((err) => {
+                    console.error(err);
                     res
                       .status(400)
                       .json({ message: "Κάτι πήγε στραβά.", body: null });
                   });
               })
               .catch((err) => {
+                console.error(err);
                 res
                   .status(400)
                   .json({ message: "Κάτι πήγε στραβά.", body: null });
@@ -981,6 +991,7 @@ app.post(
         }
       })
       .catch((err) => {
+        console.error(err);
         res.status(400).json({ message: "Κάτι πήγε στραβά", body: null });
       });
   }
@@ -1143,9 +1154,14 @@ app.post(
           },
         })
           .then(async (rev) => {
-            let newarr = [];
             for await (r of rev.rows) {
+              let fixDate = new Date(r.dataValues.createdAt);
+              r.dataValues.createdAt = await fixOnlyMonth(fixDate);
+
+              fixDate = new Date(r.dataValues.updatedAt);
+              r.dataValues.updatedAt = await fixOnlyMonth(fixDate);
               // console.log(r.emailreviewer);
+
               let user = await Users.findOne({
                 where: {
                   email: r.emailreviewer,
@@ -1307,6 +1323,11 @@ app.post(
         for await (post of finalarr) {
           const fixedDate = await fixDate(post.date);
 
+          let nnDate = new Date(post.startdate);
+          post.dataValues.startdate = await fixOnlyMonth(nnDate);
+          nnDate = new Date(post.enddate);
+          post.dataValues.enddate = await fixOnlyMonth(nnDate);
+
           post.dataValues.date =
             fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
           let image = "images/" + post.email + ".jpeg";
@@ -1398,6 +1419,10 @@ app.post(
           post.dataValues.date =
             fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
           // console.log(postI);
+          let nnDate = new Date(post.startdate);
+          post.dataValues.startdate = await fixOnlyMonth(nnDate);
+          nnDate = new Date(post.enddate);
+          post.dataValues.enddate = await fixOnlyMonth(nnDate);
 
           const intDate = await fixDate(postI.date);
           postI.dataValues.date =
@@ -1472,6 +1497,11 @@ app.post(
 
           post.dataValues.date =
             fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
+
+          let nnDate = new Date(post.startdate);
+          post.dataValues.startdate = await fixOnlyMonth(nnDate);
+          nnDate = new Date(post.enddate);
+          post.dataValues.enddate = await fixOnlyMonth(nnDate);
           // endiaferomoi gia ena sygekrimeno post
           const interested = await PostInterested.findAll({
             where: {
@@ -1611,6 +1641,10 @@ app.post(
         const fixedDate = await fixDate(posts.date);
         posts.dataValues.date =
           fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
+        let nnDate = new Date(posts.startdate);
+        posts.dataValues.startdate = await fixOnlyMonth(nnDate);
+        nnDate = new Date(posts.enddate);
+        posts.dataValues.enddate = await fixOnlyMonth(nnDate);
         let message = "Βρέθηκαν ενδιαφερόμενοι";
         let isAny = 0;
         // euresh endiafermonwn gia to post
@@ -1870,6 +1904,14 @@ app.post(
         }).catch((err) => {
           throw err;
         });
+        const fixedDate = await fixDate(post.date);
+        post.dataValues.date =
+          fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
+        // console.log(postI);
+        let nnDate = new Date(post.startdate);
+        post.dataValues.startdate = await fixOnlyMonth(nnDate);
+        nnDate = new Date(post.enddate);
+        post.dataValues.enddate = await fixOnlyMonth(nnDate);
 
         const userPost = await Users.findOne({
           attributes: {
@@ -2043,10 +2085,9 @@ const fixDate = async (date) => {
   let dateonly =
     (tempd.getDate() < 10 ? "0" : "") +
     tempd.getDate() +
-    "-" +
-    (tempd.getMonth() + 1 < 10 ? "0" : "") +
-    (tempd.getMonth() + 1) +
-    "-" +
+    " " +
+    tempd.toLocaleString("el-GR", { month: "short" }) +
+    " " +
     tempd.getFullYear();
   let newtime =
     (tempd.getHours() < 10 ? "0" : "") +
@@ -2054,10 +2095,26 @@ const fixDate = async (date) => {
     ":" +
     (tempd.getMinutes() < 10 ? "0" : "") +
     tempd.getMinutes();
+  // const test = tempd.toLocaleString("el-GR", { month: "short" });
+  // console.log(test);
   return {
     dateMonthDay: dateonly,
     hoursMinutes: newtime,
   };
+};
+
+const fixOnlyMonth = async (date) => {
+  // console.log(date);
+  let tempd = date;
+  let dateonly =
+    (tempd.getDate() < 10 ? "0" : "") +
+    tempd.getDate() +
+    " " +
+    tempd.toLocaleString("el-GR", { month: "short" }) +
+    " " +
+    tempd.getFullYear();
+  // console.log("finaldate: " + dateonly);
+  return dateonly;
 };
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
