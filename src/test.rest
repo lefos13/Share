@@ -98,7 +98,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "endcoord": "23",
         "numseats": 2,
         "startdate": "2021-12-15",
-        "enddate": "2021-12-16",
+        "enddate": "2021-12-19",
         "costperseat": 40,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": [

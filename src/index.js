@@ -81,6 +81,52 @@ const { values, hasIn } = require("lodash");
 
 checkconnection();
 
+const schedule = require("node-schedule");
+
+//run once a time to delete old posts from the database
+const deleteOldPosts = schedule.scheduleJob("0 0 1 */1 *", async function () {
+  try {
+    // console.log("Posts are being deleted");
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, "0");
+    var mm = String(today.getMonth()).padStart(2, "0"); //January is 0!
+    var yyyy = today.getFullYear();
+    if (mm == "00") {
+      mm = "12";
+      yyyy = yyyy - 1;
+    }
+
+    today = yyyy + "-" + mm + "-" + dd;
+    console.log(today);
+    //find all posts that their enddate is older than curdate
+    await Posts.findAll({
+      where: { enddate: { [Op.lt]: today } },
+    }).then(async (res) => {
+      if (res.length != 0) {
+        for await (r of res) {
+          //find interested of post
+          const postInt = await PostInterested.findAll({
+            where: {
+              postid: r.postid,
+            },
+          });
+          if (postInt.length != 0) {
+            for await (p of postInt) {
+              //destroy interested
+              p.destroy();
+            }
+          }
+
+          //destroy post
+          r.destroy();
+        }
+      }
+    });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // instertPosts();
 const insertReviews = async (main, second) => {
   let pseudo = 0;
@@ -1286,6 +1332,15 @@ app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
   }
 });
 
+const getCurDate = async () => {
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var yyyy = today.getFullYear();
+
+  today = yyyy + "-" + mm + "-" + dd;
+  return today;
+};
 //service pou epistrefei mia lista apo ta posts tou user
 app.post(
   "/getPostsUser",
@@ -1294,9 +1349,14 @@ app.post(
   async (req, res) => {
     // console.log(req.query);
     var data = req.body.data;
+
+    var today = new Date();
+    today = await getCurDate();
+
     await Posts.findAndCountAll({
       where: {
         email: data.email,
+        enddate: { [Op.gte]: today },
       },
     })
       .then(async (found) => {
