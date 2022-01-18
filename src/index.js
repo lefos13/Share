@@ -1807,7 +1807,7 @@ app.post(
 
               let image = "images/" + post.email + ".jpeg";
               let results = {
-                post: posts,
+                post: post,
                 users: allUsers,
                 imagePath: image,
                 hasMoreUsers: moreUsers,
