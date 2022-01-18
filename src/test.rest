@@ -216,6 +216,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 }
 ###
 
+//Διαγρφή post μαζί με τους ενδιαφερόμενους του post
 POST http://localhost:3000/deletePost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
@@ -227,6 +228,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 }
 ###
 
+//delete of interested
 POST http://localhost:3000/deleteInterested
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4

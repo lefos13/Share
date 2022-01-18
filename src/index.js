@@ -1332,15 +1332,24 @@ app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
   }
 });
 
-const getCurDate = async () => {
+const getCurDate = async (dif) => {
   var today = new Date();
+  let df = 1 - dif;
   var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var mm = String(today.getMonth() + df).padStart(2, "0"); //January is 0!
   var yyyy = today.getFullYear();
 
+  //an to prohgoymeno eksamhno peftei se prohgoymenh xronia
+  if (dif > today.getMonth() + 1) {
+    df = 12 - dif + today.getMonth() + 1;
+    mm = String(df).padStart(2, "0");
+    yyyy = yyyy - 1;
+  }
+  console.log(df, dd, mm, yyyy);
   today = yyyy + "-" + mm + "-" + dd;
   return today;
 };
+
 //service pou epistrefei mia lista apo ta posts tou user
 app.post(
   "/getPostsUser",
@@ -1351,8 +1360,8 @@ app.post(
     var data = req.body.data;
 
     var today = new Date();
-    today = await getCurDate();
-
+    today = await getCurDate(6);
+    console.log(today);
     await Posts.findAndCountAll({
       where: {
         email: data.email,
