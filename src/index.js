@@ -1551,9 +1551,15 @@ app.post(
   async (req, res) => {
     // console.log(req.query);
     var data = req.body.data;
+    let curDate = await getCurDate(0);
+    // console.log(curDate);
+
     await Posts.findAll({
       where: {
         email: data.email,
+        enddate: {
+          [Op.gte]: curDate,
+        },
       },
     })
       .then(async (posts) => {
@@ -1610,7 +1616,7 @@ app.post(
                 console.error(err);
               });
               let dateData = await fixDate(one.date);
-              console.log(dateData);
+              // console.log(dateData);
               one.dataValues.date =
                 dateData.dateMonthDay + " " + dateData.hoursMinutes;
 
