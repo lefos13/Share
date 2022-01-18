@@ -167,7 +167,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "giannisferagoulis21@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
