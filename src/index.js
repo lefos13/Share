@@ -327,7 +327,7 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// sunarthsh poy eisagei fake users (70) ---- gia testing --- password 123456
+// sunarthsh poy eisagei fake users (70) ---- gia testing --- password 12356
 const insertUsers = async () => {
   let arr = [];
   for (let i = 0; i < 70; i++) {
