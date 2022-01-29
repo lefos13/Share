@@ -135,7 +135,24 @@ POST http://localhost:3000/searchposts
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
 
-{"data":{"age":"18","age_end":"70","cost":"100","email":"cs141082@uniwa.gr","endcoord":"123","enddate":"2022-04-27","endplace":"Athens","page":1,"startcoord":"123","startdate":"2021-10-27","startplace":"Volos"}}
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "Volos",
+        "startcoord": "123",
+        "endplace": "Athens",
+        "endcoord": "1",
+        "startdate": "2021-10-05",
+        "enddate": "2022-12-20",
+        "page": 1,
+        "cost": 100,
+        "age": null,
+        "age_end": null,
+        "car": null,
+        "cardate": null,
+        "gender": null
+    }
+}
 
 # {
 #     "data": {
@@ -194,7 +211,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "giannisferagoulis21@gmail.com",
+        "email": "lefterisevagelinos1996@gmail.com",
         "emailreviewer": "giannisferagxsoulis21@gmail.com",
         "rating": 4,
         "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
