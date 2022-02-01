@@ -45,6 +45,10 @@ const PostInterested = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
+    ownerNotified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

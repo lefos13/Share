@@ -1,0 +1,225 @@
+01 / 02 / 2022 --- SHMANTIKO!!! ALLAGH STH VASH!!!
+
+#################################
+API Service: notifyMe:
+
+-Changes:
+
+----Response----
+Πεδίο notify: αν είναι false δεν έχεις ειδοποιήσεις.
+Προσθήκη πεδίου case0: data τα οποια αφορουν τις εγκρίσεις που έχει λάβει ένας χρήστης για κάποιο ενδιαφέρον του
+    lOfCase0: Πλήθος ειδοποίησεων για το case0
+Προσθήκη πεδίου case1: data τα οποία αφορούν τους νέους ενδιαφερόμενους για τα post ενός χρήστη.
+    lOfCase1: Πλήθος ειδοποίησεων για το case1 
+Προσθήκη πεδίου finalLength: το άθροισμα του πλήθους των ειδοποιήσεων και των δυο περιπτώσεων.
+
+Παράδειγμα response:
+
+{
+  "notify": true,
+  "case0": {
+    "verifications": [
+      {
+        "post": {
+          "postid": 1721,
+          "email": "lefterisevagelinos1996@gmail.com",
+          "startplace": "Volos",
+          "startcoord": "31",
+          "endplace": "Athens",
+          "endcoord": "23",
+          "numseats": 2,
+          "startdate": "15 Δεκ 2021",
+          "enddate": "25 Φεβ 2022",
+          "costperseat": 40,
+          "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+          "moreplaces": "[{\"place\":\"lamia\",\"placecoords\":\"123\"},{\"place\":\"lamia\",\"placecoords\":\"123\"}]",
+          "date": "17 Ιαν 2022 15:45",
+          "piid": 201
+        },
+        "userOwner": {
+          "email": "lefterisevagelinos1996@gmail.com",
+          "mobile": "6975620785",
+          "fullname": "lefos evan",
+          "car": "BMW",
+          "cardate": "2016",
+          "gender": "male",
+          "age": "25",
+          "photo": "1",
+          "facebook": null,
+          "instagram": null,
+          "verified": true
+        }
+      }
+    ],
+    "lOfCase0": 1
+  },
+  "case1": {
+    "postAndInter": [
+      {
+        "post": {
+          "postid": 1730,
+          "email": "user0@gmail.com",
+          "startplace": "Volos",
+          "startcoord": "31",
+          "endplace": "Athens",
+          "endcoord": "23",
+          "numseats": 2,
+          "startdate": "2021-12-15",
+          "enddate": "2022-12-19",
+          "costperseat": 40,
+          "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+          "moreplaces": "[{\"place\":\"lamia\",\"placecoords\":\"123\"},{\"place\":\"lamia\",\"placecoords\":\"123\"}]",
+          "date": "2022-02-01T12:26:43.000Z"
+        },
+        "postInt": [
+          {
+            "piid": 204,
+            "postid": 1730,
+            "email": "user0@gmail.com",
+            "date": "2022-02-01T12:27:07.000Z",
+            "isVerified": false,
+            "isNotified": false,
+            "ownerNotified": false
+          }
+        ]
+      }
+    ],
+    "lOfCase1": 1
+  },
+  "finalLength": 2,
+  "message": "Έχεις ειδοποιήσεις!"
+}
+
+###############################
+API Service: getInterestedPerUser: (Api pou sou epistrefei ta posts gia to opoia endiaferesai o idios)
+
+-Changes:
+
+----Response----
+Πεδίο withColor: Boolean ---- Μπήκε μέσα στο object του post ώστε να ξέρεις αν πρέπει να εμφανίσεις το συγκεκρίμενο ποστ με διαφορετικό χρώμα. Αυτό είναι που λέγαμε με τα notifications, ότι ο χρήστης δηλαδή θα μπορεί να ξεχωρίζει ανάμεσα στα ενδιαφέροντά του, σε ποια έχει λάβει έγκριση.
+
+ΠΡΟΣΟΧΗ: ---ΑΥΤΟ ΤΟ ΠΕΔΙΟ ΕΡΧΕΤΑΙ TRUE ΜΟΝΟ ΜΙΑ ΦΟΡΑ ΓΙΑ ΤΗΝ ΠΡΩΤΗ ΦΟΡΑ ΠΟΥ ΤΟ ΒΛΕΠΕΙ Ο ΧΡΗΣΤΗΣ. ΕΠΕΙΤΑ ΕΡΧΕΤΑΙ ΠΑΝΤΑ FALSE.
+
+Παράδειγμα response:
+{
+  "postUser": [
+    {
+      "user": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "fullname": "lefos evan",
+        "car": "BMW",
+        "cardate": "2016",
+        "gender": "male",
+        "age": "25",
+        "photo": "1",
+        "average": 4,
+        "count": 2
+      },
+      "imagePath": "images/lefterisevagelinos1996@gmail.com.jpeg",
+      "post": {
+        "postid": 1721,
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "Volos",
+        "startcoord": "31",
+        "endplace": "Athens",
+        "endcoord": "23",
+        "numseats": 2,
+        "startdate": "15 Δεκ 2021",
+        "enddate": "25 Φεβ 2022",
+        "costperseat": 40,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": "[{\"place\":\"lamia\",\"placecoords\":\"123\"},{\"place\":\"lamia\",\"placecoords\":\"123\"}]",
+        "date": "17 Ιαν 2022 15:45",
+        "withColor": true,
+        "piid": 201,
+        "dateOfInterest": "01 Φεβ 2022 11:25"
+      },
+      "interested": true
+    },
+    {
+      "user": {
+        "email": "user0@gmail.com",
+        "fullname": "lefos evan",
+        "car": "toyota",
+        "cardate": "1996",
+        "gender": "male",
+        "age": "26",
+        "photo": "12131231",
+        "average": 0,
+        "count": 0
+      },
+      "imagePath": "images/user0@gmail.com.jpeg",
+      "post": {
+        "postid": 1730,
+        "email": "user0@gmail.com",
+        "startplace": "Volos",
+        "startcoord": "31",
+        "endplace": "Athens",
+        "endcoord": "23",
+        "numseats": 2,
+        "startdate": "15 Δεκ 2021",
+        "enddate": "19 Δεκ 2022",
+        "costperseat": 40,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "moreplaces": "[{\"place\":\"lamia\",\"placecoords\":\"123\"},{\"place\":\"lamia\",\"placecoords\":\"123\"}]",
+        "date": "01 Φεβ 2022 14:26",
+        "withColor": true,
+        "piid": 204,
+        "dateOfInterest": "01 Φεβ 2022 14:27"
+      },
+      "interested": true
+    }
+  ],
+  "message": "No pagination"
+}
+
+##############################
+API Service: getReviews:
+
+-Changes:
+
+----Response----
+Πεδιο revId: κλειδί για τα reviews. (FAKE! δεν έχει να κάνει με τη βάση. Είναι απλά ένας counter.)
+
+Παράδειγμα response:
+
+{
+  "body": {
+    "reviews": [
+      {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "emailreviewer": "giannisferagxsoulis21@gmail.com",
+        "rating": 4,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+        "createdAt": "20 Ιαν 2022",
+        "updatedAt": "20 Ιαν 2022",
+        "revId": 0,
+        "fullname": "giannis fragoulis",
+        "imagepath": "images/giannisferagxsoulis21@gmail.com.jpeg"
+      },
+      {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "emailreviewer": "giannisferagxsouliss21@gmail.com",
+        "rating": 4,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια",
+        "createdAt": "01 Φεβ 2022",
+        "updatedAt": "01 Φεβ 2022",
+        "revId": 1,
+        "fullname": "Ο χρήστης δεν υπάρχει",
+        "imagepath": "Η εικόνα δεν υπάρχει"
+      }
+    ],
+    "average": 4,
+    "total_pages": 1,
+    "page_length": 2
+  },
+  "message": "Αξιολογήσεις, Page: 1"
+}
+
+###############################
+Vash Dedomenwn:
+
+-Changes:
+
+Prosthiki pediou sth Vash Dedomenwn ston pinaka postinterested: ownerNotified
+To pedio anaferetai sto an o xrhsths exei eidopoihthei gia to neo endiaferon tou post tou.

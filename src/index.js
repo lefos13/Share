@@ -321,7 +321,8 @@ function authenticateToken(req, res, next) {
           message: "Token expired or didnt even exist",
         });
       else {
-        console.log("inside auth: " + JSON.stringify(req.body.data));
+        // console.log("inside auth: " + JSON.stringify(req.body.data));
+        console.log("Athenticated!");
         req.body["extra"] = email.email;
       }
       next();
@@ -807,6 +808,7 @@ app.post(
         date: curtime,
         isVerified: false,
         isNotified: false,
+        ownerNotified: false,
       };
       row["date"] = curtime;
       await PostInterested.findOne({
@@ -1306,6 +1308,7 @@ app.post(
             },
           })
             .then(async (rev) => {
+              let counter = 0;
               for await (r of rev.rows) {
                 let fixDate = new Date(r.dataValues.createdAt);
                 r.dataValues.createdAt = await fixOnlyMonth(fixDate);
@@ -1313,6 +1316,8 @@ app.post(
                 fixDate = new Date(r.dataValues.updatedAt);
                 r.dataValues.updatedAt = await fixOnlyMonth(fixDate);
                 // console.log(r.emailreviewer);
+                r.dataValues.revId = counter;
+                counter++;
 
                 let user = await Users.findOne({
                   where: {
@@ -1608,11 +1613,10 @@ app.post(
         },
       })
         .then(async (found) => {
-          let obj = [];
-          let counter = 0;
           let array = [];
           for await (postI of found) {
             let curDate = await getCurDate(0);
+
             let post = await Posts.findOne({
               where: {
                 postid: postI.postid,
@@ -1624,7 +1628,9 @@ app.post(
               console.error(err);
               res.status(500).json({ message: "Κάτι πήγε στραβά!" });
             });
+
             if (post != null) {
+              //diorthwseis hmeromhniwn
               const fixedDate = await fixDate(post.date);
               post.dataValues.date =
                 fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
@@ -1637,6 +1643,19 @@ app.post(
               const intDate = await fixDate(postI.date);
               postI.dataValues.date =
                 intDate.dateMonthDay + " " + intDate.hoursMinutes;
+
+              // sugxwneush post kai stoixeia endiaferomenou
+              if (postI.isNotified == false) {
+                postI.update({ isNotified: true });
+                post.dataValues = {
+                  ...post.dataValues,
+                  ...{ withColor: true },
+                };
+              } else
+                post.dataValues = {
+                  ...post.dataValues,
+                  ...{ withColor: false },
+                };
 
               let tempPost = {
                 ...post.dataValues,
@@ -1713,12 +1732,13 @@ app.post(
             [Op.gte]: curDate,
           },
         },
+        order: [["date", "DESC"]],
       })
         .then(async (posts) => {
           let array = [];
           let message = "Βρέθηκαν ενδιαφερόμενοι";
           let isAny = 0;
-          let obj;
+          let allI = [];
           for await (post of posts) {
             let fixedDate = await fixDate(post.date);
 
@@ -1734,11 +1754,24 @@ app.post(
               where: {
                 postid: post.postid,
               },
+              order: [["date", "DESC"]],
             }).catch((err) => {
               console.error(err);
             });
 
-            let fullpost;
+            for await (i of interested) {
+              i.update({
+                ownerNotified: true,
+                where: {
+                  isNotified: false,
+                },
+              });
+            }
+            //collect piid
+            // for await (i of interested) {
+            //   if (i.isNotified == false) allI.push(i.piid);
+            // }
+
             let allUsers = [];
             let moreUsers = false;
             let finalInt = _.take(_.drop(interested, 0), 10);
@@ -2121,7 +2154,7 @@ app.post(
   }
 );
 
-//service for notification if someone has verified me
+//service for notification if someone has verified me or for people that are interested for one of my posts
 app.post(
   "/notifyMe",
   [authenticateToken],
@@ -2131,10 +2164,12 @@ app.post(
       // let data = req.body.data;
       let extra = req.body.extra;
       let flag = false;
-      let body = null;
-      let message = "Καμία νέα έγκριση!";
+
+      let message = "Καμία νέα ειδοποίηση!";
       let posts = [];
       let history = [];
+
+      // entopismos egrisewn gia ton xrhsth
       const allInt = await PostInterested.findAll({
         where: {
           email: extra,
@@ -2173,20 +2208,20 @@ app.post(
 
         if (one.isVerified == true && one.isNotified == false) {
           flag = true;
-          message = "Έχεις πάρει έγκριση!";
+          message = "Έχεις ειδοποιήσεις!";
           post.dataValues = { ...post.dataValues, ...{ piid: one.piid } };
           posts.push({
             post: post,
             userOwner: userPost,
           });
-          await PostInterested.update(
-            { isNotified: true },
-            {
-              where: {
-                piid: one.piid,
-              },
-            }
-          );
+          // await PostInterested.update(
+          //   { isNotified: true },
+          //   {
+          //     where: {
+          //       piid: one.piid,
+          //     },
+          //   }
+          // );
         } else if (
           one.isNotified == true &&
           one.isVerified == true &&
@@ -2199,10 +2234,50 @@ app.post(
         }
       }
 
+      // flow pou psaxnei tous neous endiaferomenous.
+      const exposts = await Posts.findAll({
+        where: {
+          email: extra,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+      let case1L = 0;
+      let finData = [];
+      for await (ex of exposts) {
+        let tempint = await PostInterested.findAll({
+          where: {
+            postid: ex.postid,
+            ownerNotified: false,
+          },
+        }).catch((err) => {
+          throw err;
+        });
+        case1L = case1L + tempint.length;
+        //   for await(i of tempint)
+        //   {
+        //   exArray.push(i);
+        // }
+        tempint != 0
+          ? finData.push({
+              post: ex,
+              postInt: tempint,
+            })
+          : null;
+      }
+
       res.json({
         notify: flag,
-        postUsers: posts,
-        alreadyNotified: history,
+        case0: {
+          verifications: posts,
+          lOfCase0: posts.length,
+        },
+        case1: {
+          postAndInter: finData,
+          lOfCase1: case1L,
+        },
+        finalLength: posts.length + case1L,
+        // alreadyNotified: history,
         message: message,
       });
     } catch (err) {
