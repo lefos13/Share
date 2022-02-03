@@ -1954,6 +1954,7 @@ app.post(
                 let testdata = await insertAver(user);
                 user.dataValues = { ...user.dataValues, ...testdata };
                 user.dataValues.isVerified = one.isVerified;
+                user.dataValues.piid = one.piid;
                 // console.log(JSON.stringify(testdata));
                 allUsers.push(user);
               } else {
@@ -1969,6 +1970,7 @@ app.post(
                   average: 5,
                   count: 100,
                   isVerified: one.isVerified,
+                  piid: one.piid,
                 });
               }
               fullpost = { ...{ piid: one.piid }, ...posts.dataValues };
