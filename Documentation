@@ -223,3 +223,15 @@ Vash Dedomenwn:
 
 Prosthiki pediou sth Vash Dedomenwn ston pinaka postinterested: ownerNotified
 To pedio anaferetai sto an o xrhsths exei eidopoihthei gia to neo endiaferon tou post tou.
+
+4 / 2 /2022 ==========================
+
+getIntPost changes: (API poy fernei tous endiaferomenous enos post)
+Den kanei skip kanena endiaferomeno pleon. Fernei tous pantes apo to prwto page kanonika
+
+getInterested changes: (Api pou eferne post kai 10 endiaferomenous gia to kathe post enos user)
+Pleon fernei mono ta posts kai ton arithmo ton endiaferomenwn anti gia ta stoixeia twn 10 prwtwn users.
+Sto pedio users h timh antiproswpeyei ton arithmo olwn twn endiaferomenwn.
+Στο πεδίο hasMoreUser η τιμή true αντιπροσωπεύει ότι έχει ενδιαφερόμενους. Δεν άλλαξα κάτι εδώ. Απλά το αναφέρω για να είναι ξεκάθαρο.
+
+
