@@ -31,15 +31,15 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141082@uniwa.gr",
+        "email": "lefterisevagelinos1996@gmail.com",
         "password": "12345",
-        "mobile": "12313",
+        "mobile": "6975620785",
         "fullname": "lefos evan",
         "gender": "male",
         "car": "toyota",
         "cardate": "1996",
         "age": "26",
-        "photo": "12131231"
+        "photo": ""
     }
 }
 
@@ -51,7 +51,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "cs141082@uniwa.gr"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -90,7 +90,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "user0@gmail.com",
+        "email": "cs141082@uniwa.gr",
         "date": "2021-10-05",
         "startplace": "Volos",
         "startcoord": "31",
@@ -123,8 +123,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "user0@gmail.com",
-        "postid": 1730
+        "email": "lefterisevagelinos1996@gmail.com",
+        "postid": 1155
     }
 }
 
@@ -252,7 +252,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "piid": 200
+        "piid": 114
     }
 }
 
@@ -291,8 +291,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "postid": 1721,
-        "page": 1
+        "postid": 849,
+        "page": 2
     }
 }
 ###
@@ -309,8 +309,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "postid": 1721,
-        "piid": 201
+        "postid": 1155,
+        "piid": 57
     }
 }
 
@@ -335,9 +335,12 @@ Content-Type: application/json
     "data": {
         "mainEmail": "lefterisevagelinos1996@gmail.com",
         "secondaryEmail": "cs1410823@uniwa.gr",
-        "postid": 1563,
+        "postid": 849,
         "postidList": [1564,1565,1566,1567,1568]
     }
 }
 
 ###
+
+POST http://localhost:3000/upload
+Content-Type: multipart/form-data; boundary=---

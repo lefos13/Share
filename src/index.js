@@ -271,6 +271,9 @@ const insertInterested = async (postid) => {
       email: "lefterisevagelinos@gmail.com",
       postid: postid,
       date: curtime,
+      isVerified: false,
+      isNotified: false,
+      ownerNotified: false,
     };
     for (let i = 0; i < 70; i++) {
       data.email = "lefterisevagelinos1996@gmail.com" + i;
@@ -1451,9 +1454,9 @@ app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
     var data = req.body.data;
     // insertPosts(data.mainEmail);
     // insertReviews(data.mainEmail, data.secondaryEmail);
-    // insertInterested(data.postid);
+    insertInterested(data.postid);
     // insertInterested2(data.postidList, data.mainEmail);
-    insertUsers();
+    // insertUsers();
     res.send("σωστο");
   } catch (err) {
     console.error(err);
@@ -1750,23 +1753,23 @@ app.post(
             nnDate = new Date(post.enddate);
             post.dataValues.enddate = await fixOnlyMonth(nnDate);
             // endiaferomoi gia ena sygekrimeno post
-            const interested = await PostInterested.findAll({
+            const interested = await PostInterested.count({
               where: {
                 postid: post.postid,
               },
-              order: [["date", "DESC"]],
+              // order: [["date", "DESC"]],
             }).catch((err) => {
               console.error(err);
             });
 
-            for await (i of interested) {
-              i.update({
-                ownerNotified: true,
-                where: {
-                  isNotified: false,
-                },
-              });
-            }
+            // for await (i of interested) {
+            //   i.update({
+            //     ownerNotified: true,
+            //     where: {
+            //       isNotified: false,
+            //     },
+            //   });
+            // }
             //collect piid
             // for await (i of interested) {
             //   if (i.isNotified == false) allI.push(i.piid);
@@ -1774,79 +1777,81 @@ app.post(
 
             let allUsers = [];
             let moreUsers = false;
-            let finalInt = _.take(_.drop(interested, 0), 10);
+            // let finalInt = _.take(_.drop(interested, 0), 10);
 
-            if (interested.length > 10) {
+            if (interested > 0) {
               moreUsers = true;
+              isAny = interested;
             }
 
             // console.log(interested);
-            if (interested.length != 0) {
-              isAny++;
-              for await (one of finalInt) {
-                const user = await Users.findOne({
-                  attributes: {
-                    exclude: [
-                      "password",
-                      "verified",
-                      "facebook",
-                      "instagram",
-                      "mobile",
-                    ],
-                  },
-                  where: {
-                    email: one.email,
-                  },
-                }).catch((err) => {
-                  console.error(err);
-                });
-                let dateData = await fixDate(one.date);
-                // console.log(dateData);
-                one.dataValues.date =
-                  dateData.dateMonthDay + " " + dateData.hoursMinutes;
+            // if (interested != 0) {
+            //   isAny++;
+            //   for await (one of finalInt) {
+            //     const user = await Users.findOne({
+            //       attributes: {
+            //         exclude: [
+            //           "password",
+            //           "verified",
+            //           "facebook",
+            //           "instagram",
+            //           "mobile",
+            //         ],
+            //       },
+            //       where: {
+            //         email: one.email,
+            //       },
+            //     }).catch((err) => {
+            //       console.error(err);
+            //     });
+            //     let dateData = await fixDate(one.date);
+            //     // console.log(dateData);
+            //     one.dataValues.date =
+            //       dateData.dateMonthDay + " " + dateData.hoursMinutes;
 
-                if (user != null) {
-                  user.dataValues.imagePath = "images/" + user.email + ".jpeg";
-                  let extraData = await insertAver(user);
-                  user.dataValues = {
-                    ...user.dataValues,
-                    ...extraData,
-                    ...{
-                      isVerified: one.isVerified,
-                      piid: one.piid,
-                      dateOfInterest: one.date,
-                    },
-                  };
-                  // user.dataValues.isVerified = one.isVerified;
-                  // user.dataValues.piid = one.piid;
-                  allUsers.push(user);
-                } else {
-                  allUsers.push({
-                    piid: one.piid,
-                    email: "Fake User",
-                    fullname: one.email,
-                    car: "BMW",
-                    cardate: "2016",
-                    gender: "male",
-                    age: "25",
-                    photo: "1",
-                    imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
-                    average: 5,
-                    count: 100,
-                    isVerified: one.isVerified,
-                  });
-                }
-              }
+            //     if (user != null) {
+            //       user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+            //       let extraData = await insertAver(user);
+            //       user.dataValues = {
+            //         ...user.dataValues,
+            //         ...extraData,
+            //         ...{
+            //           isVerified: one.isVerified,
+            //           piid: one.piid,
+            //           dateOfInterest: one.date,
+            //         },
+            //       };
+            //       // user.dataValues.isVerified = one.isVerified;
+            //       // user.dataValues.piid = one.piid;
+            //       allUsers.push(user);
+            //     } else {
+            //       allUsers.push({
+            //         piid: one.piid,
+            //         email: "Fake User",
+            //         fullname: one.email,
+            //         car: "BMW",
+            //         cardate: "2016",
+            //         gender: "male",
+            //         age: "25",
+            //         photo: "1",
+            //         imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
+            //         average: 5,
+            //         count: 100,
+            //         isVerified: one.isVerified,
+            //       });
+            //     }
+            //   }
 
-              let image = "images/" + post.email + ".jpeg";
-              let results = {
-                post: post,
-                users: allUsers,
-                imagePath: image,
-                hasMoreUsers: moreUsers,
-              };
-              array.push(results);
-            }
+            //
+            // }
+            let image = "images/" + post.email + ".jpeg";
+            let results = {
+              post: post,
+              users: interested,
+              imagePath: image,
+              hasMoreUsers: moreUsers,
+            };
+            array.push(results);
           }
 
           if (isAny > 0) {
@@ -1973,7 +1978,7 @@ app.post(
                   piid: one.piid,
                 });
               }
-              fullpost = { ...{ piid: one.piid }, ...posts.dataValues };
+              fullpost = { ...posts.dataValues };
             }
           }
 
@@ -1981,11 +1986,10 @@ app.post(
 
           if (isAny > 0) {
             message = "Βρέθηκαν ενδιαφερόμενοι";
-            let skipcount = 10;
+            let skipcount = 0;
             let takecount = 20;
-            if (data.page > 1) skipcount = data.page * 20 - 10;
+            if (data.page > 1) skipcount = data.page * 20 - 20;
             let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
-            isAny = isAny - 10;
             let mod = isAny % 20;
             // console.log(mod);
             let totallength = 1;
@@ -2131,6 +2135,7 @@ app.post(
       }).catch((err) => {
         throw err;
       });
+
       if (allIntersted < post.numseats || results.isVerified == true) {
         if (results.isVerified == false) {
           results.update({ isVerified: true });
@@ -2327,14 +2332,20 @@ function sleep(ms) {
 }
 
 //service poy anevazei eikona sto server
-app.post("/upload", upload.single("upload"), function (req, res) {
-  // req.file is the name of your file in the form above, here 'uploaded_file'
-  // req.body will hold the text fields, if there were any
-  console.log(req.file);
-  console.log(req.body);
+app.post(
+  "/upload",
+  upload.single("upload"),
+  // cors(corsOptions),
+  function (req, res) {
+    // req.file is the name of your file in the form above, here 'uploaded_file'
+    // req.body will hold the text fields, if there were any
+    console.log(req.headers);
+    console.log(req.file);
+    console.log(req.body);
 
-  res.json({ message: "Το upload έγινε επιτυχώς" });
-});
+    res.json({ message: "Το upload έγινε επιτυχώς" });
+  }
+);
 
 function setTime(extrad) {
   Date.prototype.today = function () {
