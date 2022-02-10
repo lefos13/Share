@@ -910,6 +910,15 @@ app.post(
         data.startdate = today;
         data.enddate = lastday;
       }
+
+      let solveReturn = false;
+      if (data.withReturn == null) {
+        solveReturn = true;
+        data.withReturn = false;
+      } else if (data.withReturn == true) {
+        solveReturn = true;
+      } else data.withReturn = false;
+
       await Posts.findAndCountAll({
         where: {
           // elaxisto kostos
@@ -961,6 +970,12 @@ app.post(
                     { endcoord: data.endcoord },
                   ],
                 },
+              ],
+            },
+            {
+              [Op.or]: [
+                { withReturn: data.withReturn },
+                { withReturn: solveReturn }, //auth h sunithikh lunei to provlima, an o xrhsths den ton noiazei h epistrofh.
               ],
             },
           ],

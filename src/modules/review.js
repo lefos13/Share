@@ -8,7 +8,7 @@ dotenv.config();
 // get the values from the .env file
 
 const { HOST, USER, PASS, DATABASE } = process.env;
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
+const sequelize = new Sequelize("new_database", USER, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: false,

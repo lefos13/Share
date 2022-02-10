@@ -8,7 +8,7 @@ dotenv.config();
 // get the values from the .env file
 
 const { HOST, USER, PASS, DATABASE } = process.env;
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
+const sequelize = new Sequelize("new_database", USER, PASS, {
   host: HOST,
   dialect: "mysql",
   // dialectOptions: {
@@ -58,6 +58,18 @@ const Posts = sequelize.define(
     },
     enddate: {
       type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    returnStartDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    returnEndDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    withReturn: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
     },
     costperseat: {

@@ -99,6 +99,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "numseats": 2,
         "startdate": "2021-12-15",
         "enddate": "2022-12-19",
+        "returnStartDate": "2022-12-20",
+        "returnEndDate": "2022-12-21",
+        "withReturn": true,
         "costperseat": 40,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": [
