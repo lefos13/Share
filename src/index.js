@@ -62,7 +62,7 @@ Date.prototype.addHours = function (h) {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
+const sequelize = new Sequelize("new_database", USER, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: false,
@@ -2341,7 +2341,7 @@ app.post(
     // req.body will hold the text fields, if there were any
     console.log(req.headers);
     console.log(req.file);
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
 
     res.json({ message: "Το upload έγινε επιτυχώς" });
   }
