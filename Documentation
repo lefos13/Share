@@ -267,9 +267,17 @@ Example:
 
 15/2/2022 changes =====================
 
+Database ----
+
+NEA PEDIA STON PINAKA post
+
+petAllowed: Boolean ==== false an o xrhsths den epitrepei katoikidio, true an epitrepei. To pedio mpainei fusika sto api createpost.
+
 1. api searchposts -> 
 
 mou stelneis extra pedio me onoma "petAllowed" analogos an o xrhsths thelei na dei posts pou epitrepetai h den epitrepetai katoikidio
 Sthn periptwsh pou den ton endiaferei mou stelneis NULL. 
+
+
 
 
