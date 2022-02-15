@@ -767,13 +767,17 @@ app.post(
 
       // auto to kommati kanei mono eggrafi opote vgalto apo sxolio otan theliseis
 
+      if (data.withReturn == false) {
+        data.returnStartDate = 0000 - 00 - 00;
+        data.returnEndDate = 0000 - 00 - 00;
+      }
       await Posts.create(data)
         .then((post) => {
           // console.log(post.moreplaces);
-          var data = {
-            body: post.toJSON(),
-            message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-          };
+          // var data = {
+          //   body: post.toJSON(),
+          //   message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+          // };
           res.json({ message: "Επιτυχής δημιουργία!" });
         })
         .catch((err) => {
@@ -910,6 +914,7 @@ app.post(
         data.startdate = today;
         data.enddate = lastday;
       }
+
       await Posts.findAndCountAll({
         where: {
           // elaxisto kostos
@@ -1071,7 +1076,43 @@ app.post(
                 return obj.user.gender == data.gender;
               });
             }
+            if (data.withReturn != null) {
+              //afairese ta post twn xrhstwn pou den exoun epistrofh
+              array = _.filter(array, (obj) => {
+                let postStartDate = new Date(obj.post.returnStartDate);
+                let postEndDate = new Date(obj.post.returnEndDate);
+                let searchStartDate = new Date(data.returnStartDate);
+                let searchEndDate = new Date(data.returnEndDate);
 
+                // console.log(postStartDate, postEndDate);
+                // console.log(
+                //   postStartDate,
+                //   postEndDate,
+                //   (searchStartDate.getTime() >= postStartDate.getTime() &&
+                //     searchStartDate.getTime() <= postEndDate.getTime()) ||
+                //     (searchEndDate.getTime() <= postEndDate.getTime() &&
+                //       searchEndDate.getTime() >= postStartDate.getTime()) ||
+                //     (searchStartDate.getTime() <= postStartDate.getTime() &&
+                //       searchEndDate.getTime() >= postEndDate.getTime())
+                // );
+
+                return (
+                  obj.post.withReturn == true &&
+                  ((searchStartDate.getTime() >= postStartDate.getTime() &&
+                    searchStartDate.getTime() <= postEndDate.getTime()) ||
+                    (searchEndDate.getTime() <= postEndDate.getTime() &&
+                      searchEndDate.getTime() >= postStartDate.getTime()) ||
+                    (searchStartDate.getTime() <= postStartDate.getTime() &&
+                      searchEndDate.getTime() >= postEndDate.getTime()))
+                );
+              });
+            }
+            //fix return dates
+            if (data.petAllowed != null) {
+              array = _.filter(array, (obj) => {
+                return obj.post.petAllowed == data.petAllowed;
+              });
+            }
             //PAGINATION
             var skipcount = 0;
             var takecount = 20;
@@ -1084,6 +1125,18 @@ app.post(
 
               ps.post.dataValues.date =
                 fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
+
+              let testDate = new Date(ps.post.returnStartDate);
+
+              ps.post.dataValues.returnStartDate = await fixOnlyMonth(testDate);
+
+              let testDate2 = new Date(ps.post.returnEndDate);
+
+              ps.post.dataValues.returnEndDate = await fixOnlyMonth(testDate2);
+
+              // console.log(JSON.stringify(ar));
+              // console.log(ar.post.returnEndDate, ar.post.returnStartDate);
+              // console.log(fixOnlyMonth(testDate), fixOnlyMonth(testDate2));
             }
             //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
             if (finalarr.length == 0) {
@@ -1534,6 +1587,14 @@ app.post(
             nnDate = new Date(post.enddate);
             post.dataValues.enddate = await fixOnlyMonth(nnDate);
 
+            let testDate = new Date(post.returnStartDate);
+
+            post.dataValues.returnStartDate = await fixOnlyMonth(testDate);
+
+            let testDate2 = new Date(post.returnEndDate);
+
+            post.dataValues.returnEndDate = await fixOnlyMonth(testDate2);
+
             post.dataValues.date =
               fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
             let image = "images/" + post.email + ".jpeg";
@@ -1643,6 +1704,14 @@ app.post(
               nnDate = new Date(post.enddate);
               post.dataValues.enddate = await fixOnlyMonth(nnDate);
 
+              let testDate = new Date(post.returnStartDate);
+
+              post.dataValues.returnStartDate = await fixOnlyMonth(testDate);
+
+              let testDate2 = new Date(post.returnEndDate);
+
+              post.dataValues.returnEndDate = await fixOnlyMonth(testDate2);
+
               const intDate = await fixDate(postI.date);
               postI.dataValues.date =
                 intDate.dateMonthDay + " " + intDate.hoursMinutes;
@@ -1739,7 +1808,7 @@ app.post(
       })
         .then(async (posts) => {
           let array = [];
-          let message = "Βρέθηκαν ενδιαφερόμενοι";
+          let message = "Δεν βρέθηκαν ενδιαφερόμενοι";
           let isAny = 0;
           let allI = [];
           for await (post of posts) {
@@ -1752,6 +1821,14 @@ app.post(
             post.dataValues.startdate = await fixOnlyMonth(nnDate);
             nnDate = new Date(post.enddate);
             post.dataValues.enddate = await fixOnlyMonth(nnDate);
+
+            let testDate = new Date(post.returnStartDate);
+
+            post.dataValues.returnStartDate = await fixOnlyMonth(testDate);
+
+            let testDate2 = new Date(post.returnEndDate);
+
+            post.dataValues.returnEndDate = await fixOnlyMonth(testDate2);
             // endiaferomoi gia ena sygekrimeno post
             const interested = await PostInterested.count({
               where: {
@@ -1761,111 +1838,36 @@ app.post(
             }).catch((err) => {
               console.error(err);
             });
-
-            // for await (i of interested) {
-            //   i.update({
-            //     ownerNotified: true,
-            //     where: {
-            //       isNotified: false,
-            //     },
-            //   });
-            // }
-            //collect piid
-            // for await (i of interested) {
-            //   if (i.isNotified == false) allI.push(i.piid);
-            // }
-
-            let allUsers = [];
             let moreUsers = false;
             // let finalInt = _.take(_.drop(interested, 0), 10);
 
             if (interested > 0) {
               moreUsers = true;
-              isAny = interested;
+              isAny++;
+              message = "Βρέθηκαν Ενδιαφερόμενοι!";
+              let image = "images/" + post.email + ".jpeg";
+              let results = {
+                post: post,
+                users: interested,
+                imagePath: image,
+                hasMoreUsers: moreUsers,
+              };
+              array.push(results);
             }
-
-            // console.log(interested);
-            // if (interested != 0) {
-            //   isAny++;
-            //   for await (one of finalInt) {
-            //     const user = await Users.findOne({
-            //       attributes: {
-            //         exclude: [
-            //           "password",
-            //           "verified",
-            //           "facebook",
-            //           "instagram",
-            //           "mobile",
-            //         ],
-            //       },
-            //       where: {
-            //         email: one.email,
-            //       },
-            //     }).catch((err) => {
-            //       console.error(err);
-            //     });
-            //     let dateData = await fixDate(one.date);
-            //     // console.log(dateData);
-            //     one.dataValues.date =
-            //       dateData.dateMonthDay + " " + dateData.hoursMinutes;
-
-            //     if (user != null) {
-            //       user.dataValues.imagePath = "images/" + user.email + ".jpeg";
-            //       let extraData = await insertAver(user);
-            //       user.dataValues = {
-            //         ...user.dataValues,
-            //         ...extraData,
-            //         ...{
-            //           isVerified: one.isVerified,
-            //           piid: one.piid,
-            //           dateOfInterest: one.date,
-            //         },
-            //       };
-            //       // user.dataValues.isVerified = one.isVerified;
-            //       // user.dataValues.piid = one.piid;
-            //       allUsers.push(user);
-            //     } else {
-            //       allUsers.push({
-            //         piid: one.piid,
-            //         email: "Fake User",
-            //         fullname: one.email,
-            //         car: "BMW",
-            //         cardate: "2016",
-            //         gender: "male",
-            //         age: "25",
-            //         photo: "1",
-            //         imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
-            //         average: 5,
-            //         count: 100,
-            //         isVerified: one.isVerified,
-            //       });
-            //     }
-            //   }
-
-            //
-            // }
-            let image = "images/" + post.email + ".jpeg";
-            let results = {
-              post: post,
-              users: interested,
-              imagePath: image,
-              hasMoreUsers: moreUsers,
-            };
-            array.push(results);
           }
 
           if (isAny > 0) {
             message = "Βρέθηκαν ενδιαφερόμενοι";
             let skipcount = 0;
-            let takecount = 20;
-            if (data.page > 1) skipcount = data.page * 20 - 20;
+            let takecount = 10;
+            if (data.page > 1) skipcount = data.page * 10 - 10;
             let finalarr = _.take(_.drop(array, skipcount), takecount);
-            let mod = isAny % 20;
+            let mod = isAny % 10;
             // console.log(mod);
             let totallength = 1;
             mod == 0
-              ? (totallength = isAny / 20)
-              : (totallength = isAny / 20 - mod / 20 + 1);
+              ? (totallength = isAny / 10)
+              : (totallength = isAny / 10 - mod / 10 + 1);
             res.json({
               postUser: finalarr,
               totalPages: totallength,
@@ -1917,6 +1919,14 @@ app.post(
           posts.dataValues.startdate = await fixOnlyMonth(nnDate);
           nnDate = new Date(posts.enddate);
           posts.dataValues.enddate = await fixOnlyMonth(nnDate);
+
+          let testDate = new Date(posts.returnStartDate);
+
+          posts.dataValues.returnStartDate = await fixOnlyMonth(testDate);
+
+          let testDate2 = new Date(posts.returnEndDate);
+
+          posts.dataValues.returnEndDate = await fixOnlyMonth(testDate2);
           let message = "Βρέθηκαν ενδιαφερόμενοι";
           let isAny = 0;
           // euresh endiafermonwn gia to post
@@ -2341,7 +2351,7 @@ app.post(
     // req.body will hold the text fields, if there were any
     console.log(req.headers);
     console.log(req.file);
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
 
     res.json({ message: "Το upload έγινε επιτυχώς" });
   }

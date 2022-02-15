@@ -234,4 +234,50 @@ Pleon fernei mono ta posts kai ton arithmo ton endiaferomenwn anti gia ta stoixe
 Sto pedio users h timh antiproswpeyei ton arithmo olwn twn endiaferomenwn.
 Στο πεδίο hasMoreUser η τιμή true αντιπροσωπεύει ότι έχει ενδιαφερόμενους. Δεν άλλαξα κάτι εδώ. Απλά το αναφέρω για να είναι ξεκάθαρο.
 
+13 / 2 /2022 ============= (allages gia epistrofh)
+
+1. vasi dedomenwn ->
+
+Nea pedia ston pinaka post:
+withReturn: boolean ---- an h diadromh exei epistrofh h oxi
+returnStartDate: 2000-12-30 ----- arxiki imerominia epistrofis
+returnEndDate: 2000-12-31 ----- teliki imerominia epistrofis
+
+2. api createpost -> 
+
+Allages sto request: prepei na stelnete to pedio withReturn me true h false. Se periptwsh true mou stelneis dates
+kai se periptwsh false den xreiazetai na stelneis ta pedia tws dates. (returnStartDate kai returnEndDate)
+Example:
+        "returnStartDate": "2022-12-20",
+        "returnEndDate": "2022-12-21",
+        "withReturn": true,
+
+
+3. api searchposts ->
+
+mou stelneis extra pedio me onoma "withReturn", to opoio tha einai true otan o xrhsths exei epileksei sta filtra na tou erxontai posts me epistrofh.
+Epishs mou epistrefeis to euros timwn twn imerominiwn epistrofhs sta pedia: returnStartDate kai returnEndDate.
+Sthn periptwsh pou o xrhsths den ton endiaferei h epistrofh tha mou to stelneis ws Null.
+
+Example:
+
+   "withReturn": true,
+   "returnStartDate": "2022-12-19",
+   "returnEndDate": "2022-12-20"
+
+15/2/2022 changes =====================
+
+Database ----
+
+NEA PEDIA STON PINAKA post
+
+petAllowed: Boolean ==== false an o xrhsths den epitrepei katoikidio, true an epitrepei. To pedio mpainei fusika sto api createpost.
+
+1. api searchposts -> 
+
+mou stelneis extra pedio me onoma "petAllowed" analogos an o xrhsths thelei na dei posts pou epitrepetai h den epitrepetai katoikidio
+Sthn periptwsh pou den ton endiaferei mou stelneis NULL. 
+
+
+
 

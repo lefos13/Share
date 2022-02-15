@@ -60,8 +60,24 @@ const Posts = sequelize.define(
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
+    returnStartDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    returnEndDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    withReturn: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
     costperseat: {
       type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    petAllowed: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
     },
     comment: {

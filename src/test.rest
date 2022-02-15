@@ -99,8 +99,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "numseats": 2,
         "startdate": "2021-12-15",
         "enddate": "2022-12-19",
+        "returnStartDate": "2022-12-20",
+        "returnEndDate": "2022-12-21",
+        "withReturn": true,
         "costperseat": 40,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "petAllowed": true,
         "moreplaces": [
             {
                     "place": "lamia",
@@ -143,14 +147,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "endplace": "Athens",
         "endcoord": "1",
         "startdate": "2021-10-05",
-        "enddate": "2022-12-20",
+        "enddate": "2022-12-19",
         "page": 1,
         "cost": 100,
         "age": null,
         "age_end": null,
         "car": null,
         "cardate": null,
-        "gender": null
+        "gender": null,
+        "withReturn": true,
+        "petAllowed": true,
+        "returnStartDate": "2022-12-19",
+        "returnEndDate": "2022-12-20"
     }
 }
 
@@ -265,7 +273,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -278,7 +286,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "user0@gmail.com",
         "page": 1
     }
 }
@@ -291,8 +299,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 
 {
     "data": {
-        "postid": 849,
-        "page": 2
+        "postid": 1721,
+        "page": 1
     }
 }
 ###
