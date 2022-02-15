@@ -1107,6 +1107,11 @@ app.post(
                 );
               });
             }
+            if (data.petAllowed != null) {
+              array = _.filter(array, (obj) => {
+                return obj.post.petAllowed == data.petAllowed;
+              });
+            }
             //PAGINATION
             var skipcount = 0;
             var takecount = 20;

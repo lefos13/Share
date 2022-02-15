@@ -104,6 +104,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "withReturn": false,
         "costperseat": 40,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "petAllowed": true,
         "moreplaces": [
             {
                     "place": "lamia",
@@ -154,7 +155,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "car": null,
         "cardate": null,
         "gender": null,
-        "withReturn": true,
+        "withReturn": null,
+        "petAllowed": false,
         "returnStartDate": "2022-12-19",
         "returnEndDate": "2022-12-20"
     }

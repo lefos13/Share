@@ -76,6 +76,10 @@ const Posts = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    petAllowed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
     comment: {
       type: DataTypes.TEXT,
       allowNull: true,

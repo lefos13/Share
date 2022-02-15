@@ -257,11 +257,19 @@ Example:
 
 mou stelneis extra pedio me onoma "withReturn", to opoio tha einai true otan o xrhsths exei epileksei sta filtra na tou erxontai posts me epistrofh.
 Epishs mou epistrefeis to euros timwn twn imerominiwn epistrofhs sta pedia: returnStartDate kai returnEndDate.
+Sthn periptwsh pou o xrhsths den ton endiaferei h epistrofh tha mou to stelneis ws Null.
 
 Example:
 
    "withReturn": true,
    "returnStartDate": "2022-12-19",
    "returnEndDate": "2022-12-20"
+
+15/2/2022 changes =====================
+
+1. api searchposts -> 
+
+mou stelneis extra pedio me onoma "petAllowed" analogos an o xrhsths thelei na dei posts pou epitrepetai h den epitrepetai katoikidio
+Sthn periptwsh pou den ton endiaferei mou stelneis NULL. 
 
 
