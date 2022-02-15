@@ -767,13 +767,17 @@ app.post(
 
       // auto to kommati kanei mono eggrafi opote vgalto apo sxolio otan theliseis
 
+      if (data.withReturn == false) {
+        data.returnStartDate = 0000 - 00 - 00;
+        data.returnEndDate = 0000 - 00 - 00;
+      }
       await Posts.create(data)
         .then((post) => {
           // console.log(post.moreplaces);
-          var data = {
-            body: post.toJSON(),
-            message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-          };
+          // var data = {
+          //   body: post.toJSON(),
+          //   message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+          // };
           res.json({ message: "Επιτυχής δημιουργία!" });
         })
         .catch((err) => {
@@ -911,14 +915,6 @@ app.post(
         data.enddate = lastday;
       }
 
-      let solveReturn = false;
-      if (data.withReturn == null) {
-        solveReturn = true;
-        data.withReturn = false;
-      } else if (data.withReturn == true) {
-        solveReturn = true;
-      } else data.withReturn = false;
-
       await Posts.findAndCountAll({
         where: {
           // elaxisto kostos
@@ -970,12 +966,6 @@ app.post(
                     { endcoord: data.endcoord },
                   ],
                 },
-              ],
-            },
-            {
-              [Op.or]: [
-                { withReturn: data.withReturn },
-                { withReturn: solveReturn }, //auth h sunithikh lunei to provlima, an o xrhsths den ton noiazei h epistrofh.
               ],
             },
           ],
@@ -1086,7 +1076,37 @@ app.post(
                 return obj.user.gender == data.gender;
               });
             }
+            if (data.withReturn != null) {
+              //afairese ta post twn xrhstwn pou den exoun epistrofh
+              array = _.filter(array, (obj) => {
+                let postStartDate = new Date(obj.post.returnStartDate);
+                let postEndDate = new Date(obj.post.returnEndDate);
+                let searchStartDate = new Date(data.returnStartDate);
+                let searchEndDate = new Date(data.returnEndDate);
 
+                // console.log(postStartDate, postEndDate);
+                // console.log(
+                //   postStartDate,
+                //   postEndDate,
+                //   (searchStartDate.getTime() >= postStartDate.getTime() &&
+                //     searchStartDate.getTime() <= postEndDate.getTime()) ||
+                //     (searchEndDate.getTime() <= postEndDate.getTime() &&
+                //       searchEndDate.getTime() >= postStartDate.getTime()) ||
+                //     (searchStartDate.getTime() <= postStartDate.getTime() &&
+                //       searchEndDate.getTime() >= postEndDate.getTime())
+                // );
+
+                return (
+                  obj.post.withReturn == true &&
+                  ((searchStartDate.getTime() >= postStartDate.getTime() &&
+                    searchStartDate.getTime() <= postEndDate.getTime()) ||
+                    (searchEndDate.getTime() <= postEndDate.getTime() &&
+                      searchEndDate.getTime() >= postStartDate.getTime()) ||
+                    (searchStartDate.getTime() <= postStartDate.getTime() &&
+                      searchEndDate.getTime() >= postEndDate.getTime()))
+                );
+              });
+            }
             //PAGINATION
             var skipcount = 0;
             var takecount = 20;

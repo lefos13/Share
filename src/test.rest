@@ -101,7 +101,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "enddate": "2022-12-19",
         "returnStartDate": "2022-12-20",
         "returnEndDate": "2022-12-21",
-        "withReturn": true,
+        "withReturn": false,
         "costperseat": 40,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "moreplaces": [
@@ -153,7 +153,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "age_end": null,
         "car": null,
         "cardate": null,
-        "gender": null
+        "gender": null,
+        "withReturn": true,
+        "returnStartDate": "2022-12-19",
+        "returnEndDate": "2022-12-20"
     }
 }
 
