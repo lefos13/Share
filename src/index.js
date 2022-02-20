@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 var http = require("http").Server(app);
+var axios = require("axios");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
 //helmet for security
 const helmet = require("helmet");
@@ -48,7 +50,8 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 // get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY } = process.env;
+const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
+  process.env;
 
 //console.log (EMAIL, PASSEMAIL);
 const bcrypt = require("bcrypt");
@@ -2306,20 +2309,68 @@ app.post(
 );
 
 //test api async await functions
-app.get("/test", [authenticateToken], cors(corsOptions), async (req, res) => {
-  var now = "now";
-  now = await test(now);
+// app.get("/test", [authenticateToken], cors(corsOptions), async (req, res) => {
+//   var config = {
+//     method: "get",
+//     url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=amoeba&types=establishment&location=37.76999%2C-122.44696&radius=500&key=${GOOGLE_KEY}`,
+//     headers: {},
+//   };
 
-  await prom(false)
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((rej) => {
-      console.error("error arpagmeno: " + rej);
-    });
-  console.log(now);
-  res.json(now);
-});
+//   await axios(config)
+//     .then(function (response) {
+//       console.log(response.data);
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+
+//   res.json({ test: "test" });
+// });
+
+// const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=amoeba&types=establishment&location=37.76999%2C-122.44696&radius=500&key=${GOOGLE_KEY}`;
+const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/`;
+// const morgan = require("morgan");
+// app.use(morgan("dev"));
+
+//google proxy for autocomplete
+app.use(
+  "/autocomplete/json",
+  [authenticateToken],
+  cors(corsOptions),
+  createProxyMiddleware({
+    target: API_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: async function (path, req) {
+      // const should_add_something = await httpRequestToDecideSomething(path);
+      console.log(path);
+      // path = "input=volos&key=" + GOOGLE_KEY;
+      // console.log(path);
+      // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
+      path += "&components=country:gr&types=(cities)&key=" + GOOGLE_KEY;
+      return path;
+    },
+  })
+);
+
+//google proxy for place details
+app.use(
+  "/details/json",
+  [authenticateToken],
+  cors(corsOptions),
+  createProxyMiddleware({
+    target: API_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: async function (path, req) {
+      // const should_add_something = await httpRequestToDecideSomething(path);
+      console.log(path);
+      // path = "input=volos&key=" + GOOGLE_KEY;
+      // console.log(path);
+      // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
+      path += "&fields=geometry&key=" + GOOGLE_KEY;
+      return path;
+    },
+  })
+);
 
 //test function for await
 async function test(now) {
