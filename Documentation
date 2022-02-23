@@ -278,6 +278,23 @@ petAllowed: Boolean ==== false an o xrhsths den epitrepei katoikidio, true an ep
 mou stelneis extra pedio me onoma "petAllowed" analogos an o xrhsths thelei na dei posts pou epitrepetai h den epitrepetai katoikidio
 Sthn periptwsh pou den ton endiaferei mou stelneis NULL. 
 
+23/2/2022 changes =====================
+
+-Neo api sendReport gia thn forma epikoinwnias
+
+Stelneis:
+
+{
+    "text": "Test report"
+}
+
+Lamvaneis katallilo message
+
+-neo api getTerms gia tous orous kai proipotheseis
+
+Kaneis apla to call me header: Content-Type: application/text/html
+kai lamvaneis ws response to analogo keimeno mesa se html forma
+
 
 
 

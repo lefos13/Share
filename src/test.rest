@@ -354,6 +354,19 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:3000/sendReport
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAyLTAxVDEyOjE1OjQ4LjUwM1oiLCJpYXQiOjE2NDM3MTc3NDgsImV4cCI6MTY0ODkwMTc0OH0.3hGmuEdGzpdhiny9YD5qIAoiD8I-TPDVHcEyH1VG3FY
+
+{
+    "text": "Test report"
+}
+###
+
+POST http://localhost:3000/getTerms
+Content-Type: application/text/html
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAyLTAxVDEyOjE1OjQ4LjUwM1oiLCJpYXQiOjE2NDM3MTc3NDgsImV4cCI6MTY0ODkwMTc0OH0.3hGmuEdGzpdhiny9YD5qIAoiD8I-TPDVHcEyH1VG3FY
+###
 
 POST http://localhost:3000/upload
 Content-Type: multipart/form-data; boundary=---

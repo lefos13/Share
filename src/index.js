@@ -3,6 +3,8 @@ const app = express();
 var http = require("http").Server(app);
 var axios = require("axios");
 const { createProxyMiddleware } = require("http-proxy-middleware");
+var fun = require("./utils/functions");
+var path = require("path");
 
 //helmet for security
 const helmet = require("helmet");
@@ -80,11 +82,12 @@ const Users = require("./modules/user");
 const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
 const Reviews = require("./modules/review");
-const { values, hasIn } = require("lodash");
+const { values, hasIn, functions } = require("lodash");
 
 checkconnection();
 
 const schedule = require("node-schedule");
+const { sendReport } = require("./utils/functions");
 
 //run once a time to delete old posts from the database
 const deleteOldPosts = schedule.scheduleJob("0 0 1 */1 *", async function () {
@@ -2308,6 +2311,42 @@ app.post(
   }
 );
 
+app.post(
+  "/sendReport",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      let extra = req.body.extra;
+      let text = req.body.text;
+      let flag = await fun.sendReport(text, extra);
+      // await sendReport(text, extra);
+      flag == true
+        ? res.json({ message: "report sent" })
+        : res.status(500).json({ message: "Κάτι πήγε λάθος!" });
+    } catch (err) {
+      console.error("!!!!!!!!!!!!!!sto sendReport: ", err);
+      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+    }
+  }
+);
+
+app.post(
+  "/getTerms",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      let email = req.body.extra;
+      let terms = fun.terms;
+      res.sendFile(path.join(__dirname + "/terms/terms.html"));
+    } catch (err) {
+      console.error("!!!!!!!!!!!!!!sto sendReport: ", err);
+      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+    }
+  }
+);
+
 //test api async await functions
 // app.get("/test", [authenticateToken], cors(corsOptions), async (req, res) => {
 //   var config = {
@@ -2371,26 +2410,6 @@ app.use(
     },
   })
 );
-
-//test function for await
-async function test(now) {
-  for (var i = 0; i <= 10000; i++) {
-    var date = new Date();
-    // i == 10000 ? await sleep(1000) : "";
-  }
-  now = "not now";
-  return now;
-}
-
-//function for the usage of then and catch
-async function prom(param) {
-  if (param) return Promise.resolve(true);
-  else return Promise.reject(false);
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 //service poy anevazei eikona sto server
 app.post(
