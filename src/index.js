@@ -2347,29 +2347,8 @@ app.post(
   }
 );
 
-//test api async await functions
-// app.get("/test", [authenticateToken], cors(corsOptions), async (req, res) => {
-//   var config = {
-//     method: "get",
-//     url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=amoeba&types=establishment&location=37.76999%2C-122.44696&radius=500&key=${GOOGLE_KEY}`,
-//     headers: {},
-//   };
-
-//   await axios(config)
-//     .then(function (response) {
-//       console.log(response.data);
-//     })
-//     .catch(function (error) {
-//       console.log(error);
-//     });
-
-//   res.json({ test: "test" });
-// });
-
 // const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=amoeba&types=establishment&location=37.76999%2C-122.44696&radius=500&key=${GOOGLE_KEY}`;
 const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/`;
-// const morgan = require("morgan");
-// app.use(morgan("dev"));
 
 //google proxy for autocomplete
 app.use(
