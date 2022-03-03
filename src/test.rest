@@ -86,19 +86,19 @@ Content-Type: application/json
 #service pou ftiaxneis ena post
 POST http://localhost:3000/createpost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAzVDE2OjA0OjAyLjE5MFoiLCJpYXQiOjE2NDYzMjM0NDIsImV4cCI6MTY1MTUwNzQ0Mn0.lx4Z5sj9VopjkLQuJp_xjkey-hY23dInagKmv9oh1VU
 
 {
     "data": {
         "email": "cs141082@uniwa.gr",
         "date": "2021-10-05",
-        "startplace": "Volos",
-        "startcoord": "31",
-        "endplace": "Athens",
-        "endcoord": "23",
+        "startplace": "ασδ",
+        "startcoord": "123",
+        "endplace": "δσα",
+        "endcoord": "321",
         "numseats": 2,
-        "startdate": "2021-12-15",
-        "enddate": "2022-12-19",
+        "startdate": "2022-12-22",
+        "enddate": "2022-12-22",
         "returnStartDate": "2022-12-20",
         "returnEndDate": "2022-12-21",
         "withReturn": true,
@@ -188,11 +188,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
 POST http://localhost:3000/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAyLTI2VDE1OjQ5OjQwLjI4OFoiLCJpYXQiOjE2NDU4OTA1ODAsImV4cCI6MTY1MTA3NDU4MH0.RVDRHuPubDnW-W8kXAEhpV77cppmfMdSYbwMPPeCWvU
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -215,14 +215,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 #Service pou eisagei ena review sth vash
 POST http://localhost:3000/createreview
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAyLTI2VDE1OjQ5OjQwLjI4OFoiLCJpYXQiOjE2NDU4OTA1ODAsImV4cCI6MTY1MTA3NDU4MH0.RVDRHuPubDnW-W8kXAEhpV77cppmfMdSYbwMPPeCWvU
 
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "emailreviewer": "giannisferagxsouliss21@gmail.com",
+        "emailreviewer": "user0@gmail.com",
         "rating": 4,
-        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια test"
     }
 }
 
@@ -370,3 +370,54 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 POST http://localhost:3000/upload
 Content-Type: multipart/form-data; boundary=---
+
+###
+
+POST http://localhost:3000/updateProfile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "mobile": "6975620785",
+        "age": 25,
+        "facebook": null,
+        "instagram": null,
+        "car": "nissan",
+        "cardate": "1996"
+    }
+}
+
+###
+
+POST http://localhost:3000/createRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "startplace": "Volos",
+        "startcoord": "123",
+        "endplace": "Athens",
+        "endcoord": "321",
+        "startdate": "2022-12-20",
+        "enddate": "2022-12-22"
+    }
+}
+
+###
+
+POST http://localhost:3000/getRequests
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+###
+POST http://localhost:3000/deleteRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "postSearchId": 4
+    }
+}

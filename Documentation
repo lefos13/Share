@@ -295,6 +295,90 @@ Lamvaneis katallilo message
 Kaneis apla to call me header: Content-Type: application/text/html
 kai lamvaneis ws response to analogo keimeno mesa se html forma
 
+26/2/2022 changes ==========================================
+
+searchuser api: Αλλαγές σχετικά με το Reviewable (API που επισττρέφει τα στοιχεία στο προφιλ ενός χρήστη)
+
+Λογική πίσω από το πότε ένας χρήσης θα μπορεί να κάνει review σε έναν άλλον:
+Όταν λοιπόν έχει έγκριθεί ένα ενδιαφέρον του και η ημερομηνία της διαδρομής έχει γίνει παλιότερη από την τρέχουσα,
+Όταν τον προηγούμενο μήνα δεν έχει κάνει ξανά review στον ίδιο χρήστη.
+
+Αν οποιαδήποτε από τις παραπάνω συνθήκες δεν ισχύει, το reviewable θα επιστρέφει false. Η λογική αλλάζει έυκολα
+γενικά, οπότε δεν δεσμευόμαστε με αυτούς τους όρους.
+
+
+CHANGES 2 MARTIOY 2022 ---- 
+
+NEW API ---->
+
+POST http://localhost:3000/updateProfile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "mobile": "6975620785",
+        "age": 25,
+        "facebook": null,
+        "instagram": null,
+        "car": "nissan",
+        "cardate": "1996"
+    }
+}
+
+API poy kanei update to profil.. 
+
+3/3/2022 CHANGES
+
+---New API
+
+createRequest
+
+POST http://localhost:3000/createRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "startplace": "volos",
+        "startcoord": "123",
+        "endplace": "Athens",
+        "endcoord": "321",
+        "startdate": "2022-12-20",
+        "enddate": "2022-12-22"
+    }
+}
+
+---New API
+
+getRequest
+
+POST http://localhost:3000/getRequests
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+
+---New API
+
+deleteRequest: to postSearchId einai to primary key tou request sth vash. Sto stelnw se kathe request sto API getRequests.
+
+POST http://localhost:3000/deleteRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "postSearchId": 4
+    }
+}
+
+---Change sto searchuser API
+
+Neo pedio gia to an o xrhsths exei kanei requests.
+
+
+
+
 
 
 

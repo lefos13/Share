@@ -82,6 +82,7 @@ const Users = require("./modules/user");
 const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
 const Reviews = require("./modules/review");
+const SearchPost = require("./modules/searchPost");
 const { values, hasIn, functions } = require("lodash");
 
 checkconnection();
@@ -495,6 +496,49 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
   }
 });
 
+//update profile
+app.post(
+  "/updateProfile",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      // crypto the password
+      var data = req.body.data;
+      let email = req.body.extra;
+      console.log("test Log: ", data, email);
+
+      const user = await Users.update(
+        {
+          mobile: data.mobile,
+          age: data.age,
+          facebook: data.facebook,
+          instagram: data.instagram,
+          car: data.car,
+          cardate: data.cardate,
+        },
+        {
+          where: {
+            email: email,
+          },
+        }
+      ).catch((err) => {
+        console.log("Update profil: ", err);
+        throw err;
+      });
+
+      console.log(user);
+
+      res.json({ message: "Η ενημέρωση έγινε επιτυχώς!" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+      });
+    }
+  }
+);
+
 //rest api service that creates the token for the user. Also checks if he is verified and sends the right message
 app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   try {
@@ -742,54 +786,175 @@ app.post(
       var firsttime = new Date().today() + " " + new Date().timeNow();
       console.log(firsttime);
       data.date = datetime;
-      // await Posts.count({
-      //   where: {
-      //     date: { [Op.between]: [firsttime, datetime] },
-      //     email: data.email,
-      //   },
-      // }).then(async (count) => {
-      //   console.log(count);
-      //   if (count >= 3) {
-      //     res.status(405).json({
-      //       message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
-      //       body: null,
-      //     });
-      //   } else {
-      //     await Posts.create(data)
-      //       .then((post) => {
-      //         // console.log(post.moreplaces);
-      //         var data = {
-      //           body: post.toJSON(),
-      //           message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-      //         };
-      //         res.json(data);
-      //       })
-      //       .catch((err) => {
-      //         console.log(err);
-      //         res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
-      //       });
-      //   }
-      // });
-
-      // auto to kommati kanei mono eggrafi opote vgalto apo sxolio otan theliseis
-
       if (data.withReturn == false) {
         data.returnStartDate = 0000 - 00 - 00;
         data.returnEndDate = 0000 - 00 - 00;
       }
-      await Posts.create(data)
-        .then((post) => {
-          // console.log(post.moreplaces);
-          // var data = {
-          //   body: post.toJSON(),
-          //   message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
-          // };
-          res.json({ message: "Επιτυχής δημιουργία!" });
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+      // ========================= PRAGMATIKO KOMMATI - ME ELEGXO GIA TRIA MAX POSTS
+      await Posts.count({
+        where: {
+          date: { [Op.between]: [firsttime, datetime] },
+          email: data.email,
+        },
+      }).then(async (count) => {
+        console.log(count);
+        if (count >= 3) {
+          res.status(405).json({
+            message: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
+            body: null,
+          });
+        } else {
+          await Posts.create(data)
+            .then((post) => {
+              // console.log(post.moreplaces);
+              var data = {
+                body: post.toJSON(),
+                message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+              };
+              res.json(data);
+              pushNotifications(post);
+            })
+            .catch((err) => {
+              console.log(err);
+              res
+                .status(400)
+                .json({ message: "Κάτι πήγε στραβά.", body: null });
+            });
+        }
+      });
+
+      // auto to kommati kanei mono eggrafi opote vgalto apo sxolio otan theliseis
+
+      // await Posts.create(data)
+      //   .then((post) => {
+      //     // console.log(post.moreplaces);
+      //     // var data = {
+      //     //   body: post.toJSON(),
+      //     //   message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+      //     // };
+      //     res.json({ message: "Επιτυχής δημιουργία!" });
+
+      //     // =========== καλώ function για το Push notification των request.
+      //     pushNotifications(post);
+      //     // ===========
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //     res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
+      //   });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+      });
+    }
+  }
+);
+
+//service that creates a request
+app.post(
+  "/createRequest",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      let data = req.body.data;
+      let email = req.body.extra;
+
+      let curTime = new Date();
+      data.created_at = curTime;
+      data.email = email;
+      // curTime.setMonth(curTime.getMonth() - 1);
+      const count = await SearchPost.count({
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        console.log("error in count", err);
+        throw err;
+      });
+
+      //check if you have more than 3 requests
+      if (count < 3) {
+        const request = await SearchPost.create(data).catch((err) => {
+          console.log("Error sto creation of request");
+          throw err;
         });
+        // console.log(request);
+        res.json({ request: request });
+      } else {
+        res
+          .status(405)
+          .json({ message: "Έχεις ήδη τρεις διαδρομές που ψάχνεις!" });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+      });
+    }
+  }
+);
+
+//api that returns a list of all the requests of a user. (Maximum 3)
+app.post(
+  "/getRequests",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      // let data = req.body.data;
+      let email = req.body.extra;
+
+      const requests = await SearchPost.findAll({
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        console.log(err);
+        throw err;
+      });
+
+      if (requests.length > 0) {
+        res.json({ requests: requests });
+      } else {
+        res
+          .status(404)
+          .json({ message: "Δεν βρέθηκαν αναζητήσεις διαδρομών!" });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+      });
+    }
+  }
+);
+
+//service that deletes a request of a user
+app.post(
+  "/deleteRequest",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      let data = req.body.data;
+      let email = req.body.extra;
+
+      const reqDel = await SearchPost.destroy({
+        where: {
+          postSearchId: data.postSearchId,
+          email: email,
+        },
+      }).catch((err) => {
+        console.log("error kata thn diagrafh enos request");
+        throw err;
+      });
+
+      // console.log(reqDel);
+      reqDel == 1
+        ? res.json({ message: "Η διαγραφή έγινε επιτυχώς!" })
+        : res.status(404).json({ message: "Το request δεν υπάρχει!" });
     } catch (err) {
       console.error(err);
       res.status(500).json({
@@ -1197,7 +1362,7 @@ app.post(
     try {
       // console.log(req.query);
       var data = req.body.data;
-      var tokenEmail = req.body.extra;
+      var searcherEmail = req.body.extra;
       // console.log("Token Email: " + JSON.stringify(tokenEmail));
       // let isUserReviwable = await Posts.findOne({
       //   where: {
@@ -1235,6 +1400,18 @@ app.post(
               var today = new Date();
               today = await getCurDate(6);
 
+              //psaxnei na dei an exei requests
+              const requests = await SearchPost.count({
+                where: {
+                  email: data.email,
+                },
+              }).catch((err) => {
+                throw err;
+              });
+              // console.log(requests, "My requests");
+              let hasRequests = false;
+              requests > 0 ? (hasRequests = true) : null;
+
               //psaxnei na dei an exei posts
               const post = await Posts.findOne({
                 where: {
@@ -1271,6 +1448,7 @@ app.post(
                 }
               }
 
+              //psaxnei an exei endiaferomenous
               today = await getCurDate(0);
               const posts = await Posts.findAll({
                 where: {
@@ -1304,14 +1482,65 @@ app.post(
               let hasPosts;
               post == null ? (hasPosts = false) : (hasPosts = true);
 
+              //section if the one who searches can review the profil
+              let reviewable = false;
+
+              let todayReviewable = await getCurDate(0);
+              console.log("Date from getCurDate(0)=  " + todayReviewable);
+              //check if already has review
+              setTime(0);
+              var datetime = new Date().today() + " " + new Date().timeNow();
+              console.log("curTime: " + datetime);
+
+              // UPDATED BETTER WAY TO GET ISO DATE
+              let firsttime = new Date();
+              firsttime.setMonth(firsttime.getMonth() - 1);
+
+              const cRev = await Reviews.count({
+                where: {
+                  email: data.email,
+                  emailreviewer: searcherEmail,
+                  createdAt: { [Op.between]: [firsttime, datetime] },
+                },
+              });
+              // console.log("Number of Reviews last month: " + cRev);
+              // case that the user that searches is not going to his profile
+              if (searcherEmail != data.email && cRev == 0) {
+                const posts = await Posts.findAll({
+                  where: {
+                    email: data.email,
+                    enddate: { [Op.lt]: todayReviewable },
+                  },
+                }).catch((err) => {
+                  console.log(err + "----- count posts for reviewable");
+                  throw err;
+                });
+                let total = 0;
+                for await (p of posts) {
+                  const interCount = await PostInterested.count({
+                    where: {
+                      postid: p.postid,
+                      email: searcherEmail,
+                      isVerified: true,
+                      isNotified: true,
+                      ownerNotified: true,
+                    },
+                  });
+                  total += interCount;
+                }
+
+                total > 0 ? (reviewable = true) : null;
+              }
+              //data response
               res.json({
                 user: found,
                 average: average,
                 count: revfound.count,
-                hasPosts: hasPosts,
-                hasInterested: hasInterested,
-                interestedForYourPosts: hasIntPosts, //4th tab
-                reviewAble: true, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
+                hasRequests: hasRequests,
+                hasPosts: hasPosts, //boolean gia to an o xrhshs exei posts
+                hasInterested: hasInterested, // boolean gia to an o xrhsths endiaferetai gia posts
+                interestedForYourPosts: hasIntPosts, // boolean gia to an uparxoun endiaferomenoi twn post tou user
+                reviewAble: reviewable, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
                 image: "images/" + data.email + ".jpeg",
                 message: "Ο χρήστης βρέθηκε",
               });
@@ -2408,14 +2637,43 @@ app.post(
 
 function setTime(extrad) {
   Date.prototype.today = function () {
+    let fixValue = 0;
+    let fixYear = 0;
+    let fixMonth = 0;
+    if (this.getDate() - extrad < 1) {
+      if (this.getMonth() == 1) {
+        fixValue = 28;
+      } else if (
+        this.getMonth() == 0 ||
+        this.getMonth() == 2 ||
+        this.getMonth() == 4 ||
+        this.getMonth() == 6 ||
+        this.getMonth() == 7 ||
+        this.getMonth() == 9 ||
+        this.getMonth() == 11
+      ) {
+        fixValue = 31;
+      } else {
+        fixValue = 30;
+      }
+    }
+
+    let moreM = 0;
+    fixValue > 0 ? (moreM = 1) : null;
+    if (this.getMonth() + 1 - moreM < 1) {
+      fixYear = 1;
+      fixMonth = 11;
+      moreM = 0;
+    }
     return (
-      this.getFullYear() +
+      this.getFullYear() -
+      fixYear +
       "-" +
-      (this.getMonth() + 1 < 10 ? "0" : "") +
-      (this.getMonth() + 1) +
+      (this.getMonth() + 1 + fixMonth - moreM < 10 ? "0" : "") +
+      (this.getMonth() + 1 + fixMonth - moreM) +
       "-" +
-      (this.getDate() - extrad < 10 ? "0" : "") +
-      (this.getDate() - extrad)
+      (this.getDate() - extrad + fixValue < 10 ? "0" : "") +
+      (this.getDate() - extrad + fixValue)
     );
   };
   // For the time now
@@ -2432,6 +2690,10 @@ function setTime(extrad) {
     );
   };
 }
+
+// let date = new Date("2022-01-03");
+// setTime(3);
+// console.log(date.today());
 
 const insertAver = async (user) => {
   try {
@@ -2517,6 +2779,45 @@ const fixOnlyMonth = async (date) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+//function that pushed notifications for all requests that find their posts
+const pushNotifications = async (post) => {
+  try {
+    const allRequests = await SearchPost.findAll({
+      where: {
+        [Op.or]: [
+          { startplace: post.startplace },
+          { startcoord: post.startcoord },
+        ],
+        [Op.or]: [{ endplace: post.endplace }, { endcoord: post.endcoord }],
+        // elegxos na peftei h arxikh hmeromhnia tou post anamesa sthn arxikh kai telikh toy xrhsth
+        // ή na peftei h telikh hmeromhnia tou post anamesa sthn arxikh h telikh hmeromhnia tou xrhsth
+        // ή na peftei h arxikh KAI h telikh hmeromhnia toy xrhsth na peftei anamesa sthn arxikh KAI telikh hmeromhnia tou post
+        [Op.or]: [
+          { startdate: { [Op.between]: [post.startdate, post.enddate] } },
+          { enddate: { [Op.between]: [post.startdate, post.enddate] } },
+          {
+            [Op.and]: [
+              { startdate: { [Op.lte]: post.startdate } },
+              { enddate: { [Op.gte]: post.enddate } },
+            ],
+          },
+        ],
+      },
+    }).catch((err) => {
+      console.log("Inside function that pushes notifications: ", err);
+      throw err;
+    });
+
+    console.log(
+      "============Found to push notifications: ",
+      allRequests.length
+    );
+  } catch (err) {
+    console.log("Error inside try and catch!!!!!");
+  }
+  // console.log("Inside func", post);
 };
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
