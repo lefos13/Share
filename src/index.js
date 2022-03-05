@@ -1792,6 +1792,7 @@ app.post(
           email: data.email,
           enddate: { [Op.gte]: today },
         },
+        order: [["date", "DESC"]],
       })
         .then(async (found) => {
           //console.log(found);
