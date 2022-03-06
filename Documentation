@@ -374,7 +374,47 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 ---Change sto searchuser API
 
-Neo pedio gia to an o xrhsths exei kanei requests.
+Neo pedio gia to an o xrhsths exei kanei requests : hasRequests
+true or false analoga me to an exei requests
+
+
+===== 3/5/2022 ====== FAVOURITES
+
+Αγαπημένα - Favourites
+
+ ------------  isfavourite ---------- neo pedio sth vash ston pinaka posts
+ Boolean
+
+
+NEW API: ----------------- handleFavourite
+
+Προσθέτει ένα Post ενός χρήστη στα αγαπημένα του (max 5).
+Επίσης, καλώντας το ίδιο api αφαιρεί το ποστ από τα αγαπημένα του.
+ΠΡΟΣΟΧΗ: Το token πρέπει να είναι του χρήστη που του ανήκει το post.
+
+POST http://localhost:3000/handleFavourite
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "postid": 1742
+    }
+}
+
+NEW API: ----------------- getFavourites
+
+Pairnw to email apo to Token opote den mou stelneis kati.
+Sou epistrefw ena array me ta post tou xrhsth kai kapoia stoixeia tou xrhsh pou endexomenos na xreiasteis.
+
+POST http://localhost:3000/getFavourites
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+---------------------------- Neo pedio sto searchuser api (hasFavourites)
+Epistrefei true an exei kai false an den exei agaphmena
+
+
 
 
 

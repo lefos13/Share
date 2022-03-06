@@ -421,3 +421,21 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
         "postSearchId": 6
     }
 }
+
+###
+#service που προσθέτει/αφαιρεί ένα ποστ από τα αγαπημένα
+POST http://localhost:3000/handleFavourite
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+{
+    "data": {
+        "postid": 1742
+    }
+}
+
+###
+#service που προσθέτει/αφαιρεί ένα ποστ από τα αγαπημένα
+POST http://localhost:3000/getFavourites
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg

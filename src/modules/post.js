@@ -92,6 +92,10 @@ const Posts = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    isFavourite: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

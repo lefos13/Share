@@ -3,8 +3,10 @@ pernas to .env mesa sto fakelo src
 npm run start (mesa sto fakelo src)
 
 Αγαπημενα
-isfavourite pedio sth vash
+isfavourite pedio sth vash ston pinaka posts
 makeFavourite (max 5)
 deleteFavourite
 getFavourites
+
+hasFavourites sto api searchuser. True
 

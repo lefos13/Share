@@ -92,16 +92,19 @@ const { sendReport } = require("./utils/functions");
 
 //run once a time to delete old posts from the database
 const deleteOldPosts = schedule.scheduleJob("0 0 1 */1 *", async function () {
+  // const deleteOldPosts = schedule.scheduleJob("*/1 * * * * *", async function () {
   try {
     // console.log("Posts are being deleted");
-    var today = new Date();
+    var today = new Date("2022-12-01");
     var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth()).padStart(2, "0"); //January is 0!
+    var mm = String(
+      today.getMonth() + 1 > 3
+        ? today.getMonth() + 1 - 3
+        : 12 - 3 + today.getMonth() + 1
+    ).padStart(2, "0"); //January is 0!
     var yyyy = today.getFullYear();
-    if (mm == "00") {
-      mm = "12";
-      yyyy = yyyy - 1;
-    }
+
+    today.getMonth() + 1 <= 3 ? yyyy-- : yyyy;
 
     today = yyyy + "-" + mm + "-" + dd;
     console.log(today);
@@ -1420,6 +1423,21 @@ app.post(
                 },
               });
 
+              //elegxos an exei agaphmena
+              let hasFavourites = false;
+              const countFavourites = await Posts.count({
+                where: {
+                  email: data.email,
+                  isFavourite: true,
+                },
+              }).catch((err) => {
+                throw err;
+              });
+
+              countFavourites > 0
+                ? (hasFavourites = true)
+                : (hasFavourites = false);
+
               //psaxnei an endiaferetai gia kapoio post
               const interested = await PostInterested.findAll({
                 where: {
@@ -1536,6 +1554,7 @@ app.post(
                 user: found,
                 average: average,
                 count: revfound.count,
+                hasFavourites: hasFavourites,
                 hasRequests: hasRequests,
                 hasPosts: hasPosts, //boolean gia to an o xrhshs exei posts
                 hasInterested: hasInterested, // boolean gia to an o xrhsths endiaferetai gia posts
@@ -1817,6 +1836,8 @@ app.post(
           let array = [];
           for await (post of finalarr) {
             const fixedDate = await fixDate(post.date);
+            post.dataValues.date =
+              fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
 
             let nnDate = new Date(post.startdate);
             post.dataValues.startdate = await fixOnlyMonth(nnDate);
@@ -1831,8 +1852,6 @@ app.post(
 
             post.dataValues.returnEndDate = await fixOnlyMonth(testDate2);
 
-            post.dataValues.date =
-              fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
             let image = "images/" + post.email + ".jpeg";
 
             //find user of post
@@ -2561,6 +2580,7 @@ app.post(
   }
 );
 
+//get terms of user and service
 app.post(
   "/getTerms",
   [authenticateToken],
@@ -2572,6 +2592,130 @@ app.post(
       res.sendFile(path.join(__dirname + "/terms/terms.html"));
     } catch (err) {
       console.error("!!!!!!!!!!!!!!sto sendReport: ", err);
+      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+    }
+  }
+);
+
+app.post(
+  "/handleFavourite",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      let email = req.body.extra;
+      let postid = req.body.data.postid;
+      const countall = await Posts.count({
+        where: {
+          isFavourite: true,
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      if (countall < 5) {
+        const count = await Posts.count({
+          where: {
+            postid: postid,
+            isFavourite: true,
+            email: email,
+          },
+        }).catch((err) => {
+          throw err;
+        });
+
+        if (count > 0) {
+          await Posts.update(
+            {
+              isFavourite: false,
+            },
+            { where: { postid: postid } }
+          )
+            .catch((err) => {
+              throw err;
+            })
+            .then((data) => {
+              res.json({
+                // data: data,
+                message: "Το post αφαιρέθηκε από τα αγαπημένα σας!",
+              });
+            });
+        } else {
+          await Posts.update(
+            {
+              isFavourite: true,
+            },
+            { where: { postid: postid } }
+          )
+            .catch((err) => {
+              throw err;
+            })
+            .then((data) => {
+              res.json({
+                // data: data,
+                message: "Το post προστέθηκε στα αγαπημένα σας!",
+              });
+            });
+        }
+      } else {
+        res.status(405).json({ message: "Έχεις ήδη 5 αγαπημένα posts" });
+      }
+    } catch (err) {
+      console.error("!!!!!!!!!!!!!!sto makeFavourite: ", err);
+      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+    }
+  }
+);
+
+app.post(
+  "/getFavourites",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      let email = req.body.extra;
+
+      const user = await Users.findOne({
+        attributes: {
+          exclude: ["password", "verified", "facebook", "instagram", "mobile"],
+        },
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      const allFavourites = await Posts.findAll({
+        where: {
+          email: email,
+          isFavourite: true,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+      for await (post of allFavourites) {
+        let nnDate = new Date(post.startdate);
+        post.dataValues.startdate = await fixOnlyMonth(nnDate);
+        nnDate = new Date(post.enddate);
+        post.dataValues.enddate = await fixOnlyMonth(nnDate);
+
+        let testDate = new Date(post.returnStartDate);
+
+        post.dataValues.returnStartDate = await fixOnlyMonth(testDate);
+
+        let testDate2 = new Date(post.returnEndDate);
+
+        post.dataValues.returnEndDate = await fixOnlyMonth(testDate2);
+        const fixedDate = await fixDate(post.date);
+        post.dataValues.date =
+          fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
+      }
+
+      res.json({ user: user, favourites: allFavourites });
+    } catch (err) {
+      console.error("!!!!!!!!!!!!!!sto getFavourites: ", err);
       res.status(500).json({ message: "Κάτι πήγε στραβά" });
     }
   }
