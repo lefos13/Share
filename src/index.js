@@ -2614,17 +2614,17 @@ app.post(
         throw err;
       });
 
-      if (countall < 5) {
-        const count = await Posts.count({
-          where: {
-            postid: postid,
-            isFavourite: true,
-            email: email,
-          },
-        }).catch((err) => {
-          throw err;
-        });
+      const count = await Posts.count({
+        where: {
+          postid: postid,
+          isFavourite: true,
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
 
+      if (countall < 5) {
         if (count > 0) {
           await Posts.update(
             {
@@ -2659,7 +2659,25 @@ app.post(
             });
         }
       } else {
-        res.status(405).json({ message: "Έχεις ήδη 5 αγαπημένα posts" });
+        if (count > 0) {
+          await Posts.update(
+            {
+              isFavourite: false,
+            },
+            { where: { postid: postid } }
+          )
+            .catch((err) => {
+              throw err;
+            })
+            .then((data) => {
+              res.json({
+                // data: data,
+                message: "Το post αφαιρέθηκε από τα αγαπημένα σας!",
+              });
+            });
+        } else {
+          res.status(405).json({ message: "Έχεις ήδη 5 αγαπημένα posts" });
+        }
       }
     } catch (err) {
       console.error("!!!!!!!!!!!!!!sto makeFavourite: ", err);
