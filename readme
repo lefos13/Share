@@ -2,11 +2,5 @@ npm i (mesa sto fakelo src)
 pernas to .env mesa sto fakelo src
 npm run start (mesa sto fakelo src)
 
-Αγαπημενα
-isfavourite pedio sth vash ston pinaka posts
-makeFavourite (max 5)
-deleteFavourite
-getFavourites
-
-hasFavourites sto api searchuser. True
+viwable πεδιο για να ξερει ο client πότε θα εμφανίζει όλα τα στοιχεία ενός άλλου χρήστη
 

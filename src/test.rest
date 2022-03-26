@@ -426,16 +426,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service που προσθέτει/αφαιρεί ένα ποστ από τα αγαπημένα
 POST http://localhost:3000/handleFavourite
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTI2VDA4OjI2OjM5LjU4MFoiLCJpYXQiOjE2NDgyODMxOTksImV4cCI6MTY1MzQ2NzE5OX0.WyMRvIhi8-FmsPe04jHorrux67vS-vVybx5SU8AOHGY
 
 {
     "data": {
-        "postid": 1742
+        "postid": 1730
     }
 }
 
 ###
-#service που προσθέτει/αφαιρεί ένα ποστ από τα αγαπημένα
-POST http://localhost:3000/getFavourites
+#service that returns all the favourites of one user
+GET http://localhost:3000/getFavourites
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg

@@ -1882,7 +1882,8 @@ app.post(
                 postid: post.postid,
               },
             }).catch((err) => {
-              console.error("provlima sto postinterested line 1258");
+              console.error("provlima sto get posts user");
+              throw err;
             });
             let flag;
             interested === null ? (flag = false) : (flag = true);
@@ -2686,7 +2687,7 @@ app.post(
   }
 );
 
-app.post(
+app.get(
   "/getFavourites",
   [authenticateToken],
   cors(corsOptions),
@@ -2705,6 +2706,9 @@ app.post(
         throw err;
       });
 
+      let extraData = await insertAver(user);
+      user.dataValues = { ...user.dataValues, ...extraData };
+
       const allFavourites = await Posts.findAll({
         where: {
           email: email,
@@ -2713,6 +2717,11 @@ app.post(
       }).catch((err) => {
         throw err;
       });
+
+      if (allFavourites.length == 0) {
+        throw { status: 404 };
+      }
+      let allResults = [];
       for await (post of allFavourites) {
         let nnDate = new Date(post.startdate);
         post.dataValues.startdate = await fixOnlyMonth(nnDate);
@@ -2729,12 +2738,22 @@ app.post(
         const fixedDate = await fixDate(post.date);
         post.dataValues.date =
           fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
+        allResults.push({
+          user: user,
+          post: post,
+          imagePath: "images/" + post.email + ".jpeg",
+          interested: false,
+        });
       }
 
-      res.json({ user: user, favourites: allFavourites });
+      res.json({ favourites: allResults });
     } catch (err) {
-      console.error("!!!!!!!!!!!!!!sto getFavourites: ", err);
-      res.status(500).json({ message: "Κάτι πήγε στραβά" });
+      if (err.status == 404) {
+        res.status(404).json({ message: "Δεν βρέθηκαν αγαπημένα posts" });
+      } else {
+        console.error("!!!!!!!!!!!!!!sto getFavourites: ", err);
+        res.status(500).json({ message: "Κάτι πήγε στραβά" });
+      }
     }
   }
 );

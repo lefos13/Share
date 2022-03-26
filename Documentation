@@ -417,6 +417,15 @@ Epistrefei true an exei kai false an den exei agaphmena
 
 
 
+26/3/2022 ----- FIXES
+
+getFavourites
+
+1. allagh se GET
+2. allagh to response gia na efarmozetai sto geniko component twn post - O user stelnete eksw apo to Array.
+
+
+
 
 
 
