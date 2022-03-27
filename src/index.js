@@ -6,9 +6,16 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 var fun = require("./utils/functions");
 var path = require("path");
 
+//limit the size of request
+var bodyParser = require("body-parser");
+app.use(bodyParser.json({ limit: "5mb", type: "application/json" }));
+
 //helmet for security
 const helmet = require("helmet");
 app.use(helmet());
+
+//base64 library
+const fs = require("fs");
 
 var where = require("lodash.where");
 var _ = require("lodash");
@@ -70,7 +77,7 @@ const { Op } = require("sequelize");
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
-  logging: false,
+  logging: true,
   dialectOptions: {
     dateStrings: true,
     typeCast: true,
@@ -444,7 +451,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
       bcrypt.hash(data.password, salt, async function (err, hash) {
         var data2 = req.body.data;
         data2.password = hash;
-        console.log(data.email);
+        // console.log(data.email);
 
         //generate otp to send to the user's mail
         var otp = otpGenerator.generate(4, {
@@ -454,13 +461,17 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
           specialChars: false,
         });
 
-        var code = null;
-        var body = null;
         var results = null;
+        let base64 = data2.photo;
+        const buffer = Buffer.from(base64, "base64");
+        // console.log(buffer);
+        fs.writeFileSync("uploads/" + data2.email + ".png", buffer);
+        // fs.writeFileSync("test.jpeg", buffer);
+        data2.photo = "";
 
+        // console.log(base64);
         await Users.create(data)
           .then((user) => {
-            console.log("inside query email: " + data2.email);
             verification(otp, data2.email);
             results = {
               message:
@@ -483,6 +494,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
               };
               res.status(405).json(data);
             } else {
+              console.log(err);
               let data = {
                 message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
               };
@@ -509,7 +521,7 @@ app.post(
       // crypto the password
       var data = req.body.data;
       let email = req.body.extra;
-      console.log("test Log: ", data, email);
+      // console.log("test Log: ", data, email);
 
       const user = await Users.update(
         {
@@ -530,7 +542,12 @@ app.post(
         throw err;
       });
 
-      console.log(user);
+      // console.log(user);
+
+      let base64 = data.photo;
+      const buffer = Buffer.from(base64, "base64");
+      // console.log(buffer);
+      fs.writeFileSync("uploads/" + email + ".png", buffer);
 
       res.json({ message: "Η ενημέρωση έγινε επιτυχώς!" });
     } catch (err) {
@@ -783,20 +800,23 @@ app.post(
       var data = req.body.data;
 
       setTime(0);
-      var datetime = new Date().today() + " " + new Date().timeNow();
+      var datetime = new Date().today() + " " + "00:00:01";
       console.log(datetime);
-      setTime(1);
-      var firsttime = new Date().today() + " " + new Date().timeNow();
+      // setTime(1);
+      var firsttime = new Date().today() + " " + "23:59:59";
       console.log(firsttime);
-      data.date = datetime;
+
+      var postdate = new Date().today() + " " + new Date().timeNow();
+      data.date = postdate;
       if (data.withReturn == false) {
         data.returnStartDate = 0000 - 00 - 00;
         data.returnEndDate = 0000 - 00 - 00;
       }
+      console.log("Dates limit:", firsttime, datetime, postdate);
       // ========================= PRAGMATIKO KOMMATI - ME ELEGXO GIA TRIA MAX POSTS
       await Posts.count({
         where: {
-          date: { [Op.between]: [firsttime, datetime] },
+          date: { [Op.between]: [datetime, firsttime] },
           email: data.email,
         },
       }).then(async (count) => {
@@ -1076,6 +1096,8 @@ app.post(
       var data = req.body.data;
       var results = null;
       var array = [];
+
+      // ==========  if startdate is null, then search from the current date to a month after today.
       if (data.startdate == null) {
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, "0");
@@ -1087,12 +1109,17 @@ app.post(
         var lastday = yyyy + "-" + mm2 + "-" + dd;
         data.startdate = today;
         data.enddate = lastday;
+        console.log("dates if client sends no startdate", today, lastday);
       }
+      // =============
 
+      // MEGA query for the results
       await Posts.findAndCountAll({
         where: {
-          // elaxisto kostos
+          // minimum cost
           costperseat: { [Op.lte]: data.cost },
+          // email different than one that do the search
+          email: { [Op.ne]: data.email },
           [Op.and]: [
             // arxikos proorismos h syntetagmenes
             {
@@ -1110,8 +1137,8 @@ app.post(
                 { enddate: { [Op.between]: [data.startdate, data.enddate] } },
                 {
                   [Op.and]: [
-                    { startdate: { [Op.lte]: data.startdate } },
-                    { enddate: { [Op.gte]: data.enddate } },
+                    { startdate: { [Op.gte]: data.startdate } },
+                    { enddate: { [Op.lte]: data.enddate } },
                   ],
                 },
               ],
@@ -1148,6 +1175,7 @@ app.post(
       })
         .then(async (found) => {
           if (found.count == 0) {
+            console.log(found.count);
             res.status(404).json({ message: "Δεν υπάρχει καμία διαδρομή" });
           } else {
             for await (fnd of found.rows) {
@@ -1287,10 +1315,11 @@ app.post(
                 return obj.post.petAllowed == data.petAllowed;
               });
             }
+
             //PAGINATION
             var skipcount = 0;
-            var takecount = 20;
-            if (data.page > 1) skipcount = data.page * 20 - 20;
+            var takecount = 10;
+            if (data.page > 1) skipcount = data.page * 10 - 10;
             var finalarr = _.take(_.drop(array, skipcount), takecount);
             var counter = 0;
             //FORMAT CHANGE OF TIMSTAMP
@@ -1314,16 +1343,17 @@ app.post(
             }
             //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
             if (finalarr.length == 0) {
-              res
-                .status(404)
-                .json({ message: "Δεν υπάρχει διαδρομή.", body: null });
+              res.status(404).json({
+                message: "Δεν υπάρχει καμία διαδρομή.",
+                body: "filtra",
+              });
             } else {
               // console.log(array[0].post.newdate);
-              var mod = array.length % 20;
+              var mod = array.length % 10;
               var totallength = 1;
               mod == 0
-                ? (totallength = array.length / 20)
-                : (totallength = array.length / 20 - mod / 20 + 1);
+                ? (totallength = array.length / 10)
+                : (totallength = array.length / 10 - mod / 10 + 1);
               results = {
                 postUser: finalarr,
                 totalPages: totallength,
@@ -2714,6 +2744,7 @@ app.get(
           email: email,
           isFavourite: true,
         },
+        order: [["date", "DESC"]],
       }).catch((err) => {
         throw err;
       });

@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "usertest0@gmail.com"
     }
 }
 
@@ -24,6 +24,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 }
 
 ###
+POST http://localhost:3000/updateProfile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJ0ZXN0MEBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMi0wMy0yN1QxMDo1MDozOS43MTFaIiwiaWF0IjoxNjQ4Mzc4MjM5LCJleHAiOjE2NTM1NjIyMzl9.JBPBdLtqUbPYU2YvEBEeit3vbK43gjtezi4FI3cND3Q
+
+{
+    "data": {
+        "mobile": "6975620785",
+        "age": 25,
+        "facebook": null,
+        "instagram": null,
+        "car": "nissan",
+        "cardate": "1996",
+        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD+f+iiigAooooAKKKKACiiigAooooAKKKKAP/Z"
+    }
+}
+
+###
 
 #service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
 POST  http://localhost:3000/register
@@ -39,7 +56,7 @@ Content-Type: application/json
         "car": "toyota",
         "cardate": "1996",
         "age": "26",
-        "photo": ""
+        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
     }
 }
 
@@ -51,7 +68,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "usertest0@gmail.com"
     }
 }
 
@@ -90,21 +107,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "email": "user0@gmail.com",
+        "email": "user4@gmail.com",
         "date": "2021-10-05",
         "startplace": "ασδ",
         "startcoord": "123",
         "endplace": "δσα",
         "endcoord": "321",
         "numseats": 2,
-        "startdate": "2022-12-22",
-        "enddate": "2022-12-22",
+        "startdate": "2022-04-22",
+        "enddate": "2022-04-21",
         "returnStartDate": "2022-12-20",
         "returnEndDate": "2022-12-21",
         "withReturn": true,
         "costperseat": 40,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "petAllowed": true,
+        "isFavourite": false,
         "moreplaces": [
             {
                     "place": "lamia",
@@ -137,17 +155,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 #service pou sou epistrefei lista me posts (paginated ana 20 kai ordered me vasi imeromhnia)
 POST http://localhost:3000/searchposts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTI2VDEwOjEwOjM2LjM2MloiLCJpYXQiOjE2NDgyODk0MzYsImV4cCI6MTY1MzQ3MzQzNn0.hJuHGobUWSGm1IIKxTFSsLzy93gRnFkOn47Hdzd289M
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "Volos",
+        "email": "cs11082@uniwa.gr",
+        "startplace": "ασsδ",
         "startcoord": "123",
-        "endplace": "Athens",
-        "endcoord": "1",
-        "startdate": "2021-10-05",
-        "enddate": "2022-12-19",
+        "endplace": "dsa",
+        "endcoord": "321",
+        "startdate": null,
+        "enddate": null,
         "page": 1,
         "cost": 100,
         "age": null,
@@ -155,29 +173,33 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
         "car": null,
         "cardate": null,
         "gender": null,
-        "withReturn": true,
-        "petAllowed": true,
-        "returnStartDate": "2022-12-19",
-        "returnEndDate": "2022-12-20"
+        "withReturn": null,
+        "petAllowed": null,
+        "returnStartDate": null,
+        "returnEndDate": null
     }
 }
 
 # {
 #     "data": {
-#         "email": "lefterisevagelinos1996@gmail.com",
-#         "startplace": "Volos",
+#         "email": "cs141082@uniwa.gr",
+#         "startplace": "ασsδ",
 #         "startcoord": "123",
-#         "endplace": "Athens",
-#         "endcoord": "1",
-#         "startdate": "2021-10-14",
-#         "enddate": "2021-12-20",
+#         "endplace": "δσsα",
+#         "endcoord": "321",
+#         "startdate": "2022-04-10",
+#         "enddate": "2022-04-30",
 #         "page": 1,
-#         "cost": 1,
-#         "age": null,
-#         "age_end": null,
-#         "car": null,
-#         "cardate": null,
-#         "gender": "male"
+#         "cost": 100,
+#         "age": 25,
+#         "age_end": 30,
+#         "car": "nissan",
+#         "cardate": 1996,
+#         "gender": "male",
+#         "withReturn": 1,
+#         "petAllowed": true,
+#         "returnStartDate": "2022-11-20",
+#         "returnEndDate": "2023-12-20"
 #     }
 # }
 
@@ -370,23 +392,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 POST http://localhost:3000/upload
 Content-Type: multipart/form-data; boundary=---
-
-###
-
-POST http://localhost:3000/updateProfile
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
-
-{
-    "data": {
-        "mobile": "6975620785",
-        "age": 25,
-        "facebook": null,
-        "instagram": null,
-        "car": "nissan",
-        "cardate": "1996"
-    }
-}
 
 ###
 

@@ -424,6 +424,28 @@ getFavourites
 1. allagh se GET
 2. allagh to response gia na efarmozetai sto geniko component twn post - O user stelnete eksw apo to Array.
 3. allagh sto response otan den exei agaphmena. Epistrefei 404
+4. swsth taksinomish
+
+createpost
+
+1. fix gia ta maximum 3 post. Upologizei thn hmerologiakh hmera kai oxi to 24wro
+2. prepei na mou stelneis sto request kai pedio gia to isfavourite
+
+searchposts
+
+1. Otan epistrefeis null sto startdate, ypologizei ta posts olou tou epomenou mhna apo thn trexousa hmeromhnia
+Ara otan o xrhsths den thelei na valei telikh hmeomhnia, apla stelei mou kai ta duo pedia (startdate, enddate) ws null.
+Ypologizw egw tis hmeromhnies opote mhn se apasxolei afto.
+
+2. Den epistrefei posts tou xrhsth pou psaxnei gia posts
+
+register
+
+1. pedio photo einai gia base64 eikona
+
+updateProfile
+
+2. sto pedio photo stelneis base64
 
 
 
