@@ -430,6 +430,7 @@ createpost
 
 1. fix gia ta maximum 3 post. Upologizei thn hmerologiakh hmera kai oxi to 24wro
 2. prepei na mou stelneis sto request kai pedio gia to isfavourite
+3. fucntion pushNotification mesa sto createpost. Se afth th function mesa thewrhtika ginetai to notification me firebase.
 
 searchposts
 
@@ -445,7 +446,37 @@ register
 
 updateProfile
 
-2. sto pedio photo stelneis base64
+1. sto pedio photo stelneis base64
+2. otan to pedio photo den stelnetai tote den allazei h fwtografia
+
+Requests
+
+1.afairesh twn pediwn hmeromhniwn
+2.
+
+createRequest
+
+1.prosthikh katallhlou mhnumatos sthn epityxh dhmiourgia
+2. den epitrepei thn dhmiourgia request apo enan xrhsth me tis idies topothesies.
+epistrefei 405 kai katallhlo mhnuma.
+
+getRequests
+
+1. fixed date format
+2. egine get anti gia post
+
+MEGA FIX ==== 
+ola ta moreplaces erxontai ws Array
+
+sendReport
+
+1. diorthwsh tou mhnumatos response
+
+getTerms
+
+1. epistrefei apla text
+
+
 
 
 

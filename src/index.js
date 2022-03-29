@@ -465,7 +465,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
         let base64 = data2.photo;
         const buffer = Buffer.from(base64, "base64");
         // console.log(buffer);
-        fs.writeFileSync("uploads/" + data2.email + ".png", buffer);
+        fs.writeFileSync("uploads/" + data2.email + ".jpeg", buffer);
         // fs.writeFileSync("test.jpeg", buffer);
         data2.photo = "";
 
@@ -538,17 +538,19 @@ app.post(
           },
         }
       ).catch((err) => {
-        console.log("Update profil: ", err);
+        // console.log("Update profil: ", err);
         throw err;
       });
 
       // console.log(user);
-
-      let base64 = data.photo;
-      const buffer = Buffer.from(base64, "base64");
-      // console.log(buffer);
-      fs.writeFileSync("uploads/" + email + ".png", buffer);
-
+      if (data.photo != null) {
+        let base64 = data.photo;
+        const buffer = Buffer.from(base64, "base64");
+        // console.log(buffer);
+        fs.writeFileSync("uploads/" + email + ".png", buffer);
+      } else {
+        // console.log("photo is null");
+      }
       res.json({ message: "Η ενημέρωση έγινε επιτυχώς!" });
     } catch (err) {
       console.error(err);
@@ -897,14 +899,29 @@ app.post(
         throw err;
       });
 
+      const countDubl = await SearchPost.count({
+        where: {
+          email: email,
+          startcoord: data.startcoord,
+          endcoord: data.endcoord,
+        },
+      }).catch((err) => {
+        console.log("error in count", err);
+        throw err;
+      });
+
       //check if you have more than 3 requests
-      if (count < 3) {
+      if (count < 3 && countDubl == 0) {
         const request = await SearchPost.create(data).catch((err) => {
           console.log("Error sto creation of request");
           throw err;
         });
         // console.log(request);
-        res.json({ request: request });
+        res.json({ request: request, message: "Επιτυχής δημιουργία!" });
+      } else if (countDubl > 0) {
+        res.status(405).json({
+          message: "Έχεις ήδη αίτηση διαδρομής με αυτές τις τοποθεσίες!",
+        });
       } else {
         res
           .status(405)
@@ -920,7 +937,7 @@ app.post(
 );
 
 //api that returns a list of all the requests of a user. (Maximum 3)
-app.post(
+app.get(
   "/getRequests",
   [authenticateToken],
   cors(corsOptions),
@@ -939,6 +956,10 @@ app.post(
       });
 
       if (requests.length > 0) {
+        for await (r of requests) {
+          const fixedDate = await fixDate(new Date(r.created_at));
+          r.dataValues.created_at = fixedDate.dateMonthDay;
+        }
         res.json({ requests: requests });
       } else {
         res
@@ -1865,6 +1886,9 @@ app.post(
             : (totallength = count / 20 - mod / 20 + 1);
           let array = [];
           for await (post of finalarr) {
+            if (IsJsonString(post.moreplaces)) {
+              post.moreplaces = JSON.parse(post.moreplaces);
+            }
             const fixedDate = await fixDate(post.date);
             post.dataValues.date =
               fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
@@ -1980,6 +2004,9 @@ app.post(
             });
 
             if (post != null) {
+              if (IsJsonString(post.moreplaces)) {
+                post.moreplaces = JSON.parse(post.moreplaces);
+              }
               //diorthwseis hmeromhniwn
               const fixedDate = await fixDate(post.date);
               post.dataValues.date =
@@ -2096,8 +2123,10 @@ app.post(
           let array = [];
           let message = "Δεν βρέθηκαν ενδιαφερόμενοι";
           let isAny = 0;
-          let allI = [];
           for await (post of posts) {
+            if (IsJsonString(post.moreplaces)) {
+              post.moreplaces = JSON.parse(post.moreplaces);
+            }
             let fixedDate = await fixDate(post.date);
 
             post.dataValues.date =
@@ -2198,6 +2227,9 @@ app.post(
         },
       })
         .then(async (posts) => {
+          if (IsJsonString(posts.moreplaces)) {
+            posts.moreplaces = JSON.parse(posts.moreplaces);
+          }
           const fixedDate = await fixDate(posts.date);
           posts.dataValues.date =
             fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
@@ -2602,7 +2634,7 @@ app.post(
       let flag = await fun.sendReport(text, extra);
       // await sendReport(text, extra);
       flag == true
-        ? res.json({ message: "report sent" })
+        ? res.json({ message: "Ευχαριστούμε για το feedback" })
         : res.status(500).json({ message: "Κάτι πήγε λάθος!" });
     } catch (err) {
       console.error("!!!!!!!!!!!!!!sto sendReport: ", err);
@@ -2619,8 +2651,7 @@ app.post(
   async (req, res) => {
     try {
       let email = req.body.extra;
-      let terms = fun.terms;
-      res.sendFile(path.join(__dirname + "/terms/terms.html"));
+      res.sendFile(path.join(__dirname + "/terms/terms.txt"));
     } catch (err) {
       console.error("!!!!!!!!!!!!!!sto sendReport: ", err);
       res.status(500).json({ message: "Κάτι πήγε στραβά" });
@@ -2994,41 +3025,89 @@ const fixOnlyMonth = async (date) => {
   }
 };
 
-//function that pushed notifications for all requests that find their posts
+//function that pushes notifications for all requests that find their posts ========= FIREBASE
 const pushNotifications = async (post) => {
   try {
     const allRequests = await SearchPost.findAll({
       where: {
-        [Op.or]: [
-          { startplace: post.startplace },
-          { startcoord: post.startcoord },
-        ],
-        [Op.or]: [{ endplace: post.endplace }, { endcoord: post.endcoord }],
+        startcoord: post.startcoord,
+        endcoord: post.endcoord,
         // elegxos na peftei h arxikh hmeromhnia tou post anamesa sthn arxikh kai telikh toy xrhsth
         // ή na peftei h telikh hmeromhnia tou post anamesa sthn arxikh h telikh hmeromhnia tou xrhsth
         // ή na peftei h arxikh KAI h telikh hmeromhnia toy xrhsth na peftei anamesa sthn arxikh KAI telikh hmeromhnia tou post
-        [Op.or]: [
-          { startdate: { [Op.between]: [post.startdate, post.enddate] } },
-          { enddate: { [Op.between]: [post.startdate, post.enddate] } },
-          {
-            [Op.and]: [
-              { startdate: { [Op.lte]: post.startdate } },
-              { enddate: { [Op.gte]: post.enddate } },
-            ],
-          },
-        ],
+        // [Op.or]: [
+        //   { startdate: { [Op.between]: [post.startdate, post.enddate] } },
+        //   { enddate: { [Op.between]: [post.startdate, post.enddate] } },
+        //   {
+        //     [Op.and]: [
+        //       { startdate: { [Op.lte]: post.startdate } },
+        //       { enddate: { [Op.gte]: post.enddate } },
+        //     ],
+        //   },
+        // ],
       },
     }).catch((err) => {
-      console.log("Inside function that pushes notifications: ", err);
+      console.log("Inside function that pushes notifications, threw error!");
       throw err;
     });
 
+    // console.log("FIRST QUERY:", allRequests);
+
+    let toSendNotification = false;
+    // CHECK FOR MOREPLACES
+    if (allRequests.length == 0) {
+      const allRequests2 = await SearchPost.findAll({
+        where: {
+          startcoord: post.startcoord,
+        },
+      }).catch((err) => {
+        console.log("Inside function that pushes notifications, threw error!");
+        throw err;
+      });
+      // console.log("SECOND QUERY:", allRequests2);
+      // console.log("DATA OF POST:", post);
+
+      if (allRequests2.length > 0) {
+        let arrayToNotify = [];
+        for await (req of allRequests2) {
+          let moreplaces = IsJsonString(post.moreplaces)
+            ? JSON.parse(post.moreplaces)
+            : post.moreplaces;
+          for await (place of moreplaces) {
+            if (place.placecoords == req.endcoord) {
+              toSendNotification = true;
+              // section to gather the data for the notification
+              //HERE I MUST WRITE THE CODE FOR THAT PURPOPSE
+              arrayToNotify.push(req);
+
+              // =================
+            }
+          }
+        }
+        // ===== FIREBASE
+        let dataToSend = {
+          allRequests: arrayToNotify,
+        };
+
+        console.log("Notification Data to Send:", JSON.stringify(dataToSend));
+      }
+    } else {
+      toSendNotification = true;
+      // section to gather the data for the notification ====FIREBASE
+      //HERE I MUST WRITE THE CODE FOR THAT PURPOPSE
+      let dataToSend = {
+        allRequests: allRequests,
+      };
+      console.log("Notification Data to Send:", JSON.stringify(dataToSend));
+      // =================
+    }
+
     console.log(
       "============Found to push notifications: ",
-      allRequests.length
+      toSendNotification
     );
   } catch (err) {
-    console.log("Error inside try and catch!!!!!");
+    console.log("Error inside try and catch!!!!!", err);
   }
   // console.log("Inside func", post);
 };

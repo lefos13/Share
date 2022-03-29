@@ -45,14 +45,6 @@ const SearchPost = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    startdate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    enddate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
