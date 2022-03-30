@@ -730,6 +730,7 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
         res.json({
           message: "Επιτυχής είσοδος.",
           user: data,
+          forceUpdate: false,
         });
       } else {
         body = "Λάθος κωδικός.";
@@ -737,7 +738,7 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
       }
     }
   } catch (err) {
-    console.error(err);
+    console.error("LOGIN ERROR: ", err);
     res.status(500).json({
       message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
     });
@@ -1016,7 +1017,6 @@ app.post(
   async (req, res) => {
     try {
       // console.log(req.query);
-
       var results = null;
       setTime(0);
       var curtime = new Date().today() + " " + new Date().timeNow();
@@ -1033,6 +1033,21 @@ app.post(
         ownerNotified: false,
       };
       row["date"] = curtime;
+
+      //CHECK IF THE CLIENT IS THE OWNER OF THE POST
+      const checkPost = await Posts.count({
+        where: {
+          postid: row.postid,
+          email: row.email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      if (checkPost > 0) {
+        throw 1;
+      }
+
       await PostInterested.findOne({
         where: {
           email: row.email,
@@ -1098,10 +1113,16 @@ app.post(
           res.status(400).json({ message: "Κάτι πήγε στραβά.", body: null });
         });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({
-        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
-      });
+      if (err == 1) {
+        res
+          .status(405)
+          .json({ message: "Δεν μπορείς να ενδιαφερθείς για δικό σου Post!" });
+      } else {
+        console.error(err);
+        res.status(500).json({
+          message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+        });
+      }
     }
   }
 );
@@ -1454,104 +1475,116 @@ app.post(
               var today = new Date();
               today = await getCurDate(6);
 
-              //psaxnei na dei an exei requests
-              const requests = await SearchPost.count({
-                where: {
-                  email: data.email,
-                },
-              }).catch((err) => {
-                throw err;
-              });
-              // console.log(requests, "My requests");
               let hasRequests = false;
-              requests > 0 ? (hasRequests = true) : null;
-
-              //psaxnei na dei an exei posts
-              const post = await Posts.findOne({
-                where: {
-                  email: data.email,
-                  enddate: { [Op.gte]: today },
-                },
-              });
-
-              //elegxos an exei agaphmena
+              let hasPosts = false;
               let hasFavourites = false;
-              const countFavourites = await Posts.count({
-                where: {
-                  email: data.email,
-                  isFavourite: true,
-                },
-              }).catch((err) => {
-                throw err;
-              });
-
-              countFavourites > 0
-                ? (hasFavourites = true)
-                : (hasFavourites = false);
-
-              //psaxnei an endiaferetai gia kapoio post
-              const interested = await PostInterested.findAll({
-                where: {
-                  email: data.email,
-                },
-              }).catch((err) => {
-                console.error(err);
-              });
-
               let hasInterested = false;
-              if (interested.length != 0) {
-                for await (int of interested) {
-                  let dateForInt = await getCurDate(0);
-                  let countP = await Posts.count({
-                    where: {
-                      postid: int.postid,
-                      enddate: {
-                        [Op.gte]: dateForInt,
+              let hasIntPosts = false;
+
+              // ================ MEGA case that the person that sees the profil is the same user as the profil
+              if (data.email == searcherEmail) {
+                //psaxnei na dei an exei requests
+                const requests = await SearchPost.count({
+                  where: {
+                    email: data.email,
+                  },
+                }).catch((err) => {
+                  throw err;
+                });
+                // console.log(requests, "My requests");
+
+                requests > 0 && data.email == searcherEmail
+                  ? (hasRequests = true)
+                  : null;
+
+                //psaxnei na dei an exei posts
+                const post = await Posts.findOne({
+                  where: {
+                    email: data.email,
+                    enddate: { [Op.gte]: today },
+                  },
+                });
+
+                post != null && data.email == searcherEmail
+                  ? (hasPosts = true)
+                  : (hasPosts = false);
+
+                //elegxos an exei agaphmena
+                const countFavourites = await Posts.count({
+                  where: {
+                    email: data.email,
+                    isFavourite: true,
+                  },
+                }).catch((err) => {
+                  throw err;
+                });
+
+                countFavourites > 0 && data.email == searcherEmail
+                  ? (hasFavourites = true)
+                  : (hasFavourites = false);
+
+                //psaxnei an endiaferetai gia kapoio post
+                const interested = await PostInterested.findAll({
+                  where: {
+                    email: data.email,
+                  },
+                }).catch((err) => {
+                  console.error(err);
+                });
+
+                if (interested.length != 0 && data.email == searcherEmail) {
+                  for await (int of interested) {
+                    let dateForInt = await getCurDate(0);
+                    let countP = await Posts.count({
+                      where: {
+                        postid: int.postid,
+                        email: { [Op.ne]: data.email },
+                        enddate: {
+                          [Op.gte]: dateForInt,
+                        },
                       },
-                    },
-                  });
-                  if (countP > 0) {
-                    hasInterested = true;
-                    break;
+                    });
+                    if (countP > 0) {
+                      hasInterested = true;
+                      break;
+                    }
                   }
                 }
-              }
 
-              //psaxnei an exei endiaferomenous
-              today = await getCurDate(0);
-              const posts = await Posts.findAll({
-                where: {
-                  email: data.email,
-                  enddate: { [Op.gte]: today },
-                },
-              }).catch((err) => {
-                console.error(err);
-              });
-              let isAny = 0;
-              console.log(posts.length);
-              if (posts.length != 0) {
-                for await (one of posts) {
-                  const interested2 = await PostInterested.findOne({
-                    where: {
-                      postid: one.postid,
-                    },
-                  }).catch((err) => {
-                    console.error(err);
-                  });
+                //psaxnei an exei endiaferomenous
+                today = await getCurDate(0);
+                const posts = await Posts.findAll({
+                  where: {
+                    email: data.email,
+                    enddate: { [Op.gte]: today },
+                  },
+                }).catch((err) => {
+                  console.error(err);
+                });
+                let isAny = 0;
+                console.log(posts.length);
+                if (posts.length != 0) {
+                  for await (one of posts) {
+                    const interested2 = await PostInterested.findOne({
+                      where: {
+                        postid: one.postid,
+                      },
+                    }).catch((err) => {
+                      console.error(err);
+                    });
 
-                  if (interested2 != null) {
-                    isAny++;
-                    break;
+                    if (interested2 != null) {
+                      isAny++;
+                      break;
+                    }
                   }
                 }
+
+                isAny > 0 ? (hasIntPosts = true) : (hasIntPosts = false);
               }
-              let hasIntPosts;
-              isAny > 0 ? (hasIntPosts = true) : (hasIntPosts = false);
+              // =============== End of section of user == searchuser
 
-              let hasPosts;
-              post == null ? (hasPosts = false) : (hasPosts = true);
-
-              //section if the one who searches can review the profil
+              // ==================== section if the one who searches can review the profil ======================
               let reviewable = false;
 
               let todayReviewable = await getCurDate(0);
@@ -1561,7 +1594,7 @@ app.post(
               var datetime = new Date().today() + " " + new Date().timeNow();
               console.log("curTime: " + datetime);
 
-              // UPDATED BETTER WAY TO GET ISO DATE
+              // UPDATED BETTER WAY TO GET ISO DATE ?????????????
               let firsttime = new Date();
               firsttime.setMonth(firsttime.getMonth() - 1);
 
@@ -1573,6 +1606,7 @@ app.post(
                 },
               });
               // console.log("Number of Reviews last month: " + cRev);
+
               // case that the user that searches is not going to his profile
               if (searcherEmail != data.email && cRev == 0) {
                 const posts = await Posts.findAll({
@@ -1600,6 +1634,49 @@ app.post(
 
                 total > 0 ? (reviewable = true) : null;
               }
+
+              //================= Section for isVisible... Check if the user can see the other's user phone ================
+              let isVisible = false;
+              if (searcherEmail != data.email) {
+                let visibleDate = new Date();
+
+                console.log("Visible Date: " + visibleDate);
+                const posts = await Posts.findAll({
+                  where: {
+                    email: data.email,
+                    enddate: { [Op.gte]: visibleDate },
+                  },
+                }).catch((err) => {
+                  throw err;
+                });
+
+                console.log("Posts of User: " + posts.length);
+
+                // find interest that is verified by the owner of the post
+                for await (p of posts) {
+                  const pInt = await PostInterested.findOne({
+                    where: {
+                      postid: p.postid,
+                      email: searcherEmail,
+                      isVerified: true,
+                    },
+                  }).catch((err) => {
+                    throw err;
+                  });
+
+                  console.log(
+                    "Interested and verified for one of the posts: ",
+                    pInt != null ? pInt.toJSON() : pInt
+                  );
+
+                  if (pInt != null) {
+                    isVisible = true;
+                  }
+                }
+              } else {
+                isVisible = true;
+              }
+              //================= END OF SECTION
               //data response
               res.json({
                 user: found,
@@ -1611,6 +1688,7 @@ app.post(
                 hasInterested: hasInterested, // boolean gia to an o xrhsths endiaferetai gia posts
                 interestedForYourPosts: hasIntPosts, // boolean gia to an uparxoun endiaferomenoi twn post tou user
                 reviewAble: reviewable, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
+                isVisible: isVisible, //Boolean for the phone to be visible or not.
                 image: "images/" + data.email + ".jpeg",
                 message: "Ο χρήστης βρέθηκε",
               });
@@ -1994,6 +2072,7 @@ app.post(
             let post = await Posts.findOne({
               where: {
                 postid: postI.postid,
+                email: { [Op.ne]: data.email },
                 enddate: {
                   [Op.gte]: curDate,
                 },
@@ -2148,6 +2227,7 @@ app.post(
             const interested = await PostInterested.count({
               where: {
                 postid: post.postid,
+                email: { [Op.ne]: data.email },
               },
               // order: [["date", "DESC"]],
             }).catch((err) => {
