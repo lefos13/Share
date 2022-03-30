@@ -419,20 +419,23 @@ Epistrefei true an exei kai false an den exei agaphmena
 
 26/3/2022 ----- FIXES
 
-getFavourites
+==== MEGA FIX ==== 
+ola ta moreplaces erxontai ws Array
+
+==== getFavourites
 
 1. allagh se GET
 2. allagh to response gia na efarmozetai sto geniko component twn post - O user stelnete eksw apo to Array.
 3. allagh sto response otan den exei agaphmena. Epistrefei 404
 4. swsth taksinomish
 
-createpost
+==== createpost
 
 1. fix gia ta maximum 3 post. Upologizei thn hmerologiakh hmera kai oxi to 24wro
 2. prepei na mou stelneis sto request kai pedio gia to isfavourite
 3. fucntion pushNotification mesa sto createpost. Se afth th function mesa thewrhtika ginetai to notification me firebase.
 
-searchposts
+==== searchposts
 
 1. Otan epistrefeis null sto startdate, ypologizei ta posts olou tou epomenou mhna apo thn trexousa hmeromhnia
 Ara otan o xrhsths den thelei na valei telikh hmeomhnia, apla stelei mou kai ta duo pedia (startdate, enddate) ws null.
@@ -440,41 +443,88 @@ Ypologizw egw tis hmeromhnies opote mhn se apasxolei afto.
 
 2. Den epistrefei posts tou xrhsth pou psaxnei gia posts
 
-register
+==== register
 
 1. pedio photo einai gia base64 eikona
 
-updateProfile
+==== updateProfile
 
 1. sto pedio photo stelneis base64
 2. otan to pedio photo den stelnetai tote den allazei h fwtografia
 
-Requests
+==== Requests
 
 1.afairesh twn pediwn hmeromhniwn
 2.
 
-createRequest
+==== createRequest
 
 1.prosthikh katallhlou mhnumatos sthn epityxh dhmiourgia
 2. den epitrepei thn dhmiourgia request apo enan xrhsth me tis idies topothesies.
 epistrefei 405 kai katallhlo mhnuma.
 
-getRequests
+==== getRequests
 
 1. fixed date format
 2. egine get anti gia post
 
-MEGA FIX ==== 
-ola ta moreplaces erxontai ws Array
-
-sendReport
+==== sendReport
 
 1. diorthwsh tou mhnumatos response
 
-getTerms
+==== getTerms
 
 1. epistrefei apla text
+
+==== searchuser
+
+1. Otan o xrhsths pou mpainei sto profil kapoiou allou xrhsth, ola ta boolean sxetika me ta tabs erxontai false ektos tou isVisible kai tou reviewAble (Afto den to eixa skeftei, opote to eftiaksa)
+2. Otan enas xrhsths mpainei sto profil kapoiou, stou opoiou exei ekdhlwsei endiaferon kai exei egkrithei, to pedio isVisible epistrefei true.
+Vasei aftou tha emfanizetai to kinhto thlefwno
+
+==== login
+
+1. Pedio forceUpdate=boolean. Apla sto stelnw false pros to paron. H logikh tha mpei sthn poreia
+{
+  "message": "Επιτυχής είσοδος.",
+  "user": {
+    "DATA........."
+  },
+  "forceUpdate": false
+}
+
+==== getInterestedPerUser
+
+1. Den epistrefei posts tou idiou user
+
+==== getInterested
+
+1. Den upologizei ton idio ton user tou post an einai interested
+
+==== interested
+
+1. Den epitrepei se enan xrhsth na dhlwsei endiaferon se ena diko tou post
+
+
+==== ORIA STA PEDIA STH VASH --- Se opoia den dhlwnw, den uparxei orio opote vale esu oti nomizeis
+*Genika oi topothesies einai 45 opote afto paramenei idio.
+
+== pinakas post
+email = 320
+startplace = 45
+endplace = 45
+
+== pinakas user
+
+email = 320
+password = 64
+mobile = 10
+fullname = 100
+gender = 10
+car = 40
+cardate = 4
+age = 3
+
 
 
 
