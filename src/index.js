@@ -547,7 +547,7 @@ app.post(
         let base64 = data.photo;
         const buffer = Buffer.from(base64, "base64");
         // console.log(buffer);
-        fs.writeFileSync("uploads/" + email + ".png", buffer);
+        fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
       } else {
         // console.log("photo is null");
       }
