@@ -2955,8 +2955,8 @@ app.post(
 
           user.dataValues.toEdit = toEdit;
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
-          user.dataValues.rating = 3;
-          user.dataValues.countReviews = 5;
+          user.dataValues.average = 3;
+          user.dataValues.count = 5;
 
           arrayOfUsers.push(user);
         } else {
@@ -2987,8 +2987,8 @@ app.post(
 
           user.dataValues.toEdit = toEdit;
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
-          user.dataValues.rating = 3;
-          user.dataValues.countReviews = 5;
+          user.dataValues.average = 3;
+          user.dataValues.count = 5;
           // console.log(user.toJSON());
 
           arrayOfUsers.push(user);
