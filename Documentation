@@ -525,6 +525,58 @@ car = 40
 cardate = 4
 age = 3
 
+======== 31/3/2022 new changes/FIXES
+
+==== setVisible
+
+1. Neo API. Kaleitai gia na allaksei to isVisible pedio sth vash. Prosdiorizei kata poso h fwtografia tha einai orath se atoma poy exoun lavei egkrish.
+2. To kaleis toso gia na kaneis to pedio true oso kai gia na to kaneis false. Xreiazetai mono to TOKEN gia na leitourghsei opote den stelneis kati sto body.
+
+==== verInterested
+
+1. Kathe fora pou egkrineis ena endiaferon xrhsth, dhmiourghtai kataxwrhsh sto neo pinaka (toReview), opou tha elegxw gia pithanh periptwsh review
+otan h telikh hmeomhnia anaxwrhshs ths diadromhs exei lhksei edw kai mia hmera.
+
+2.Sthn periptwsh pou enas ek twn duo ths kataxwrhshs dn exei kanei to review tou kai ginetai nea kataxwrhsh me tous idious xrhstes, 
+tote mhdenizetai to pedio done ths palias kataxwrhshs kai twn duo opote mporoun ek neou na kanoun neo review ή update analogws an eixan kanei sto parelthon ksana review ston idio xrhsh
+
+==== register
+
+1. car, cardate dexontai pleon kai null timh ===== Edw prepei na allaxtei kai sth vash
+
+==== login
+
+1. sto pedio photo tou response sou epistrefw to path ths fwtografias opws mou zhthses
+
+==== notifyMe
+
+1. Epistrefei pleon lista me users pou prepei o xrhsths na kanei review se aftous. Mesa sta stoixeia exei kai ena pedio "toEdit". An afto einai true tote o xrhshts kanei update to review tou.
+An einai false tote kanei kanonika review kathws den exei kanei pote ksana ston sugkekrimeno xrhsth.
+
+2. H lista me tous ws pros aksiologhsh xrhstes pou sou epistrefei einai gia diadromes pou exei perasei h hmeromhnia anaxwrhshs gia toulaxiston mia hmera
+
+==== createreview
+
+1. Paroles tis allages pou exoun ginei, esu eksakoloutheis na xrhsimopoieis afto to API eite an o xrhsths kanei update to review eite ftiaxnei kainouriou.
+Stelneis klasika ta stoixeia opws mou ta estelnes panta.
+
+==== searchuser
+
+1. to Reviewable pedio pou sou epistrefw douleuei sxetika me ton neo pinaka ton pithanwn aksiologisewn. Otan einai true shmainei pws o xrhshs pou mpainei sto profil
+mporei na kanei aksiologhsh.
+
+
+==== NOTIFICATIONS WITH FIREBASE 
+1. createpost -> se afto to API exei prostethei function sto opoio tha ginetai h apostolh tou notification me firebase.
+Name of function: pushNotifications()
+
+2. interested -> se afto to API exei prostethei function sto opoio tha ginetai h apostolh tou notification me firebase.
+Name of function: toNotifyOwner()
+
+3. verInterested -> se afto to API exei prostethei function sto opoio tha ginetai h apostolh tou notification me firebase.
+Name of function: toNotifyTheVerified()
+
+
 
 
 

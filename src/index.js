@@ -90,6 +90,7 @@ const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
 const Reviews = require("./modules/review");
 const SearchPost = require("./modules/searchPost");
+const ToReview = require("./modules/toreview");
 const { values, hasIn, functions } = require("lodash");
 
 checkconnection();
@@ -332,6 +333,7 @@ function authenticateToken(req, res, next) {
   try {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
+    // console.log(token);
     if (token == null) return res.sendStatus(401);
 
     jwt.verify(token, TOKEN_KEY, (err, email) => {
@@ -342,7 +344,8 @@ function authenticateToken(req, res, next) {
         });
       else {
         // console.log("inside auth: " + JSON.stringify(req.body.data));
-        console.log("Athenticated!");
+        // console.log("Athenticated: " + email.email + "lol");
+        console.log("Authenticated:", email.email);
         req.body["extra"] = email.email;
       }
       next();
@@ -522,6 +525,7 @@ app.post(
       var data = req.body.data;
       let email = req.body.extra;
       // console.log("test Log: ", data, email);
+      console.log(email + "test");
 
       const user = await Users.update(
         {
@@ -565,7 +569,7 @@ app.post(
 app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
   try {
     var email = req.body.data.email;
-    console.log(req.body);
+    console.log("'" + email + "'");
     const user = await Users.findOne({
       where: {
         email: email,
@@ -574,12 +578,13 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
       console.log("Error:" + err);
     });
 
-    if (user === null) {
+    console.log(user.toJSON());
+    if (user == null) {
       res.status(404).json({
         message: "Ο χρήστης δεν βρέθηκε.",
       });
     } else {
-      if (user.verified === false) {
+      if (user.verified == false) {
         var otp = otpGenerator.generate(4, {
           digits: true,
           upperCase: false,
@@ -602,6 +607,7 @@ app.post("/createtoken", [], cors(corsOptions), async (req, res) => {
           data: new Date(),
         };
         const accessToken = jwt.sign(payload, TOKEN_KEY, { expiresIn: "60d" });
+        // console.log(accessToken);
         res.json({
           message: "Επιτυχής δημιουργία του token",
           accessToken: accessToken,
@@ -727,11 +733,12 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
         //console.log(user.toJSON());
         let data = user.toJSON();
         data.password = null;
-        res.json({
-          message: "Επιτυχής είσοδος.",
-          user: data,
-          forceUpdate: false,
-        });
+        (data.photo = "images/" + data.email + "/jpeg"),
+          res.json({
+            message: "Επιτυχής είσοδος.",
+            user: data,
+            forceUpdate: false,
+          });
       } else {
         body = "Λάθος κωδικός.";
         res.status(405).json({ message: body });
@@ -744,6 +751,42 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
     });
   }
 });
+
+app.post(
+  "/setVisible",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      var email = req.body.extra;
+
+      const user = await Users.findOne({
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      if (user.isVisible == true) {
+        user.update({ isVisible: false });
+        res.json({
+          message: "Απόκρυψη κινητού τηλεφώνου από όλους",
+        });
+      } else {
+        user.update({ isVisible: true });
+        res.json({
+          message: "Εμφανιση κινητου τηλεφώνου στους εγκεκριμένους χρήστες",
+        });
+      }
+    } catch (err) {
+      console.error("setVisible ERROR: ", err);
+      res.status(500).json({
+        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+      });
+    }
+  }
+);
 
 //api that checks if the user exists and if he is verified. Also, it sends an otp for the reset of his password
 app.post("/passotp", [], cors(corsOptions), async (req, res) => {
@@ -876,6 +919,76 @@ app.post(
     }
   }
 );
+
+const pushNotifications = async (post) => {
+  try {
+    let arrayToNotify = [];
+    // GATHER ALL THE REQUESTS WITH THE SPECIFIC STARTCOORD AND THE ENDCOORD OF THE POST THAT HAS BEEN CREATED
+    const allRequests = await SearchPost.findAll({
+      where: {
+        startcoord: post.startcoord,
+        endcoord: post.endcoord,
+      },
+    }).catch((err) => {
+      console.log("Inside function that pushes notifications, threw error!");
+      throw err;
+    });
+
+    // FLAG TO SEND OR NOT THE NOTIFICATION
+    let toSendNotification = false;
+
+    if (allRequests.length > 0) {
+      // CASE THAT THE POST HAS THE RIGHT ENDPLACE OF A REQUEST
+      // GATHER THE USERS TO BE INFORMED
+      toSendNotification = true;
+      for await (req of allRequests) {
+        arrayToNotify.push(req.email);
+      }
+    }
+
+    // IF THE POST HASN'T THE ENDPLACE OF THE REQUESTS, CHECK FOR MOREPLACES IF THEY INCLUDE THE ENDPLACE OF THE REQUEST ----
+    const allRequests2 = await SearchPost.findAll({
+      where: {
+        startcoord: post.startcoord,
+      },
+    }).catch((err) => {
+      console.log("Inside function that pushes notifications, threw error!");
+      throw err;
+    });
+
+    // IF THE ENDPLACE OF A REQUEST IS INSIDE THE MOREPLACES, GATHER THE USERS THAT I NEED TO NOTIFY
+    if (allRequests2.length > 0) {
+      for await (req of allRequests2) {
+        let moreplaces = IsJsonString(post.moreplaces)
+          ? JSON.parse(post.moreplaces)
+          : post.moreplaces;
+        for await (place of moreplaces) {
+          if (place.placecoords == req.endcoord) {
+            toSendNotification = true;
+
+            // array with the users that need to be informed that a post of their request has been created
+            arrayToNotify.push(req.email);
+          }
+        }
+      }
+    }
+
+    // HERE YOU SEND THE NOTIFICATIONS
+    if (toSendNotification) {
+      // Data for the notification, postid and the array of users
+      let dataToSend = {
+        post: post.postid,
+        users: arrayToNotify,
+      };
+      console.log("Notifications to send: ", dataToSend);
+    } else {
+      console.log("No request is found to be valid for the new post");
+    }
+  } catch (err) {
+    console.log("Error inside try and catch!!!!!", err);
+  }
+  // console.log("Inside func", post);
+};
 
 //service that creates a request
 app.post(
@@ -1091,6 +1204,16 @@ app.post(
                         message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
                       };
                       res.json(data);
+
+                      const postForFunction = Posts.findOne({
+                        where: {
+                          postid: row.postid,
+                        },
+                      }).catch((err) => {
+                        throw err;
+                      });
+                      //Function to push notification to the owner of the post === FIREBASE
+                      toNotifyOwner(postForFunction.email, row.postid);
                     })
                     .catch((err) => {
                       console.log(err);
@@ -1126,6 +1249,14 @@ app.post(
     }
   }
 );
+
+const toNotifyOwner = async (ownerEmail, postid) => {
+  console.log("User to notify that someone is interested: ", ownerEmail);
+  console.log("Post of user that someone is interested: ", postid);
+  /*
+  CODE FOR THE FIREBASE NOTIFICATIONS
+  */
+};
 
 //service that is searching posts
 app.post(
@@ -1290,7 +1421,6 @@ app.post(
 
               // console.log(fnd.email);
             }
-            var arr;
 
             if (data.age != null) {
               // afairese ta post twn xrhstwn pou einai panw apo data.age_end
@@ -1449,6 +1579,9 @@ app.post(
       // });
 
       await Users.findOne({
+        attributes: {
+          exclude: ["password"],
+        },
         where: {
           email: data.email,
         },
@@ -1587,57 +1720,57 @@ app.post(
               // ==================== section if the one who searches can review the profil ======================
               let reviewable = false;
 
-              let todayReviewable = await getCurDate(0);
-              console.log("Date from getCurDate(0)=  " + todayReviewable);
-              //check if already has review
-              setTime(0);
-              var datetime = new Date().today() + " " + new Date().timeNow();
-              console.log("curTime: " + datetime);
+              /*
+              HERE I MUST WRITE THE NEW CODE FOR THE REVIEWABLE
+              */
 
-              // UPDATED BETTER WAY TO GET ISO DATE ?????????????
-              let firsttime = new Date();
-              firsttime.setMonth(firsttime.getMonth() - 1);
+              let dateToCheck = new Date();
+              dateToCheck.setDate(dateToCheck.getDate() + -1);
+              dateToCheck =
+                dateToCheck.getFullYear() +
+                "-" +
+                String(dateToCheck.getMonth() + 1).padStart(2, "0") +
+                "-" +
+                String(dateToCheck.getDate()).padStart(2, "0");
+              console.log("Date to check:", dateToCheck);
 
-              const cRev = await Reviews.count({
+              // FIND THE ROWS THAT I AM A PASSENGER OR DRIVER AND THE POST IS ALREADY FINISHED BY A DAY
+              let possibleReviews = await ToReview.findAll({
                 where: {
-                  email: data.email,
-                  emailreviewer: searcherEmail,
-                  createdAt: { [Op.between]: [firsttime, datetime] },
+                  [Op.or]: [
+                    { passengerEmail: searcherEmail },
+                    { driverEmail: searcherEmail },
+                  ],
+                  endDate: { [Op.lte]: dateToCheck },
                 },
+              }).catch((err) => {
+                throw err;
               });
-              // console.log("Number of Reviews last month: " + cRev);
+              // CHECK IF THE USER HAS ALREADY DONE HIS PART OF THE REVIEW
+              possibleReviews = _.filter(possibleReviews, (obj) => {
+                if (
+                  obj.passengerEmail == searcherEmail &&
+                  obj.driverEmail == data.email &&
+                  obj.passengerDone == true
+                ) {
+                  return false;
+                } else if (
+                  obj.driverEmail == searcherEmail &&
+                  obj.passengerEmail == data.email &&
+                  obj.driverDone == true
+                ) {
+                  return false;
+                } else return true;
+              });
 
-              // case that the user that searches is not going to his profile
-              if (searcherEmail != data.email && cRev == 0) {
-                const posts = await Posts.findAll({
-                  where: {
-                    email: data.email,
-                    enddate: { [Op.lt]: todayReviewable },
-                  },
-                }).catch((err) => {
-                  console.log(err + "----- count posts for reviewable");
-                  throw err;
-                });
-                let total = 0;
-                for await (p of posts) {
-                  const interCount = await PostInterested.count({
-                    where: {
-                      postid: p.postid,
-                      email: searcherEmail,
-                      isVerified: true,
-                      isNotified: true,
-                      ownerNotified: true,
-                    },
-                  });
-                  total += interCount;
-                }
-
-                total > 0 ? (reviewable = true) : null;
+              console.log(possibleReviews);
+              if (possibleReviews.length > 0) {
+                reviewable = true;
               }
 
               //================= Section for isVisible... Check if the user can see the other's user phone ================
               let isVisible = false;
-              if (searcherEmail != data.email) {
+              if (searcherEmail != data.email && found.isVisible == true) {
                 let visibleDate = new Date();
 
                 console.log("Visible Date: " + visibleDate);
@@ -1673,9 +1806,9 @@ app.post(
                     isVisible = true;
                   }
                 }
-              } else {
+              } else if (data.email == searcherEmail) {
                 isVisible = true;
-              }
+              } else isVisible = false;
               //================= END OF SECTION
               //data response
               res.json({
@@ -1829,52 +1962,172 @@ app.post(
     try {
       var data = req.body.data;
       var results = null;
+      const revExist = await Reviews.findOne({
+        where: {
+          email: data.email,
+          emailreviewer: data.emailreviewer,
+        },
+      }).catch((err) => {
+        throw err;
+      });
 
-      await Reviews.create(data)
-        .then(async (review) => {
-          await Reviews.findAndCountAll({
-            attributes:
-              // [sequelize.fn("count", sequelize.col("rating")), "counter"],
-              [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
-            where: {
-              email: data.email,
-            },
-          })
-            .then(async (results) => {
-              var rows = results.rows;
-
-              var total = null;
-              for await (r of rows) {
-                // console.log(results.count);
-                total = r.toJSON().total;
-              }
-              var average = total / results.count;
-
-              res.json({
-                review: review,
-                average: average,
-                count: results.count,
-                message: "Η αξιολόγηση έγινε επιτυχώς!",
-              });
+      if (revExist == null) {
+        await Reviews.create(data)
+          .then(async (review) => {
+            await Reviews.findAndCountAll({
+              attributes:
+                // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+                [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+              where: {
+                email: data.email,
+              },
             })
-            .catch((err) => {
-              console.error(err);
+              .then(async (results) => {
+                var rows = results.rows;
+
+                var total = null;
+                for await (r of rows) {
+                  // console.log(results.count);
+                  total = r.toJSON().total;
+                }
+                var average = total / results.count;
+
+                //Section where i update the toreview row
+
+                const possibleReview = await ToReview.findOne({
+                  [Op.or]: [
+                    { driverEmail: data.emailreviewer },
+                    { passengerEmail: data.emailreviewer },
+                  ],
+                }).catch((err) => {
+                  throw err;
+                });
+
+                if (possibleReview == null) {
+                  throw err + " H KATAGRAFH STON PINAKA TO REVIEWS DEN UPARXEI";
+                }
+                // if the reviewer is the driver then update the driver
+                if (possibleReview.driverEmail == data.emailreviewer) {
+                  await possibleReview
+                    .update({
+                      driverDone: true,
+                    })
+                    .catch((err) => {
+                      throw err;
+                    });
+                } else {
+                  //if the reviewer is the passenger update the passenger
+                  await possibleReview
+                    .update({
+                      passengerDone: true,
+                    })
+                    .catch((err) => {
+                      throw err;
+                    });
+                }
+                //==========
+                res.json({
+                  review: review,
+                  average: average,
+                  count: results.count,
+                  message: "Η αξιολόγηση έγινε επιτυχώς!",
+                });
+              })
+              .catch((err) => {
+                console.error(err);
+                res
+                  .status(500)
+                  .json({ message: "Κάτι πήγε στραβά.", body: null });
+              });
+          })
+          .catch((err) => {
+            console.error(err);
+            if (err.original.code == "ER_DUP_ENTRY") {
+              res.status(405).json({
+                message: "Έχεις κάνει ήδη αξιολόγηση σε αυτόν τον χρήστη.",
+                body: null,
+              });
+            } else {
               res
                 .status(500)
                 .json({ message: "Κάτι πήγε στραβά.", body: null });
-            });
-        })
-        .catch((err) => {
-          console.error(err);
-          if (err.original.code == "ER_DUP_ENTRY") {
-            res.status(405).json({
-              message: "Έχεις κάνει ήδη αξιολόγηση σε αυτόν τον χρήστη.",
-              body: null,
-            });
-          } else {
-            res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
-          }
+            }
+          });
+      } else {
+        // CASE THAT THE REVIEW IS TO BE UPDATED.
+
+        //Section where i update the toreview row!!!!!!!!!!!!1
+
+        const possibleReview = await ToReview.findOne({
+          [Op.or]: [
+            { driverEmail: data.emailreviewer },
+            { passengerEmail: data.emailreviewer },
+          ],
+        }).catch((err) => {
+          throw err;
         });
+
+        if (possibleReview == null) {
+          throw err + " H KATAGRAFH STON PINAKA TO REVIEWS DEN UPARXEI";
+        }
+
+        //update the review
+        await revExist
+          .update({
+            rating: data.rating,
+            text: data.text,
+          })
+          .catch((err) => {
+            throw err;
+          });
+
+        // if the reviewer is the driver then update the driver
+        if (possibleReview.driverEmail == data.emailreviewer) {
+          await possibleReview
+            .update({
+              driverDone: true,
+            })
+            .catch((err) => {
+              throw err;
+            });
+        } else {
+          //if the reviewer is the passenger update the passenger
+          await possibleReview
+            .update({
+              passengerDone: true,
+            })
+            .catch((err) => {
+              throw err;
+            });
+        }
+
+        const results = await Reviews.findAndCountAll({
+          attributes:
+            // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+            [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+          where: {
+            email: data.email,
+          },
+        }).catch((err) => {
+          throw err;
+        });
+
+        var rows = results.rows;
+
+        var total = null;
+        for await (r of rows) {
+          // console.log(results.count);
+          total = r.toJSON().total;
+        }
+        var average = total / results.count;
+        res.json({
+          review: revExist,
+          average: average,
+          count: results.count,
+          message: "Η αξιολόγηση ανανεώθηκε επιτυχώς!",
+        });
+        //==========
+      }
     } catch (err) {
       console.error(err);
       res.status(500).json({
@@ -2547,11 +2800,55 @@ app.post(
       if (allIntersted < post.numseats || results.isVerified == true) {
         if (results.isVerified == false) {
           results.update({ isVerified: true });
+          // Create possible review notification
+
+          const toReviewExists = await ToReview.findOne({
+            where: {
+              driverEmail: post.email,
+              passengerEmail: results.email,
+            },
+          }).catch((err) => {
+            throw err;
+          });
+
+          if (toReviewExists == null) {
+            await ToReview.create({
+              driverEmail: post.email,
+              passengerEmail: results.email,
+              endDate: post.enddate,
+              piid: results.piid,
+            });
+          } else {
+            if (toReviewExists.driverDone == true) {
+              toReviewExists
+                .update({
+                  driverDone: false,
+                  passengerDone: false,
+                  piid: data.piid,
+                })
+                .catch((err) => {
+                  throw err;
+                });
+            }
+          }
+
           res.json({
             message: "Επιτυχής έγκριση ενδιαφερόμενου!",
           });
+
+          // push notification to the user that was interested ---- FIREBASE
+          toNotifyTheVerified(results.email, post.postid);
         } else {
+          //unverify the interested user
           results.update({ isVerified: false, isNotified: false });
+          // delete possible review notification
+          await ToReview.destroy({
+            where: {
+              piid: results.piid,
+            },
+          }).catch((err) => {
+            throw err;
+          });
           res.json({
             message: "Ακύρωση έγκρισης ενδιαφερόμενου!",
           });
@@ -2569,7 +2866,21 @@ app.post(
   }
 );
 
-//service for notification if someone has verified me or for people that are interested for one of my posts
+//FIREBASE NOTIFICATION FUNCTION FOR VERIFIED
+const toNotifyTheVerified = (emailToNotify, postId) => {
+  console.log("Email to be notified that got verified: ", emailToNotify);
+  console.log("Postid of the post that got verified: ", postId);
+  /* Here you write the code for the firebase
+  .
+  .
+  .
+  .
+  .
+  .
+  */
+};
+
+//service for notification for reviews
 app.post(
   "/notifyMe",
   [authenticateToken],
@@ -2578,127 +2889,119 @@ app.post(
     try {
       // let data = req.body.data;
       let extra = req.body.extra;
-      let flag = false;
 
-      let message = "Καμία νέα ειδοποίηση!";
-      let posts = [];
-      let history = [];
+      let dateToCheck = new Date();
+      dateToCheck.setDate(dateToCheck.getDate() + -1);
+      dateToCheck =
+        dateToCheck.getFullYear() +
+        "-" +
+        String(dateToCheck.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(dateToCheck.getDate()).padStart(2, "0");
+      console.log("Date to check:", dateToCheck);
 
-      // entopismos egrisewn gia ton xrhsth
-      const allInt = await PostInterested.findAll({
+      // FIND THE ROWS THAT I AM A PASSENGER OR DRIVER AND THE POST IS ALREADY FINISHED BY A DAY
+      let possibleReviews = await ToReview.findAll({
         where: {
-          email: extra,
+          [Op.or]: [{ passengerEmail: extra }, { driverEmail: extra }],
+          endDate: { [Op.lte]: dateToCheck },
         },
       }).catch((err) => {
         throw err;
       });
 
-      for await (one of allInt) {
-        const post = await Posts.findOne({
-          where: {
-            postid: one.postid,
-          },
-        }).catch((err) => {
-          throw err;
-        });
-        const fixedDate = await fixDate(post.date);
-        post.dataValues.date =
-          fixedDate.dateMonthDay + " " + fixedDate.hoursMinutes;
-        // console.log(postI);
-        let nnDate = new Date(post.startdate);
-        post.dataValues.startdate = await fixOnlyMonth(nnDate);
-        nnDate = new Date(post.enddate);
-        post.dataValues.enddate = await fixOnlyMonth(nnDate);
+      // CHECK IF THE USER HAS ALREADY DONE HIS PART OF THE REVIEW
+      possibleReviews = _.filter(possibleReviews, (obj) => {
+        if (obj.passengerEmail == extra && obj.passengerDone == true) {
+          return false;
+        } else if (obj.driverEmail == extra && obj.driverDone == true) {
+          return false;
+        } else return true;
+      });
 
-        const userPost = await Users.findOne({
-          attributes: {
-            exclude: ["password"],
-          },
-          where: {
-            email: post.email,
-          },
-        }).catch((err) => {
-          throw err;
-        });
+      let arrayOfUsers = [];
 
-        if (one.isVerified == true && one.isNotified == false) {
-          flag = true;
-          message = "Έχεις ειδοποιήσεις!";
-          post.dataValues = { ...post.dataValues, ...{ piid: one.piid } };
-          posts.push({
-            post: post,
-            userOwner: userPost,
+      //SCAN THE LIST AND GATHER THE USERS THAT THE CLIENT NEED TO REVIEW
+      for await (val of possibleReviews) {
+        // console.log(val.toJSON());
+        console.log(val.driverEmail, extra);
+
+        // IF YOU ARE WERE A PASSENGER
+        if (val.passengerEmail == extra) {
+          const user = await Users.findOne({
+            attributes: {
+              exclude: ["password"],
+            },
+            where: {
+              email: val.driverEmail,
+            },
+          }).catch((err) => {
+            throw err;
           });
-          // await PostInterested.update(
-          //   { isNotified: true },
-          //   {
-          //     where: {
-          //       piid: one.piid,
-          //     },
-          //   }
-          // );
-        } else if (
-          one.isNotified == true &&
-          one.isVerified == true &&
-          history.length < 5
-        ) {
-          history.push({
-            post: post,
-            userOwner: userPost,
+
+          const reviewExist = await Reviews.findOne({
+            where: {
+              emailreviewer: extra,
+              email: val.driverEmail,
+            },
+          }).catch((err) => {
+            throw err;
           });
+
+          let toEdit = false;
+          if (reviewExist != null) {
+            toEdit = true;
+          }
+
+          user.dataValues.toEdit = toEdit;
+
+          arrayOfUsers.push(user);
+        } else {
+          const user = await Users.findOne({
+            attributes: {
+              exclude: ["password"],
+            },
+            where: {
+              email: val.passengerEmail,
+            },
+          }).catch((err) => {
+            throw err;
+          });
+
+          const reviewExist = await Reviews.findOne({
+            where: {
+              emailreviewer: extra,
+              email: val.passengerEmail,
+            },
+          }).catch((err) => {
+            throw err;
+          });
+
+          let toEdit = false;
+          if (reviewExist != null) {
+            toEdit = true;
+          }
+
+          user.dataValues.toEdit = toEdit;
+          // console.log(user.toJSON());
+
+          arrayOfUsers.push(user);
+          // console.log("Inside truth: ", arrayOfUsers);
         }
       }
 
-      // flow pou psaxnei tous neous endiaferomenous.
-      const exposts = await Posts.findAll({
-        where: {
-          email: extra,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-      let case1L = 0;
-      let finData = [];
-      for await (ex of exposts) {
-        let tempint = await PostInterested.findAll({
-          where: {
-            postid: ex.postid,
-            ownerNotified: false,
-          },
-        }).catch((err) => {
-          throw err;
-        });
-        case1L = case1L + tempint.length;
-        //   for await(i of tempint)
-        //   {
-        //   exArray.push(i);
-        // }
-        tempint != 0
-          ? finData.push({
-              post: ex,
-              postInt: tempint,
-            })
-          : null;
-      }
+      // console.log(arrayOfUsers);
 
-      res.json({
-        notify: flag,
-        case0: {
-          verifications: posts,
-          lOfCase0: posts.length,
-        },
-        case1: {
-          postAndInter: finData,
-          lOfCase1: case1L,
-        },
-        finalLength: posts.length + case1L,
-        // alreadyNotified: history,
-        message: message,
-      });
+      if (arrayOfUsers.length > 0) res.json({ usersToReview: arrayOfUsers });
+      else
+        res
+          .status(404)
+          .json({ message: "Δεν βρέθηκαν χρήστες ως προς αξιολόγηση" });
     } catch (err) {
       console.error("!!!!!!!!!!!!!!sto notifyme: ", err);
       res.status(500).json({ message: "Κάτι πήγε στραβά" });
     }
+
     // console.log(req.query);
   }
 );
@@ -2900,7 +3203,6 @@ app.get(
   }
 );
 
-// const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=amoeba&types=establishment&location=37.76999%2C-122.44696&radius=500&key=${GOOGLE_KEY}`;
 const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/`;
 
 //google proxy for autocomplete
@@ -3015,10 +3317,6 @@ function setTime(extrad) {
   };
 }
 
-// let date = new Date("2022-01-03");
-// setTime(3);
-// console.log(date.today());
-
 const insertAver = async (user) => {
   try {
     let results = await Reviews.findAndCountAll({
@@ -3103,93 +3401,6 @@ const fixOnlyMonth = async (date) => {
   } catch (err) {
     console.log(err);
   }
-};
-
-//function that pushes notifications for all requests that find their posts ========= FIREBASE
-const pushNotifications = async (post) => {
-  try {
-    const allRequests = await SearchPost.findAll({
-      where: {
-        startcoord: post.startcoord,
-        endcoord: post.endcoord,
-        // elegxos na peftei h arxikh hmeromhnia tou post anamesa sthn arxikh kai telikh toy xrhsth
-        // ή na peftei h telikh hmeromhnia tou post anamesa sthn arxikh h telikh hmeromhnia tou xrhsth
-        // ή na peftei h arxikh KAI h telikh hmeromhnia toy xrhsth na peftei anamesa sthn arxikh KAI telikh hmeromhnia tou post
-        // [Op.or]: [
-        //   { startdate: { [Op.between]: [post.startdate, post.enddate] } },
-        //   { enddate: { [Op.between]: [post.startdate, post.enddate] } },
-        //   {
-        //     [Op.and]: [
-        //       { startdate: { [Op.lte]: post.startdate } },
-        //       { enddate: { [Op.gte]: post.enddate } },
-        //     ],
-        //   },
-        // ],
-      },
-    }).catch((err) => {
-      console.log("Inside function that pushes notifications, threw error!");
-      throw err;
-    });
-
-    // console.log("FIRST QUERY:", allRequests);
-
-    let toSendNotification = false;
-    // CHECK FOR MOREPLACES
-    if (allRequests.length == 0) {
-      const allRequests2 = await SearchPost.findAll({
-        where: {
-          startcoord: post.startcoord,
-        },
-      }).catch((err) => {
-        console.log("Inside function that pushes notifications, threw error!");
-        throw err;
-      });
-      // console.log("SECOND QUERY:", allRequests2);
-      // console.log("DATA OF POST:", post);
-
-      if (allRequests2.length > 0) {
-        let arrayToNotify = [];
-        for await (req of allRequests2) {
-          let moreplaces = IsJsonString(post.moreplaces)
-            ? JSON.parse(post.moreplaces)
-            : post.moreplaces;
-          for await (place of moreplaces) {
-            if (place.placecoords == req.endcoord) {
-              toSendNotification = true;
-              // section to gather the data for the notification
-              //HERE I MUST WRITE THE CODE FOR THAT PURPOPSE
-              arrayToNotify.push(req);
-
-              // =================
-            }
-          }
-        }
-        // ===== FIREBASE
-        let dataToSend = {
-          allRequests: arrayToNotify,
-        };
-
-        console.log("Notification Data to Send:", JSON.stringify(dataToSend));
-      }
-    } else {
-      toSendNotification = true;
-      // section to gather the data for the notification ====FIREBASE
-      //HERE I MUST WRITE THE CODE FOR THAT PURPOPSE
-      let dataToSend = {
-        allRequests: allRequests,
-      };
-      console.log("Notification Data to Send:", JSON.stringify(dataToSend));
-      // =================
-    }
-
-    console.log(
-      "============Found to push notifications: ",
-      toSendNotification
-    );
-  } catch (err) {
-    console.log("Error inside try and catch!!!!!", err);
-  }
-  // console.log("Inside func", post);
 };
 
 http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));

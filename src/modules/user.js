@@ -36,11 +36,11 @@ const Users = sequelize.define(
     },
     car: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     cardate: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     gender: {
       type: DataTypes.STRING,
@@ -63,6 +63,10 @@ const Users = sequelize.define(
     verified: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: 0,
+    },
+    isVisible: {
+      type: DataTypes.BOOLEAN,
       defaultValue: 0,
     },
   },
