@@ -733,7 +733,7 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
         //console.log(user.toJSON());
         let data = user.toJSON();
         data.password = null;
-        (data.photo = "images/" + data.email + "/jpeg"),
+        (data.photo = "images/" + data.email + ".jpeg"),
           res.json({
             message: "Επιτυχής είσοδος.",
             user: data,
