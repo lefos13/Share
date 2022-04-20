@@ -1,0 +1,8 @@
+Register Flow Changes
+
+1. When the user tries to register, the client calls the api /passotp, which generates
+   and sends the otp to the user so he can verify his email
+
+2. When the user pass the test and give the right otp, then the client should call the api /register in which the final registration happens.
+
+3. The api /verify isnt usefull anymore so the client SHOULD NOT call it anywhere because the /register api knows that the user is already verified by the front-end. Thus when the row is created in the database the column "verified" is true by default.

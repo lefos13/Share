@@ -78,3 +78,12 @@ Flow gia ta reviews:
 3. lhksh hmeromhnias anaxwrhshs
 4. oi xrhstes pleon mporoun na knoun review o enas ston allon. Eidika notifications erxontai!!
 5. 
+
+
+Register Flow
+
+O xrhsths sumplhrwnei ta pedia kai pataei register
+--- kaleitai to /passotp api wste na stalei to OTP sto email tou xrhsth
+
+Ginetai swsth sumplhrwsh tou OTP
+--- kaleite to /register api wste na ginei en telh h eggrafh tou xrhsth

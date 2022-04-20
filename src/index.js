@@ -450,6 +450,7 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
   try {
     // crypto the password
     var data = req.body.data;
+    data["verified"] = true;
     bcrypt.genSalt(saltRounds, function (err, salt) {
       bcrypt.hash(data.password, salt, async function (err, hash) {
         var data2 = req.body.data;
@@ -457,12 +458,12 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
         // console.log(data.email);
 
         //generate otp to send to the user's mail
-        var otp = otpGenerator.generate(4, {
-          digits: true,
-          upperCase: false,
-          alphabets: false,
-          specialChars: false,
-        });
+        // var otp = otpGenerator.generate(4, {
+        //   digits: true,
+        //   upperCase: false,
+        //   alphabets: false,
+        //   specialChars: false,
+        // });
 
         var results = null;
         let base64 = data2.photo;
@@ -475,11 +476,9 @@ app.post("/register", [], cors(corsOptions), async (req, res) => {
         // console.log(base64);
         await Users.create(data)
           .then((user) => {
-            verification(otp, data2.email);
+            // verification(otp, data2.email);
             results = {
-              message:
-                "Εγγραφήκατε επιτυχώς. Πάμε για την εξακρίβωση του email!",
-              otp: otp,
+              message: "Εγγραφήκατε επιτυχώς!",
               user: data,
             };
             var data = {
@@ -788,7 +787,7 @@ app.post(
   }
 );
 
-//api that checks if the user exists and if he is verified. Also, it sends an otp for the reset of his password
+//api that checks if the user exists and if he is verified. Also, it sends an otp
 app.post("/passotp", [], cors(corsOptions), async (req, res) => {
   try {
     var email = req.body.data.email;
