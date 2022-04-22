@@ -793,41 +793,18 @@ app.post("/passotp", [], cors(corsOptions), async (req, res) => {
   try {
     var email = req.body.data.email;
 
-    var body = null;
-
-    // console.log();
-    const user = await Users.findOne({
-      where: {
-        email: email,
-      },
-    })
-      .catch((err) => {
-        console.log("Error:" + err);
-        body = "Κάτι πήγε στραβά. Παρακαλούμε προσπαθήστε ξανά αργότερα!";
-        res.status(500).json({
-          message: body,
-        });
-      })
-      .then((user) => {
-        if (user === null) {
-          res.status(404).json({
-            message: "Ο χρήστης δεν βρέθηκε",
-          });
-        } else {
-          var otp = otpGenerator.generate(4, {
-            digits: true,
-            upperCase: false,
-            alphabets: false,
-            specialChars: false,
-          });
-          // send email for verification
-          verification(otp, email);
-          res.json({
-            message: "Έλεγξε το email σου για τον ειδικό κωδικό.",
-            otp: otp,
-          });
-        }
-      });
+    var otp = otpGenerator.generate(4, {
+      digits: true,
+      upperCase: false,
+      alphabets: false,
+      specialChars: false,
+    });
+    // send email for verification
+    verification(otp, email);
+    res.json({
+      message: "Έλεγξε το email σου για τον ειδικό κωδικό.",
+      otp: otp,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({
