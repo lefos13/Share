@@ -67,7 +67,7 @@ const Users = sequelize.define(
     },
     isVisible: {
       type: DataTypes.BOOLEAN,
-      defaultValue: 0,
+      defaultValue: 1,
     },
   },
   {

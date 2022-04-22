@@ -524,11 +524,12 @@ app.post(
       var data = req.body.data;
       let email = req.body.extra;
       // console.log("test Log: ", data, email);
-      console.log(email + "test");
+      // console.log(email + "test");
 
       const user = await Users.update(
         {
           mobile: data.mobile,
+          fullname: data.fullname,
           age: data.age,
           facebook: data.facebook,
           instagram: data.instagram,
@@ -1440,6 +1441,8 @@ app.post(
             if (data.cardate != null) {
               //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
               array = _.filter(array, (obj) => {
+                data.cardate = parseInt(data.cardate, 10);
+                obj.user.cardate = parseInt(obj.user.cardate, 10);
                 return parseInt(obj.user.cardate) >= data.cardate;
               });
             }
@@ -1731,14 +1734,24 @@ app.post(
                 String(dateToCheck.getMonth() + 1).padStart(2, "0") +
                 "-" +
                 String(dateToCheck.getDate()).padStart(2, "0");
-              console.log("Date to check:", dateToCheck);
+              // console.log("Date to check:", dateToCheck);
 
               // FIND THE ROWS THAT I AM A PASSENGER OR DRIVER AND THE POST IS ALREADY FINISHED BY A DAY
               let possibleReviews = await ToReview.findAll({
                 where: {
-                  [Op.or]: [
-                    { passengerEmail: searcherEmail },
-                    { driverEmail: searcherEmail },
+                  [Op.and]: [
+                    {
+                      [Op.or]: [
+                        { driverEmail: searcherEmail },
+                        { passengerEmail: searcherEmail },
+                      ],
+                    },
+                    {
+                      [Op.or]: [
+                        { driverEmail: data.email },
+                        { passengerEmail: data.email },
+                      ],
+                    },
                   ],
                   endDate: { [Op.lte]: dateToCheck },
                 },
@@ -1762,44 +1775,47 @@ app.post(
                 } else return true;
               });
 
-              console.log(possibleReviews);
-              if (possibleReviews.length > 0) {
+              // console.log(possibleReviews);
+              if (possibleReviews.length > 0 && searcherEmail != data.email) {
                 reviewable = true;
               }
 
               //================= Section for isVisible... Check if the user can see the other's user phone ================
               let isVisible = false;
-              if (searcherEmail != data.email && found.isVisible == true) {
+              if (searcherEmail != data.email) {
+                // && found.isVisible == true
+                //CHECK IF THE PHONE SOULD BE VISIBLE
                 let visibleDate = new Date();
 
-                console.log("Visible Date: " + visibleDate);
+                // console.log("Visible Date: " + visibleDate);
+                // console.log("FIND ALL THE POSTS OF BOTH USERS");
                 const posts = await Posts.findAll({
                   where: {
-                    email: data.email,
+                    email: { [Op.or]: [data.email, searcherEmail] },
                     enddate: { [Op.gte]: visibleDate },
                   },
                 }).catch((err) => {
                   throw err;
                 });
 
-                console.log("Posts of User: " + posts.length);
+                // console.log("Posts of User: " + posts.length);
 
                 // find interest that is verified by the owner of the post
                 for await (p of posts) {
                   const pInt = await PostInterested.findOne({
                     where: {
                       postid: p.postid,
-                      email: searcherEmail,
+                      email: { [Op.or]: [data.email, searcherEmail] },
                       isVerified: true,
                     },
                   }).catch((err) => {
                     throw err;
                   });
 
-                  console.log(
-                    "Interested and verified for one of the posts: ",
-                    pInt != null ? pInt.toJSON() : pInt
-                  );
+                  // console.log(
+                  //   "Interested and verified for one of the posts: ",
+                  //   pInt != null ? pInt.toJSON() : pInt
+                  // );
 
                   if (pInt != null) {
                     isVisible = true;
@@ -1814,8 +1830,8 @@ app.post(
                 user: found,
                 average: average,
                 count: revfound.count,
-                hasFavourites: hasFavourites,
-                hasRequests: hasRequests,
+                hasFavourites: hasFavourites, // boolean if the user has any favourites
+                hasRequests: hasRequests, //boolean if the user has any post requsts
                 hasPosts: hasPosts, //boolean gia to an o xrhshs exei posts
                 hasInterested: hasInterested, // boolean gia to an o xrhsths endiaferetai gia posts
                 interestedForYourPosts: hasIntPosts, // boolean gia to an uparxoun endiaferomenoi twn post tou user
@@ -1973,6 +1989,54 @@ app.post(
       if (revExist == null) {
         await Reviews.create(data)
           .then(async (review) => {
+            const possibleReview = await ToReview.findOne({
+              where: {
+                [Op.and]: [
+                  {
+                    [Op.or]: [
+                      { driverEmail: review.emailreviewer },
+                      { passengerEmail: review.emailreviewer },
+                    ],
+                  },
+                  {
+                    [Op.or]: [
+                      { driverEmail: review.email },
+                      { passengerEmail: review.email },
+                    ],
+                  },
+                ],
+              },
+            }).catch((err) => {
+              throw err;
+            });
+
+            if (possibleReview == null) {
+              throw err + " H KATAGRAFH STON PINAKA TO REVIEWS DEN UPARXEI";
+            }
+
+            // if the reviewer is the driver then update the driver
+            if (possibleReview.driverEmail == review.emailreviewer) {
+              console.log("Driver done review");
+              await possibleReview
+                .update({
+                  driverDone: true,
+                })
+                .catch((err) => {
+                  throw err;
+                });
+
+              // console.log(possibleReview);
+            } else {
+              console.log("Passenger done Review");
+              //if the reviewer is the passenger update the passenger
+              await possibleReview
+                .update({
+                  passengerDone: true,
+                })
+                .catch((err) => {
+                  throw err;
+                });
+            }
             await Reviews.findAndCountAll({
               attributes:
                 // [sequelize.fn("count", sequelize.col("rating")), "counter"],
@@ -2058,10 +2122,22 @@ app.post(
         //Section where i update the toreview row!!!!!!!!!!!!1
 
         const possibleReview = await ToReview.findOne({
-          [Op.or]: [
-            { driverEmail: data.emailreviewer },
-            { passengerEmail: data.emailreviewer },
-          ],
+          where: {
+            [Op.and]: [
+              {
+                [Op.or]: [
+                  { driverEmail: data.emailreviewer },
+                  { passengerEmail: data.emailreviewer },
+                ],
+              },
+              {
+                [Op.or]: [
+                  { driverEmail: data.email },
+                  { passengerEmail: data.email },
+                ],
+              },
+            ],
+          },
         }).catch((err) => {
           throw err;
         });
@@ -2205,15 +2281,15 @@ app.post(
           //   // console.log(total);
           // }
           let skipcount = 0;
-          let takecount = 20;
-          if (data.page > 1) skipcount = data.page * 20 - 20;
+          let takecount = 10;
+          if (data.page > 1) skipcount = data.page * 10 - 10;
           let finalarr = _.take(_.drop(rows, skipcount), takecount);
-          let mod = count % 20;
+          let mod = count % 10;
           // console.log(mod);
           let totallength = 1;
           mod == 0
-            ? (totallength = count / 20)
-            : (totallength = count / 20 - mod / 20 + 1);
+            ? (totallength = count / 10)
+            : (totallength = count / 10 - mod / 10 + 1);
           let array = [];
           for await (post of finalarr) {
             if (IsJsonString(post.moreplaces)) {
@@ -2266,16 +2342,35 @@ app.post(
                 postid: post.postid,
               },
             }).catch((err) => {
-              console.error("provlima sto get posts user");
+              // console.error("provlima sto get posts user");
               throw err;
             });
             let flag;
             interested === null ? (flag = false) : (flag = true);
 
+            // endiaferomoi gia ena sygekrimeno post
+            const countInt = await PostInterested.count({
+              where: {
+                postid: post.postid,
+                email: { [Op.ne]: data.email },
+              },
+              // order: [["date", "DESC"]],
+            }).catch((err) => {
+              console.error(err);
+            });
+            let moreUsers = false;
+            // let finalInt = _.take(_.drop(interested, 0), 10);
+            if (countInt > 0) {
+              moreUsers = true;
+              message = "Βρέθηκαν Ενδιαφερόμενοι!";
+            }
+
             let results = {
               user: user,
               imagePath: image,
               post: post,
+              hasMoreUsers: moreUsers,
+              countUsers: countInt,
               interested: flag,
             };
             array.push(results);
@@ -2647,15 +2742,15 @@ app.post(
           if (isAny > 0) {
             message = "Βρέθηκαν ενδιαφερόμενοι";
             let skipcount = 0;
-            let takecount = 20;
-            if (data.page > 1) skipcount = data.page * 20 - 20;
+            let takecount = 10;
+            if (data.page > 1) skipcount = data.page * 10 - 10;
             let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
-            let mod = isAny % 20;
+            let mod = isAny % 10;
             // console.log(mod);
             let totallength = 1;
             mod == 0
-              ? (totallength = isAny / 20)
-              : (totallength = isAny / 20 - mod / 20 + 1);
+              ? (totallength = isAny / 10)
+              : (totallength = isAny / 10 - mod / 10 + 1);
             res.json({
               users: finalarr,
               post: fullpost,
@@ -2798,18 +2893,35 @@ app.post(
 
       if (allIntersted < post.numseats || results.isVerified == true) {
         if (results.isVerified == false) {
-          results.update({ isVerified: true });
+          results.update({ isVerified: true }).catch((err) => {
+            throw err;
+          });
+
           // Create possible review notification
 
+          //Find if a possible review already exists
           const toReviewExists = await ToReview.findOne({
             where: {
-              driverEmail: post.email,
-              passengerEmail: results.email,
+              [Op.and]: [
+                {
+                  [Op.or]: [
+                    { driverEmail: post.email },
+                    { passengerEmail: post.email },
+                  ],
+                },
+                {
+                  [Op.or]: [
+                    { driverEmail: results.email },
+                    { passengerEmail: results.email },
+                  ],
+                },
+              ],
             },
           }).catch((err) => {
             throw err;
           });
 
+          //If there is no possible review, create a new one
           if (toReviewExists == null) {
             await ToReview.create({
               driverEmail: post.email,
@@ -2818,8 +2930,31 @@ app.post(
               piid: results.piid,
             });
           } else {
-            if (toReviewExists.driverDone == true) {
-              toReviewExists
+            //if a review is done already check if the driver and the passenger have the right emails.
+
+            //if the possibleReview has the post owner as the passenger, change the row so that the owner become the driver
+            // and the interested user become the passenger.
+            if (
+              toReviewExists.driverEmail != post.email &&
+              toReviewExists.driverEmail == results.email
+            ) {
+              await toReviewExists
+                .update({
+                  driverEmail: post.email,
+                  passengerEmail: results.email,
+                })
+                .catch((err) => {
+                  throw err;
+                });
+            }
+
+            //if a review is done already by the owner of the post and the owner is marked as driver
+            //update him as false so he can review again the same user
+            if (
+              toReviewExists.driverDone == true &&
+              toReviewExists.driverEmail == post.email
+            ) {
+              await toReviewExists
                 .update({
                   driverDone: false,
                   passengerDone: false,
@@ -2880,7 +3015,7 @@ const toNotifyTheVerified = (emailToNotify, postId) => {
 };
 
 //service for notification for reviews
-app.post(
+app.get(
   "/notifyMe",
   [authenticateToken],
   cors(corsOptions),
@@ -2954,11 +3089,13 @@ app.post(
 
           user.dataValues.toEdit = toEdit;
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
-          user.dataValues.average = 3;
-          user.dataValues.count = 5;
+          let res = await insertAver(user);
+          user.dataValues.average = res.average;
+          user.dataValues.count = res.count;
 
           arrayOfUsers.push(user);
         } else {
+          //IF THE USER WAS THE DRIVER
           const user = await Users.findOne({
             attributes: {
               exclude: ["password"],
@@ -2986,8 +3123,9 @@ app.post(
 
           user.dataValues.toEdit = toEdit;
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
-          user.dataValues.average = 3;
-          user.dataValues.count = 5;
+          let res = await insertAver(user);
+          user.dataValues.average = res.average;
+          user.dataValues.count = res.count;
           // console.log(user.toJSON());
 
           arrayOfUsers.push(user);

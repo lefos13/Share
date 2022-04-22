@@ -6,3 +6,46 @@ Register Flow Changes
 2. When the user pass the test and give the right otp, then the client should call the api /register in which the final registration happens.
 
 3. The api /verify isnt usefull anymore so the client SHOULD NOT call it anywhere because the /register api knows that the user is already verified by the front-end. Thus when the row is created in the database the column "verified" is true by default.
+
+4. isVisible is now by default true. (for the phone)
+
+notifyMe API Changes
+
+1. Changed to GET from POST
+
+2. Fixed the values of average and count per user. Now they are the true values and not some fixed default values that the api was sending as response before.
+
+createreview API changes
+
+1. fixed the case that when a user reviewed another user, the tables wouldnt update as a result it would return the same results for possible reviews in notifyMe
+
+updateProfile API changes
+
+1. Now the user can update his fullname too.
+
+example of request:
+{
+"data": {
+"fullname": "George",
+"mobile": "6975620785",
+"age": 25,
+"facebook": null,
+"instagram": null,
+"car": "nissan",
+"cardate": "1996",
+"photo": "-----"
+}
+}
+
+getPostsUser API changes
+
+1. Two more fields are inserted in each element of the array.
+
+example:
+
+"hasMoreUsers": true,
+"countUsers": 4,
+
+2. With those fields the client now knows if each post in the Array has people that are interested for it (hasMoreUsers) and how many of them are (countUsers).
+   So if the field hasMoreUsers is true then there are people that are interested for this post. If false then there are none.
+   The field countUsers counts how many users are interested for the particular post each time.

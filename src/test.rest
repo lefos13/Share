@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "user1@gmail.com"
     }
 }
 
@@ -25,11 +25,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 ###
 POST http://localhost:3000/updateProfile
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tICIsImRhdGEiOiIyMDIyLTAzLTMwVDE3OjUxOjM0LjYyNVoiLCJpYXQiOjE2NDg2NjI2OTQsImV4cCI6MTY1Mzg0NjY5NH0.msZVc8oYTGbgKqn0Ixx7YcqGJ7ApatFV9oNWlNin5vs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIxVDA5OjMwOjIwLjA5NloiLCJpYXQiOjE2NTA1MzM0MjAsImV4cCI6MTY1NTcxNzQyMH0.3cTeMd_dQ-yQFpf0DLaA3d_foLF7cd8bDo3JbRGN93M
 
 
 {
     "data": {
+        "fullname": "George",
         "mobile": "6975620785",
         "age": 25,
         "facebook": null,
@@ -151,8 +152,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "postid": 1785
+        "email": "user0@gmail.com",
+        "postid": 1784
     }
 }
 
@@ -177,7 +178,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
         "age": null,
         "age_end": null,
         "car": null,
-        "cardate": null,
+        "cardate": 1995,
         "gender": null,
         "withReturn": null,
         "petAllowed": null,
@@ -216,11 +217,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
 POST http://localhost:3000/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTAyVDEzOjEzOjE0LjMxNFoiLCJpYXQiOjE2NDg5MDUxOTQsImV4cCI6MTY1NDA4OTE5NH0.NtEX2hKtjKmWrLMqtJpO8h9aQIWvKAiNeCc8eBw4x2k
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIxVDEwOjM1OjQ4LjkzMVoiLCJpYXQiOjE2NTA1MzczNDgsImV4cCI6MTY1NTcyMTM0OH0.xJdvsjqCrZwj_Dw3XhwRTMsoZkGFr_jQEcFAH1zUDsk
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -247,9 +248,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "emailreviewer": "lefterisevagelinos1996@gmail.com",
-        "email": "user0@gmail.com",
-        "rating": 3,
+        "emailreviewer": "user0@gmail.com",
+        "email": "lefterisevagelinos1996@gmail.com",
+        "rating": 4,
         "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια UPDATED"
     }
 }
@@ -327,7 +328,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1731,
+        "postid": 1785,
         "page": 1
     }
 }
@@ -350,17 +351,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1785,
-        "piid": 351
+        "postid": 1781,
+        "piid": 355
     }
 }
 
 ###
 
 //service to notify someone that has been verified for a post that he is interested
-POST http://localhost:3000/notifyMe
+GET http://localhost:3000/notifyMe
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTMxVDEwOjU3OjA1LjA0MVoiLCJpYXQiOjE2NDg3MjQyMjUsImV4cCI6MTY1MzkwODIyNX0.NnWeCsU5rdoHpcMt_vOBBdjg0pEwn9cpXvejKlH3Sqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIwVDE1OjQ0OjQ2LjU1NloiLCJpYXQiOjE2NTA0Njk0ODYsImV4cCI6MTY1NTY1MzQ4Nn0.SQpUynP0mI4KHgrIqe0Ut47YT8JP0nf_kfEr85Wu2po
 
 ###
 // mainEmail: se afto to email tha ginontai generated ta posts. 
