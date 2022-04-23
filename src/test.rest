@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "user1@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -152,8 +152,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "user0@gmail.com",
-        "postid": 1784
+        "email": "user11@gmail.com",
+        "postid": 1785
     }
 }
 
@@ -217,11 +217,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
 POST http://localhost:3000/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIxVDEwOjM1OjQ4LjkzMVoiLCJpYXQiOjE2NTA1MzczNDgsImV4cCI6MTY1NTcyMTM0OH0.xJdvsjqCrZwj_Dw3XhwRTMsoZkGFr_jQEcFAH1zUDsk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIzVDEzOjAwOjQ1LjcyMFoiLCJpYXQiOjE2NTA3MTg4NDUsImV4cCI6MTY1NTkwMjg0NX0.d3mVR52EShOEtK3JMMgU3nmSQhdik0xmYmC15ZKkGoc
 
 {
     "data": {
-        "email": "user0@gmail.com"
+        "email": "user1@gmail.com"
     }
 }
 
@@ -249,7 +249,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 {
     "data": {
         "emailreviewer": "user0@gmail.com",
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "user1@gmail.com",
         "rating": 4,
         "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια UPDATED"
     }
@@ -351,8 +351,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1781,
-        "piid": 355
+        "postid": 1785,
+        "piid": 358
     }
 }
 
@@ -361,7 +361,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 //service to notify someone that has been verified for a post that he is interested
 GET http://localhost:3000/notifyMe
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIwVDE1OjQ0OjQ2LjU1NloiLCJpYXQiOjE2NTA0Njk0ODYsImV4cCI6MTY1NTY1MzQ4Nn0.SQpUynP0mI4KHgrIqe0Ut47YT8JP0nf_kfEr85Wu2po
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIzVDEzOjAwOjQ1LjcyMFoiLCJpYXQiOjE2NTA3MTg4NDUsImV4cCI6MTY1NTkwMjg0NX0.d3mVR52EShOEtK3JMMgU3nmSQhdik0xmYmC15ZKkGoc
 
 ###
 // mainEmail: se afto to email tha ginontai generated ta posts. 

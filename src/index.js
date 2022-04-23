@@ -2919,6 +2919,7 @@ app.post(
                 .update({
                   driverEmail: post.email,
                   passengerEmail: results.email,
+                  piid: results.piid,
                 })
                 .catch((err) => {
                   throw err;
@@ -2953,13 +2954,64 @@ app.post(
           //unverify the interested user
           results.update({ isVerified: false, isNotified: false });
           // delete possible review notification
-          await ToReview.destroy({
+          // check if the unverification should destroy the possible review
+          // get all posts of current passenger
+          // console.log("Find the posts of: ", results.email);
+          const passengerPosts = await Posts.findAll({
             where: {
-              piid: results.piid,
+              email: results.email,
             },
           }).catch((err) => {
             throw err;
           });
+          let flagCounter = 0;
+
+          //Check if the current driver was ever interested for a post of current passenger
+          // console.log("Find the interested of:", post.email);
+          for await (p of passengerPosts) {
+            const intP = await PostInterested.findOne({
+              where: {
+                postid: p.postid,
+                email: post.email,
+                isVerified: true,
+              },
+            }).catch((err) => {
+              throw err;
+            });
+
+            // if you find such a post, then update the possible review and dont delete it
+            if (intP != null) {
+              // console.log("Found such a post", intP.toJSON());
+              // console.log("New driver:", p.email);
+              // console.log("New passenger:", intP.email);
+              flagCounter++;
+              ToReview.update(
+                {
+                  driverEmail: p.email,
+                  passengerEmail: intP.email,
+                  piid: intP.piid,
+                  endDate: p.enddate,
+                },
+                {
+                  where: {
+                    piid: results.piid,
+                  },
+                }
+              ).catch((err) => {
+                throw err;
+              });
+            }
+          }
+
+          if (flagCounter == 0) {
+            await ToReview.destroy({
+              where: {
+                piid: results.piid,
+              },
+            }).catch((err) => {
+              throw err;
+            });
+          }
           res.json({
             message: "Ακύρωση έγκρισης ενδιαφερόμενου!",
           });
