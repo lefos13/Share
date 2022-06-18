@@ -422,11 +422,13 @@ async function verification(otp, email) {
   try {
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
-      service: "Gmail",
+      service: "gmail",
       auth: {
         user: EMAIL,
         pass: PASSEMAIL,
       },
+      port: 465,
+      host: "smtp.gmail.com",
     });
 
     // send mail with defined transport object
@@ -445,6 +447,11 @@ async function verification(otp, email) {
   }
 }
 
+app.get("/test", async (req, res) => {
+  res.json({
+    did: "asd",
+  });
+});
 //rest api service that registers the user to the database, checks if he already exists and sends an otp for verification.
 app.post("/register", [], cors(corsOptions), async (req, res) => {
   try {
@@ -835,7 +842,11 @@ app.post(
         data.returnStartDate = 0000 - 00 - 00;
         data.returnEndDate = 0000 - 00 - 00;
       }
-      console.log("Dates limit:", firsttime, datetime, postdate);
+      // fix gia to enddate==null
+      if (data.enddate == null) {
+        data.enddate = data.startdate;
+      }
+      // console.log("Dates limit:", firsttime, datetime, postdate);
       // ========================= PRAGMATIKO KOMMATI - ME ELEGXO GIA TRIA MAX POSTS
       await Posts.count({
         where: {
@@ -1764,8 +1775,7 @@ app.post(
                 //CHECK IF THE PHONE SOULD BE VISIBLE
                 let visibleDate = new Date();
 
-                // console.log("Visible Date: " + visibleDate);
-                // console.log("FIND ALL THE POSTS OF BOTH USERS");
+                // =========== Search for posts for both users that their enddate is greater or equal to the current date ==========
                 const posts = await Posts.findAll({
                   where: {
                     email: { [Op.or]: [data.email, searcherEmail] },
@@ -1775,9 +1785,7 @@ app.post(
                   throw err;
                 });
 
-                // console.log("Posts of User: " + posts.length);
-
-                // find interest that is verified by the owner of the post
+                // For each post of both users, find interest that is verified by the owner of the post
                 for await (p of posts) {
                   const pInt = await PostInterested.findOne({
                     where: {
@@ -1789,11 +1797,7 @@ app.post(
                     throw err;
                   });
 
-                  // console.log(
-                  //   "Interested and verified for one of the posts: ",
-                  //   pInt != null ? pInt.toJSON() : pInt
-                  // );
-
+                  // IF you find a verification, then make isVisible=true
                   if (pInt != null) {
                     isVisible = true;
                   }
@@ -2466,7 +2470,9 @@ app.post(
               }).catch((err) => {
                 console.error("line 1344 " + err);
               });
+              console.log(post.dataValues.email);
               let extraData = await insertAver(user);
+
               user.dataValues = { ...user.dataValues, ...extraData };
               let image = "images/" + post.email + ".jpeg";
 
@@ -2867,7 +2873,7 @@ app.post(
       }).catch((err) => {
         throw err;
       });
-
+      console.log("test   " + post);
       if (allIntersted < post.numseats || results.isVerified == true) {
         if (results.isVerified == false) {
           results.update({ isVerified: true }).catch((err) => {
@@ -3121,6 +3127,7 @@ app.get(
           let res = await insertAver(user);
           user.dataValues.average = res.average;
           user.dataValues.count = res.count;
+          // console.log(user);
 
           arrayOfUsers.push(user);
         } else {
@@ -3150,11 +3157,17 @@ app.get(
             toEdit = true;
           }
 
+          if (user == null) {
+            console.log(
+              "Ο XRHSTHS " + val.passengerEmail + "  DEN UPARXEI!!!!"
+            );
+          }
           user.dataValues.toEdit = toEdit;
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
           let res = await insertAver(user);
           user.dataValues.average = res.average;
           user.dataValues.count = res.count;
+          // console.log(user);
           // console.log(user.toJSON());
 
           arrayOfUsers.push(user);

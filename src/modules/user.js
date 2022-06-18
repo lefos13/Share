@@ -65,10 +65,6 @@ const Users = sequelize.define(
       allowNull: false,
       defaultValue: 0,
     },
-    isVisible: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: 1,
-    },
   },
   {
     freezeTableName: true,

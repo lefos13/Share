@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "giannisfragoulis21@gmail.com"
     }
 }
 
@@ -110,6 +110,43 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service pou ftiaxneis ena post
 POST http://localhost:3000/createpost
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMTdUMTI6NTY6MDAuMzkwWiIsImlhdCI6MTY1NTQ3MDU2MCwiZXhwIjoxNjYwNjU0NTYwfQ.rc3qgCqziUl3FkhTb7SDfH95TZrbyICS50nxj1DOahQ
+
+{
+    "data": {
+        "email": "user0@gmail.com",
+        "date": "2021-10-05",
+        "startplace": "ασδ",
+        "startcoord": "1234",
+        "endplace": "δσα",
+        "endcoord": "3215",
+        "numseats": 2,
+        "startdate": "2022-04-22",
+        "enddate": null,
+        "returnStartDate": null,
+        "returnEndDate": null,
+        "withReturn": false,
+        "costperseat": 40,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "petAllowed": true,
+        "isFavourite": false,
+        "moreplaces": [
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            },
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            }
+        ]
+    }
+}
+###
+
+#service pou ftiaxneis ena post
+POST http://localhost:3000/createpost
+Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAzVDE2OjA0OjAyLjE5MFoiLCJpYXQiOjE2NDYzMjM0NDIsImV4cCI6MTY1MTUwNzQ0Mn0.lx4Z5sj9VopjkLQuJp_xjkey-hY23dInagKmv9oh1VU
 
 {
@@ -148,11 +185,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
 POST http://localhost:3000/interested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDMtMzBUMDk6Mjk6NTkuNjgyWiIsImlhdCI6MTY0ODYzMjU5OSwiZXhwIjoxNjUzODE2NTk5fQ.7mRYjs_OLOUMLw_y12mAlq4F0Tk_O0bmKziLD_qiVu0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMTdUMTI6NTY6MDAuMzkwWiIsImlhdCI6MTY1NTQ3MDU2MCwiZXhwIjoxNjYwNjU0NTYwfQ.rc3qgCqziUl3FkhTb7SDfH95TZrbyICS50nxj1DOahQ
 
 {
     "data": {
-        "email": "user11@gmail.com",
+        "email": "giannisfragoulis21@gmail.com",
         "postid": 1785
     }
 }
@@ -217,11 +254,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
 POST http://localhost:3000/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIzVDEzOjAwOjQ1LjcyMFoiLCJpYXQiOjE2NTA3MTg4NDUsImV4cCI6MTY1NTkwMjg0NX0.d3mVR52EShOEtK3JMMgU3nmSQhdik0xmYmC15ZKkGoc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMTdUMTI6NTY6MDAuMzkwWiIsImlhdCI6MTY1NTQ3MDU2MCwiZXhwIjoxNjYwNjU0NTYwfQ.rc3qgCqziUl3FkhTb7SDfH95TZrbyICS50nxj1DOahQ
 
 {
     "data": {
-        "email": "user1@gmail.com"
+        "email": "giannisfragoulis21@gmail.com"
     }
 }
 
@@ -347,12 +384,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 // verify an insterested user to a post
 POST http://localhost:3000/verInterested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTMwVDA5OjMzOjAxLjM3MloiLCJpYXQiOjE2NDg2MzI3ODEsImV4cCI6MTY1MzgxNjc4MX0.b7OGqzEdz7TRaYwpcnHeA08_LVztbOS-FVr2GbyDSkU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaXNmcmFnb3VsaXMyMUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMi0wNi0xN1QxMzoxOTo0OC41NTVaIiwiaWF0IjoxNjU1NDcxOTg4LCJleHAiOjE2NjA2NTU5ODh9.8Qv-om9AF8ZYx6DeqTjZ71fpEykSBL859sre5dp-L1g
 
 {
     "data": {
-        "postid": 1785,
-        "piid": 358
+        "postid": 1337,
+        "piid": 2222
     }
 }
 
@@ -447,5 +484,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 ###
 #service that returns all the favourites of one user
 GET http://localhost:3000/getFavourites
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+###
+#service that returns all the favourites of one user
+GET http://192.168.1.7:3000/test
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
