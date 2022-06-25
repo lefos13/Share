@@ -1,2 +1,11 @@
 -fixed enddate in createpost
 -Deleted isvisible from database and from the object of user
+
+- Notification
+
+let data = {
+        type: "receiveInterest",
+        postid: postString,
+        email: emailAction,
+        fullname: user.fullname,
+      };

@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "giannisfragoulis21@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -185,11 +185,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
 POST http://localhost:3000/interested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMTdUMTI6NTY6MDAuMzkwWiIsImlhdCI6MTY1NTQ3MDU2MCwiZXhwIjoxNjYwNjU0NTYwfQ.rc3qgCqziUl3FkhTb7SDfH95TZrbyICS50nxj1DOahQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA2LTI0VDE1OjU0OjE0LjcxM1oiLCJpYXQiOjE2NTYwODYwNTQsImV4cCI6MTY2MTI3MDA1NH0.pYPCerytopoRmbIG2eY4rfkWxKzu0alHNuje6sKFKM4
 
 {
     "data": {
-        "email": "giannisfragoulis21@gmail.com",
+        "email": "user0@gmail.com",
         "postid": 1785
     }
 }
@@ -305,6 +305,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
         "page": 1
     }
 }
+###
+
+#service epistrefei post vasei id
+GET http://localhost:3000/getPostPerId?postid=1785
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA2LTIzVDA5OjU0OjU5LjI4MVoiLCJpYXQiOjE2NTU5NzgwOTksImV4cCI6MTY2MTE2MjA5OX0.F6jdTc8q-6szz0aRqzy-mtOv0reeoVUgp1neeKrSeJk
+
 ###
 
 //Διαγρφή post μαζί με τους ενδιαφερόμενους του post

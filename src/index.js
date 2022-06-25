@@ -5,6 +5,9 @@ var axios = require("axios");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 var fun = require("./utils/functions");
 var path = require("path");
+const moment = require("moment");
+const RFC_H = "d MMM YYYY hh:mm";
+const RFC_ONLYM = "d MMM YYYY";
 
 //limit the size of request
 var bodyParser = require("body-parser");
@@ -83,7 +86,6 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
     typeCast: true,
   },
 });
-const saltRounds = 10;
 
 const Users = require("./modules/user");
 const Posts = require("./modules/post");
@@ -91,8 +93,10 @@ const PostInterested = require("./modules/postinterested");
 const Reviews = require("./modules/review");
 const SearchPost = require("./modules/searchPost");
 const ToReview = require("./modules/toreview");
+const FcmToken = require("./modules/fcmtoken");
 const { values, hasIn, functions } = require("lodash");
 
+const saltRounds = 10;
 checkconnection();
 
 const schedule = require("node-schedule");
@@ -703,6 +707,8 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
   try {
     var email = req.body.data.email;
     var pass = req.body.data.pass;
+    console.log(req.body);
+    let fcmToken = req.body.data.fcmToken;
 
     var body = null;
 
@@ -740,12 +746,40 @@ app.post("/login", [authenticateToken], cors(corsOptions), async (req, res) => {
         //console.log(user.toJSON());
         let data = user.toJSON();
         data.password = null;
-        (data.photo = "images/" + data.email + ".jpeg"),
-          res.json({
-            message: "Επιτυχής είσοδος.",
-            user: data,
-            forceUpdate: false,
-          });
+
+        if (fcmToken != null) {
+          fcmData = {
+            email: email,
+            fcmToken: fcmToken,
+          };
+
+          FcmToken.findOne({
+            where: {
+              email: email,
+            },
+          })
+            .then((fcmUser) => {
+              if (fcmUser != null) {
+                fcmUser.update({ fcmToken: fcmToken }).catch((err) => {
+                  throw err;
+                });
+              } else {
+                FcmToken.create(fcmData).catch((err) => {
+                  throw err;
+                });
+              }
+            })
+            .catch((err) => {
+              throw err;
+            });
+        }
+
+        data.photo = "images/" + data.email + ".jpeg";
+        res.json({
+          message: "Επιτυχής είσοδος.",
+          user: data,
+          forceUpdate: false,
+        });
       } else {
         body = "Λάθος κωδικός.";
         res.status(405).json({ message: body });
@@ -1117,6 +1151,7 @@ app.post(
   cors(corsOptions),
   async (req, res) => {
     try {
+      let extra = req.body.extra;
       // console.log(req.query);
       var results = null;
       setTime(0);
@@ -1185,7 +1220,7 @@ app.post(
                   });
                 } else {
                   await PostInterested.create(row)
-                    .then((inter) => {
+                    .then(async (inter) => {
                       results = inter;
                       var data = {
                         body: results,
@@ -1193,7 +1228,7 @@ app.post(
                       };
                       res.json(data);
 
-                      const postForFunction = Posts.findOne({
+                      const postForFunction = await Posts.findOne({
                         where: {
                           postid: row.postid,
                         },
@@ -1201,7 +1236,11 @@ app.post(
                         throw err;
                       });
                       //Function to push notification to the owner of the post === FIREBASE
-                      toNotifyOwner(postForFunction.email, row.postid);
+                      fun.toNotifyOwner(
+                        postForFunction.email,
+                        extra,
+                        row.postid
+                      );
                     })
                     .catch((err) => {
                       console.log(err);
@@ -2369,6 +2408,95 @@ app.post(
           console.error(err);
           res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
         });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
+      });
+    }
+  }
+);
+
+//service that returns a post by its id
+app.get(
+  "/getPostPerId",
+  [authenticateToken],
+  cors(corsOptions),
+  async (req, res) => {
+    try {
+      // console.log(req.query);
+      var postid = req.query.postid;
+      let email = req.body.extra;
+
+      console.log(postid);
+
+      let post = await Posts.findOne({
+        where: {
+          postid: postid,
+        },
+      }).catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: "Κάτι πήγε στραβά.", body: null });
+      });
+
+      if (IsJsonString(post.moreplaces)) {
+        post.moreplaces = JSON.parse(post.moreplaces);
+      }
+
+      //set the language
+      moment.locale("el"); // or "en" depends on the header
+      //get the dates from the post
+      let newDate = moment(post.dataValues.date);
+      let startDate = moment(post.startdate);
+      let endDate = moment(post.enddate);
+      let returnStartDate = moment(post.returnStartDate);
+      let returnEndDate = moment(post.returnEndDate);
+
+      //convert to RFC format
+      post.dataValues.date = newDate.format(RFC_H);
+      post.dataValues.startdate = startDate.format(RFC_ONLYM);
+      post.dataValues.enddate = endDate.format(RFC_ONLYM);
+      post.dataValues.returnStartDate = returnStartDate.format(RFC_ONLYM);
+      post.dataValues.returnEndDate = returnEndDate.format(RFC_ONLYM);
+
+      // CHECK IF THE SEARCHER IS INTERESTED
+      let interested = false;
+      const postInt = await PostInterested.findOne({
+        where: {
+          email: email,
+          postid: postid,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+      // if the searcher is interested then true
+      postInt == null ? (interested = false) : (interested = true);
+
+      // find creator of post
+      const user = await Users.findOne({
+        attributes: {
+          exclude: ["password", "verified", "mobile"],
+        },
+        where: {
+          email: post.email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      // get average and count from reviews and insert them into the object
+      let extraData = await insertAver(user);
+      user.dataValues = { ...user.dataValues, ...extraData };
+
+      // change cardate format
+      user.cardate = parseInt(user.cardate, 10);
+
+      res.json({
+        imagePath: "images/" + post.email + ".jpeg",
+        interested: interested,
+        post: post,
+        user: user,
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({
