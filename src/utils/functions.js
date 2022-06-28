@@ -109,4 +109,128 @@ module.exports = {
       console.error(error);
     }
   },
+
+  toNotifyTheVerified: async (email, postid, ownerEmail) => {
+    try {
+      let postIdString = postid.toString();
+      const user = await Users.findOne({
+        where: {
+          email: ownerEmail,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      let fcmToken = await FcmToken.findOne({
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+      let message = {
+        data: {
+          type: "receiveApproval",
+          postid: postIdString,
+          email: user.email, // owner email
+          fullname: user.fullname, // owner email
+        },
+        token: fcmToken.fcmToken,
+        notification: {
+          title:
+            "Ο χρήστης " + user.fullname + " σας ενέκρινε να ταξιδέψετε μαζί!",
+          body: "TEST MESSAGE",
+        },
+      };
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  newRide: async (postid, emailArray, postOwner) => {
+    try {
+      // let users = await Users.findAll({
+      //   attributes: ["fullname"],
+      //   where: {
+      //     email: {
+      //       [Op.or]: emailArray,
+      //     },
+      //   },
+      // }).catch((err) => {
+      //   throw err;
+      // });
+      let owner = await Users.findOne({
+        where: {
+          email: postOwner,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      let fcmTokens = await FcmToken.findAll({
+        where: {
+          email: {
+            [Op.or]: emailArray,
+          },
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      // let allTokens = [];
+      let allMessages = [];
+      let postIdString = postid.toString();
+
+      for await (f of fcmTokens) {
+        let message = {
+          data: {
+            type: "newRide",
+            postid: postIdString,
+            email: owner.email, // owner email
+            fullname: owner.fullname, // owner email
+          },
+          token: f.fcmToken,
+          notification: {
+            title:
+              "Ο χρήστης " + owner.fullname + " έφτιαξε ένα ride που ζητήσατε!",
+            body: "TEST MESSAGE",
+          },
+        };
+        allMessages.push(message);
+        // allTokens.push(f.fcmToken);
+      }
+
+      admin
+        .messaging()
+        .sendAll(allMessages)
+        .then((response) => {
+          console.log("Success: " + response);
+        })
+        .catch((err) => {
+          console.log("Error to send massive notifications: " + err);
+        });
+      // admin
+      //   .messaging()
+      //   .send(message)
+      //   .then((response) => {
+      //     console.log("Success: ", response);
+      //   })
+      //   .catch((err) => {
+      //     throw err;
+      //   });
+
+      // console.log("ALL USERS TO BE NOTIFIED: " + string2); ///test log
+    } catch (error) {
+      console.log("Inside Newride  ============= " + error);
+    }
+  },
 };

@@ -903,6 +903,7 @@ app.post(
                 message: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
               };
               res.json(data);
+              //Firebase newRide notification
               pushNotifications(post);
             })
             .catch((err) => {
@@ -998,11 +999,7 @@ const pushNotifications = async (post) => {
     // HERE YOU SEND THE NOTIFICATIONS
     if (toSendNotification) {
       // Data for the notification, postid and the array of users
-      let dataToSend = {
-        post: post.postid,
-        users: arrayToNotify,
-      };
-      console.log("Notifications to send: ", dataToSend);
+      fun.newRide(post.postid, arrayToNotify, post.email);
     } else {
       console.log("No request is found to be valid for the new post");
     }
@@ -1276,14 +1273,6 @@ app.post(
     }
   }
 );
-
-const toNotifyOwner = async (ownerEmail, postid) => {
-  console.log("User to notify that someone is interested: ", ownerEmail);
-  console.log("Post of user that someone is interested: ", postid);
-  /*
-  CODE FOR THE FIREBASE NOTIFICATIONS
-  */
-};
 
 //service that is searching posts
 app.post(
@@ -1753,15 +1742,10 @@ app.post(
               HERE I MUST WRITE THE NEW CODE FOR THE REVIEWABLE
               */
 
-              let dateToCheck = new Date();
-              dateToCheck.setDate(dateToCheck.getDate() + -1);
-              dateToCheck =
-                dateToCheck.getFullYear() +
-                "-" +
-                String(dateToCheck.getMonth() + 1).padStart(2, "0") +
-                "-" +
-                String(dateToCheck.getDate()).padStart(2, "0");
-              // console.log("Date to check:", dateToCheck);
+              let dateToCheck = moment()
+                .date(moment().get("date") - 1)
+                .format("MM-DD-YYYY");
+              // console.log(dateToCheck);
 
               // FIND THE ROWS THAT I AM A PASSENGER OR DRIVER AND THE POST IS ALREADY FINISHED BY A DAY
               let possibleReviews = await ToReview.findAll({
@@ -1809,6 +1793,7 @@ app.post(
 
               //================= Section for isVisible... Check if the user can see the other's user phone ================
               let isVisible = false;
+              console.log("CHECK: " + searcherEmail + " AND " + data.email);
               if (searcherEmail != data.email) {
                 // && found.isVisible == true
                 //CHECK IF THE PHONE SOULD BE VISIBLE
@@ -1826,6 +1811,7 @@ app.post(
 
                 // For each post of both users, find interest that is verified by the owner of the post
                 for await (p of posts) {
+                  console.log("FOUND POST TO CHECK FOR IS VISIBLE!");
                   const pInt = await PostInterested.findOne({
                     where: {
                       postid: p.postid,
@@ -1838,6 +1824,9 @@ app.post(
 
                   // IF you find a verification, then make isVisible=true
                   if (pInt != null) {
+                    console.log(
+                      "FOUND THAT ONE OF TWO ARE INTERESTED TO " + p.postid
+                    );
                     isVisible = true;
                   }
                 }
@@ -3083,7 +3072,7 @@ app.post(
           });
 
           // push notification to the user that was interested ---- FIREBASE
-          toNotifyTheVerified(results.email, post.postid);
+          fun.toNotifyTheVerified(results.email, post.postid, post.email);
         } else {
           //unverify the interested user
           results.update({ isVerified: false, isNotified: false });
@@ -3162,20 +3151,6 @@ app.post(
     // console.log(req.query);
   }
 );
-
-//FIREBASE NOTIFICATION FUNCTION FOR VERIFIED
-const toNotifyTheVerified = (emailToNotify, postId) => {
-  console.log("Email to be notified that got verified: ", emailToNotify);
-  console.log("Postid of the post that got verified: ", postId);
-  /* Here you write the code for the firebase
-  .
-  .
-  .
-  .
-  .
-  .
-  */
-};
 
 //service for notification for reviews
 app.get(

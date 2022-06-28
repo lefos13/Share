@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -147,15 +147,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 #service pou ftiaxneis ena post
 POST http://localhost:3000/createpost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAzVDE2OjA0OjAyLjE5MFoiLCJpYXQiOjE2NDYzMjM0NDIsImV4cCI6MTY1MTUwNzQ0Mn0.lx4Z5sj9VopjkLQuJp_xjkey-hY23dInagKmv9oh1VU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA2LTI2VDE2OjUyOjIzLjIyOFoiLCJpYXQiOjE2NTYyNjIzNDMsImV4cCI6MTY2MTQ0NjM0M30._PWmI7NvBmjRG3cPF0-fPJLQw0-gDbmkuMclk5HD57U
 
 {
     "data": {
-        "email": "user0@gmail.com",
-        "date": "2021-10-05",
-        "startplace": "ασδ",
+        "email": "user1@gmail.com",
+        "date": "2022-06-26",
+        "startplace": "Βόλος",
         "startcoord": "1234",
-        "endplace": "δσα",
+        "endplace": "Αθήνα",
         "endcoord": "3215",
         "numseats": 2,
         "startdate": "2022-04-22",
@@ -254,11 +254,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
 POST http://localhost:3000/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMTdUMTI6NTY6MDAuMzkwWiIsImlhdCI6MTY1NTQ3MDU2MCwiZXhwIjoxNjYwNjU0NTYwfQ.rc3qgCqziUl3FkhTb7SDfH95TZrbyICS50nxj1DOahQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMjhUMTA6MDE6MjguNTQ2WiIsImlhdCI6MTY1NjQxMDQ4OCwiZXhwIjoxNjYxNTk0NDg4fQ.slJRmEVRCTz3GFmEG3jG_qIl_Ig5WODy_GyU2EMIZvA
 
 {
     "data": {
-        "email": "giannisfragoulis21@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
