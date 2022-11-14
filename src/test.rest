@@ -1,10 +1,10 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
-POST http://localhost:3000/createtoken
+POST http://localhost:3000/users/createtoken
 Content-Type: application/json
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -13,7 +13,7 @@ Content-Type: application/json
 #service pou kanei update to password you user sth vash
 POST http://localhost:3000/updateUserPass
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEwLTI2VDE0OjU3OjI4LjI5MVoiLCJpYXQiOjE2NjY3OTYyNDgsImV4cCI6MTY3MTk4MDI0OH0.aqDYU4dG3OfcVJ39eiLxiAAqU2y8V8-A_1dLpfDq2EA
 
 {
     "data":{
@@ -64,7 +64,7 @@ Content-Type: application/json
 ###
 
 #service pou kanei verify to xrhsth sth vash dedomenwn, afou kanei epibebaiwsh to otp tou ston client
-POST http://localhost:3000/verify
+POST http://localhost:3000/users/verify
 Content-Type: application/json
 
 {
@@ -76,9 +76,9 @@ Content-Type: application/json
 ###
 
 #service pou elegxei ta stoixeia tou xrhsth otan kanei login
-POST http://localhost:3000/login
+POST http://localhost:3000/users/login
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDMtMzBUMDk6NDU6MTEuMjYyWiIsImlhdCI6MTY0ODYzMzUxMSwiZXhwIjoxNjUzODE3NTExfQ.6LpmT-6L4gQV2lv35sAsFbLs8kz1fBlt_YGIwA4H-vU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMDhUMTk6MzY6MDcuMDIyWiIsImlhdCI6MTY2NzkzNjE2NywiZXhwIjoxNjczMTIwMTY3fQ.Rm7X-PLNZBFnmAEssYrXCJr1Mxv_KxnoGa0ojWbfG_E
 
 {
     "data":{
@@ -90,7 +90,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service poy stelnei otp ston xrhsth kai ston client gia epibebaiwsh
-POST http://localhost:3000/passotp
+POST http://localhost:3000/users/passotp
 Content-Type: application/json
 
 {
@@ -183,31 +183,31 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQ
 ###
 
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
-POST http://localhost:3000/interested
+POST http://localhost:3000/posts/interested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA2LTI0VDE1OjU0OjE0LjcxM1oiLCJpYXQiOjE2NTYwODYwNTQsImV4cCI6MTY2MTI3MDA1NH0.pYPCerytopoRmbIG2eY4rfkWxKzu0alHNuje6sKFKM4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
-        "email": "user0@gmail.com",
-        "postid": 1785
+        "email": "lefterisevagelinos1996@gmail.com",
+        "postid": 1809
     }
 }
 
 ###
 
 #service pou sou epistrefei lista me posts (paginated ana 20 kai ordered me vasi imeromhnia)
-POST http://localhost:3000/searchposts
+POST http://localhost:3000/posts/searchposts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTI2VDEwOjEwOjM2LjM2MloiLCJpYXQiOjE2NDgyODk0MzYsImV4cCI6MTY1MzQ3MzQzNn0.hJuHGobUWSGm1IIKxTFSsLzy93gRnFkOn47Hdzd289M
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
         "email": "cs11082@uniwa.gr",
-        "startplace": "ασsδ",
-        "startcoord": "123",
-        "endplace": "dsa",
-        "endcoord": "321",
+        "startplace": "ασδ",
+        "startcoord": "1234",
+        "endplace": "δσα",
+        "endcoord": "3215",
         "startdate": null,
         "enddate": null,
         "page": 1,
@@ -252,22 +252,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 ###
 
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
-POST http://localhost:3000/searchuser
+POST http://localhost:3000/users/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMjhUMTA6MDE6MjguNTQ2WiIsImlhdCI6MTY1NjQxMDQ4OCwiZXhwIjoxNjYxNTk0NDg4fQ.slJRmEVRCTz3GFmEG3jG_qIl_Ig5WODy_GyU2EMIZvA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE0VDE2OjU1OjEwLjgzNFoiLCJpYXQiOjE2Njg0NDQ5MTAsImV4cCI6MTY3MzYyODkxMH0.eSGiSvs_eqz7ipo7uOH76c_JFPzCXEgOax-I9wYxvfM
 
 {
     "data": {
-        "email": "user0@gmail.com"
+        "email": "user1@gmail.com"
     }
 }
 
 ###
 
 #get reviews
-POST http://localhost:3000/getReviews
+POST http://localhost:3000/reviews/getReviews
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
@@ -279,16 +279,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxM
 ###
 
 #Service pou eisagei ena review sth vash
-POST http://localhost:3000/createreview
+POST http://localhost:3000/reviews/createreview
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAyLTI2VDE1OjQ5OjQwLjI4OFoiLCJpYXQiOjE2NDU4OTA1ODAsImV4cCI6MTY1MTA3NDU4MH0.RVDRHuPubDnW-W8kXAEhpV77cppmfMdSYbwMPPeCWvU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
         "emailreviewer": "user0@gmail.com",
         "email": "user1@gmail.com",
         "rating": 4,
-        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια UPDATED"
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
     }
 }
 
@@ -446,9 +446,9 @@ Content-Type: multipart/form-data; boundary=---
 
 ###
 
-POST http://localhost:3000/createRequest
+POST http://localhost:3000/requests/createRequest
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTMxVDE0OjU5OjU3LjMxOVoiLCJpYXQiOjE2NDg3Mzg3OTcsImV4cCI6MTY1MzkyMjc5N30.-AcV8wZojWxyEM9PWMdrY2VI1cK6aN--7_6ZDYafJ8c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
 
 {
     "data": {
@@ -461,18 +461,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQ
 
 ###
 
-GET http://localhost:3000/getRequests
+GET http://localhost:3000/requests/getRequests
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
 
 ###
-POST http://localhost:3000/deleteRequest
+POST http://localhost:3000/requests/deleteRequest
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
 
 {
     "data": {
-        "postSearchId": 6
+        "postSearchId": 19
     }
 }
 
@@ -499,3 +499,76 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 GET http://192.168.1.7:3000/test
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+
+###
+#ALL NEW APIS 
+POST http://localhost:3000/posts/createPost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEwLTI2VDE0OjU3OjI4LjI5MVoiLCJpYXQiOjE2NjY3OTYyNDgsImV4cCI6MTY3MTk4MDI0OH0.aqDYU4dG3OfcVJ39eiLxiAAqU2y8V8-A_1dLpfDq2EA
+
+{
+    "data": {
+        "email": "user0@gmail.com",
+        "date": "2021-10-05",
+        "startplace": "ασδ",
+        "startcoord": "1234",
+        "endplace": "δσα",
+        "endcoord": "3215",
+        "numseats": 2,
+        "startdate": "2022-04-22",
+        "enddate": null,
+        "returnStartDate": null,
+        "returnEndDate": null,
+        "withReturn": false,
+        "costperseat": 40,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "petAllowed": true,
+        "isFavourite": false,
+        "moreplaces": [
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            },
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            }
+        ]
+    }
+}
+
+###
+POST http://localhost:3000/users/register
+Content-Type: application/json
+
+{
+    "data":{
+        "email": "lollololol@opa.com",
+        "password": "12345",
+        "mobile": "6975620785",
+        "fullname": "lefos evan",
+        "gender": "male",
+        "car": null,
+        "cardate": null,
+        "age": "26",
+        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
+    }
+}
+
+###
+POST http://localhost:3000/users/updateProfile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEwLTI2VDE0OjU3OjI4LjI5MVoiLCJpYXQiOjE2NjY3OTYyNDgsImV4cCI6MTY3MTk4MDI0OH0.aqDYU4dG3OfcVJ39eiLxiAAqU2y8V8-A_1dLpfDq2EA
+
+{
+    "data": {
+        "fullname": "George1",
+        "mobile": "6975620785",
+        "age": 25,
+        "facebook": null,
+        "instagram": null,
+        "car": "nissan",
+        "cardate": "1996",
+        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
+    }
+}

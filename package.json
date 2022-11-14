@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "body-parser": "^1.19.2",
-    "fs": "^0.0.1-security"
-  }
-}

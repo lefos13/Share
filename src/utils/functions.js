@@ -10,6 +10,10 @@ admin.initializeApp({
   credential: admin.credential.applicationDefault(),
   // databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
 });
+
+var _ = require("lodash");
+
+const Review = require("../database/Review");
 const { EMAIL, PASSEMAIL, DATABASE, USER, PASS, HOST } = process.env;
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
@@ -231,6 +235,109 @@ module.exports = {
       // console.log("ALL USERS TO BE NOTIFIED: " + string2); ///test log
     } catch (error) {
       console.log("Inside Newride  ============= " + error);
+    }
+  },
+
+  insertAver: async (user) => {
+    try {
+      //define the query for the db call
+      let query = {
+        attributes:
+          // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+          [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+        where: {
+          email: user.email,
+        },
+      };
+      let results = await Review.findAndCountAll(query);
+
+      if (results.count != 0) {
+        let rows = results.rows;
+        let total = null;
+        for await (r of rows) {
+          total = r.toJSON().total;
+        }
+        let average = total / results.count;
+        let rounded = average.toFixed(1);
+        rounded = parseFloat(rounded);
+        let count = results.count;
+        return {
+          average: rounded,
+          count: count,
+        };
+      } else {
+        let average = 0;
+        let count = 0;
+        return {
+          average: average,
+          count: count,
+        };
+      }
+    } catch (err) {
+      console.error("inside InsertAver()" + err);
+      return false;
+    }
+  },
+
+  applyFilters: async (data, array) => {
+    try {
+      if (data.age != null) {
+        // afairese ta post twn xrhstwn pou einai panw apo data.age_end
+        array = _.filter(array, (obj) => {
+          return parseInt(obj.user.age) <= data.age_end;
+        });
+        // afairese ta post twn xrhstwn pou einai katw apo data.age
+        array = _.filter(array, (obj) => {
+          return parseInt(obj.user.age) >= data.age;
+        });
+      }
+      if (data.car != null) {
+        //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
+        array = _.filter(array, (obj) => {
+          return obj.user.car == data.car;
+        });
+      }
+      if (data.cardate != null) {
+        //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
+        array = _.filter(array, (obj) => {
+          data.cardate = parseInt(data.cardate, 10);
+          obj.user.cardate = parseInt(obj.user.cardate, 10);
+          return parseInt(obj.user.cardate) >= data.cardate;
+        });
+      }
+      if (data.gender != null) {
+        //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
+        array = _.filter(array, (obj) => {
+          return obj.user.gender == data.gender;
+        });
+      }
+      if (data.withReturn != null) {
+        //afairese ta post twn xrhstwn pou den exoun epistrofh
+        array = _.filter(array, (obj) => {
+          let postStartDate = new Date(obj.post.returnStartDate);
+          let postEndDate = new Date(obj.post.returnEndDate);
+          let searchStartDate = new Date(data.returnStartDate);
+          let searchEndDate = new Date(data.returnEndDate);
+
+          return (
+            obj.post.withReturn == true &&
+            ((searchStartDate.getTime() >= postStartDate.getTime() &&
+              searchStartDate.getTime() <= postEndDate.getTime()) ||
+              (searchEndDate.getTime() <= postEndDate.getTime() &&
+                searchEndDate.getTime() >= postStartDate.getTime()) ||
+              (searchStartDate.getTime() <= postStartDate.getTime() &&
+                searchEndDate.getTime() >= postEndDate.getTime()))
+          );
+        });
+      }
+      if (data.petAllowed != null) {
+        array = _.filter(array, (obj) => {
+          return obj.post.petAllowed == data.petAllowed;
+        });
+      }
+      return array;
+    } catch (error) {
+      return false;
     }
   },
 };

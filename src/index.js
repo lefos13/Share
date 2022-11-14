@@ -96,6 +96,45 @@ const ToReview = require("./modules/toreview");
 const FcmToken = require("./modules/fcmtoken");
 const { values, hasIn, functions } = require("lodash");
 
+function authenticateToken(req, res, next) {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    // console.log(token);
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, TOKEN_KEY, (err, email) => {
+      if (err)
+        return res.json({
+          body: null,
+          message: "Token expired or didnt even exist",
+        });
+      else {
+        // console.log("inside auth: " + JSON.stringify(req.body.data));
+        // console.log("Athenticated: " + email.email + "lol");
+        console.log("Authenticated:", email.email);
+        req.body["extra"] = email.email;
+      }
+      next();
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Something went wrong!" });
+  }
+}
+//ROUTES IMPORT
+
+// *** ADD ***
+const v1PostRouter = require("./v1/routes/postRoutes");
+const v1UserRouter = require("./v1/routes/userRoutes");
+const v1RequestRouter = require("./v1/routes/requestRoutes");
+const v1ReviewRouter = require("./v1/routes/reviewsRoutes");
+
+app.use("/reviews", v1ReviewRouter);
+app.use("/requests", v1RequestRouter);
+app.use("/posts", v1PostRouter);
+app.use("/users", v1UserRouter);
+// === END OF ROUTES IMPORT
 const saltRounds = 10;
 checkconnection();
 
@@ -148,241 +187,6 @@ const deleteOldPosts = schedule.scheduleJob("0 0 1 */1 *", async function () {
     console.error(err);
   }
 });
-
-// instertPosts();
-const insertReviews = async (main, second) => {
-  let pseudo = 0;
-  let data = {
-    email: main,
-    emailreviewer: second + pseudo,
-    rating: 5,
-    text: "",
-  };
-  for (let i = 0; i <= 100; i++) {
-    data.text = " FAKE REVIEW NUMBER: " + i;
-    await Reviews.create(data)
-      .then((res) => {
-        data.rating >= 5 ? (data.rating = 1) : data.rating++;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-    pseudo++;
-    data.emailreviewer = second + pseudo;
-  }
-};
-async function insertPosts(email) {
-  try {
-    var data = {
-      email: email,
-      date: "2021-10-06",
-      startplace: "Τρίκαλα",
-      startcoord: "39.5557317,21.7678951",
-      endplace: "Γαλατάς",
-      endcoord: "35.498456,23.9630835",
-      numseats: 2,
-      startdate: "2021-12-15",
-      enddate: "2021-12-16",
-      costperseat: 25,
-      comment: "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-      moreplaces: [
-        {
-          place: "Αθήνα",
-          placecoords: "37.9838096,23.7275388",
-        },
-      ],
-    };
-
-    var startplace = "Αθήνα";
-    var endplace = "Θεσσαλονίκη";
-    var startcoord = "37.9838096,23.7275388";
-    var endcoord = "40.6400629,22.9444191";
-    var numseats = 1;
-    var costperseat = 0;
-    var moreplaces = [
-      {
-        place: "Γαλατάς",
-        placecoords: "35.498456,23.9630835",
-      },
-    ];
-
-    setTime(0);
-    var datetime = new Date().today() + " " + new Date().timeNow();
-    data.date = datetime;
-
-    // dates(data);
-    var counter = 0;
-    for (var i = 0; i <= 50; i++) {
-      if (numseats < 3) numseats++;
-      else numseats = 0;
-      data.numseats = numseats;
-
-      costperseat++;
-      data.costperseat = costperseat;
-
-      if (i > 24) {
-        data.email = "cs141082@uniwa.gr";
-        data.startcoord = startcoord;
-        data.endcoord = endcoord;
-        data.startplace = startplace;
-        data.endplace = endplace;
-        data.moreplaces = moreplaces;
-      }
-
-      var today = new Date();
-      dates();
-
-      await Posts.create(data)
-        .then((data) => {
-          // console.log(data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  } catch (error) {
-    console.error("Something Went wrong: " + error);
-  }
-
-  function dates() {
-    if (counter + today.getDate() <= 21) {
-      var dd = String(today.getDate() + counter).padStart(2, "0");
-      var dd2 = String(today.getDate() + counter + 5).padStart(2, "0");
-      var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-      var mm2 = String(today.getMonth() + 2).padStart(2, "0"); //January is 0!
-      var yyyy = today.getFullYear();
-
-      today = yyyy + "-" + mm + "-" + dd;
-      var lastday = yyyy + "-" + mm2 + "-" + dd2;
-
-      var tempdate = new Date();
-      setTime(tempdate.getDate() > counter && counter < 0 ? -counter : 0);
-      // setTime(2);
-      data.date = new Date().today() + " " + new Date().timeNow();
-      data.startdate = today;
-      data.enddate = lastday;
-      counter++;
-      // console.log(data);
-    } else {
-      counter = counter - 20;
-      var dd = String(today.getDate() - counter).padStart(2, "0");
-      var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-      var mm2 = String(today.getMonth() + 2).padStart(2, "0"); //January is 0!
-      var yyyy = today.getFullYear();
-
-      today = yyyy + "-" + mm + "-" + dd;
-      var lastday = yyyy + "-" + mm2 + "-" + dd;
-      setTime(0);
-      data.date = new Date().today() + " " + new Date().timeNow();
-      console.log("data.date: " + data.date + " counter: " + counter);
-      console.log("today: " + today + " counter: " + counter);
-      console.log("lastday: " + lastday + " counter: " + counter);
-      data.startdate = today;
-      data.enddate = lastday;
-      // console.log(data2);
-    }
-  }
-}
-
-//eisagwgh endiaferomenwn gia ena post
-const insertInterested = async (postid) => {
-  try {
-    setTime(0);
-    var curtime = new Date().today() + " " + new Date().timeNow();
-    let data = {
-      email: "lefterisevagelinos@gmail.com",
-      postid: postid,
-      date: curtime,
-      isVerified: false,
-      isNotified: false,
-      ownerNotified: false,
-    };
-    for (let i = 0; i < 70; i++) {
-      data.email = "lefterisevagelinos1996@gmail.com" + i;
-      await PostInterested.create(data).catch((err) => {
-        console.error(err);
-        return 0;
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    return 0;
-  }
-};
-
-//eisagwgh endiaferwn gia enan xrhsth se polla post
-const insertInterested2 = async (postidList, mainEmail) => {
-  try {
-    setTime(0);
-    var curtime = new Date().today() + " " + new Date().timeNow();
-    let data = {
-      email: mainEmail,
-      postid: 0,
-      date: curtime,
-    };
-    for await (id of postidList) {
-      data.postid = id;
-      await PostInterested.create(data).catch((err) => {
-        console.error(err);
-        return 0;
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    return 0;
-  }
-};
-
-function authenticateToken(req, res, next) {
-  try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    // console.log(token);
-    if (token == null) return res.sendStatus(401);
-
-    jwt.verify(token, TOKEN_KEY, (err, email) => {
-      if (err)
-        return res.json({
-          body: null,
-          message: "Token expired or didnt even exist",
-        });
-      else {
-        // console.log("inside auth: " + JSON.stringify(req.body.data));
-        // console.log("Athenticated: " + email.email + "lol");
-        console.log("Authenticated:", email.email);
-        req.body["extra"] = email.email;
-      }
-      next();
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Something went wrong!" });
-  }
-}
-
-// sunarthsh poy eisagei fake users (70) ---- gia testing --- password 12356
-const insertUsers = async () => {
-  let arr = [];
-  for (let i = 0; i < 70; i++) {
-    arr.push({
-      email: "user" + i + "@gmail.com",
-      password: "$2b$10$GsLPti1c129vcZdPdK8gk.VDX1oSHyWfg.I7Rh77tKvtZEWtl9nJ.",
-      mobile: "12313",
-      fullname: "lefos evan",
-      gender: "male",
-      car: "toyota",
-      cardate: "1996",
-      age: "26",
-      photo: "12131231",
-      verified: true,
-    });
-  }
-
-  // console.log(arr);
-  Users.bulkCreate(arr).catch((err) => {
-    console.error(err);
-  });
-};
 
 //cors configuration
 const whitelist = ["*"];
@@ -451,11 +255,6 @@ async function verification(otp, email) {
   }
 }
 
-app.get("/test", async (req, res) => {
-  res.json({
-    did: "asd",
-  });
-});
 //rest api service that registers the user to the database, checks if he already exists and sends an otp for verification.
 app.post("/register", [], cors(corsOptions), async (req, res) => {
   try {
@@ -873,8 +672,8 @@ app.post(
       var postdate = new Date().today() + " " + new Date().timeNow();
       data.date = postdate;
       if (data.withReturn == false) {
-        data.returnStartDate = 0000 - 00 - 00;
-        data.returnEndDate = 0000 - 00 - 00;
+        data.returnStartDate = moment();
+        data.returnEndDate = moment();
       }
       // fix gia to enddate==null
       if (data.enddate == null) {
@@ -2020,7 +1819,7 @@ app.post(
             });
 
             if (possibleReview == null) {
-              throw err + " H KATAGRAFH STON PINAKA TO REVIEWS DEN UPARXEI";
+              throw " H KATAGRAFH STON PINAKA TO REVIEWS DEN UPARXEI";
             }
 
             // if the reviewer is the driver then update the driver
@@ -2046,6 +1845,7 @@ app.post(
                   throw err;
                 });
             }
+
             await Reviews.findAndCountAll({
               attributes:
                 // [sequelize.fn("count", sequelize.col("rating")), "counter"],
@@ -2220,22 +2020,6 @@ app.post(
     }
   }
 );
-
-//database posts and reviews population
-app.post("/dbMigration", [], cors(corsOptions), async (req, res) => {
-  try {
-    var data = req.body.data;
-    // insertPosts(data.mainEmail);
-    // insertReviews(data.mainEmail, data.secondaryEmail);
-    insertInterested(data.postid);
-    // insertInterested2(data.postidList, data.mainEmail);
-    // insertUsers();
-    res.send("σωστο");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Λαθος");
-  }
-});
 
 const getCurDate = async (dif) => {
   try {
