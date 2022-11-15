@@ -58,6 +58,13 @@ router.post(
   postController.searchPosts
 );
 
+router.post(
+  "/getPostsUser",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.getPostsUser
+);
+
 router.patch("/:postId", postController.updateOnePost);
 
 router.delete("/:postId", postController.deleteOnePost);

@@ -143,6 +143,25 @@ const findOneUserQuery = async (query) => {
   }
 };
 
+const findOneLight = async (email) => {
+  try {
+    const user = await Users.findOne({
+      attributes: {
+        exclude: ["password", "verified", "facebook", "instagram", "mobile"],
+      },
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return user;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 const userVerify = async (email) => {
   try {
     // console.log(email);
@@ -174,4 +193,5 @@ module.exports = {
   updatePassUser,
   userVerify,
   findOneUserQuery,
+  findOneLight,
 };

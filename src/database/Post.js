@@ -160,6 +160,23 @@ const countAllPastHalfYear = async (email, today) => {
   }
 };
 
+const findAllPastHalfYear = async (email, today) => {
+  try {
+    const all = await Posts.findAndCountAll({
+      where: {
+        email: email,
+        enddate: { [Op.gte]: today },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return all;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 const countFavourites = async (email) => {
   try {
     const countFavourites = await Posts.count({
@@ -199,4 +216,5 @@ module.exports = {
   countAllPastHalfYear,
   countFavourites,
   countPostsQuery,
+  findAllPastHalfYear,
 };

@@ -2138,8 +2138,9 @@ app.post(
               // console.error("provlima sto get posts user");
               throw err;
             });
+
             let flag;
-            interested === null ? (flag = false) : (flag = true);
+            interested == null ? (flag = false) : (flag = true);
 
             // endiaferomoi gia ena sygekrimeno post
             const countInt = await PostInterested.count({

@@ -120,6 +120,23 @@ const findAny = async (email) => {
   // code to count posts of a user the current day
 };
 
+const countInterestedOfPost = async (postid, email) => {
+  try {
+    const countInt = await PostInterested.count({
+      where: {
+        postid: postid,
+        email: { [Op.ne]: email },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return countInt;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 // *** ADD ***
 
 module.exports = {
@@ -128,4 +145,5 @@ module.exports = {
   getCountOfUser,
   createInterest,
   findAny,
+  countInterestedOfPost,
 };

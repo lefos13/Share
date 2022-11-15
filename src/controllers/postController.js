@@ -49,6 +49,19 @@ const searchPosts = async (req, res) => {
   }
 };
 
+const getPostsUser = async (req, res) => {
+  try {
+    let data = await postService.getPostsUser(req);
+    if (data.status == 500) {
+      throw "Error";
+    }
+    res.status(data.status).json(data.data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
 module.exports = {
   getAllPosts,
   getOnePost,
@@ -57,4 +70,5 @@ module.exports = {
   deleteOnePost,
   interested,
   searchPosts,
+  getPostsUser,
 };

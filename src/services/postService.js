@@ -323,6 +323,111 @@ const searchPosts = async (req) => {
   }
 };
 
+const getPostsUser = async (req) => {
+  try {
+    var data = req.body.data;
+    let array = [];
+
+    let today = moment().subtract(6, "months");
+    let found = await Post.findAllPastHalfYear(data.email, today);
+    if (found == false) {
+      throw new Error("Error with finding the posts of the user");
+    }
+
+    let rows = found.rows;
+    let count = found.count;
+    //PAGINATION
+    let skipcount = 0;
+    let takecount = 10;
+    if (data.page > 1) skipcount = data.page * 10 - 10;
+    let finalarr = _.take(_.drop(rows, skipcount), takecount);
+    let mod = count % 10;
+    let totallength = 1;
+    mod == 0
+      ? (totallength = count / 10)
+      : (totallength = count / 10 - mod / 10 + 1);
+
+    for await (post of finalarr) {
+      if (IsJsonString(post.moreplaces)) {
+        post.moreplaces = JSON.parse(post.moreplaces);
+      }
+
+      post.dataValues.date = moment(post.dataValues.date).format(
+        "DD MMM YYYY HH:mm"
+      );
+      console.log(post.dataValues.date);
+
+      post.dataValues.startdate = moment(post.dataValues.startdate).format(
+        "DD MMM YYYY"
+      );
+      post.dataValues.enddate = moment(post.dataValues.enddate).format(
+        "DD MMM YYYY"
+      );
+
+      post.dataValues.returnStartDate = moment(
+        post.dataValues.returnStartDate
+      ).format("DD MMM YYYY");
+
+      post.dataValues.returnEndDate = moment(
+        post.dataValues.returnEndDate
+      ).format("DD MMM YYYY");
+      let image = "images/" + post.email + ".jpeg";
+
+      let rows = found.rows;
+      let count = found.count;
+      //get the data of user
+      let user = await User.findOneLight(post.email);
+      if (user == false) {
+        throw new Error("Error at finding user");
+      }
+
+      let reviewData = await insertAver(user);
+      user.dataValues = { ...user.dataValues, ...reviewData };
+
+      let interested = await PostInterested.findOne(post.email, post.postid);
+      if (interested == false) {
+        throw new Error("Error at getting the interested of a post");
+      }
+      let flag;
+      interested == null ? (flag = false) : (flag = true);
+      const countInt = await PostInterested.countInterestedOfPost(
+        post.postid,
+        data.email
+      );
+
+      if (countInt == null) {
+        throw new Error("Error at counting the interested of a single post");
+      }
+
+      let moreUsers = false;
+
+      if (countInt > 0) moreUsers = true;
+
+      let results = {
+        user: user,
+        imagePath: image,
+        post: post,
+        hasMoreUsers: moreUsers,
+        countUsers: countInt,
+        interested: flag,
+      };
+      array.push(results);
+    }
+
+    let response = {
+      postUser: array,
+      totalPages: totallength,
+      totalLength: count,
+      pageLength: finalarr.length,
+    };
+
+    return { status: 200, data: response };
+  } catch (error) {
+    console.log(error);
+    return { status: 500, message: "Κάτι πήγε στραβά!" };
+  }
+};
+
 function IsJsonString(str) {
   try {
     JSON.parse(str);
@@ -340,4 +445,5 @@ module.exports = {
   deleteOnePost,
   interested,
   searchPosts,
+  getPostsUser,
 };
