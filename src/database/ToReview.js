@@ -128,9 +128,167 @@ const setPassengerDone = async (possibleReview) => {
     return false;
   }
 };
+
+const findIfExists = async (email1, email2) => {
+  try {
+    const toReviewExists = await ToReview.findOne({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [{ driverEmail: email1 }, { passengerEmail: email1 }],
+          },
+          {
+            [Op.or]: [{ driverEmail: email2 }, { passengerEmail: email2 }],
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return toReviewExists;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const createOne = async (driverEmail, passengerEmail, endDate, piid) => {
+  try {
+    const newToReview = await ToReview.create({
+      driverEmail: driverEmail,
+      passengerEmail: passengerEmail,
+      endDate: endDate,
+      piid: piid,
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const reverseUsers = async (
+  toReview,
+  driverEmail,
+  passengerEmail,
+  piid,
+  enddate
+) => {
+  try {
+    console.log(enddate);
+    const newToReview = await toReview
+      .update({
+        driverEmail: driverEmail,
+        passengerEmail: passengerEmail,
+        piid: piid,
+        endDate: enddate,
+      })
+      .catch((err) => {
+        throw err;
+      });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const resetFlags = async (toReviewExists, piid) => {
+  try {
+    await toReviewExists
+      .update({
+        driverDone: false,
+        passengerDone: false,
+        piid: piid,
+      })
+      .catch((err) => {
+        throw err;
+      });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const updateInVer = async (
+  driverEmail,
+  passengerEmail,
+  piid,
+  enddate,
+  oldpiid
+) => {
+  try {
+    ToReview.update(
+      {
+        driverEmail: driverEmail,
+        passengerEmail: passengerEmail,
+        piid: piid,
+        endDate: enddate,
+      },
+      {
+        where: {
+          piid: oldpiid,
+        },
+      }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const deleteOne = async (piid) => {
+  try {
+    await ToReview.destroy({
+      where: {
+        piid: results.piid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const findAllMyFinished = async (passengerEmail, driverEmail, dateToCheck) => {
+  try {
+    let possibleReviews = await ToReview.findAll({
+      where: {
+        [Op.or]: [
+          { passengerEmail: passengerEmail },
+          { driverEmail: driverEmail },
+        ],
+        endDate: { [Op.lte]: dateToCheck },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return possibleReviews;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
 module.exports = {
   findForProfile,
   findForCreatingReview,
   setDriverDone,
   setPassengerDone,
+  findIfExists,
+  createOne,
+  reverseUsers,
+  resetFlags,
+  updateInVer,
+  deleteOne,
+  findAllMyFinished,
 };

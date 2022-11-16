@@ -98,6 +98,19 @@ const searchUser = async (req, res) => {
   }
 };
 
+const notifyMe = async (req, res) => {
+  try {
+    const results = await userService.notifyMe(req);
+    if (results.status == 500) throw "error";
+    else if (results.status == 404)
+      res.status(404).json({ message: results.message });
+    else res.status(results.status).json(results.data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getOneUser,
@@ -110,4 +123,5 @@ module.exports = {
   login,
   sendOtp,
   searchUser,
+  notifyMe,
 };

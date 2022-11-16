@@ -62,6 +62,99 @@ const getPostsUser = async (req, res) => {
   }
 };
 
+const getPostPerId = async (req, res) => {
+  try {
+    let data = await postService.getPostPerId(req);
+    if (data.status == 500) {
+      throw "Error";
+    }
+    res.status(data.status).json(data.data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
+const getInterestedPerUser = async (req, res) => {
+  try {
+    let data = await postService.getInterestedPerUser(req);
+    if (data.status == 500) {
+      throw "Error";
+    } else if (data.status == 404) {
+      res.status(404).json({ message: data.data });
+    } else {
+      res.status(data.status).json(data.data);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
+const getIntPost = async (req, res) => {
+  try {
+    let data = await postService.getIntPost(req);
+    if (data.status == 500) {
+      throw "Error";
+    } else if (data.status == 404) {
+      res.status(404).json({ message: data.data });
+    } else {
+      res.status(data.status).json(data.data);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
+const deletePost = async (req, res) => {
+  try {
+    let data = await postService.deletePost(req);
+    if (data.status == 500) {
+      throw "Error";
+    } else if (data.status == 404) {
+      res.status(404).json({ message: data.message });
+    } else {
+      res.status(data.status).json({ message: data.message });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
+const deleteInterested = async (req, res) => {
+  try {
+    let data = await postService.deleteInterested(req);
+    if (data.status == 500) {
+      throw "Error";
+    } else if (data.status == 404) {
+      res.status(404).json({ message: data.message });
+    } else {
+      res.status(data.status).json({ message: data.message });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
+const verInterested = async (req, res) => {
+  try {
+    let data = await postService.verInterested(req);
+    if (data.status == 500) {
+      throw "Error";
+    } else if (data.status == 405) {
+      res.status(405).json({ message: data.message });
+    } else {
+      res.status(data.status).json({ message: data.message });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
 module.exports = {
   getAllPosts,
   getOnePost,
@@ -71,4 +164,10 @@ module.exports = {
   interested,
   searchPosts,
   getPostsUser,
+  getPostPerId,
+  getInterestedPerUser,
+  getIntPost,
+  deletePost,
+  deleteInterested,
+  verInterested,
 };

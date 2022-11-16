@@ -258,7 +258,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "email": "user1@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -308,45 +308,45 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service epistrefei post vasei id
-GET http://localhost:3000/getPostPerId?postid=1785
+GET http://localhost:3000/posts/getPostPerId?postid=1809
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA2LTIzVDA5OjU0OjU5LjI4MVoiLCJpYXQiOjE2NTU5NzgwOTksImV4cCI6MTY2MTE2MjA5OX0.F6jdTc8q-6szz0aRqzy-mtOv0reeoVUgp1neeKrSeJk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 ###
 
 //Διαγρφή post μαζί με τους ενδιαφερόμενους του post
-POST http://localhost:3000/deletePost
+POST http://localhost:3000/posts/deletePost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
-        "postid": 1565
+        "postid": 1732
     }
 }
 ###
 
-//delete of interested
-POST http://localhost:3000/deleteInterested
+#delete of interested
+POST http://localhost:3000/posts/deleteInterested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNzMTQxMDgyQHVuaXdhLmdyIiwiZGF0YSI6IjIwMjEtMTItMTlUMTE6MDM6NTUuNTI5WiIsImlhdCI6MTYzOTkxMTgzNSwiZXhwIjoxNjQ1MDk1ODM1fQ.DlNnEmDXjJCZi_6MLaYDOUtD_3tvEFA8LcN_qLNCHn4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
-        "piid": 114
+        "piid": 395
     }
 }
 
 ###
 
 #service poy epistrefei ta post gia ta opoia einai interested o user
-POST http://localhost:3000/getInterestedPerUser
+POST http://localhost:3000/posts/getInterestedPerUser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTMwVDA5OjUwOjUzLjk0OFoiLCJpYXQiOjE2NDg2MzM4NTMsImV4cCI6MTY1MzgxNzg1M30.uN8E5RBBZy3fZEGioLJoUJhG7HdTRsifKBLMn4nHAyA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -355,7 +355,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service epistrefei lista me endiaferomenous gia ta posts enos user
 POST http://localhost:3000/getInterested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTMwVDA5OjUwOjUzLjk0OFoiLCJpYXQiOjE2NDg2MzM4NTMsImV4cCI6MTY1MzgxNzg1M30.uN8E5RBBZy3fZEGioLJoUJhG7HdTRsifKBLMn4nHAyA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
@@ -366,13 +366,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 ###
 
 #service epistrefei lista me endiaferomenous gia ena post
-POST http://localhost:3000/getIntPost
+POST http://localhost:3000/posts/getIntPost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
-        "postid": 1785,
+        "postid": 1809,
         "page": 1
     }
 }
@@ -389,23 +389,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 ###
 // verify an insterested user to a post
-POST http://localhost:3000/verInterested
+POST http://localhost:3000/posts/verInterested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdpYW5uaXNmcmFnb3VsaXMyMUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMi0wNi0xN1QxMzoxOTo0OC41NTVaIiwiaWF0IjoxNjU1NDcxOTg4LCJleHAiOjE2NjA2NTU5ODh9.8Qv-om9AF8ZYx6DeqTjZ71fpEykSBL859sre5dp-L1g
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "data": {
-        "postid": 1337,
-        "piid": 2222
+        "postid": 1809,
+        "piid": 396
     }
 }
 
 ###
 
 //service to notify someone that has been verified for a post that he is interested
-GET http://localhost:3000/notifyMe
+GET http://localhost:3000/users/notifyMe
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA0LTIzVDEzOjAwOjQ1LjcyMFoiLCJpYXQiOjE2NTA3MTg4NDUsImV4cCI6MTY1NTkwMjg0NX0.d3mVR52EShOEtK3JMMgU3nmSQhdik0xmYmC15ZKkGoc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 ###
 // mainEmail: se afto to email tha ginontai generated ta posts. 

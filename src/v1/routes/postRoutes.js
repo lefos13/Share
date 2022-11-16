@@ -32,10 +32,6 @@ const corsOptions = {
   },
 };
 
-router.get("/", postController.getAllPosts);
-
-router.get("/:postId", postController.getOnePost);
-
 //route to create a post
 router.post(
   "/createPost",
@@ -65,8 +61,46 @@ router.post(
   postController.getPostsUser
 );
 
-router.patch("/:postId", postController.updateOnePost);
+router.get(
+  "/getPostPerId",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.getPostPerId
+);
 
-router.delete("/:postId", postController.deleteOnePost);
+router.post(
+  "/getInterestedPerUser",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.getInterestedPerUser
+);
+
+router.post(
+  "/getIntPost",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.getIntPost
+);
+
+router.post(
+  "/deletePost",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.deletePost
+);
+
+router.post(
+  "/deleteInterested",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.deleteInterested
+);
+
+router.post(
+  "/verInterested",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.verInterested
+);
 
 module.exports = router;

@@ -131,6 +131,27 @@ const findOne = async (postid) => {
   }
 };
 
+const findOneNotOwnerGTEToday = async (postid, email, date) => {
+  try {
+    let post = await Posts.findOne({
+      where: {
+        postid: postid,
+        email: { [Op.ne]: email },
+        enddate: {
+          [Op.gte]: date,
+        },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return post;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 const findAndCountAll = async (query) => {
   try {
     const found = await Posts.findAndCountAll(query).catch((err) => {
@@ -206,6 +227,38 @@ const countPostsQuery = async (query) => {
   }
 };
 
+const deleteOne = async (postid) => {
+  try {
+    const countPosts = await Posts.destroy({
+      where: {
+        postid: postid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return countPosts;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const findAllOfUser = async (email) => {
+  try {
+    const passengerPosts = await Posts.findAll({
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return passengerPosts;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   getAllPosts,
   createNewPost,
@@ -217,4 +270,7 @@ module.exports = {
   countFavourites,
   countPostsQuery,
   findAllPastHalfYear,
+  findOneNotOwnerGTEToday,
+  deleteOne,
+  findAllOfUser,
 };

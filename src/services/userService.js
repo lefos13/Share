@@ -13,6 +13,7 @@ const saltRounds = 10;
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { verification, checkPass } = require("../database/utils");
+const { insertAver } = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 
@@ -433,6 +434,90 @@ const searchUser = async (req) => {
     return { status: 500, message: "Κάτι πήγε στραβά!" };
   }
 };
+
+const notifyMe = async (req) => {
+  try {
+    let extra = req.body.extra;
+    let arrayOfUsers = [];
+
+    let dateToCheck = moment().subtract(1, "days");
+
+    // FIND THE ROWS THAT I AM A PASSENGER OR DRIVER AND THE POST IS ALREADY FINISHED BY A DAY
+    let possibleReviews = await ToReview.findAllMyFinished(
+      extra,
+      extra,
+      dateToCheck
+    );
+    if (possibleReviews == false)
+      throw new Error("Error at finding all the finished possible reviews");
+
+    // CHECK IF THE USER HAS ALREADY DONE HIS PART OF THE REVIEW
+    possibleReviews = _.filter(possibleReviews, (obj) => {
+      if (obj.passengerEmail == extra && obj.passengerDone == true) {
+        return false;
+      } else if (obj.driverEmail == extra && obj.driverDone == true) {
+        return false;
+      } else return true;
+    });
+    //SCAN THE LIST AND GATHER THE USERS THAT THE CLIENT NEED TO REVIEW
+    for await (val of possibleReviews) {
+      if (val.passengerEmail == extra) {
+        // IF YOU ARE WERE A PASSENGER
+        const user = await User.findOneLight(val.driverEmail);
+        if (user == false) throw new Error("Error at finding the user");
+
+        const reviewExist = await Review.findOne(val.driverEmail, extra);
+        if (reviewExist == false) throw new Error("Error at finding review");
+
+        let toEdit = false;
+        if (reviewExist != null) {
+          toEdit = true;
+        }
+
+        user.dataValues.toEdit = toEdit;
+        user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+        let res = await insertAver(user);
+        user.dataValues.average = res.average;
+        user.dataValues.count = res.count;
+        arrayOfUsers.push(user);
+      } else {
+        //IF THE USER WAS THE DRIVER
+        const user = await User.findOneLight(val.passengerEmail);
+        if (user == false) throw new Error("Error at finding the user");
+        if (user == null) {
+          throw new Error("User doesnt exist");
+        }
+
+        // console.log(user);
+        const reviewExist = await Review.findOne(val.passengerEmail, extra);
+        if (reviewExist == false) throw new Error("Error at finding review");
+
+        let toEdit = false;
+        if (reviewExist != null) {
+          toEdit = true;
+        }
+
+        user.dataValues.toEdit = toEdit;
+        user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+        let res = await insertAver(user);
+        user.dataValues.average = res.average;
+        user.dataValues.count = res.count;
+
+        arrayOfUsers.push(user);
+      }
+    }
+    if (arrayOfUsers.length > 0)
+      return { status: 200, data: { usersToReview: arrayOfUsers } };
+    else
+      return {
+        status: 404,
+        message: "Δεν βρέθηκαν χρήστες ως προς αξιολόγηση!",
+      };
+  } catch (error) {
+    console.log(error);
+    return { status: 500 };
+  }
+};
 module.exports = {
   getAllUsers,
   getOneUser,
@@ -445,4 +530,5 @@ module.exports = {
   login,
   sendOtp,
   searchUser,
+  notifyMe,
 };

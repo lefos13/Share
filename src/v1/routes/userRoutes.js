@@ -32,10 +32,6 @@ const corsOptions = {
   },
 };
 
-router.get("/", userController.getAllUsers);
-
-router.get("/:UserId", userController.getOneUser);
-
 //route to find a user
 router.post(
   "/searchuser",
@@ -80,8 +76,11 @@ router.post("/passotp", [], cors(corsOptions), userController.sendOtp);
 //route for verifing user
 router.post("/verify", [], cors(corsOptions), userController.userVerify);
 
-router.patch("/:UserId", userController.updateOneUser);
-
-router.delete("/:UserId", userController.deleteOneUser);
+router.get(
+  "/notifyMe",
+  [authenticateToken],
+  cors(corsOptions),
+  userController.notifyMe
+);
 
 module.exports = router;

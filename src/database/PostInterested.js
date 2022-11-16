@@ -137,6 +137,143 @@ const countInterestedOfPost = async (postid, email) => {
   }
 };
 
+const updateNotify = async (postInt) => {
+  try {
+    await postInt.update({ isNotified: true }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const findAllPerId = async (postid) => {
+  try {
+    const interested = await PostInterested.findAll({
+      where: {
+        postid: postid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return interested;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const detroyAllPerPost = async (postid) => {
+  try {
+    const interested = await PostInterested.destroy({
+      where: {
+        postid: postid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const deleteOne = async (piid) => {
+  try {
+    const del = await PostInterested.destroy({
+      where: {
+        piid: piid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return del;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const findOneById = async (piid) => {
+  try {
+    const results = await PostInterested.findOne({
+      where: {
+        piid: piid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return results;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const countVerified = async (postid) => {
+  try {
+    const allIntersted = await PostInterested.count({
+      where: {
+        postid: postid,
+        isVerified: true,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return allIntersted;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const updateVerify = async (postInt) => {
+  try {
+    await postInt.update({ isVerified: true }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const resetFlags = async (postInt) => {
+  try {
+    await postInt
+      .update({ isVerified: false, isNotified: false })
+      .catch((err) => {
+        throw err;
+      });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const getInterestedIfVerified = async (postid, email) => {
+  try {
+    const intP = await PostInterested.findOne({
+      where: {
+        postid: postid,
+        email: email,
+        isVerified: true,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return intP;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 // *** ADD ***
 
 module.exports = {
@@ -146,4 +283,13 @@ module.exports = {
   createInterest,
   findAny,
   countInterestedOfPost,
+  updateNotify,
+  findAllPerId,
+  detroyAllPerPost,
+  deleteOne,
+  findOneById,
+  countVerified,
+  updateVerify,
+  resetFlags,
+  getInterestedIfVerified,
 };

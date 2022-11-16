@@ -54,13 +54,13 @@ const findOne = async (email, emailReviewer) => {
   try {
     const revExist = await Reviews.findOne({
       where: {
-        email: email,
         emailreviewer: emailReviewer,
+        email: email,
       },
     }).catch((err) => {
       throw err;
     });
-
+    console.log(revExist);
     return revExist;
   } catch (error) {
     console.log(error);
