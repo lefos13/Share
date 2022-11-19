@@ -259,6 +259,61 @@ const findAllOfUser = async (email) => {
   }
 };
 
+const deleteFavourite = async (postid) => {
+  try {
+    await Posts.update(
+      {
+        isFavourite: false,
+      },
+      { where: { postid: postid } }
+    ).catch((err) => {
+      throw err;
+    });
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const makeFavourite = async (postid) => {
+  try {
+    await Posts.update(
+      {
+        isFavourite: true,
+      },
+      { where: { postid: postid } }
+    ).catch((err) => {
+      throw err;
+    });
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const findAllFavourites = async (email) => {
+  try {
+    const allFavourites = await Posts.findAll({
+      where: {
+        email: email,
+        isFavourite: true,
+      },
+      order: [["date", "DESC"]],
+    }).catch((err) => {
+      throw err;
+    });
+
+    return allFavourites;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   getAllPosts,
   createNewPost,
@@ -273,4 +328,7 @@ module.exports = {
   findOneNotOwnerGTEToday,
   deleteOne,
   findAllOfUser,
+  deleteFavourite,
+  makeFavourite,
+  findAllFavourites,
 };

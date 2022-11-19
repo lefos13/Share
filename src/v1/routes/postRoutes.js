@@ -103,4 +103,18 @@ router.post(
   postController.verInterested
 );
 
+router.post(
+  "/handleFavourite",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.handleFavourite
+);
+
+router.get(
+  "/getFavourites",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.getFavourites
+);
+
 module.exports = router;

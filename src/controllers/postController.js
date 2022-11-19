@@ -155,6 +155,38 @@ const verInterested = async (req, res) => {
   }
 };
 
+const handleFavourite = async (req, res) => {
+  try {
+    let data = await postService.handleFavourite(req);
+    if (data.status == 500) {
+      throw "Error";
+    } else if (data.status == 405) {
+      res.status(405).json({ message: data.message });
+    } else {
+      res.status(data.status).json({ message: data.message });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
+const getFavourites = async (req, res) => {
+  try {
+    let data = await postService.getFavourites(req);
+    if (data.status == 500) {
+      throw "Error";
+    } else if (data.status == 404) {
+      res.status(404).json({ message: data.message });
+    } else {
+      res.status(data.status).json({ favourites: data.data });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
 module.exports = {
   getAllPosts,
   getOnePost,
@@ -170,4 +202,6 @@ module.exports = {
   deletePost,
   deleteInterested,
   verInterested,
+  handleFavourite,
+  getFavourites,
 };

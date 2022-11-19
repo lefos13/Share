@@ -864,6 +864,93 @@ const verInterested = async (req) => {
   }
 };
 
+const handleFavourite = async (req) => {
+  try {
+    let email = req.body.extra;
+    let postid = req.body.data.postid;
+
+    const countAll = await Post.countFavourites(email);
+    if (countAll == null)
+      throw new Error("Error at counting the favourites of user");
+
+    const post = await Post.findOne(postid);
+    if (post == false) throw new Error("Error at finding the post of user");
+
+    if (post.isFavourite == true) {
+      const deletedFav = await Post.deleteFavourite(postid);
+      if (deletedFav == false)
+        throw new Error("Error at deleting the favourite");
+      return {
+        status: 200,
+        message: "Το ride αφαιρέθηκε από τα αγαπημένα σου!",
+      };
+    }
+    if (countAll < 5) {
+      const newFav = await Post.makeFavourite(postid);
+      if (newFav == false) throw new Error("Error at declaring new favourite");
+      return { status: 200, message: "To ride προστέθηκε στα αγαπημένα σου" };
+    } else {
+      return { status: 405, message: "Έχεις ήδη 5 αγαπημένα ride" };
+    }
+  } catch (error) {
+    console.log(error);
+    return { status: 500 };
+  }
+};
+
+const getFavourites = async (req) => {
+  try {
+    let email = req.body.extra;
+    moment.locale("en");
+
+    const user = await User.findOneLight(email);
+    if (user == false) throw new Error("Error at finding the user data");
+
+    let extraData = await insertAver(user);
+    user.dataValues = { ...user.dataValues, ...extraData };
+
+    const allFavourites = await Post.findAllFavourites(email);
+    if (allFavourites == false)
+      throw new Error("Error at getting all the favourites");
+    else if (allFavourites.length == 0) {
+      return { status: 404, message: "Δεν βρέθηκαν αγαπημένα Rides" };
+    }
+
+    let allResults = [];
+    for await (post of allFavourites) {
+      post.dataValues.date = moment(post.dataValues.date).format(
+        "DD MMM YYYY HH:mm"
+      );
+
+      post.dataValues.startdate = moment(post.dataValues.startdate).format(
+        "DD MMM YYYY"
+      );
+      post.dataValues.enddate = moment(post.dataValues.enddate).format(
+        "DD MMM YYYY"
+      );
+
+      post.dataValues.returnStartDate = moment(
+        post.dataValues.returnStartDate
+      ).format("DD MMM YYYY");
+
+      post.dataValues.returnEndDate = moment(
+        post.dataValues.returnEndDate
+      ).format("DD MMM YYYY");
+
+      allResults.push({
+        user: user,
+        post: post,
+        imagePath: "images/" + post.email + ".jpeg",
+        interested: false,
+      });
+    }
+    return { status: 200, data: allResults };
+  } catch (error) {
+    console.log(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
   getAllPosts,
   getOnePost,
@@ -879,4 +966,6 @@ module.exports = {
   deletePost,
   deleteInterested,
   verInterested,
+  handleFavourite,
+  getFavourites,
 };

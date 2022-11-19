@@ -427,18 +427,18 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/sendReport
+POST http://localhost:3000/neutral/sendReport
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAyLTAxVDEyOjE1OjQ4LjUwM1oiLCJpYXQiOjE2NDM3MTc3NDgsImV4cCI6MTY0ODkwMTc0OH0.3hGmuEdGzpdhiny9YD5qIAoiD8I-TPDVHcEyH1VG3FY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 
 {
     "text": "Test report"
 }
 ###
 
-POST http://localhost:3000/getTerms
+GET http://localhost:3000/neutral/getTerms
 Content-Type: application/text/html
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAyLTAxVDEyOjE1OjQ4LjUwM1oiLCJpYXQiOjE2NDM3MTc3NDgsImV4cCI6MTY0ODkwMTc0OH0.3hGmuEdGzpdhiny9YD5qIAoiD8I-TPDVHcEyH1VG3FY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
 ###
 
 POST http://localhost:3000/upload
@@ -478,21 +478,21 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 ###
 #service που προσθέτει/αφαιρεί ένα ποστ από τα αγαπημένα
-POST http://localhost:3000/handleFavourite
+POST http://localhost:3000/posts/handleFavourite
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTI2VDA4OjI2OjM5LjU4MFoiLCJpYXQiOjE2NDgyODMxOTksImV4cCI6MTY1MzQ2NzE5OX0.WyMRvIhi8-FmsPe04jHorrux67vS-vVybx5SU8AOHGY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
 
 {
     "data": {
-        "postid": 1730
+        "postid": 1809
     }
 }
 
 ###
 #service that returns all the favourites of one user
-GET http://localhost:3000/getFavourites
+GET http://localhost:3000/posts/getFavourites
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
 
 ###
 #service that returns all the favourites of one user

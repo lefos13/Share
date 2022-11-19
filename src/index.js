@@ -129,11 +129,13 @@ const v1PostRouter = require("./v1/routes/postRoutes");
 const v1UserRouter = require("./v1/routes/userRoutes");
 const v1RequestRouter = require("./v1/routes/requestRoutes");
 const v1ReviewRouter = require("./v1/routes/reviewsRoutes");
+const v1NeutralRouter = require("./v1/routes/neutralRoutes");
 
 app.use("/reviews", v1ReviewRouter);
 app.use("/requests", v1RequestRouter);
 app.use("/posts", v1PostRouter);
 app.use("/users", v1UserRouter);
+app.use("/neutral", v1NeutralRouter);
 // === END OF ROUTES IMPORT
 const saltRounds = 10;
 checkconnection();
