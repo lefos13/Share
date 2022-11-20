@@ -11,8 +11,16 @@ const getOnePost = (req, res) => {
 };
 
 const createNewPost = async (req, res) => {
-  const newPost = await postService.createNewPost(req.body.data);
-  res.status(newPost.status).json({ message: newPost.data });
+  try {
+    const newPost = await postService.createNewPost(req.body.data);
+    if (newPost.status == 500) throw "error";
+    res
+      .status(newPost.status)
+      .json({ message: newPost.data, postid: newPost.postid });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
 };
 
 const updateOnePost = (req, res) => {

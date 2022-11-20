@@ -55,9 +55,13 @@ const createNewPost = async (data) => {
     // console.log("Inside postService: " + counter);
     if (counter < 3) {
       //do it
-      const newPost = Post.createNewPost(postToInsert);
+      const newPost = await Post.createNewPost(postToInsert);
       if (newPost != false)
-        message = { status: 200, data: "Η υποβολή πραγματοποιήθηκε επιτυχώς." };
+        message = {
+          status: 200,
+          data: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+          postid: newPost.postid,
+        };
       else message = { status: 500, data: "Κάτι πήγε λάθος" };
     } else {
       message = {
@@ -828,7 +832,8 @@ const verInterested = async (req) => {
             p.postid,
             post.email
           );
-          if (!intP) throw new Error("Error at geting the PP if verified");
+          if (intP == false)
+            throw new Error("Error at geting the PP if verified");
 
           // if you find such a post, then update the possible review and dont delete it
           if (intP != null) {
@@ -841,7 +846,7 @@ const verInterested = async (req) => {
               results.piid
             );
 
-            if (!updated)
+            if (updated == false)
               throw new Error("Error at updating the possible review");
           }
         }

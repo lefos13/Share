@@ -37,13 +37,14 @@ const moment = require("moment-timezone");
 // *** ADD ***
 const register = async (data) => {
   try {
-    const user = await Users.create(data).catch((err) => {
+    let user = await Users.create(data).catch((err) => {
       throw err;
     });
+    let { password, mobile, ...rest } = data;
 
     results = {
       message: "Εγγραφήκατε επιτυχώς!",
-      user: user,
+      user: rest,
     };
 
     var data = {
@@ -62,7 +63,7 @@ const register = async (data) => {
       let data = {
         message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
       };
-      return { status: 505, data: data };
+      return { status: 500, data: data };
     }
   }
 };

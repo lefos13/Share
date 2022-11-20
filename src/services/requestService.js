@@ -83,6 +83,7 @@ const getRequests = async (req) => {
 
 const deleteRequest = async (req) => {
   try {
+    //CHECK
     let data = req.body.data;
     let email = req.body.extra;
 

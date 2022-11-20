@@ -13,9 +13,15 @@ const getOneUser = (req, res) => {
 };
 
 const createNewUser = async (req, res) => {
-  const newUser = await userService.createNewUser(req);
-  console.log("controller: ", newUser);
-  res.status(newUser.status).json({ message: newUser.data });
+  try {
+    const newUser = await userService.createNewUser(req);
+    // console.log("controller: ", newUser);
+    if (newUser.status == 500) throw "Error";
+    res.status(newUser.status).json(newUser.data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
 };
 
 const createToken = async (req, res) => {

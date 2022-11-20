@@ -1,6 +1,7 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
 POST http://localhost:3000/users/createtoken
 Content-Type: application/json
+Accept-Language: en
 
 {
     "data":{
@@ -44,7 +45,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 ###
 
 #service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
-POST  http://localhost:3000/register
+POST  http://localhost:3000/users/register
 Content-Type: application/json
 
 {
@@ -108,9 +109,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 ###
 
 #service pou ftiaxneis ena post
-POST http://localhost:3000/createpost
+POST http://localhost:3000/posts/createpost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMDYtMTdUMTI6NTY6MDAuMzkwWiIsImlhdCI6MTY1NTQ3MDU2MCwiZXhwIjoxNjYwNjU0NTYwfQ.rc3qgCqziUl3FkhTb7SDfH95TZrbyICS50nxj1DOahQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMDhUMTk6MzY6MDcuMDIyWiIsImlhdCI6MTY2NzkzNjE2NywiZXhwIjoxNjczMTIwMTY3fQ.Rm7X-PLNZBFnmAEssYrXCJr1Mxv_KxnoGa0ojWbfG_E
 
 {
     "data": {

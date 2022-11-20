@@ -52,20 +52,19 @@ const createNewUser = async (data) => {
     data["verified"] = true;
     let salt = await bcrypt.genSalt(saltRounds);
     data.password = await bcrypt.hash(data.password, salt);
-
-    let base64 = data.photo;
-    const buffer = Buffer.from(base64, "base64");
-    // console.log(buffer);
-    fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
-    // fs.writeFileSync("test.jpeg", buffer);
     data.photo = "";
-    console.log("Salt: ", salt);
-    console.log("Password: ", data.password);
+
     const final = await User.register(data);
+    if (final.status == 200) {
+      let base64 = data.photo;
+      const buffer = Buffer.from(base64, "base64");
+      fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
+    }
+
     return final;
   } catch (error) {
     console.log(error);
-    return false;
+    return { status: 500 };
   }
 };
 
@@ -90,6 +89,14 @@ const updateOneUser = async (req) => {
 const createToken = async (data) => {
   try {
     let email = data.body.data.email;
+    let lang = data.headers["accept-language"];
+    if (lang == "en") {
+      lang = fs.readFileSync("lang/english.json");
+      lang = JSON.parse(lang);
+    } else if (lang == "gr") {
+      lang = fs.readFileSync("lang/greek.json");
+      lang = JSON.parse(lang);
+    }
     const user = await User.findOneUser(email);
     if (user == false) {
       // if error with the db
@@ -386,6 +393,7 @@ const searchUser = async (req) => {
         data.email,
         dateToCheck
       );
+      //CHECK!!!
       if (possibleReviews == false)
         throw new Error(
           "Something went wrong with finding all the possible reviews"
