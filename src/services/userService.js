@@ -393,8 +393,7 @@ const searchUser = async (req) => {
         data.email,
         dateToCheck
       );
-      //CHECK!!!
-      if (possibleReviews == false)
+      if (possibleReviews === false)
         throw new Error(
           "Something went wrong with finding all the possible reviews"
         );
