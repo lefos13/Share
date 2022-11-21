@@ -57,7 +57,7 @@ router.post("/createtoken", [], cors(corsOptions), userController.createToken);
 //route to update a user's pass
 router.post(
   "/updateUserPass",
-  [authenticateToken],
+  [],
   cors(corsOptions),
   userController.updatePass
 );
@@ -81,6 +81,13 @@ router.get(
   [authenticateToken],
   cors(corsOptions),
   userController.notifyMe
+);
+
+router.post(
+  "/loginThirdParty",
+  [],
+  cors(corsOptions),
+  userController.loginThirdParty
 );
 
 module.exports = router;

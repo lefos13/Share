@@ -12,7 +12,7 @@ var otpGenerator = require("otp-generator");
 const saltRounds = 10;
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
-const { verification, checkPass } = require("../database/utils");
+const { verification, checkPass, saveFcm } = require("../database/utils");
 const { insertAver } = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
@@ -52,7 +52,6 @@ const createNewUser = async (data) => {
     data["verified"] = true;
     let salt = await bcrypt.genSalt(saltRounds);
     data.password = await bcrypt.hash(data.password, salt);
-    data.photo = "";
 
     const final = await User.register(data);
     if (final.status == 200) {
@@ -142,25 +141,74 @@ const createToken = async (data) => {
 
 const updatePass = async (req) => {
   try {
-    // GENERATE HASH FOR THE PASSWORD GIVEN
-    var password = req.body.data.pass;
-    const salt = await bcrypt.genSalt(saltRounds);
-    let hash = await bcrypt.hash(password, salt);
+    let data = req.body.data;
+    let email = req.body.data.email;
+    let password = req.body.data.pass;
+    const userExist = await User.findOneUser(email);
+    if (userExist === false) throw new Error("Error at finding the user");
+    // CHECK IF THE UPDATE IS FOR A NEW GOOGLE USER
+    const campareGooglePass = await bcrypt.compare(
+      "google_sign_in_pass",
+      userExist.password
+    );
+    if (campareGooglePass === true) {
+      // update the pass with no current password mandatory
 
-    var newpass = hash;
+      // GENERATE HASH FOR THE PASSWORD GIVEN
+      const salt = await bcrypt.genSalt(saltRounds);
+      let hash = await bcrypt.hash(password, salt);
+      const user = await User.updatePassUser(email, hash);
+      if (user === false) {
+        throw new Error("Error at updating the password");
+      } else {
+        return { status: 200, message: "Ο κωδικός ανανεώθηκε!" };
+      }
+    } else if (data.currentPassword == null) {
+      console.log("Changing password from forgot procedure...");
+      // GENERATE HASH FOR THE PASSWORD GIVEN
+      const salt = await bcrypt.genSalt(saltRounds);
+      let hash = await bcrypt.hash(password, salt);
 
-    // UPDATE USER'S PASSWORD
-    const user = await User.updatePassUser(req, newpass);
+      // UPDATE USER'S PASSWORD
+      const user = await User.updatePassUser(email, hash);
 
-    if (user === null) {
-      return { status: 404, message: "Ο χρήστης δεν βρέθηκε." };
-    } else if (user == false) {
-      throw new Error(
-        "Κάτι πήγε στραβά μέσα στο Function updatePassUser στο αρχείο database/User.js"
-      );
+      if (user === null) {
+        return { status: 404, message: "Ο χρήστης δεν βρέθηκε." };
+      } else if (user == false) {
+        throw new Error(
+          "Κάτι πήγε στραβά μέσα στο Function updatePassUser στο αρχείο database/User.js"
+        );
+      } else {
+        return { status: 200, message: "Ο κωδικός ανανεώθηκε." };
+      }
     } else {
-      return { status: 200, message: "Ο κωδικός ανανεώθηκε." };
+      console.log("Changing password normally...");
+      let curPass = data.currentPassword;
+      const salt = await bcrypt.genSalt(saltRounds);
+      let hash = await bcrypt.hash(password, salt);
+
+      const compareNew = await bcrypt.compare(curPass, userExist.password);
+      if (!compareNew) {
+        return {
+          status: 406,
+          message: "Λανθασμένος τρέχων κωδικός!",
+        };
+      }
+      const compareOld = await bcrypt.compare(password, userExist.password);
+      if (compareOld) {
+        return {
+          status: 406,
+          message: "Ο νέος κωδικός είναι ο ίδιος με τον παλιό!",
+        };
+      }
+
+      const updatedPass = await User.updatePassUser(email, hash);
+      if (updatedPass === false) {
+        throw new Error("Error at updating the password");
+      }
+      return { status: 200, message: "Ο κωδικός ανανεώθηκε!" };
     }
+    // USER
   } catch (err) {
     console.error(err);
     return { status: 500, message: "Κάτι πήγε στραβά!" };
@@ -199,25 +247,127 @@ const login = async (req) => {
 
     if (user == null) {
       return { status: 404, message: "Ο χρήστης δεν βρέθηκε!" };
-    } else if (user == false) {
+    } else if (user === false) {
       throw new Error("Σφάλμα στην findOneUser του User.js");
     } else {
+      //USER EXISTS
       if (user.verified === false) {
         return {
           status: 405,
           message: "Πρέπει να επιβεβαιώσεις το email σου.",
         };
       } else {
-        // CHECK IF THE PASS IS RIGHT
-        const result = await bcrypt.compare(pass, user.password);
-        const whatToReturn = await checkPass(result, user, fcmToken, email);
-        return whatToReturn;
-        // ============
+        // CHECK IF THE PASS IS GOOGLE FIXED ONE
+        const campareGooglePass = await bcrypt.compare(
+          "google_sign_in_pass",
+          user.password
+        );
+        if (campareGooglePass === true) {
+          return {
+            status: 406,
+            message:
+              "Πρέπει να κάνεις forgot password για να ορίσεις νέο κωδικό πρόσβασης!",
+          };
+        } else {
+          // CHECK IF THE PASS IS RIGHT
+          const result = await bcrypt.compare(pass, user.password);
+          const whatToReturn = await checkPass(result, user, fcmToken, email);
+          //update the login state
+          const updatedState = await User.updateLoginState(user.email, false);
+          if (updatedState === false) {
+            throw new Error("Error at updating the state of the user");
+          }
+          return whatToReturn;
+          // ============
+        }
       }
     }
   } catch (error) {
     console.log(error);
     return { status: 500, message: "Κάτι πήγε στραβά!" };
+  }
+};
+
+const loginThirdParty = async (req) => {
+  try {
+    let data = req.body.data;
+    let userRegistered = false;
+    let forceUpdate = false;
+    data["isThirdPartyLogin"] = true;
+    const user = await User.findOneUser(data.email);
+    if (user === false) {
+      throw new Error("Something went wrong with finding the user");
+    } else if (user === null) {
+      //Register and login
+
+      //encrypt the password
+      let salt = await bcrypt.genSalt(saltRounds);
+      data.password = await bcrypt.hash(data.password, salt);
+
+      // save the user to the db
+      let userRegistered = await User.saveViaGoogle(data);
+      if (userRegistered === false) {
+        throw new Error("Error at saving the user via Google sign in");
+      }
+
+      let newUser = await User.findOneUser(data.email);
+      if (newUser === false) throw new Error("Error at getting the new user");
+
+      // ignore some properties
+      let { password, mobile, photo, ...rest } = newUser.dataValues;
+
+      // flag that the user is new
+      userRegistered = true;
+
+      //MISING FCM TOKEN CODE
+      let fcmDone = await saveFcm(data.fcmToken, data.email);
+      if (fcmDone === false) {
+        throw new Error("Error at creating/updating the fcmToken");
+      }
+      //
+      return {
+        status: 200,
+        response: {
+          user: rest,
+          message: "Επιτυχής είσοδος!",
+          forceUpdate: forceUpdate,
+          userRegistered: userRegistered,
+        },
+      };
+    } else {
+      //Login
+      let userData = user.toJSON();
+      let { password, mobile, photo, ...rest } = userData;
+      //TEMP CODE FOR PHOTO
+      const photoPath = "./uploads/" + data.email + ".jpeg";
+      //check if the photo exists and insert the property
+      if (fs.existsSync(photoPath)) {
+        rest.photo = "images/" + data.email + ".jpeg";
+      }
+      //MISING FCM TOKEN CODE
+      let fcmDone = await saveFcm(data.fcmToken, data.email);
+      if (fcmDone === false) {
+        throw new Error("Error at creating/updating the fcmToken");
+      }
+      //
+
+      rest.isThirdPartyLogin = true;
+      const response = {
+        user: rest,
+        message: "Επιτυχής είσοδος!",
+        forceUpdate: forceUpdate,
+        userRegistered: userRegistered,
+      };
+
+      const updatedState = User.updateLoginState(rest.email, true);
+      if (updatedState === false)
+        throw new Error("Error at updating the login state!");
+
+      return { status: 200, response: response };
+    }
+  } catch (error) {
+    console.log(error);
+    return { status: 500 };
   }
 };
 
@@ -525,6 +675,7 @@ const notifyMe = async (req) => {
     return { status: 500 };
   }
 };
+
 module.exports = {
   getAllUsers,
   getOneUser,
@@ -538,4 +689,5 @@ module.exports = {
   sendOtp,
   searchUser,
   notifyMe,
+  loginThirdParty,
 };

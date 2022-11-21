@@ -20,7 +20,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
     typeCast: true,
   },
 });
-
+const fs = require("fs");
 const Users = require("../modules/user");
 const Posts = require("../modules/post");
 const PostInterested = require("../modules/postinterested");
@@ -97,11 +97,15 @@ const checkPass = async (result, user, fcmToken, email) => {
           });
         }
       }
-      data.photo = "images/" + data.email + ".jpeg";
+      if (fs.existsSync(photoPath)) {
+        rest.photo = "images/" + data.email + ".jpeg";
+      }
+      let { password, mobile, ...rest } = data;
+      rest.isThirdPartyLogin = false;
       return {
         status: 200,
         message: "Επιτυχής είσοδος.",
-        user: data,
+        user: rest,
         forceUpdate: false,
       };
     } else {
@@ -110,6 +114,36 @@ const checkPass = async (result, user, fcmToken, email) => {
   } catch (err) {
     console.log(err);
     return { status: 500, message: "Κάτι πήγε στραβά!" };
+  }
+};
+
+const saveFcm = async (fcmToken, email) => {
+  try {
+    if (fcmToken != null) {
+      fcmData = {
+        email: email,
+        fcmToken: fcmToken,
+      };
+      const fcmUser = await FcmToken.findOne({
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+      if (fcmUser != null) {
+        fcmUser.update({ fcmToken: fcmToken }).catch((err) => {
+          throw err;
+        });
+      } else {
+        FcmToken.create(fcmData).catch((err) => {
+          throw err;
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 };
 
@@ -129,4 +163,4 @@ const fixDate = async (date) => {
   }
 };
 
-module.exports = { savePost, verification, checkPass, fixDate };
+module.exports = { savePost, verification, checkPass, fixDate, saveFcm };

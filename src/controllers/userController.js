@@ -117,6 +117,17 @@ const notifyMe = async (req, res) => {
   }
 };
 
+const loginThirdParty = async (req, res) => {
+  try {
+    const results = await userService.loginThirdParty(req);
+    if (results.status == 500) throw "error";
+    else res.status(results.status).json(results.response);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getOneUser,
@@ -130,4 +141,5 @@ module.exports = {
   sendOtp,
   searchUser,
   notifyMe,
+  loginThirdParty,
 };

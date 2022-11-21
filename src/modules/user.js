@@ -28,7 +28,7 @@ const Users = sequelize.define(
     },
     mobile: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     fullname: {
       type: DataTypes.STRING,
@@ -44,15 +44,15 @@ const Users = sequelize.define(
     },
     gender: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     age: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     photo: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     facebook: {
       type: DataTypes.TEXT,
@@ -62,7 +62,12 @@ const Users = sequelize.define(
     },
     verified: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: 1,
+    },
+    isThirdPartyLogin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
       defaultValue: 0,
     },
   },

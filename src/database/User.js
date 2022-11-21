@@ -98,20 +98,19 @@ const updateUser = async (req) => {
   }
 };
 
-const updatePassUser = async (req, newpass) => {
+const updatePassUser = async (email, newpass) => {
   try {
-    var email = req.body.data.email;
-
     const user = await Users.update(
       { password: newpass },
       { where: { email: email } }
     ).catch((err) => {
-      console.log(err);
+      throw err;
 
       // res.status(500).json("Κάτι πήγε στραβά!");
     });
     return user;
   } catch (error) {
+    console.log(error);
     return false;
   }
 };
@@ -187,6 +186,33 @@ const userVerify = async (email) => {
   }
 };
 
+const saveViaGoogle = async (data) => {
+  try {
+    const userSaved = await Users.create(data).catch((err) => {
+      throw err;
+    });
+    return userSaved;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const updateLoginState = async (email, state) => {
+  try {
+    const user = await Users.update(
+      { isThirdPartyLogin: state },
+      { where: { email: email } }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   register,
   updateUser,
@@ -195,4 +221,6 @@ module.exports = {
   userVerify,
   findOneUserQuery,
   findOneLight,
+  saveViaGoogle,
+  updateLoginState,
 };
