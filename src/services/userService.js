@@ -239,6 +239,7 @@ const login = async (req) => {
   try {
     var email = req.body.data.email;
     var pass = req.body.data.pass;
+    let autoLogin = req.body.data.autoLogin;
     // console.log(req.body);
     let fcmToken = req.body.data.fcmToken;
 
@@ -262,7 +263,7 @@ const login = async (req) => {
           "google_sign_in_pass",
           user.password
         );
-        if (campareGooglePass === true) {
+        if (campareGooglePass === true && autoLogin === false) {
           return {
             status: 406,
             message:
@@ -271,12 +272,16 @@ const login = async (req) => {
         } else {
           // CHECK IF THE PASS IS RIGHT
           const result = await bcrypt.compare(pass, user.password);
-          const whatToReturn = await checkPass(result, user, fcmToken, email);
+          let whatToReturn = await checkPass(result, user, fcmToken, email);
           //update the login state
-          const updatedState = await User.updateLoginState(user.email, false);
-          if (updatedState === false) {
-            throw new Error("Error at updating the state of the user");
+          if (autoLogin === false) {
+            whatToReturn.user.isThirdPartyLogin = false;
+            const updatedState = await User.updateLoginState(user.email, false);
+            if (updatedState === false) {
+              throw new Error("Error at updating the state of the user");
+            }
           }
+
           return whatToReturn;
           // ============
         }

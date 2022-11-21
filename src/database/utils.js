@@ -97,11 +97,12 @@ const checkPass = async (result, user, fcmToken, email) => {
           });
         }
       }
+
+      let { password, mobile, ...rest } = data;
+      const photoPath = "./uploads/" + data.email + ".jpeg";
       if (fs.existsSync(photoPath)) {
         rest.photo = "images/" + data.email + ".jpeg";
       }
-      let { password, mobile, ...rest } = data;
-      rest.isThirdPartyLogin = false;
       return {
         status: 200,
         message: "Επιτυχής είσοδος.",
