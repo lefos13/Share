@@ -50,6 +50,9 @@ const createNewUser = async (req) => {
   try {
     var data = req.body.data;
     let photo = data.photo;
+    console.log(data.age);
+    let testDate = new Date(data.age);
+    console.log(testDate);
     data["verified"] = true;
     data["photo"] = null;
     let salt = await bcrypt.genSalt(saltRounds);
@@ -57,6 +60,7 @@ const createNewUser = async (req) => {
 
     const final = await User.register(data);
     if (final.status == 200) {
+      console.log("Uploading new photo...");
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
       fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
@@ -71,14 +75,15 @@ const createNewUser = async (req) => {
 
 const updateOneUser = async (req) => {
   try {
-    let data = req.body.data;
+    let photo = req.body.data.photo;
     let email = req.body.extra;
     const res = await User.updateUser(req);
     if (res === false) {
       throw new Error("Error at updating profile");
     }
-    if (data.photo != null && res.status == 200) {
-      let base64 = data.photo;
+    if (photo !== null) {
+      console.log("Uploading new photo");
+      let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
       // console.log(buffer);
       fs.writeFileSync("uploads/" + email + ".jpeg", buffer);

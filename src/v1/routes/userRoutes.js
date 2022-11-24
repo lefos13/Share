@@ -23,6 +23,7 @@ const corsOptions = {
     "Accept",
   ],
   origin: function (origin, callback) {
+    console.log(origin);
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -89,5 +90,9 @@ router.post(
   cors(corsOptions),
   userController.loginThirdParty
 );
+
+router.get("/1", [], cors(corsOptions), (req, res) => {
+  res.json({ message: 1 });
+});
 
 module.exports = router;
