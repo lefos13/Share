@@ -247,7 +247,7 @@ const deleteOne = async (piid) => {
   try {
     await ToReview.destroy({
       where: {
-        piid: results.piid,
+        piid: piid,
       },
     }).catch((err) => {
       throw err;

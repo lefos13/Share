@@ -50,9 +50,14 @@ const createNewUser = async (req) => {
   try {
     var data = req.body.data;
     let photo = data.photo;
-    console.log(data.age);
-    let testDate = new Date(data.age);
-    console.log(testDate);
+    // let splitted = data.age.split("/");
+    // let ageDate = moment()
+    //   .set("year", parseInt(splitted[2]))
+    //   .set("month", parseInt(splitted[1]) - 1)
+    //   .set("date", parseInt(splitted[0]));
+
+    // let calcAge = moment().diff(ageDate, "years");
+    // data.age = calcAge;
     data["verified"] = true;
     data["photo"] = null;
     let salt = await bcrypt.genSalt(saltRounds);
@@ -60,7 +65,7 @@ const createNewUser = async (req) => {
 
     const final = await User.register(data);
     if (final.status == 200) {
-      console.log("Uploading new photo...");
+      // console.log("Uploading new photo...");
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
       fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
@@ -81,7 +86,7 @@ const updateOneUser = async (req) => {
     if (res === false) {
       throw new Error("Error at updating profile");
     }
-    if (photo !== null) {
+    if (photo != null) {
       console.log("Uploading new photo");
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
@@ -315,7 +320,7 @@ const login = async (req) => {
 
           let whatToReturn = await checkPass(result, user, fcmToken, email);
           //update the login state
-          if (autoLogin === false) {
+          if (autoLogin === false && whatToReturn.status == 200) {
             whatToReturn.user.isThirdPartyLogin = false;
             const updatedState = await User.updateLoginState(user.email, false);
             if (updatedState === false) {

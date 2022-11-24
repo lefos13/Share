@@ -103,6 +103,7 @@ const checkPass = async (result, user, fcmToken, email) => {
       if (fs.existsSync(photoPath)) {
         rest.photo = "images/" + data.email + ".jpeg";
       }
+      // console.log("useraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       return {
         status: 200,
         message: "Επιτυχής είσοδος.",

@@ -37,6 +37,7 @@ const moment = require("moment-timezone");
 // *** ADD ***
 const register = async (data) => {
   try {
+    // console.log(data);
     let user = await Users.create(data).catch((err) => {
       throw err;
     });
@@ -59,7 +60,7 @@ const register = async (data) => {
       };
       return { status: 405, data: data };
     } else {
-      console.log(err);
+      // console.log(err);
       let data = {
         message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
       };

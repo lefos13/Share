@@ -858,7 +858,7 @@ const verInterested = async (req) => {
           }
         }
         if (flagCounter == 0) {
-          const destroyed = await ToReview.destroyOne(results.piid);
+          const destroyed = await ToReview.deleteOne(results.piid);
           if (!destroyed)
             throw new Error("Error at destroying the possible review");
         }

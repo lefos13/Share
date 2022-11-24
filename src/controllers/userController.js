@@ -15,7 +15,6 @@ const getOneUser = (req, res) => {
 const createNewUser = async (req, res) => {
   try {
     const newUser = await userService.createNewUser(req);
-    // console.log("controller: ", newUser);
     if (newUser.status == 500) throw "Error";
     res.status(newUser.status).json(newUser.data);
   } catch (error) {
@@ -73,6 +72,7 @@ const userVerify = async (req, res) => {
 const login = async (req, res) => {
   try {
     const results = await userService.login(req);
+
     res.status(results.status).json({
       message: results.message,
       user: results.user,
