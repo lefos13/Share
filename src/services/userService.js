@@ -74,16 +74,20 @@ const updateOneUser = async (req) => {
     let data = req.body.data;
     let email = req.body.extra;
     const res = await User.updateUser(req);
+    if (res === false) {
+      throw new Error("Error at updating profile");
+    }
     if (data.photo != null && res.status == 200) {
       let base64 = data.photo;
       const buffer = Buffer.from(base64, "base64");
       // console.log(buffer);
       fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
     }
-    return res;
+
+    return { status: 200, message: "Η ενημέρωση έγινε επιτυχώς!" };
   } catch (err) {
     console.log(err);
-    return { status: 200, message: "Κάτι πήγε στραβά!" };
+    return { status: 500, message: "Κάτι πήγε στραβά!" };
   }
 };
 
@@ -216,6 +220,7 @@ const updatePass = async (req) => {
     return { status: 500, message: "Κάτι πήγε στραβά!" };
   }
 };
+
 const deleteOneUser = async () => {
   return;
 };

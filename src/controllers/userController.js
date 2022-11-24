@@ -38,7 +38,7 @@ const createToken = async (req, res) => {
 const updateOneUser = async (req, res) => {
   try {
     const updatedUser = await userService.updateOneUser(req);
-    res.status(updatedUser.status).json({ message: updatedUser.data });
+    res.status(updatedUser.status).json({ message: updatedUser.message });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Κάτι πήγε στραβά!" });

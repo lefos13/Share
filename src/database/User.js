@@ -81,6 +81,7 @@ const updateUser = async (req) => {
         instagram: data.instagram,
         car: data.car,
         cardate: data.cardate,
+        gender: data.gender,
       },
       {
         where: {
@@ -88,13 +89,12 @@ const updateUser = async (req) => {
         },
       }
     ).catch((err) => {
-      // console.log("Update profil: ", err);
       throw err;
     });
-    return { status: 200, message: "Η ενημέρωση έγινε επιτυχώς!" };
+    return user;
   } catch (err) {
     console.log(err);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return false;
   }
 };
 
