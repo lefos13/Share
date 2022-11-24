@@ -287,11 +287,7 @@ const login = async (req) => {
             message:
               "Για να συνδεθείς με email και password θα πρέπει να ορίσεις νέο password. Πάτα Οκ για να το ορίσεις ή συνδέσου με google Sign in!",
           };
-        } else if (
-          campareGooglePass === true &&
-          user.isThirdPartyLogin === true &&
-          autoLogin === true
-        ) {
+        } else if (user.isThirdPartyLogin === true && autoLogin === true) {
           //case that is google signed in and go for autologin
           console.log("case that is google signed in and go for autologin");
           let userData = user.toJSON();
@@ -315,6 +311,7 @@ const login = async (req) => {
             forceUpdate: false,
           };
         } else {
+          console.log("case with normal login");
           // CHECK IF THE PASS IS RIGHT
           const result = await bcrypt.compare(pass, user.password);
 
