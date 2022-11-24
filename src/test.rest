@@ -84,7 +84,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data":{
         "email": "lefterisevagelinos1996@gmail.com",
-        "pass": "1111111",
+        "pass": "google_sign_in_pass",
         "autoLogin": true
     }
 }

@@ -271,9 +271,18 @@ const login = async (req) => {
             message:
               "Πρέπει να κάνεις forgot password για να ορίσεις νέο κωδικό πρόσβασης!",
           };
-        } else {
+        }
+        // else if (
+        //   campareGooglePass === true &&
+        //   user.isThirdPartyLogin === true &&
+        //   autoLogin === true
+        // ) {
+        //   //case that is google signed in and go for autologin
+        // }
+        else {
           // CHECK IF THE PASS IS RIGHT
           const result = await bcrypt.compare(pass, user.password);
+
           let whatToReturn = await checkPass(result, user, fcmToken, email);
           //update the login state
           if (autoLogin === false) {
