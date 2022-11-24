@@ -91,7 +91,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 POST http://localhost:3000/users/loginThirdParty
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEwLTI2VDE0OjU3OjI4LjI5MVoiLCJpYXQiOjE2NjY3OTYyNDgsImV4cCI6MTY3MTk4MDI0OH0.aqDYU4dG3OfcVJ39eiLxiAAqU2y8V8-A_1dLpfDq2EA
 
 {
     "data": {

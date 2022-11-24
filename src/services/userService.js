@@ -99,13 +99,13 @@ const createToken = async (data) => {
       lang = JSON.parse(lang);
     }
     const user = await User.findOneUser(email);
-    if (user == false) {
+    if (user === false) {
       // if error with the db
       throw 500;
     } else if (user == null) {
       //if user doesnt exist
       return { status: 404, data: "Ο χρήστης δεν βρέθηκε!" };
-    } else if (user.verified == false) {
+    } else if (user.verified === false) {
       //if user isnt verified
       var otp = otpGenerator.generate(4, {
         digits: true,
@@ -176,7 +176,7 @@ const updatePass = async (req) => {
 
       if (user === null) {
         return { status: 404, message: "Ο χρήστης δεν βρέθηκε." };
-      } else if (user == false) {
+      } else if (user === false) {
         throw new Error(
           "Κάτι πήγε στραβά μέσα στο Function updatePassUser στο αρχείο database/User.js"
         );
@@ -475,7 +475,7 @@ const searchUser = async (req) => {
 
       //check if he has any interested posts
       const interested = await PostInt.findAny(data.email);
-      if (interested == false) {
+      if (interested === false) {
         throw new Error("something went wrong with finding the interests");
       }
 
@@ -612,7 +612,7 @@ const notifyMe = async (req) => {
       extra,
       dateToCheck
     );
-    if (possibleReviews == false)
+    if (possibleReviews === false)
       throw new Error("Error at finding all the finished possible reviews");
 
     // CHECK IF THE USER HAS ALREADY DONE HIS PART OF THE REVIEW
@@ -628,10 +628,10 @@ const notifyMe = async (req) => {
       if (val.passengerEmail == extra) {
         // IF YOU ARE WERE A PASSENGER
         const user = await User.findOneLight(val.driverEmail);
-        if (user == false) throw new Error("Error at finding the user");
+        if (user === false) throw new Error("Error at finding the user");
 
         const reviewExist = await Review.findOne(val.driverEmail, extra);
-        if (reviewExist == false) throw new Error("Error at finding review");
+        if (reviewExist === false) throw new Error("Error at finding review");
 
         let toEdit = false;
         if (reviewExist != null) {
@@ -647,14 +647,14 @@ const notifyMe = async (req) => {
       } else {
         //IF THE USER WAS THE DRIVER
         const user = await User.findOneLight(val.passengerEmail);
-        if (user == false) throw new Error("Error at finding the user");
+        if (user === false) throw new Error("Error at finding the user");
         if (user == null) {
           throw new Error("User doesnt exist");
         }
 
         // console.log(user);
         const reviewExist = await Review.findOne(val.passengerEmail, extra);
-        if (reviewExist == false) throw new Error("Error at finding review");
+        if (reviewExist === false) throw new Error("Error at finding review");
 
         let toEdit = false;
         if (reviewExist != null) {

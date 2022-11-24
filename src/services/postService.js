@@ -141,7 +141,7 @@ const interested = async (req) => {
       } else {
         const inter = await PostInterested.createInterest(row);
         // console.log(inter.date);
-        if (inter == false)
+        if (inter === false)
           throw new Error("Something went wrong with creation of interest!");
         //Section for notificaiton through firebase
         const postForFunction = await Post.findOne(row.postid);
@@ -269,7 +269,7 @@ const searchPosts = async (req) => {
       };
 
       const user = await User.findOneUserQuery(userQuery);
-      if (user == false) {
+      if (user === false) {
         throw new Error(
           "Something went wrong with finding the user of each post"
         );
@@ -298,7 +298,7 @@ const searchPosts = async (req) => {
     }
 
     let filteredArray = await applyFilters(data, array);
-    if (filteredArray == false) {
+    if (filteredArray === false) {
       throw err;
     }
     var skipcount = 0;
@@ -348,7 +348,7 @@ const getPostsUser = async (req) => {
 
     let today = moment().subtract(6, "months");
     let found = await Post.findAllPastHalfYear(data.email, today);
-    if (found == false) {
+    if (found === false) {
       throw new Error("Error with finding the posts of the user");
     }
 
@@ -395,7 +395,7 @@ const getPostsUser = async (req) => {
       let count = found.count;
       //get the data of user
       let user = await User.findOneLight(post.email);
-      if (user == false) {
+      if (user === false) {
         throw new Error("Error at finding user");
       }
 
@@ -403,7 +403,7 @@ const getPostsUser = async (req) => {
       user.dataValues = { ...user.dataValues, ...reviewData };
 
       let interested = await PostInterested.findOne(post.email, post.postid);
-      if (interested == false) {
+      if (interested === false) {
         throw new Error("Error at getting the interested of a post");
       }
       let flag;
@@ -452,7 +452,7 @@ const getPostPerId = async (req) => {
     let email = req.body.extra;
 
     let post = await Post.findOne(postid);
-    if (post == false) {
+    if (post === false) {
       throw new Error("Error at finding one post");
     }
     if (IsJsonString(post.moreplaces)) {
@@ -472,7 +472,7 @@ const getPostPerId = async (req) => {
     // CHECK IF THE SEARCHER IS INTERESTED
     let interested = false;
     const postInt = await PostInterested.findOne(email, postid);
-    if (postInt == false) {
+    if (postInt === false) {
       throw new Error("Error at findning if user is interested for the post");
     }
     // if the searcher is interested then true
@@ -480,7 +480,7 @@ const getPostPerId = async (req) => {
 
     // find creator of post
     const user = await User.findOneLight(post.email);
-    if (user == false) {
+    if (user === false) {
       throw new Error("Error at finding the user of the post");
     }
 
@@ -511,7 +511,7 @@ const getInterestedPerUser = async (req) => {
     let response;
 
     let found = await PostInterested.findAny(data.email);
-    if (found == false) {
+    if (found === false) {
       throw new Error("Error at getting all the interests");
     }
 
@@ -540,7 +540,7 @@ const getInterestedPerUser = async (req) => {
         );
 
         // sugxwneush post kai stoixeia endiaferomenou
-        if (postI.isNotified == false) {
+        if (postI.isNotified === false) {
           let flag = await PostInterested.updateNotify(postI);
           if (flag == null) {
             throw new Error(
@@ -562,7 +562,7 @@ const getInterestedPerUser = async (req) => {
         };
 
         let user = await User.findOneLight(post.dataValues.email);
-        if (user == false) {
+        if (user === false) {
           throw new Error("Error at finding the user of the post");
         }
 
@@ -602,7 +602,7 @@ const getIntPost = async (req) => {
     var extra = req.body.extra;
 
     let posts = await Post.findOne(data.postid);
-    if (posts == false) {
+    if (posts === false) {
       throw new Error("Error at finding the requested post");
     }
     if (IsJsonString(posts.moreplaces)) {
@@ -623,7 +623,7 @@ const getIntPost = async (req) => {
     let allUsers = [];
 
     const interested = await PostInterested.findAllPerId(posts.postid);
-    if (interested == false) {
+    if (interested === false) {
       throw new Error("Error at finding all the interested per ID");
     }
     // ean vrethikan endiaferomenoi
@@ -632,7 +632,7 @@ const getIntPost = async (req) => {
       for await (one of interested) {
         isAny++;
         const user = await User.findOneLight(one.email);
-        if (user == false) throw new Error("Error at getting user");
+        if (user === false) throw new Error("Error at getting user");
 
         if (user != null) {
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
@@ -746,7 +746,7 @@ const verInterested = async (req) => {
     var data = req.body.data;
     //GETING THE DATA OF THE ROW THAT IS TO BE VERIFIED
     const results = await PostInterested.findOneById(data.piid);
-    if (results == false) {
+    if (results === false) {
       throw new Error("Error at getting the interested data");
     }
 
@@ -761,7 +761,7 @@ const verInterested = async (req) => {
     if (!post) throw new Error("Error at finding the post");
 
     if (allIntersted < post.numseats || results.isVerified == true) {
-      if (results.isVerified == false) {
+      if (results.isVerified === false) {
         const updated = await PostInterested.updateVerify(results);
         if (!updated) throw new Error("Error at update verify flag");
         // Create possible review notification
@@ -839,7 +839,7 @@ const verInterested = async (req) => {
             p.postid,
             post.email
           );
-          if (intP == false)
+          if (intP === false)
             throw new Error("Error at geting the PP if verified");
 
           // if you find such a post, then update the possible review and dont delete it
@@ -853,7 +853,7 @@ const verInterested = async (req) => {
               results.piid
             );
 
-            if (updated == false)
+            if (updated === false)
               throw new Error("Error at updating the possible review");
           }
         }
@@ -886,11 +886,11 @@ const handleFavourite = async (req) => {
       throw new Error("Error at counting the favourites of user");
 
     const post = await Post.findOne(postid);
-    if (post == false) throw new Error("Error at finding the post of user");
+    if (post === false) throw new Error("Error at finding the post of user");
 
     if (post.isFavourite == true) {
       const deletedFav = await Post.deleteFavourite(postid);
-      if (deletedFav == false)
+      if (deletedFav === false)
         throw new Error("Error at deleting the favourite");
       return {
         status: 200,
@@ -899,7 +899,7 @@ const handleFavourite = async (req) => {
     }
     if (countAll < 5) {
       const newFav = await Post.makeFavourite(postid);
-      if (newFav == false) throw new Error("Error at declaring new favourite");
+      if (newFav === false) throw new Error("Error at declaring new favourite");
       return { status: 200, message: "To ride προστέθηκε στα αγαπημένα σου" };
     } else {
       return { status: 405, message: "Έχεις ήδη 5 αγαπημένα ride" };
@@ -916,13 +916,13 @@ const getFavourites = async (req) => {
     moment.locale("en");
 
     const user = await User.findOneLight(email);
-    if (user == false) throw new Error("Error at finding the user data");
+    if (user === false) throw new Error("Error at finding the user data");
 
     let extraData = await insertAver(user);
     user.dataValues = { ...user.dataValues, ...extraData };
 
     const allFavourites = await Post.findAllFavourites(email);
-    if (allFavourites == false)
+    if (allFavourites === false)
       throw new Error("Error at getting all the favourites");
     else if (allFavourites.length == 0) {
       return { status: 404, message: "Δεν βρέθηκαν αγαπημένα Rides" };

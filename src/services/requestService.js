@@ -37,7 +37,7 @@ const createRequest = async (req) => {
       //CREATE THE REQUEST
       const request = await Request.saveRequest(data);
       // console.log(request);
-      if (request == false) {
+      if (request === false) {
         throw new Error("Error at creation of request");
       }
       return { status: 200, request: request, message: "Επιτυχής δημιουργία!" };
@@ -59,7 +59,7 @@ const getRequests = async (req) => {
   try {
     let email = req.body.extra;
     const requests = await Request.getAll(email);
-    if (requests == false) {
+    if (requests === false) {
       throw new Error("Error at getting the requests");
     }
     if (requests.length > 0) {

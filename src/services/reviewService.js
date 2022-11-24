@@ -37,7 +37,7 @@ const getReviews = async (req) => {
     };
 
     const revfound = await Review.findAndCountAll(query);
-    if (revfound == false)
+    if (revfound === false)
       throw new Error("Something went wrong with counting the reviews");
     var rows = revfound.rows;
     var total = null;
@@ -54,7 +54,7 @@ const getReviews = async (req) => {
     };
 
     const rev = await Review.findAndCountAll(query);
-    if (rev == false)
+    if (rev === false)
       throw new Error("Something went wrong with getting all the reviews");
 
     let counter = 0;
@@ -70,7 +70,7 @@ const getReviews = async (req) => {
       r.dataValues.revId = counter;
       counter++;
       let user = await User.findOneUser(r.emailreviewer);
-      if (user == false) {
+      if (user === false) {
         throw new Error(
           "Something went wrong with finding the user of the a review"
         );
@@ -123,17 +123,17 @@ const createReview = async (req) => {
       },
     };
     const revExist = await Review.findOne(data.email, data.emailreviewer);
-    if (revExist == false) {
+    if (revExist === false) {
       throw new Error("Something went wrong with finding an existing review");
     } else if (revExist == null) {
       //CASE THAT THE REVIEW DOESNT EXIST
       const review = await Review.saveReview(data);
-      if (review == false) {
+      if (review === false) {
         throw new Error("Something went wrong with creating the review");
       }
       // get the possible review that led the user to create the particular review
       const possibleReview = await ToReview.findForCreatingReview(review);
-      if (possibleReview == false) {
+      if (possibleReview === false) {
         throw new Error(
           "Something went wrong with getting the possible review"
         );
@@ -152,7 +152,7 @@ const createReview = async (req) => {
       }
 
       let results = await Review.findAndCountAll(query);
-      if (results == false) {
+      if (results === false) {
         throw new Error(
           "Something went wrong with finding/counting the reviews"
         );
@@ -176,7 +176,7 @@ const createReview = async (req) => {
       // CASE THAT THE REVIEW IS TO BE UPDATED.
       //Section where i update the toreview row!!!!!!!!!!!!1
       const possibleReview = await ToReview.findForCreatingReview(data);
-      if (possibleReview == false) {
+      if (possibleReview === false) {
         throw new Error(
           "Something went wrong at finding possible Review at updating the review"
         );
@@ -187,7 +187,7 @@ const createReview = async (req) => {
       }
 
       const flag = await Review.updateReview(revExist, data);
-      if (flag == false) {
+      if (flag === false) {
         throw new Error("Something went wrong with updating the review");
       }
 
@@ -199,7 +199,7 @@ const createReview = async (req) => {
       }
 
       const results = await Review.findAndCountAll(query);
-      if (results == false) {
+      if (results === false) {
         throw new Error(
           "Something went wrong at getting the sum and count of reviews (updating"
         );
