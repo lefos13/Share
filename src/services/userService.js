@@ -50,14 +50,14 @@ const createNewUser = async (req) => {
   try {
     var data = req.body.data;
     let photo = data.photo;
-    // let splitted = data.age.split("/");
-    // let ageDate = moment()
-    //   .set("year", parseInt(splitted[2]))
-    //   .set("month", parseInt(splitted[1]) - 1)
-    //   .set("date", parseInt(splitted[0]));
+    let splitted = data.age.split("/");
+    let ageDate = moment()
+      .set("year", parseInt(splitted[2]))
+      .set("month", parseInt(splitted[1]) - 1)
+      .set("date", parseInt(splitted[0]));
 
-    // let calcAge = moment().diff(ageDate, "years");
-    // data.age = calcAge;
+    let calcAge = moment().diff(ageDate, "years");
+    data.age = calcAge;
     data["verified"] = true;
     data["photo"] = null;
     let salt = await bcrypt.genSalt(saltRounds);
