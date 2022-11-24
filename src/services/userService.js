@@ -239,6 +239,7 @@ const userVerify = async (req) => {
 
 const login = async (req) => {
   try {
+    let data = req.body.data;
     var email = req.body.data.email;
     var pass = req.body.data.pass;
     let autoLogin = req.body.data.autoLogin;
@@ -269,17 +270,36 @@ const login = async (req) => {
           return {
             status: 406,
             message:
-              "Πρέπει να κάνεις forgot password για να ορίσεις νέο κωδικό πρόσβασης!",
+              "Για να συνδεθείς με email και password θα πρέπει να ορίσεις νέο password. Πάτα Οκ για να το ορίσεις ή συνδέσου με google Sign in!",
           };
-        }
-        // else if (
-        //   campareGooglePass === true &&
-        //   user.isThirdPartyLogin === true &&
-        //   autoLogin === true
-        // ) {
-        //   //case that is google signed in and go for autologin
-        // }
-        else {
+        } else if (
+          campareGooglePass === true &&
+          user.isThirdPartyLogin === true &&
+          autoLogin === true
+        ) {
+          //case that is google signed in and go for autologin
+          console.log("case that is google signed in and go for autologin");
+          let userData = user.toJSON();
+          let { password, mobile, photo, ...rest } = userData;
+          //TEMP CODE FOR PHOTO
+          const photoPath = "./uploads/" + data.email + ".jpeg";
+          //check if the photo exists and insert the property
+          if (fs.existsSync(photoPath)) {
+            rest.photo = "images/" + data.email + ".jpeg";
+          }
+          //MISING FCM TOKEN CODE
+          let fcmDone = await saveFcm(data.fcmToken, data.email);
+          if (fcmDone === false) {
+            throw new Error("Error at creating/updating the fcmToken");
+          }
+          //
+          return {
+            status: 200,
+            message: "Επιτυχής είσοδος!",
+            user: rest,
+            forceUpdate: false,
+          };
+        } else {
           // CHECK IF THE PASS IS RIGHT
           const result = await bcrypt.compare(pass, user.password);
 

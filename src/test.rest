@@ -5,7 +5,7 @@ Accept-Language: en
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos199@gmail.com"
     }
 }
 
@@ -85,7 +85,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
     "data":{
         "email": "lefterisevagelinos1996@gmail.com",
         "pass": "google_sign_in_pass",
-        "autoLogin": true
+        "autoLogin": true,
+        "fcmToken": null
     }
 }
 ###
@@ -96,7 +97,8 @@ Content-Type: application/json
     "data": {
         "fullname": "George1",
         "email": "lefterisevagelinos1996@gmail.com",
-        "password": "google_sign_in_pass"
+        "password": "google_sign_in_pass",
+        "fcmToken": null
     }
 }
 
@@ -267,11 +269,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
 POST http://localhost:3000/users/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE0VDE2OjU1OjEwLjgzNFoiLCJpYXQiOjE2Njg0NDQ5MTAsImV4cCI6MTY3MzYyODkxMH0.eSGiSvs_eqz7ipo7uOH76c_JFPzCXEgOax-I9wYxvfM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMi0xMS0yNFQxMToyODowNS4wMjNaIiwiaWF0IjoxNjY5Mjg5Mjg1LCJleHAiOjE2NzQ0NzMyODV9.yFGn8s_ytYI_aEx5kauNiSHWWiQS_K0B-IqIRtSUoCo
 
 {
     "data": {
-        "email": "user2@gmail.com"
+        "email": "lefterisevagelinos199@gmail.com"
     }
 }
 
