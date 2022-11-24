@@ -20,7 +20,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 });
 
 const SearchPost = sequelize.define(
-  "searchPost",
+  "searchpost",
   {
     postSearchId: {
       type: DataTypes.BIGINT.UNSIGNED,

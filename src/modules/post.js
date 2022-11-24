@@ -19,7 +19,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 });
 
 const Posts = sequelize.define(
-  "Posts",
+  "posts",
   {
     postid: {
       type: DataTypes.BIGINT.UNSIGNED,

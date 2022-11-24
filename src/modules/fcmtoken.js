@@ -19,7 +19,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 });
 
 const FcmToken = sequelize.define(
-  "FcmToken",
+  "fcmtoken",
   {
     email: {
       type: DataTypes.STRING,

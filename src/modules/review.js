@@ -25,7 +25,7 @@ Date.prototype.addHours = function (h) {
 };
 
 const Reviews = sequelize.define(
-  "Reviews",
+  "reviews",
   {
     email: {
       type: DataTypes.BIGINT.UNSIGNED,

@@ -15,7 +15,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 });
 
 const Users = sequelize.define(
-  "Users",
+  "users",
   {
     email: {
       type: DataTypes.STRING,
