@@ -1,5 +1,7 @@
 // In src/controllers/postController.js
 const postService = require("../services/postService");
+const moment = require("moment-timezone");
+moment.tz.setDefault("Europe/Athens");
 const getAllPosts = (req, res) => {
   const allPosts = postService.getAllPosts();
   res.send("Get all workouts");
@@ -38,11 +40,13 @@ const interested = async (req, res) => {
     // console.log("asd");
     const data = await postService.interested(req);
     if (data.status == 200) {
+      // console.log(data.body.date);
       res.json({ body: data.body, message: data.message });
     } else {
       res.status(data.status).json({ message: data.message });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Κάτι πήγε στραβά!" });
   }
 };

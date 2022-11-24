@@ -31,7 +31,9 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
     typeCast: true,
   },
 });
-const moment = require("moment");
+const moment = require("moment-timezone");
+moment.tz.setDefault("Europe/Athens");
+moment.locale("el");
 
 const RFC_H = "DD MMM YYYY hh:mm";
 const RFC_ONLYM = "DD MMM YYYY";
@@ -90,19 +92,23 @@ const interested = async (req) => {
     // console.log(req.query);
     var results = null;
 
-    let curtime = moment().format("YYYY-MM-DD HH:m:s");
-    let starttime = moment().subtract(1, "day").format("YYYY-MM-DD HH:m:s");
+    let curtime = moment().endOf("day").format("YYYY-MM-DD HH:mm:ss");
+    let starttime = moment().startOf("day").format("YYYY-MM-DD HH:mm:ss");
+    // console.log(curtime, starttime);
     // console.log("Moment curdate: ", cur, endDate);
+
+    let dateOfInterest = moment();
+    // console.log(dateOfInterest);
 
     var row = {
       email: req.body.data.email,
       postid: req.body.data.postid,
-      date: curtime,
+      date: dateOfInterest.format("YYYY MMM DD HH:mm:ss"),
       isVerified: false,
       isNotified: false,
       ownerNotified: false,
     };
-    row["date"] = curtime;
+    // console.log(row.date);
     //CHECK IF THE CLIENT IS THE OWNER OF THE POST
     const isPostOwner = await Post.isPostOwner(row);
 
@@ -113,8 +119,8 @@ const interested = async (req) => {
     }
 
     const interest = await PostInterested.findOne(row.email, row.postid);
-    if (interest == false) {
-      throw new Error("Something went wrong!");
+    if (interest === false) {
+      throw new Error("Something went wrong with finding the interested");
     }
     if (interest == null) {
       const count = await PostInterested.getCountOfUser(
@@ -126,7 +132,7 @@ const interested = async (req) => {
         throw new Error(
           "Something went wrong at counting the interests of user"
         );
-      } else if (count == 9) {
+      } else if (count >= 9) {
         return {
           status: 405,
           message:
@@ -134,16 +140,17 @@ const interested = async (req) => {
         };
       } else {
         const inter = await PostInterested.createInterest(row);
+        // console.log(inter.date);
         if (inter == false)
           throw new Error("Something went wrong with creation of interest!");
-        results = inter;
         //Section for notificaiton through firebase
         const postForFunction = await Post.findOne(row.postid);
         fun.toNotifyOwner(postForFunction.email, extra, row.postid);
         // return the right results to the controller
+        console.log(row.date);
         return {
           status: 200,
-          body: results,
+          body: row,
           message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
         };
       }

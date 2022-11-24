@@ -5,9 +5,10 @@ var axios = require("axios");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 var fun = require("./utils/functions");
 var path = require("path");
-const moment = require("moment");
-const RFC_H = "d MMM YYYY hh:mm";
-const RFC_ONLYM = "d MMM YYYY";
+const moment = require("moment-timezone");
+moment.tz.setDefault("Europe/Athens");
+const RFC_H = "DD MMM YYYY hh:mm";
+const RFC_ONLYM = "DD MMM YYYY";
 
 //limit the size of request
 var bodyParser = require("body-parser");
@@ -81,6 +82,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,
+  timezone: "+02:00",
   dialectOptions: {
     dateStrings: true,
     typeCast: true,

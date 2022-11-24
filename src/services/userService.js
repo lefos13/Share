@@ -46,16 +46,18 @@ const getOneUser = () => {
   return;
 };
 // create User service
-const createNewUser = async (data) => {
+const createNewUser = async (req) => {
   try {
-    var data = data.body.data;
+    var data = req.body.data;
+    let photo = data.photo;
     data["verified"] = true;
+    data["photo"] = null;
     let salt = await bcrypt.genSalt(saltRounds);
     data.password = await bcrypt.hash(data.password, salt);
 
     const final = await User.register(data);
     if (final.status == 200) {
-      let base64 = data.photo;
+      let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
       fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
     }

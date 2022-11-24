@@ -10,17 +10,7 @@ const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
 // END OF SECTION (ENV VAR)
 
 // code for db
-const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
-  host: HOST,
-  dialect: "mysql",
-  logging: true,
-  dialectOptions: {
-    dateStrings: true,
-    typeCast: true,
-  },
-});
 
 const Users = require("../modules/user");
 const Posts = require("../modules/post");
@@ -29,11 +19,6 @@ const Reviews = require("../modules/review");
 const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
-const moment = require("moment");
-require("moment/locale/el");
-moment.locale("el");
-// import "moment/locale/gr";
-// moment.locale("gr");
 // ==== code for db
 
 // *** ADD ***
@@ -96,6 +81,7 @@ const createInterest = async (row) => {
     const inter = await PostInterested.create(row).catch((err) => {
       throw err;
     });
+    // console.log(row.date, inter.date);
     return inter;
   } catch (error) {
     console.log("Inside createInterest: ", error);
