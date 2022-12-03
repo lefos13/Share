@@ -31,6 +31,7 @@ const moment = require("moment");
 
 const createIfNotExist = async (data) => {
   try {
+    // find if this search exists
     const exist = await LastSearch.findOne({
       where: {
         email: data.email,
@@ -49,34 +50,28 @@ const createIfNotExist = async (data) => {
       },
     });
     console.log(data);
+
+    //if it exists
     if (exist === null) {
+      //find and count all of the user
       const allAndCount = await LastSearch.findAndCountAll({
         where: {
           email: data.email,
           isFavourite: false,
         },
+        order: [["isUpdated", "ASC"]],
       }).catch((err) => {
         throw err;
       });
-      // console.log(allAndCount.count);
+      // if they are less than 10 searches
       if (allAndCount.count < 10) {
         //create the last search
         const results = await LastSearch.create(data).catch((err) => {
           throw err;
         });
       } else {
-        //get the list of all the last searches
-        const resultsAll = await LastSearch.findAll({
-          where: {
-            email: data.email,
-            isFavourite: false,
-          },
-          order: [["isUpdated", "ASC"]],
-        }).catch((err) => {
-          throw err;
-        });
         // update the oldest search and make it the last one
-        await resultsAll[0]
+        await allAndCount.rows[0]
           .update({
             isCreated: data.isCreated,
             isUpdated: data.isUpdated,

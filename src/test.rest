@@ -220,7 +220,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
         "startplace": "Volos",
-        "startcoord": "22111111111111111",
+        "startcoord": "222111111111111111",
         "endplace": "Athens",
         "endcoord": "222222",
         "startdate": null,
