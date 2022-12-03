@@ -218,11 +218,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "cs11082@uniwa.gr",
-        "startplace": "ασδ",
-        "startcoord": "1234",
-        "endplace": "δσα",
-        "endcoord": "3215",
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "Volos",
+        "startcoord": "22111111111111111",
+        "endplace": "Athens",
+        "endcoord": "222222",
         "startdate": null,
         "enddate": null,
         "page": 1,

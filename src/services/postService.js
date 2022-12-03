@@ -6,6 +6,7 @@ const PostInterested = require("../database/PostInterested");
 const User = require("../database/User");
 const Review = require("../database/Review");
 const ToReview = require("../database/ToReview");
+const LastSearch = require("../database/LastSearch");
 const fun = require("../utils/functions");
 const {
   insertAver,
@@ -171,6 +172,7 @@ const interested = async (req) => {
 const searchPosts = async (req) => {
   try {
     var data = req.body.data;
+    let email = req.body.extra;
     if (data.startdate == null) {
       data.startdate = moment().format("YYYY-MM-DD");
       data.enddate = moment().add(1, "months").format("YYYY-MM-DD");
@@ -236,6 +238,23 @@ const searchPosts = async (req) => {
     };
     var results = null;
     var array = [];
+    let curDate = moment();
+    let lastSearch = {
+      email: email,
+      startPlace: data.startplace,
+      startCoord: data.startcoord,
+      endPlace: data.endplace,
+      endCoord: data.endcoord,
+      isCreated: curDate,
+      isUpdated: curDate,
+    };
+
+    //Create or Update lastSearch for user
+    const lastSearchRes = await LastSearch.createIfNotExist(lastSearch);
+    if (lastSearchRes === false)
+      throw new Error(
+        "Something went wrong with creating/updating last search"
+      );
 
     // ==========  if startdate is null, then search from the current date to a month after today.
 
