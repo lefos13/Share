@@ -218,7 +218,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "lefterisevgelinos1996@gmail.com",
         "startplace": "Volos",
         "startcoord": "222111111111111111",
         "endplace": "Athens",
@@ -230,7 +230,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "age": null,
         "age_end": null,
         "car": null,
-        "cardate": 1995,
+        "cardate": null,
         "gender": null,
         "withReturn": null,
         "petAllowed": null,
@@ -591,6 +591,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 }
 
 ### SECTION WITH LAST SEARCHES FUNCTIONALITY
+### add favourite search
 POST http://localhost:3000/searches/addFavouriteSearch
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI

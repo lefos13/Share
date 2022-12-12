@@ -152,8 +152,8 @@ const saveFcm = async (fcmToken, email) => {
 const fixDate = async (date) => {
   try {
     let tempd = date;
-    let dateonly = moment(tempd).format("DD MMM YYYY");
-    let newtime = moment(tempd).format("HH:mm");
+    let dateonly = moment(tempd).format("DD/MM/YYYY");
+    let newtime = moment(tempd).format("hh:mm");
 
     // console.log(dateonly, newtime);
     return {

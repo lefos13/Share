@@ -36,8 +36,8 @@ const moment = require("moment-timezone");
 moment.tz.setDefault("Europe/Athens");
 moment.locale("el");
 
-const RFC_H = "DD MMM YYYY hh:mm";
-const RFC_ONLYM = "DD MMM YYYY";
+const RFC_H = "DD/MM/YYYY hh:mm";
+const RFC_ONLYM = "DD/MM/YYYY";
 
 const getAllPosts = () => {
   return;
@@ -269,15 +269,11 @@ const searchPosts = async (req) => {
     for await (fnd of found.rows) {
       if (IsJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
-
-        fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
-          "DD MMM YYYY"
-        );
-        fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(
-          "DD MMM YYYY"
-        );
-        // console.log(fnd.dataValues.startdate, fnd.dataValues.enddate);
       }
+      fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
+        RFC_ONLYM
+      );
+      fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(RFC_ONLYM);
 
       let userQuery = {
         attributes: {
@@ -327,15 +323,13 @@ const searchPosts = async (req) => {
     var finalarr = _.take(_.drop(filteredArray, skipcount), takecount);
     //fix the dates of return and date of creation
     for await (ps of finalarr) {
-      ps.post.dataValues.date = moment(ps.post.dataValues.date).format(
-        "DD MMM YYYY"
-      );
+      ps.post.dataValues.date = moment(ps.post.dataValues.date).format(RFC_H);
       ps.post.dataValues.returnStartDate = moment(
         ps.post.dataValues.returnStartDate
-      ).format("DD MMM YYYY");
+      ).format(RFC_ONLYM);
       ps.post.dataValues.returnEndDate = moment(
         ps.post.dataValues.returnEndDate
-      ).format("DD MMM YYYY");
+      ).format(RFC_ONLYM);
     }
     //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
     if (finalarr.length == 0) {
@@ -389,25 +383,23 @@ const getPostsUser = async (req) => {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
 
-      post.dataValues.date = moment(post.dataValues.date).format(
-        "DD MMM YYYY HH:mm"
-      );
+      post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
       console.log(post.dataValues.date);
 
       post.dataValues.startdate = moment(post.dataValues.startdate).format(
-        "DD MMM YYYY"
+        RFC_ONLYM
       );
       post.dataValues.enddate = moment(post.dataValues.enddate).format(
-        "DD MMM YYYY"
+        RFC_ONLYM
       );
 
       post.dataValues.returnStartDate = moment(
         post.dataValues.returnStartDate
-      ).format("DD MMM YYYY");
+      ).format(RFC_ONLYM);
 
       post.dataValues.returnEndDate = moment(
         post.dataValues.returnEndDate
-      ).format("DD MMM YYYY");
+      ).format(RFC_ONLYM);
       let image = "images/" + post.email + ".jpeg";
 
       let rows = found.rows;
@@ -949,24 +941,22 @@ const getFavourites = async (req) => {
 
     let allResults = [];
     for await (post of allFavourites) {
-      post.dataValues.date = moment(post.dataValues.date).format(
-        "DD MMM YYYY HH:mm"
-      );
+      post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
 
       post.dataValues.startdate = moment(post.dataValues.startdate).format(
-        "DD MMM YYYY"
+        RFC_ONLYM
       );
       post.dataValues.enddate = moment(post.dataValues.enddate).format(
-        "DD MMM YYYY"
+        RFC_ONLYM
       );
 
       post.dataValues.returnStartDate = moment(
         post.dataValues.returnStartDate
-      ).format("DD MMM YYYY");
+      ).format(RFC_ONLYM);
 
       post.dataValues.returnEndDate = moment(
         post.dataValues.returnEndDate
-      ).format("DD MMM YYYY");
+      ).format(RFC_ONLYM);
 
       allResults.push({
         user: user,

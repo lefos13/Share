@@ -23,6 +23,8 @@ const Review = require("../database/Review");
 const User = require("../database/User");
 const ToReview = require("../database/ToReview");
 const _ = require("lodash");
+const RFC_H = "DD/MM/YYYY ΗΗ:mm";
+const RFC_ONLYM = "DD/MM/YYYY";
 
 const getReviews = async (req) => {
   try {
@@ -60,12 +62,8 @@ const getReviews = async (req) => {
     let counter = 0;
     // FIX DATES AND ADD MORE VALUES INTO THE OBJECTS
     for await (r of rev.rows) {
-      r.dataValues.createdAt = moment(r.dataValues.createdAt).format(
-        "DD MMM YYYY"
-      );
-      r.dataValues.updatedAt = moment(r.dataValues.updatedAt).format(
-        "DD MMM YYYY"
-      );
+      r.dataValues.createdAt = moment(r.dataValues.createdAt).format(RFC_ONLYM);
+      r.dataValues.updatedAt = moment(r.dataValues.updatedAt).format(RFC_ONLYM);
 
       r.dataValues.revId = counter;
       counter++;
