@@ -54,11 +54,6 @@ const updatePass = async (req, res) => {
   }
 };
 
-const deleteOneUser = (req, res) => {
-  const deletedUser = userService.deleteOneUser();
-  res.send("Delete an existing workout");
-};
-
 const userVerify = async (req, res) => {
   try {
     const updatedUser = await userService.userVerify(req);
@@ -133,7 +128,6 @@ module.exports = {
   getOneUser,
   createNewUser,
   updateOneUser,
-  deleteOneUser,
   createToken,
   updatePass,
   userVerify,

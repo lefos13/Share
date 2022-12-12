@@ -720,7 +720,7 @@ const notifyMe = async (req) => {
       };
   } catch (error) {
     console.log(error);
-    return { status: 500 };
+    return { status: 500, message: "Κάτι πήγε στραβά!", error: error };
   }
 };
 
