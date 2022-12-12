@@ -34,10 +34,24 @@ const corsOptions = {
 
 //route to find a user
 router.post(
-  "/sendReport",
+  "/addFavouriteSearch",
   [authenticateToken],
   cors(corsOptions),
-  lastSearchController.sendReport
+  lastSearchController.addFavouriteSearch
+);
+
+router.get(
+  "/getAllSearches",
+  [authenticateToken],
+  cors(corsOptions),
+  lastSearchController.getAllSearches
+);
+
+router.post(
+  "/deleteFavourite",
+  [authenticateToken],
+  cors(corsOptions),
+  lastSearchController.deleteFavourite
 );
 
 module.exports = router;

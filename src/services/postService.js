@@ -236,6 +236,7 @@ const searchPosts = async (req) => {
       },
       order: [["date", "DESC"]],
     };
+
     var results = null;
     var array = [];
     let curDate = moment();
@@ -340,12 +341,11 @@ const searchPosts = async (req) => {
     if (finalarr.length == 0) {
       return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
     } else {
-      // console.log(array[0].post.newdate);
-      var mod = array.length % 10;
+      var mod = finalarr.length % 10;
       var totallength = 1;
       mod == 0
-        ? (totallength = array.length / 10)
-        : (totallength = array.length / 10 - mod / 10 + 1);
+        ? (totallength = finalarr.length / 10)
+        : (totallength = finalarr.length / 10 - mod / 10 + 1);
       results = {
         postUser: finalarr,
         totalPages: totallength,

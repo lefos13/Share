@@ -101,6 +101,106 @@ const createIfNotExist = async (data) => {
   }
 };
 
+const favouriteExist = async (data) => {
+  try {
+    //check if favourite already exists
+    const found = await LastSearch.findOne({
+      where: {
+        email: data.email,
+        isFavourite: true,
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { startPlace: data.startPlace },
+              { startCoord: data.startCoord },
+            ],
+          },
+          {
+            [Op.or]: [{ endPlace: data.endPlace }, { endCoord: data.endCoord }],
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return found;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+const createFavourite = async (data) => {
+  try {
+    await LastSearch.create(data).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const countFavourites = async (email) => {
+  try {
+    const count = await LastSearch.count({
+      where: {
+        email: email,
+        isFavourite: true,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return count;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const getAll = async (email) => {
+  try {
+    const searches = await LastSearch.findAll({
+      where: {
+        email: email,
+      },
+      order: [["isCreated", "DESC"]],
+    }).catch((err) => {
+      throw err;
+    });
+
+    return searches;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const deleteFavourite = async (lsid, email) => {
+  try {
+    const destroyed = await LastSearch.destroy({
+      where: {
+        email: email,
+        lsid: lsid,
+        isFavourite: true,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    console.log(destroyed);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   createIfNotExist,
+  createFavourite,
+  countFavourites,
+  getAll,
+  favouriteExist,
+  deleteFavourite,
 };

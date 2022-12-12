@@ -590,3 +590,33 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
     }
 }
 
+### SECTION WITH LAST SEARCHES FUNCTIONALITY
+POST http://localhost:3000/searches/addFavouriteSearch
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+
+{
+    "data": {
+        "startPlace": "Volosssssssssss",
+        "startCoord": "123ssssssssss",
+        "endPlace": "Athens",
+        "endCoord": "321",
+        "isFavourite": true
+    }
+}
+
+### get all searches.
+GET http://localhost:3000/searches/getAllSearches
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+
+### delete one favourite search.
+POST http://localhost:3000/searches/deleteFavourite
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+
+{
+    "data": {
+        "lsid": 25
+    }
+}
