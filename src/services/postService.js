@@ -59,7 +59,7 @@ const createNewPost = async (data) => {
     if (counter < 3) {
       //do it
       const newPost = await Post.createNewPost(postToInsert);
-      if (newPost != false)
+      if (newPost !== false)
         message = {
           status: 200,
           data: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
@@ -179,8 +179,6 @@ const searchPosts = async (req) => {
     }
     let query = {
       where: {
-        // minimum cost
-        costperseat: { [Op.lte]: data.cost },
         // email different than one that do the search
         email: { [Op.ne]: data.email },
         [Op.and]: [

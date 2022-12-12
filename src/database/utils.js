@@ -31,15 +31,6 @@ const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
 // ==== code for db
 
-const savePost = async (data) => {
-  // database code to save post to db
-  const post = await Posts.create(data).catch((err) => {
-    throw err;
-  });
-
-  return post;
-};
-
 const verification = async (otp, email) => {
   try {
     // create reusable transporter object using the default SMTP transport
@@ -165,4 +156,4 @@ const fixDate = async (date) => {
   }
 };
 
-module.exports = { savePost, verification, checkPass, fixDate, saveFcm };
+module.exports = { verification, checkPass, fixDate, saveFcm };

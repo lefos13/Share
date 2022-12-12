@@ -9,6 +9,7 @@ const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
   process.env;
 // END OF SECTION (ENV VAR)
 
+const { pushNotifications } = require("../utils/functions");
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
@@ -81,17 +82,20 @@ const createNewPost = async (data) => {
       data.returnEndDate = moment();
     }
     // fix gia to enddate==null
-    if (data.enddate == null) {
+    if (data.enddate === null) {
       data.enddate = data.startdate;
     }
 
-    // console.log("current day: ", postdate); // current date
-    const post = await savePost(data); // actual creation of post to DB
-    return post;
+    const post = await Posts.create(data).catch((err) => {
+      throw err;
+    });
+
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //Firebase newRide notification
-    //   pushNotifications(post);
+    pushNotifications(post);
+    return post;
   } catch (error) {
+    console.log(error);
     return false;
   }
   // logic for the creation of post in db

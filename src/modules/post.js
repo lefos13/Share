@@ -72,10 +72,6 @@ const Posts = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-    costperseat: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     petAllowed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

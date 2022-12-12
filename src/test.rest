@@ -5,7 +5,7 @@ Accept-Language: en
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user1@gmail.com"
     }
 }
 
@@ -160,25 +160,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service pou ftiaxneis ena post
-POST http://localhost:3000/createpost
+POST http://localhost:3000/posts/createpost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTA2LTI2VDE2OjUyOjIzLjIyOFoiLCJpYXQiOjE2NTYyNjIzNDMsImV4cCI6MTY2MTQ0NjM0M30._PWmI7NvBmjRG3cPF0-fPJLQw0-gDbmkuMclk5HD57U
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEyVDE5OjQ4OjMwLjg3NVoiLCJpYXQiOjE2NzA4NzQ1MTAsImV4cCI6MTY3NjA1ODUxMH0.lZsv25J64lxVhOw8FtWionb5ZSJQl0bptPkV4Ww-Ifs
 
 {
     "data": {
         "email": "user1@gmail.com",
         "date": "2022-06-26",
         "startplace": "Βόλος",
-        "startcoord": "1234",
+        "startcoord": "123",
         "endplace": "Αθήνα",
-        "endcoord": "3215",
+        "endcoord": "321",
         "numseats": 2,
-        "startdate": "2022-04-22",
-        "enddate": "2022-04-21",
+        "startdate": "2022-12-22",
+        "enddate": "2022-12-22",
         "returnStartDate": "2022-12-20",
         "returnEndDate": "2022-12-21",
-        "withReturn": true,
-        "costperseat": 40,
+        "withReturn": false,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "petAllowed": true,
         "isFavourite": false,
@@ -226,7 +225,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "startdate": null,
         "enddate": null,
         "page": 1,
-        "cost": 100,
         "age": null,
         "age_end": null,
         "car": null,

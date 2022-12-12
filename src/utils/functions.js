@@ -348,4 +348,69 @@ module.exports = {
     }
     return true;
   },
+  pushNotifications: async (post) => {
+    try {
+      let arrayToNotify = [];
+      // GATHER ALL THE REQUESTS WITH THE SPECIFIC STARTCOORD AND THE ENDCOORD OF THE POST THAT HAS BEEN CREATED
+      const allRequests = await SearchPost.findAll({
+        where: {
+          startcoord: post.startcoord,
+          endcoord: post.endcoord,
+        },
+      }).catch((err) => {
+        console.log("Inside function that pushes notifications, threw error!");
+        throw err;
+      });
+
+      // FLAG TO SEND OR NOT THE NOTIFICATION
+      let toSendNotification = false;
+
+      if (allRequests.length > 0) {
+        // CASE THAT THE POST HAS THE RIGHT ENDPLACE OF A REQUEST
+        // GATHER THE USERS TO BE INFORMED
+        toSendNotification = true;
+        for await (req of allRequests) {
+          arrayToNotify.push(req.email);
+        }
+      }
+
+      // IF THE POST HASN'T THE ENDPLACE OF THE REQUESTS, CHECK FOR MOREPLACES IF THEY INCLUDE THE ENDPLACE OF THE REQUEST ----
+      const allRequests2 = await SearchPost.findAll({
+        where: {
+          startcoord: post.startcoord,
+        },
+      }).catch((err) => {
+        console.log("Inside function that pushes notifications, threw error!");
+        throw err;
+      });
+
+      // IF THE ENDPLACE OF A REQUEST IS INSIDE THE MOREPLACES, GATHER THE USERS THAT I NEED TO NOTIFY
+      if (allRequests2.length > 0) {
+        for await (req of allRequests2) {
+          let moreplaces = IsJsonString(post.moreplaces)
+            ? JSON.parse(post.moreplaces)
+            : post.moreplaces;
+          for await (place of moreplaces) {
+            if (place.placecoords == req.endcoord) {
+              toSendNotification = true;
+
+              // array with the users that need to be informed that a post of their request has been created
+              arrayToNotify.push(req.email);
+            }
+          }
+        }
+      }
+
+      // HERE YOU SEND THE NOTIFICATIONS
+      if (toSendNotification) {
+        // Data for the notification, postid and the array of users
+        newRide(post.postid, arrayToNotify, post.email);
+      } else {
+        console.log("No request is found to be valid for the new post");
+      }
+    } catch (err) {
+      console.log("Error inside try and catch!!!!!", err);
+    }
+    // console.log("Inside func", post);
+  },
 };
