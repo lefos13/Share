@@ -29,7 +29,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 });
 
 const moment = require("moment");
-const RFC_H = "DD/MM/YYYY hh:mm";
+const RFC_H = "DD/MM/YYYY HH:mm";
 const RFC_ONLYM = "DD/MM/YYYY";
 
 const Users = require("../modules/user");

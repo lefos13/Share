@@ -36,16 +36,9 @@ const moment = require("moment-timezone");
 moment.tz.setDefault("Europe/Athens");
 moment.locale("el");
 
-const RFC_H = "DD/MM/YYYY hh:mm";
+const RFC_H = "DD/MM/YYYY HH:mm";
 const RFC_ONLYM = "DD/MM/YYYY";
 
-const getAllPosts = () => {
-  return;
-};
-
-const getOnePost = () => {
-  return;
-};
 // create post service
 const createNewPost = async (data) => {
   try {
@@ -79,22 +72,14 @@ const createNewPost = async (data) => {
   }
 };
 
-const updateOnePost = () => {
-  return;
-};
-
-const deleteOnePost = () => {
-  return;
-};
-
 const interested = async (req) => {
   try {
     let extra = req.body.extra;
     // console.log(req.query);
     var results = null;
 
-    let curtime = moment().endOf("day").format("YYYY-MM-DD HH:mm:ss");
-    let starttime = moment().startOf("day").format("YYYY-MM-DD HH:mm:ss");
+    let curtime = moment().endOf("day").format("YYYY-MM-DD hh:mm:ss");
+    let starttime = moment().startOf("day").format("YYYY-MM-DD hh:mm:ss");
     // console.log(curtime, starttime);
     // console.log("Moment curdate: ", cur, endDate);
 
@@ -104,7 +89,7 @@ const interested = async (req) => {
     var row = {
       email: req.body.data.email,
       postid: req.body.data.postid,
-      date: dateOfInterest.format("YYYY MMM DD HH:mm:ss"),
+      date: dateOfInterest,
       isVerified: false,
       isNotified: false,
       ownerNotified: false,
@@ -398,23 +383,24 @@ const getPostsUser = async (req) => {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
 
-      post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
-      console.log(post.dataValues.date);
+      // post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
+      // console.log(post.dataValues.date);
 
-      post.dataValues.startdate = moment(post.dataValues.startdate).format(
-        RFC_ONLYM
-      );
-      post.dataValues.enddate = moment(post.dataValues.enddate).format(
-        RFC_ONLYM
-      );
+      // post.dataValues.startdate = moment(post.dataValues.startdate).format(
+      //   RFC_ONLYM
+      // );
+      // post.dataValues.enddate = moment(post.dataValues.enddate).format(
+      //   RFC_ONLYM
+      // );
 
-      post.dataValues.returnStartDate = moment(
-        post.dataValues.returnStartDate
-      ).format(RFC_ONLYM);
+      // post.dataValues.returnStartDate = moment(
+      //   post.dataValues.returnStartDate
+      // ).format(RFC_ONLYM);
 
-      post.dataValues.returnEndDate = moment(
-        post.dataValues.returnEndDate
-      ).format(RFC_ONLYM);
+      // post.dataValues.returnEndDate = moment(
+      //   post.dataValues.returnEndDate
+      // ).format(RFC_ONLYM);
+      post = await fun.fixAllDates(post);
       let image = "images/" + post.email + ".jpeg";
 
       let rows = found.rows;
@@ -484,16 +470,9 @@ const getPostPerId = async (req) => {
     if (IsJsonString(post.moreplaces)) {
       post.moreplaces = JSON.parse(post.moreplaces);
     }
+
     //FIX ALL DATES
-    post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
-    post.dataValues.startdate = moment(post.startdate).format(RFC_ONLYM);
-    post.dataValues.enddate = moment(post.enddate).format(RFC_ONLYM);
-    post.dataValues.returnStartDate = moment(post.returnStartDate).format(
-      RFC_ONLYM
-    );
-    post.dataValues.returnEndDate = moment(post.returnEndDate).format(
-      RFC_ONLYM
-    );
+    post = await fun.fixAllDates(post);
 
     // CHECK IF THE SEARCHER IS INTERESTED
     let interested = false;
@@ -505,7 +484,7 @@ const getPostPerId = async (req) => {
     postInt == null ? (interested = false) : (interested = true);
 
     // find creator of post
-    const user = await User.findOneLight(post.email);
+    const user = await User.findOneLight(email);
     if (user === false) {
       throw new Error("Error at finding the user of the post");
     }
@@ -534,12 +513,12 @@ const getPostPerId = async (req) => {
 const getInterestedPerUser = async (req) => {
   try {
     var data = req.body.data;
-    let response;
 
     let found = await PostInterested.findAny(data.email);
     if (found === false) {
       throw new Error("Error at getting all the interests");
     }
+    // console.log(found);
 
     let array = [];
     for await (postI of found) {
@@ -555,15 +534,8 @@ const getInterestedPerUser = async (req) => {
           post.moreplaces = JSON.parse(post.moreplaces);
         }
         postI.dataValues.date = moment(postI.dataValues.date).format(RFC_H);
-        post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
-        post.dataValues.startdate = moment(post.startdate).format(RFC_ONLYM);
-        post.dataValues.enddate = moment(post.enddate).format(RFC_ONLYM);
-        post.dataValues.returnStartDate = moment(post.returnStartDate).format(
-          RFC_ONLYM
-        );
-        post.dataValues.returnEndDate = moment(post.returnEndDate).format(
-          RFC_ONLYM
-        );
+
+        post = await fun.fixAllDates(post);
 
         // sugxwneush post kai stoixeia endiaferomenou
         if (postI.isNotified === false) {
@@ -634,15 +606,16 @@ const getIntPost = async (req) => {
     if (IsJsonString(posts.moreplaces)) {
       posts.moreplaces = JSON.parse(posts.moreplaces);
     }
-    posts.dataValues.date = moment(posts.dataValues.date).format(RFC_H);
-    posts.dataValues.startdate = moment(posts.startdate).format(RFC_ONLYM);
-    posts.dataValues.enddate = moment(posts.enddate).format(RFC_ONLYM);
-    posts.dataValues.returnStartDate = moment(posts.returnStartDate).format(
-      RFC_ONLYM
-    );
-    posts.dataValues.returnEndDate = moment(posts.returnEndDate).format(
-      RFC_ONLYM
-    );
+    // posts.dataValues.date = moment(posts.dataValues.date).format(RFC_H);
+    // posts.dataValues.startdate = moment(posts.startdate).format(RFC_ONLYM);
+    // posts.dataValues.enddate = moment(posts.enddate).format(RFC_ONLYM);
+    // posts.dataValues.returnStartDate = moment(posts.returnStartDate).format(
+    //   RFC_ONLYM
+    // );
+    // posts.dataValues.returnEndDate = moment(posts.returnEndDate).format(
+    //   RFC_ONLYM
+    // );
+    posts = await fun.fixAllDates(posts);
     let message = "Βρέθηκαν ενδιαφερόμενοι";
     let isAny = 0;
     let fullpost;
@@ -956,22 +929,23 @@ const getFavourites = async (req) => {
 
     let allResults = [];
     for await (post of allFavourites) {
-      post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
+      // post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
 
-      post.dataValues.startdate = moment(post.dataValues.startdate).format(
-        RFC_ONLYM
-      );
-      post.dataValues.enddate = moment(post.dataValues.enddate).format(
-        RFC_ONLYM
-      );
+      // post.dataValues.startdate = moment(post.dataValues.startdate).format(
+      //   RFC_ONLYM
+      // );
+      // post.dataValues.enddate = moment(post.dataValues.enddate).format(
+      //   RFC_ONLYM
+      // );
 
-      post.dataValues.returnStartDate = moment(
-        post.dataValues.returnStartDate
-      ).format(RFC_ONLYM);
+      // post.dataValues.returnStartDate = moment(
+      //   post.dataValues.returnStartDate
+      // ).format(RFC_ONLYM);
 
-      post.dataValues.returnEndDate = moment(
-        post.dataValues.returnEndDate
-      ).format(RFC_ONLYM);
+      // post.dataValues.returnEndDate = moment(
+      //   post.dataValues.returnEndDate
+      // ).format(RFC_ONLYM);
+      post = await fun.fixAllDates(post);
 
       allResults.push({
         user: user,
@@ -988,11 +962,7 @@ const getFavourites = async (req) => {
 };
 
 module.exports = {
-  getAllPosts,
-  getOnePost,
   createNewPost,
-  updateOnePost,
-  deleteOnePost,
   interested,
   searchPosts,
   getPostsUser,

@@ -145,9 +145,12 @@ const findOneNotOwnerGTEToday = async (postid, email, date) => {
       where: {
         postid: postid,
         email: { [Op.ne]: email },
-        enddate: {
-          [Op.gte]: date,
-        },
+        [Op.or]: [
+          { enddate: { [Op.gte]: date } },
+          {
+            [Op.and]: [{ enddate: null }, { startdate: { [Op.gte]: date } }],
+          },
+        ],
       },
     }).catch((err) => {
       throw err;
@@ -194,7 +197,12 @@ const findAllPastHalfYear = async (email, today) => {
     const all = await Posts.findAndCountAll({
       where: {
         email: email,
-        enddate: { [Op.gte]: today },
+        [Op.or]: [
+          { enddate: { [Op.gte]: today } },
+          {
+            [Op.and]: [{ enddate: null }, { startdate: { [Op.gte]: today } }],
+          },
+        ],
       },
     }).catch((err) => {
       throw err;

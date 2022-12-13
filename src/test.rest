@@ -5,7 +5,7 @@ Accept-Language: en
 
 {
     "data":{
-        "email": "user1@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -204,7 +204,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "postid": 1809
+        "postid": 1825
     }
 }
 
@@ -296,9 +296,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service epistrefei post vasei id
-GET http://localhost:3000/posts/getPostPerId?postid=1809
+GET http://localhost:3000/posts/getPostPerId?postid=1825
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEzVDExOjM1OjEyLjQ5NVoiLCJpYXQiOjE2NzA5MzEzMTIsImV4cCI6MTY3NjExNTMxMn0.nWSTnBBjVpX8CpA9Vm0UhMtFFvzGizZhQ7fBV9HQjnM
 
 ###
 
@@ -330,7 +330,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 #service poy epistrefei ta post gia ta opoia einai interested o user
 POST http://localhost:3000/posts/getInterestedPerUser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTNUMTE6NTc6NDYuMTk2WiIsImlhdCI6MTY3MDkzMjY2NiwiZXhwIjoxNjc2MTE2NjY2fQ.XSwCnqcEQwySfpLNhNlPHHaAh1334qPys7SQ8FyDixs
 
 {
     "data": {
@@ -360,7 +360,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "postid": 1809,
+        "postid": 1825,
         "page": 1
     }
 }
@@ -472,7 +472,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1809
+        "postid": 1825
     }
 }
 
