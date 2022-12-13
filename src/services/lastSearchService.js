@@ -64,8 +64,40 @@ const addFavouriteSearch = async (req) => {
       }
     }
 
+    //GET ALL SEARCHES
+    let allSearches = await LastSearch.getAll(email);
+    if (allSearches === false) {
+      throw new Error(
+        "Something went wrong with getting all the searches of the user"
+      );
+    }
+    let lastSearches = [];
+    let favSearches = [];
+    // console.log(allSearches);
+    _.forEach(allSearches, (val) => {
+      if (val.isFavourite) favSearches.push(val);
+      else lastSearches.push(val);
+    });
+    // check with last searches are favourite searches too
+    _.forEach(lastSearches, (val) => {
+      _.forEach(favSearches, (fav) => {
+        if (
+          (val.startPlace == fav.startPlace ||
+            val.startCoord == fav.startCoord) &&
+          (val.endPlace == fav.endPlace || val.endCoord == fav.endCoord)
+        ) {
+          val.isFavourite = true;
+        }
+      });
+    });
+    const finalData = {
+      favouriteSearches: favSearches,
+      lastSearches: lastSearches,
+    };
+
     return {
       status: 200,
+      data: finalData,
       message: "Επιτυχής δημιουργία αγαπημένης αναζήτησης!",
     };
   } catch (error) {
@@ -129,8 +161,40 @@ const deleteFavourite = async (req) => {
     if (response === false)
       throw new Error("Something went wrong at deleting the favourite search");
 
+    //GET ALL SEARCHES
+    let allSearches = await LastSearch.getAll(email);
+    if (allSearches === false) {
+      throw new Error(
+        "Something went wrong with getting all the searches of the user"
+      );
+    }
+    let lastSearches = [];
+    let favSearches = [];
+    // console.log(allSearches);
+    _.forEach(allSearches, (val) => {
+      if (val.isFavourite) favSearches.push(val);
+      else lastSearches.push(val);
+    });
+    // check with last searches are favourite searches too
+    _.forEach(lastSearches, (val) => {
+      _.forEach(favSearches, (fav) => {
+        if (
+          (val.startPlace == fav.startPlace ||
+            val.startCoord == fav.startCoord) &&
+          (val.endPlace == fav.endPlace || val.endCoord == fav.endCoord)
+        ) {
+          val.isFavourite = true;
+        }
+      });
+    });
+    const finalData = {
+      favouriteSearches: favSearches,
+      lastSearches: lastSearches,
+    };
+
     return {
       status: 200,
+      data: finalData,
       message: "Η αγαπημένη αναζήτηση διαγράφηκε!",
     };
   } catch (error) {

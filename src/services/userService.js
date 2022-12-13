@@ -50,6 +50,7 @@ const createNewUser = async (req) => {
   try {
     var data = req.body.data;
     let photo = data.photo;
+    //Calculate age
     let splitted = data.age.split("/");
     let ageDate = moment()
       .set("year", parseInt(splitted[2]))
@@ -58,6 +59,8 @@ const createNewUser = async (req) => {
 
     let calcAge = moment().diff(ageDate, "years");
     data.age = calcAge;
+    //===========
+
     data["verified"] = true;
     data["photo"] = null;
     let salt = await bcrypt.genSalt(saltRounds);
@@ -81,8 +84,23 @@ const createNewUser = async (req) => {
 const updateOneUser = async (req) => {
   try {
     let photo = req.body.data.photo;
+    let data = req.body.data;
     let email = req.body.extra;
-    const res = await User.updateUser(req);
+    //Calculate age
+    let splitted = data.age.split("/");
+    let ageDate = moment()
+      .set("year", parseInt(splitted[2]))
+      .set("month", parseInt(splitted[1]) - 1)
+      .set("date", parseInt(splitted[0]));
+
+    let calcAge = moment().diff(ageDate, "years");
+    data.age = calcAge;
+
+    console.log(data.age);
+
+    //===========
+
+    const res = await User.updateUser(data, email);
     if (res === false) {
       throw new Error("Error at updating profile");
     }

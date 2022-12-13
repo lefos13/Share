@@ -68,10 +68,9 @@ const register = async (data) => {
   }
 };
 
-const updateUser = async (req) => {
+const updateUser = async (data, email) => {
   try {
-    let data = req.body.data;
-    let email = req.body.extra;
+    console.log(data);
     const user = await Users.update(
       {
         mobile: data.mobile,

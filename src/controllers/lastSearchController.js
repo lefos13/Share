@@ -7,7 +7,7 @@ const addFavouriteSearch = async (req, res) => {
     if (data.status == 500) {
       throw "error";
     }
-    res.status(data.status).json({ message: data.message });
+    res.status(data.status).json({ message: data.message, data: data.data });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: data.message });

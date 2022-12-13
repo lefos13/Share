@@ -896,7 +896,7 @@ const handleFavourite = async (req) => {
         message: "Το ride αφαιρέθηκε από τα αγαπημένα σου!",
       };
     }
-    if (countAll < 5) {
+    if (countAll < 10) {
       const newFav = await Post.makeFavourite(postid);
       if (newFav === false) throw new Error("Error at declaring new favourite");
       return { status: 200, message: "To ride προστέθηκε στα αγαπημένα σου" };
