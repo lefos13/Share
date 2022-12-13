@@ -177,6 +177,14 @@ const searchPosts = async (req) => {
       data.startdate = moment().format("YYYY-MM-DD");
       data.enddate = moment().add(1, "months").format("YYYY-MM-DD");
     }
+    if (data.enddate == null) {
+      data.enddate = moment().add(1, "months").format("YYYY-MM-DD");
+    }
+    if (data.withReturn == true && data.returnEndDate == null) {
+      data.returnEndDate = moment(data.returnStartDate)
+        .add(1, "months")
+        .format("YYYY-MM-DD");
+    }
     let query = {
       where: {
         // email different than one that do the search
@@ -265,13 +273,26 @@ const searchPosts = async (req) => {
     }
 
     for await (fnd of found.rows) {
+      // console.log(fnd.toJSON());
       if (IsJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
-      fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
-        RFC_ONLYM
-      );
-      fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(RFC_ONLYM);
+      // fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
+      //   RFC_ONLYM
+      // );
+      // if (fnd.enddate != null) {
+      //   fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(
+      //     RFC_ONLYM
+      //   );
+      // }
+      // fnd.dataValues.date = moment(fnd.dataValues.date).format(RFC_H);
+      // fnd.dataValues.returnStartDate = moment(
+      //   fnd.dataValues.returnStartDate
+      // ).format(RFC_ONLYM);
+      // fnd.dataValues.returnEndDate = moment(
+      //   fnd.dataValues.returnEndDate
+      // ).format(RFC_ONLYM);
+      fnd = await fun.fixAllDates(fnd);
 
       let userQuery = {
         attributes: {
@@ -319,20 +340,16 @@ const searchPosts = async (req) => {
     var takecount = 10;
     if (data.page > 1) skipcount = data.page * 10 - 10;
     var finalarr = _.take(_.drop(filteredArray, skipcount), takecount);
-    //fix the dates of return and date of creation
-    for await (ps of finalarr) {
-      ps.post.dataValues.date = moment(ps.post.dataValues.date).format(RFC_H);
-      ps.post.dataValues.returnStartDate = moment(
-        ps.post.dataValues.returnStartDate
-      ).format(RFC_ONLYM);
-      ps.post.dataValues.returnEndDate = moment(
-        ps.post.dataValues.returnEndDate
-      ).format(RFC_ONLYM);
-    }
+
     //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
     if (finalarr.length == 0) {
       return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
     } else {
+      // _.forEach(finalarr, (val)=>{
+      //   if (condition) {
+
+      //   }
+      // })
       var mod = finalarr.length % 10;
       var totallength = 1;
       mod == 0

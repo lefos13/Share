@@ -28,6 +28,10 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   },
 });
 
+const moment = require("moment");
+const RFC_H = "DD/MM/YYYY hh:mm";
+const RFC_ONLYM = "DD/MM/YYYY";
+
 const Users = require("../modules/user");
 const Posts = require("../modules/post");
 const PostInterested = require("../modules/postinterested");
@@ -36,6 +40,15 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const { response } = require("express");
+
+const IsJsonString = async (str) => {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};
 
 module.exports = {
   sendReport: async (text, email) => {
@@ -318,7 +331,8 @@ module.exports = {
           let postEndDate = new Date(obj.post.returnEndDate);
           let searchStartDate = new Date(data.returnStartDate);
           let searchEndDate = new Date(data.returnEndDate);
-
+          // console.log("Checking return start: " + searchStartDate);
+          // console.log("Checking return end: " + searchEndDate);
           return (
             obj.post.withReturn == true &&
             ((searchStartDate.getTime() >= postStartDate.getTime() &&
@@ -387,9 +401,13 @@ module.exports = {
       // IF THE ENDPLACE OF A REQUEST IS INSIDE THE MOREPLACES, GATHER THE USERS THAT I NEED TO NOTIFY
       if (allRequests2.length > 0) {
         for await (req of allRequests2) {
-          let moreplaces = IsJsonString(post.moreplaces)
-            ? JSON.parse(post.moreplaces)
-            : post.moreplaces;
+          let moreplaces;
+          // console.log(post.moreplaces);
+          if (IsJsonString(post.moreplaces)) {
+            // FIXXXXXXXXX
+            moreplaces = JSON.parse(post.moreplaces);
+          }
+
           for await (place of moreplaces) {
             if (place.placecoords == req.endcoord) {
               toSendNotification = true;
@@ -412,5 +430,26 @@ module.exports = {
       console.log("Error inside try and catch!!!!!", err);
     }
     // console.log("Inside func", post);
+  },
+  fixAllDates: async (fnd) => {
+    fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
+      RFC_ONLYM
+    );
+    if (fnd.enddate != null) {
+      fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(RFC_ONLYM);
+    }
+    fnd.dataValues.date = moment(fnd.dataValues.date).format(RFC_H);
+    if (fnd.returnStartDate != null) {
+      fnd.dataValues.returnStartDate = moment(
+        fnd.dataValues.returnStartDate
+      ).format(RFC_ONLYM);
+    }
+    if (fnd.returnEndDate != null) {
+      fnd.dataValues.returnEndDate = moment(
+        fnd.dataValues.returnEndDate
+      ).format(RFC_ONLYM);
+    }
+
+    return fnd;
   },
 };

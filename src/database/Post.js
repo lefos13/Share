@@ -77,14 +77,18 @@ const createNewPost = async (data) => {
     data.date = postdate;
 
     //fix for return dates if not given
-    if (data.withReturn == false) {
-      data.returnStartDate = moment();
-      data.returnEndDate = moment();
-    }
+    // if (data.withReturn == false) {
+    //   data.returnStartDate = moment();
+    //   data.returnEndDate = moment();
+    // } else if (data.withReturn == true && data.returnEndDate == null) {
+    //   // console.log("gamw ton antitheo sou");
+    //   data.returnEndDate = data.returnStartDate;
+    // }
+    console.log(data);
     // fix gia to enddate==null
-    if (data.enddate === null) {
-      data.enddate = data.startdate;
-    }
+    // if (data.enddate === null) {
+    //   data.enddate = data.startdate;
+    // }
 
     const post = await Posts.create(data).catch((err) => {
       throw err;

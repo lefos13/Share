@@ -58,15 +58,18 @@ const Posts = sequelize.define(
     },
     enddate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
     },
     returnStartDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
     },
     returnEndDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
     },
     withReturn: {
       type: DataTypes.BOOLEAN,

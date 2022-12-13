@@ -165,7 +165,7 @@ const getAll = async (email) => {
       where: {
         email: email,
       },
-      order: [["isCreated", "DESC"]],
+      order: [["isUpdated", "DESC"]],
     }).catch((err) => {
       throw err;
     });
