@@ -59,6 +59,7 @@ const LastSearch = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
+    timezone: "+02:00",
   }
 );
 

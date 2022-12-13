@@ -598,9 +598,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "startPlace": "Volosssssssssss",
-        "startCoord": "123ssssssssss",
-        "endPlace": "Athens",
+        "startPlace": "ασδ",
+        "startCoord": "123",
+        "endPlace": "δσα",
         "endCoord": "321",
         "isFavourite": true
     }

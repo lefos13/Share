@@ -23,6 +23,7 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
+const { last } = require("lodash");
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
@@ -90,6 +91,18 @@ const getAllSearches = async (req) => {
     _.forEach(allSearches, (val) => {
       if (val.isFavourite) favSearches.push(val);
       else lastSearches.push(val);
+    });
+    // check with last searches are favourite searches too
+    _.forEach(lastSearches, (val) => {
+      _.forEach(favSearches, (fav) => {
+        if (
+          (val.startPlace == fav.startPlace ||
+            val.startCoord == fav.startCoord) &&
+          (val.endPlace == fav.endPlace || val.endCoord == fav.endCoord)
+        ) {
+          val.isFavourite = true;
+        }
+      });
     });
     const finalData = {
       favouriteSearches: favSearches,
