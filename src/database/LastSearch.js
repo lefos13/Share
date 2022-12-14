@@ -183,7 +183,6 @@ const deleteFavourite = async (lsid, email) => {
       where: {
         email: email,
         lsid: lsid,
-        isFavourite: true,
       },
     }).catch((err) => {
       throw err;
@@ -191,10 +190,11 @@ const deleteFavourite = async (lsid, email) => {
     if (target == null) {
       throw new Error("Η αναζήτηση δεν είναι στις αγαπημένες!");
     }
+
     const existExtra = await LastSearch.findOne({
       where: {
         email: email,
-        isFavourite: false,
+        lsid: { [Op.ne]: target.lsid },
         [Op.and]: [
           {
             [Op.or]: [
