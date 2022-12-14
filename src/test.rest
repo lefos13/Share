@@ -572,7 +572,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
     "data": {
         "email": "lefterisevgelinos1996@gmail.com",
         "startplace": "ασδ",
-        "startcoord": "1234",
+        "startcoord": "123",
         "endplace": "δσα",
         "endcoord": "321",
         "startdate": "2022-12-22",
@@ -598,8 +598,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "startPlace": "ασδ1",
-        "startCoord": "1231",
+        "startPlace": "ασδ",
+        "startCoord": "123",
         "endPlace": "δσα",
         "endCoord": "321",
         "isFavourite": true
@@ -618,6 +618,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "lsid": 29
+        "lsid": 30
     }
 }

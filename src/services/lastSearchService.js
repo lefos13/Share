@@ -172,8 +172,11 @@ const deleteFavourite = async (req) => {
     let favSearches = [];
     // console.log(allSearches);
     _.forEach(allSearches, (val) => {
-      if (val.isFavourite) favSearches.push(val);
-      else lastSearches.push(val);
+      if (val.isFavourite) {
+        favSearches.push(val);
+      } else {
+        lastSearches.push(val);
+      }
     });
     // check with last searches are favourite searches too
     _.forEach(lastSearches, (val) => {

@@ -179,7 +179,7 @@ const getAll = async (email) => {
 
 const deleteFavourite = async (lsid, email) => {
   try {
-    const destroyed = await LastSearch.destroy({
+    const target = await LastSearch.findOne({
       where: {
         email: email,
         lsid: lsid,
@@ -188,7 +188,42 @@ const deleteFavourite = async (lsid, email) => {
     }).catch((err) => {
       throw err;
     });
-    console.log(destroyed);
+    if (target == null) {
+      throw new Error("Η αναζήτηση δεν είναι στις αγαπημένες!");
+    }
+    const existExtra = await LastSearch.findOne({
+      where: {
+        email: email,
+        isFavourite: false,
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { startPlace: target.startPlace },
+              { startCoord: target.startCoord },
+            ],
+          },
+          {
+            [Op.or]: [
+              { endPlace: target.endPlace },
+              { endCoord: target.endCoord },
+            ],
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    await target.destroy().catch((err) => {
+      throw err;
+    });
+
+    if (existExtra != null) {
+      existExtra.destroy().catch((err) => {
+        throw err;
+      });
+    }
+
     return true;
   } catch (error) {
     console.log(error);

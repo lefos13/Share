@@ -10,7 +10,7 @@ const addFavouriteSearch = async (req, res) => {
     res.status(data.status).json({ message: data.message, data: data.data });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: data.message });
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
   }
 };
 
@@ -23,7 +23,7 @@ const getAllSearches = async (req, res) => {
     res.status(data.status).json({ message: data.message, data: data.data });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: data.message });
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
   }
 };
 
@@ -36,7 +36,7 @@ const deleteFavourite = async (req, res) => {
     res.status(data.status).json({ message: data.message, data: data.data });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: data.message });
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
   }
 };
 
