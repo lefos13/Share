@@ -214,11 +214,13 @@ const deleteFavourite = async (lsid, email) => {
       throw err;
     });
 
-    await target.destroy().catch((err) => {
-      throw err;
-    });
+    if (target.isFavourite == true) {
+      await target.destroy().catch((err) => {
+        throw err;
+      });
+    }
 
-    if (existExtra != null) {
+    if (existExtra != null && existExtra.isFavourite == true) {
       existExtra.destroy().catch((err) => {
         throw err;
       });
