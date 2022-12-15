@@ -14,3 +14,7 @@
 
 μελλοντικη προσθηκη: φιλτρο αναζητησης βαση αξιολογησης οδηγου
 πριν ανεβασο0με το app να θυμηθοθμε να σβησο0με ολα τα console logs both in front-back end
+
+
+Giannis Fragoulis
+https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey},

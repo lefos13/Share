@@ -262,21 +262,7 @@ const searchPosts = async (req) => {
       if (IsJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
-      // fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
-      //   RFC_ONLYM
-      // );
-      // if (fnd.enddate != null) {
-      //   fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(
-      //     RFC_ONLYM
-      //   );
-      // }
-      // fnd.dataValues.date = moment(fnd.dataValues.date).format(RFC_H);
-      // fnd.dataValues.returnStartDate = moment(
-      //   fnd.dataValues.returnStartDate
-      // ).format(RFC_ONLYM);
-      // fnd.dataValues.returnEndDate = moment(
-      //   fnd.dataValues.returnEndDate
-      // ).format(RFC_ONLYM);
+
       fnd = await fun.fixAllDates(fnd);
 
       let userQuery = {
@@ -320,33 +306,36 @@ const searchPosts = async (req) => {
     let filteredArray = await applyFilters(data, array);
     if (filteredArray === false) {
       throw err;
+    } else if (filteredArray.length == 0) {
+      return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
     }
+
+    //Pagination
+    var mod = filteredArray.length % 10;
+    var totallength = 1;
+    mod == 0
+      ? (totallength = filteredArray.length / 10)
+      : (totallength = filteredArray.length / 10 - mod / 10 + 1);
+    //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
+    if (data.page > totallength) {
+      return {
+        status: 404,
+        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+      };
+    }
+
     var skipcount = 0;
     var takecount = 10;
     if (data.page > 1) skipcount = data.page * 10 - 10;
     var finalarr = _.take(_.drop(filteredArray, skipcount), takecount);
 
-    //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
-    if (finalarr.length == 0) {
-      return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
-    } else {
-      // _.forEach(finalarr, (val)=>{
-      //   if (condition) {
+    results = {
+      postUser: finalarr,
+      totalPages: totallength,
+      pageLength: finalarr.length,
+      // test: array,
+    };
 
-      //   }
-      // })
-      var mod = finalarr.length % 10;
-      var totallength = 1;
-      mod == 0
-        ? (totallength = finalarr.length / 10)
-        : (totallength = finalarr.length / 10 - mod / 10 + 1);
-      results = {
-        postUser: finalarr,
-        totalPages: totallength,
-        pageLength: finalarr.length,
-        // test: array,
-      };
-    }
     return { status: 200, body: results, message: "Βρέθηκαν Rides" };
   } catch (error) {
     console.log(error);
@@ -961,6 +950,118 @@ const getFavourites = async (req) => {
   }
 };
 
+const feedScreen = async (req) => {
+  try {
+    var data = req.body.data;
+    let email = req.body.extra;
+    let array = [];
+    let curDate = moment();
+    let query = {
+      where: {
+        email: { [Op.ne]: email },
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { startplace: data.startplace },
+              { startcoord: data.startcoord },
+            ],
+          },
+          // check startdate if greater than curdate
+          // check if enddate greater than curdate
+          {
+            [Op.or]: [
+              { startdate: { [Op.gte]: curDate } },
+              { enddate: { [Op.gte]: curDate } },
+            ],
+          },
+        ],
+      },
+      order: [["date", "DESC"]],
+    };
+
+    // console.log(email, data, query);
+    // get all the rides based on the query above
+    let found = await Post.findAndCountAll(query);
+    if (found.count == 0) {
+      return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
+    } else if (found == null) {
+      throw new Error("Something went wrong in searching the posts");
+    }
+
+    for await (fnd of found.rows) {
+      if (IsJsonString(fnd.moreplaces)) {
+        fnd.moreplaces = JSON.parse(fnd.moreplaces);
+      }
+      fnd = await fun.fixAllDates(fnd);
+      let userQuery = {
+        attributes: {
+          exclude: ["password", "verified", "facebook", "instagram", "mobile"],
+        },
+        where: {
+          email: fnd.email,
+        },
+      };
+
+      const user = await User.findOneUserQuery(userQuery);
+      if (user === false) {
+        throw new Error(
+          "Something went wrong with finding the user of each post"
+        );
+      }
+      var flag;
+      // insert the review average and count inside the object of the user
+      let extraData = await insertAver(user);
+      user.dataValues = { ...user.dataValues, ...extraData };
+
+      // check if the user is interested in the specific post
+      let interested = await PostInterested.findOne(email, fnd.postid);
+
+      if (interested == null) {
+        flag = false;
+      } else {
+        flag = true;
+      }
+      let results = {
+        user: user.toJSON(),
+        imagePath: "images/" + fnd.email + ".jpeg",
+        post: fnd,
+        interested: flag,
+      };
+      array.push(results);
+    }
+
+    //PAGINATION
+    var skipcount = 0;
+    var takecount = 10;
+    if (data.page > 1) skipcount = data.page * 10 - 10;
+    var finalarr = _.take(_.drop(array, skipcount), takecount);
+
+    var mod = array.length % 10;
+    // console.log(mod);
+    var totallength = 1;
+    mod == 0
+      ? (totallength = array.length / 10)
+      : (totallength = array.length / 10 - mod / 10 + 1);
+
+    // if the request asks for page that is over the limit
+    if (data.page > totallength) {
+      return {
+        status: 404,
+        message: "You asked for a page over the limit of pages",
+      };
+    }
+    let results = {
+      postUser: finalarr,
+      totalPages: totallength,
+      pageLength: finalarr.length,
+    };
+    return { status: 200, body: results, message: "Βρέθηκαν Rides" };
+  } catch (error) {
+    console.log(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
   createNewPost,
   interested,
@@ -974,4 +1075,5 @@ module.exports = {
   verInterested,
   handleFavourite,
   getFavourites,
+  feedScreen,
 };

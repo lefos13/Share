@@ -117,4 +117,11 @@ router.get(
   postController.getFavourites
 );
 
+router.post(
+  "/feedScreen",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.feedScreen
+);
+
 module.exports = router;

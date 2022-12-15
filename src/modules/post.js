@@ -99,6 +99,7 @@ const Posts = sequelize.define(
   {
     freezeTableName: true,
     timestamps: false,
+    logging: true,
   }
 );
 

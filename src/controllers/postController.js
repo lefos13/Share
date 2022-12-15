@@ -54,6 +54,7 @@ const interested = async (req, res) => {
 const searchPosts = async (req, res) => {
   try {
     let data = await postService.searchPosts(req);
+    if (data.status == 500) throw "error";
     res.status(data.status).json({ body: data.body, message: data.message });
   } catch (error) {
     console.log(error);
@@ -68,6 +69,19 @@ const getPostsUser = async (req, res) => {
       throw "Error";
     }
     res.status(data.status).json(data.data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  }
+};
+
+const feedScreen = async (req, res) => {
+  try {
+    let data = await postService.feedScreen(req);
+    if (data.status == 500) {
+      throw "Error";
+    }
+    res.status(data.status).json({ body: data.body, message: data.message });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Κάτι πήγε στραβά!" });
@@ -216,4 +230,5 @@ module.exports = {
   verInterested,
   handleFavourite,
   getFavourites,
+  feedScreen,
 };

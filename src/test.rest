@@ -5,7 +5,7 @@ Accept-Language: en
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -496,14 +496,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "email": "user0@gmail.com",
+        "email": "user6@gmail.com",
         "date": "2021-10-05",
         "startplace": "ασδ",
-        "startcoord": "1234",
-        "endplace": "δσα",
-        "endcoord": "3215",
-        "numseats": 2,
-        "startdate": "2022-04-22",
+        "startcoord": "123",
+        "endplace": "δσαasd",
+        "endcoord": "321asd",
+        "numseats": 4,
+        "startdate": "2022-12-22",
         "enddate": null,
         "returnStartDate": null,
         "returnEndDate": null,
@@ -574,7 +574,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "startplace": "ασδ",
         "startcoord": "123",
         "endplace": "δσα",
-        "endcoord": "321",
+        "endcoord": "321asd",
         "startdate": "2022-12-22",
         "enddate": null,
         "page": 1,
@@ -585,8 +585,21 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "gender": null,
         "withReturn": null,
         "petAllowed": null,
-        "returnStartDate": "2022-12-21",
+        "returnStartDate": null,
         "returnEndDate": null
+    }
+}
+
+### feed Screen
+POST http://localhost:3000/posts/feedScreen
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE1VDEzOjQ3OjM4LjEwM1oiLCJpYXQiOjE2NzExMTIwNTgsImV4cCI6MTY3NjI5NjA1OH0.CEbcQhtCWuuap7g2XCljelexze18A-hPRCJJnD3W0qQ
+
+{
+    "data": {
+        "startplace": "ασδ",
+        "startcoord": "123",
+        "page": 3
     }
 }
 
@@ -621,3 +634,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "lsid": 44
     }
 }
+
