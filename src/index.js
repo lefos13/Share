@@ -3283,6 +3283,7 @@ app.get(
 );
 
 const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/`;
+const API_SERVICE_URL2 = `https://maps.googleapis.com/maps/api/`;
 
 //google proxy for autocomplete
 app.use(
@@ -3319,6 +3320,27 @@ app.use(
       // console.log(path);
       // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
       path += "&fields=geometry&key=" + GOOGLE_KEY;
+      return path;
+    },
+  })
+);
+
+//google proxy for place details
+app.use(
+  "/geocode/json",
+  [authenticateToken],
+  cors(corsOptions),
+  createProxyMiddleware({
+    target: API_SERVICE_URL2,
+    changeOrigin: true,
+    pathRewrite: async function (path, req) {
+      // const should_add_something = await httpRequestToDecideSomething(path);
+      // console.log(path);
+      // path = "input=volos&key=" + GOOGLE_KEY;
+      // console.log(path);
+      // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
+      path += "&result_type=locality&key=" + GOOGLE_KEY;
+      console.log(path);
       return path;
     },
   })
