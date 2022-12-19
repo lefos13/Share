@@ -73,7 +73,6 @@ const updateUser = async (data, email) => {
     console.log(data);
     const user = await Users.update(
       {
-        mobile: data.mobile,
         fullname: data.fullname,
         age: data.age,
         facebook: data.facebook,
@@ -81,6 +80,7 @@ const updateUser = async (data, email) => {
         car: data.car,
         cardate: data.cardate,
         gender: data.gender,
+        photo: 1,
       },
       {
         where: {

@@ -49,7 +49,7 @@ const createIfNotExist = async (data) => {
         ],
       },
     });
-    console.log(data);
+    // console.log(data);
 
     //if it exists
     if (exist === null) {

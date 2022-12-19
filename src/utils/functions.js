@@ -50,7 +50,76 @@ const IsJsonString = async (str) => {
   return true;
 };
 
+const newRide = async (postid, emailArray, postOwner) => {
+  try {
+    let owner = await Users.findOne({
+      where: {
+        email: postOwner,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    let fcmTokens = await FcmToken.findAll({
+      where: {
+        email: {
+          [Op.or]: emailArray,
+        },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    // let allTokens = [];
+    let allMessages = [];
+    let postIdString = postid.toString();
+
+    for await (f of fcmTokens) {
+      let message = {
+        data: {
+          type: "newRide",
+          postid: postIdString,
+          email: owner.email, // owner email
+          fullname: owner.fullname, // owner email
+        },
+        token: f.fcmToken,
+        notification: {
+          title:
+            "Ο χρήστης " + owner.fullname + " έφτιαξε ένα ride που ζητήσατε!",
+          body: "TEST MESSAGE",
+        },
+      };
+      allMessages.push(message);
+      // allTokens.push(f.fcmToken);
+    }
+
+    admin
+      .messaging()
+      .sendAll(allMessages)
+      .then((response) => {
+        console.log("Success: " + response);
+      })
+      .catch((err) => {
+        console.log("Error to send massive notifications: " + err);
+      });
+    // admin
+    //   .messaging()
+    //   .send(message)
+    //   .then((response) => {
+    //     console.log("Success: ", response);
+    //   })
+    //   .catch((err) => {
+    //     throw err;
+    //   });
+
+    // console.log("ALL USERS TO BE NOTIFIED: " + string2); ///test log
+  } catch (error) {
+    console.log("Inside Newride  ============= " + error);
+  }
+};
+
 module.exports = {
+  IsJsonString,
   sendReport: async (text, email) => {
     try {
       // create reusable transporter object using the default SMTP transport
@@ -173,83 +242,7 @@ module.exports = {
     }
   },
 
-  newRide: async (postid, emailArray, postOwner) => {
-    try {
-      // let users = await Users.findAll({
-      //   attributes: ["fullname"],
-      //   where: {
-      //     email: {
-      //       [Op.or]: emailArray,
-      //     },
-      //   },
-      // }).catch((err) => {
-      //   throw err;
-      // });
-      let owner = await Users.findOne({
-        where: {
-          email: postOwner,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-
-      let fcmTokens = await FcmToken.findAll({
-        where: {
-          email: {
-            [Op.or]: emailArray,
-          },
-        },
-      }).catch((err) => {
-        throw err;
-      });
-
-      // let allTokens = [];
-      let allMessages = [];
-      let postIdString = postid.toString();
-
-      for await (f of fcmTokens) {
-        let message = {
-          data: {
-            type: "newRide",
-            postid: postIdString,
-            email: owner.email, // owner email
-            fullname: owner.fullname, // owner email
-          },
-          token: f.fcmToken,
-          notification: {
-            title:
-              "Ο χρήστης " + owner.fullname + " έφτιαξε ένα ride που ζητήσατε!",
-            body: "TEST MESSAGE",
-          },
-        };
-        allMessages.push(message);
-        // allTokens.push(f.fcmToken);
-      }
-
-      admin
-        .messaging()
-        .sendAll(allMessages)
-        .then((response) => {
-          console.log("Success: " + response);
-        })
-        .catch((err) => {
-          console.log("Error to send massive notifications: " + err);
-        });
-      // admin
-      //   .messaging()
-      //   .send(message)
-      //   .then((response) => {
-      //     console.log("Success: ", response);
-      //   })
-      //   .catch((err) => {
-      //     throw err;
-      //   });
-
-      // console.log("ALL USERS TO BE NOTIFIED: " + string2); ///test log
-    } catch (error) {
-      console.log("Inside Newride  ============= " + error);
-    }
-  },
+  newRide,
 
   insertAver: async (user) => {
     try {
@@ -401,17 +394,16 @@ module.exports = {
       // IF THE ENDPLACE OF A REQUEST IS INSIDE THE MOREPLACES, GATHER THE USERS THAT I NEED TO NOTIFY
       if (allRequests2.length > 0) {
         for await (req of allRequests2) {
-          let moreplaces;
+          let moreplaces = post.moreplaces;
           // console.log(post.moreplaces);
-          if (IsJsonString(post.moreplaces)) {
-            // FIXXXXXXXXX
-            moreplaces = JSON.parse(post.moreplaces);
-          }
+          // if (IsJsonString(post.moreplaces)) {
+          //   // FIXXXXXXXXX
+          //   moreplaces = JSON.parse(post.moreplaces);
+          // }
 
           for await (place of moreplaces) {
             if (place.placecoords == req.endcoord) {
               toSendNotification = true;
-
               // array with the users that need to be informed that a post of their request has been created
               arrayToNotify.push(req.email);
             }

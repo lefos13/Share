@@ -157,6 +157,7 @@ const interested = async (req) => {
 const searchPosts = async (req) => {
   try {
     var data = req.body.data;
+    console.log(data);
     let email = req.body.extra;
     if (data.startdate == null) {
       data.startdate = moment().format("YYYY-MM-DD");
@@ -284,7 +285,7 @@ const searchPosts = async (req) => {
       // insert the review average and count inside the object of the user
       let extraData = await insertAver(user);
       user.dataValues = { ...user.dataValues, ...extraData };
-      console.log(user.dataValues);
+      // console.log(user.dataValues);
 
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(data.email, fnd.postid);
@@ -294,9 +295,13 @@ const searchPosts = async (req) => {
       } else {
         flag = true;
       }
+      let imagePath = null;
+      if (user.photo !== null) {
+        imagePath = "images/" + fnd.email + ".jpeg";
+      }
       results = {
         user: user.toJSON(),
-        imagePath: "images/" + fnd.email + ".jpeg",
+        imagePath: imagePath,
         post: fnd,
         interested: flag,
       };
@@ -372,25 +377,7 @@ const getPostsUser = async (req) => {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
 
-      // post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
-      // console.log(post.dataValues.date);
-
-      // post.dataValues.startdate = moment(post.dataValues.startdate).format(
-      //   RFC_ONLYM
-      // );
-      // post.dataValues.enddate = moment(post.dataValues.enddate).format(
-      //   RFC_ONLYM
-      // );
-
-      // post.dataValues.returnStartDate = moment(
-      //   post.dataValues.returnStartDate
-      // ).format(RFC_ONLYM);
-
-      // post.dataValues.returnEndDate = moment(
-      //   post.dataValues.returnEndDate
-      // ).format(RFC_ONLYM);
       post = await fun.fixAllDates(post);
-      let image = "images/" + post.email + ".jpeg";
 
       let rows = found.rows;
       let count = found.count;
@@ -398,6 +385,11 @@ const getPostsUser = async (req) => {
       let user = await User.findOneLight(post.email);
       if (user === false) {
         throw new Error("Error at finding user");
+      }
+
+      let image = null;
+      if (user.photo !== null) {
+        image = "images/" + user.email + ".jpeg";
       }
 
       let reviewData = await insertAver(user);
@@ -473,7 +465,7 @@ const getPostPerId = async (req) => {
     postInt == null ? (interested = false) : (interested = true);
 
     // find creator of post
-    const user = await User.findOneLight(email);
+    const user = await User.findOneLight(post.email);
     if (user === false) {
       throw new Error("Error at finding the user of the post");
     }
@@ -485,8 +477,12 @@ const getPostPerId = async (req) => {
     // change cardate format
     user.cardate = parseInt(user.cardate, 10);
 
+    let image = null;
+    if (user.photo !== null) {
+      image = "images/" + user.email + ".jpeg";
+    }
     const response = {
-      imagePath: "images/" + post.email + ".jpeg",
+      imagePath: image,
       interested: interested,
       post: post,
       user: user,
@@ -556,7 +552,10 @@ const getInterestedPerUser = async (req) => {
         let extraData = await insertAver(user);
 
         user.dataValues = { ...user.dataValues, ...extraData };
-        let image = "images/" + post.email + ".jpeg";
+        let image = null;
+        if (user.photo !== null) {
+          image = "images/" + fnd.email + ".jpeg";
+        }
         let results = {
           user: user,
           imagePath: image,
@@ -595,15 +594,6 @@ const getIntPost = async (req) => {
     if (IsJsonString(posts.moreplaces)) {
       posts.moreplaces = JSON.parse(posts.moreplaces);
     }
-    // posts.dataValues.date = moment(posts.dataValues.date).format(RFC_H);
-    // posts.dataValues.startdate = moment(posts.startdate).format(RFC_ONLYM);
-    // posts.dataValues.enddate = moment(posts.enddate).format(RFC_ONLYM);
-    // posts.dataValues.returnStartDate = moment(posts.returnStartDate).format(
-    //   RFC_ONLYM
-    // );
-    // posts.dataValues.returnEndDate = moment(posts.returnEndDate).format(
-    //   RFC_ONLYM
-    // );
     posts = await fun.fixAllDates(posts);
     let message = "Βρέθηκαν ενδιαφερόμενοι";
     let isAny = 0;
@@ -623,7 +613,11 @@ const getIntPost = async (req) => {
         if (user === false) throw new Error("Error at getting user");
 
         if (user != null) {
-          user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+          let image = null;
+          if (user.photo !== null) {
+            image = "images/" + user.email + ".jpeg";
+          }
+          user.dataValues.imagePath = image;
           let testdata = await insertAver(user);
           user.dataValues = { ...user.dataValues, ...testdata };
           user.dataValues.isVerified = one.isVerified;
@@ -639,7 +633,7 @@ const getIntPost = async (req) => {
             gender: "male",
             age: "25",
             photo: "1",
-            imagePath: "images/lefterisevagelinos1996@gmail.com.jpeg",
+            imagePath: null,
             average: 5,
             count: 100,
             isVerified: one.isVerified,
@@ -649,7 +643,7 @@ const getIntPost = async (req) => {
         fullpost = { ...posts.dataValues };
       }
     }
-    let image = "images/" + extra + ".jpeg";
+    let image = "images/" + posts.email + ".jpeg";
 
     if (isAny > 0) {
       message = "Βρέθηκαν ενδιαφερόμενοι";
@@ -663,6 +657,7 @@ const getIntPost = async (req) => {
       mod == 0
         ? (totallength = isAny / 10)
         : (totallength = isAny / 10 - mod / 10 + 1);
+
       let response = {
         users: finalarr,
         post: fullpost,
@@ -890,7 +885,7 @@ const handleFavourite = async (req) => {
       if (newFav === false) throw new Error("Error at declaring new favourite");
       return { status: 200, message: "To ride προστέθηκε στα αγαπημένα σου" };
     } else {
-      return { status: 405, message: "Έχεις ήδη 5 αγαπημένα ride" };
+      return { status: 405, message: "Έχεις ήδη 10 αγαπημένα ride" };
     }
   } catch (error) {
     console.log(error);
@@ -918,28 +913,18 @@ const getFavourites = async (req) => {
 
     let allResults = [];
     for await (post of allFavourites) {
-      // post.dataValues.date = moment(post.dataValues.date).format(RFC_H);
-
-      // post.dataValues.startdate = moment(post.dataValues.startdate).format(
-      //   RFC_ONLYM
-      // );
-      // post.dataValues.enddate = moment(post.dataValues.enddate).format(
-      //   RFC_ONLYM
-      // );
-
-      // post.dataValues.returnStartDate = moment(
-      //   post.dataValues.returnStartDate
-      // ).format(RFC_ONLYM);
-
-      // post.dataValues.returnEndDate = moment(
-      //   post.dataValues.returnEndDate
-      // ).format(RFC_ONLYM);
+      if (fun.IsJsonString(post.moreplaces)) {
+        post.moreplaces = JSON.parse(post.moreplaces);
+      }
       post = await fun.fixAllDates(post);
-
+      let image = null;
+      if (user.photo !== null) {
+        image = "images/" + user.email + ".jpeg";
+      }
       allResults.push({
         user: user,
         post: post,
-        imagePath: "images/" + post.email + ".jpeg",
+        imagePath: image,
         interested: false,
       });
     }
@@ -1021,9 +1006,13 @@ const feedScreen = async (req) => {
       } else {
         flag = true;
       }
+      let image = null;
+      if (user.photo !== null) {
+        image = "images/" + user.email + ".jpeg";
+      }
       let results = {
         user: user.toJSON(),
-        imagePath: "images/" + fnd.email + ".jpeg",
+        imagePath: image,
         post: fnd,
         interested: flag,
       };

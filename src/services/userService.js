@@ -62,7 +62,7 @@ const createNewUser = async (req) => {
     //===========
 
     data["verified"] = true;
-    data["photo"] = null;
+    data["photo"] = 1;
     let salt = await bcrypt.genSalt(saltRounds);
     data.password = await bcrypt.hash(data.password, salt);
 
@@ -315,6 +315,8 @@ const login = async (req) => {
           //check if the photo exists and insert the property
           if (fs.existsSync(photoPath)) {
             rest.photo = "images/" + data.email + ".jpeg";
+          } else {
+            rest.photo = null;
           }
           //MISING FCM TOKEN CODE
           let fcmDone = await saveFcm(data.fcmToken, data.email);
@@ -360,6 +362,7 @@ const loginThirdParty = async (req) => {
     let userRegistered = false;
     let forceUpdate = false;
     data["isThirdPartyLogin"] = true;
+    data["photo"] = null;
     const user = await User.findOneUser(data.email);
     if (user === false) {
       throw new Error("Something went wrong with finding the user");
@@ -409,6 +412,8 @@ const loginThirdParty = async (req) => {
       //check if the photo exists and insert the property
       if (fs.existsSync(photoPath)) {
         rest.photo = "images/" + data.email + ".jpeg";
+      } else {
+        rest.photo = null;
       }
       //MISING FCM TOKEN CODE
       let fcmDone = await saveFcm(data.fcmToken, data.email);
@@ -562,37 +567,6 @@ const searchUser = async (req) => {
           }
         }
       }
-
-      //FING IF THERE IS ANY PEOPLE INTERESTED IN THE
-      // today = await getCurDate(0);
-      // const posts = await Posts.findAll({
-      //   where: {
-      //     email: data.email,
-      //     enddate: { [Op.gte]: today },
-      //   },
-      // }).catch((err) => {
-      //   console.error(err);
-      // });
-      // let isAny = 0;
-      // console.log(posts.length);
-      // if (posts.length != 0) {
-      //   for await (one of posts) {
-      //     const interested2 = await PostInterested.findOne({
-      //       where: {
-      //         postid: one.postid,
-      //       },
-      //     }).catch((err) => {
-      //       console.error(err);
-      //     });
-
-      //     if (interested2 != null) {
-      //       isAny++;
-      //       break;
-      //     }
-      //   }
-      // }
-
-      // isAny > 0 ? (hasIntPosts = true) : (hasIntPosts = false);
     }
     // =============== End of section of user == searchuser
 
@@ -637,6 +611,11 @@ const searchUser = async (req) => {
       }
     }
 
+    let imagePath;
+
+    if (found.photo !== null) imagePath = "images/" + found.email + ".jpeg";
+    else imagePath = null;
+
     const responseData = {
       user: found,
       average: average,
@@ -648,7 +627,7 @@ const searchUser = async (req) => {
       interestedForYourPosts: hasIntPosts, // boolean gia to an uparxoun endiaferomenoi twn post tou user
       reviewAble: reviewable, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
       isVisible: isVisible, //Boolean for the phone to be visible or not.
-      image: "images/" + data.email + ".jpeg",
+      image: imagePath,
       message: "Ο χρήστης βρέθηκε",
     };
     return { status: 200, data: responseData };
@@ -686,7 +665,7 @@ const notifyMe = async (req) => {
     for await (val of possibleReviews) {
       if (val.passengerEmail == extra) {
         // IF YOU ARE WERE A PASSENGER
-        const user = await User.findOneLight(val.driverEmail);
+        let user = await User.findOneLight(val.driverEmail);
         if (user === false) throw new Error("Error at finding the user");
 
         const reviewExist = await Review.findOne(val.driverEmail, extra);
@@ -698,14 +677,16 @@ const notifyMe = async (req) => {
         }
 
         user.dataValues.toEdit = toEdit;
-        user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+        if (user.photo !== null)
+          user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+        else user.dataValues.imagePath = null;
         let res = await insertAver(user);
         user.dataValues.average = res.average;
         user.dataValues.count = res.count;
         arrayOfUsers.push(user);
       } else {
         //IF THE USER WAS THE DRIVER
-        const user = await User.findOneLight(val.passengerEmail);
+        let user = await User.findOneLight(val.passengerEmail);
         if (user === false) throw new Error("Error at finding the user");
         if (user == null) {
           throw new Error("User doesnt exist");
@@ -721,7 +702,9 @@ const notifyMe = async (req) => {
         }
 
         user.dataValues.toEdit = toEdit;
-        user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+        if (user.photo !== null)
+          user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+        else user.dataValues.imagePath = null;
         let res = await insertAver(user);
         user.dataValues.average = res.average;
         user.dataValues.count = res.count;

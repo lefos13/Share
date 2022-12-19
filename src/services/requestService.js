@@ -68,12 +68,8 @@ const getRequests = async (req) => {
         r.dataValues.created_at = fixedDate.dateMonthDay;
       }
       return { status: 200, requests: requests };
-      // res.json({ requests: requests });
     } else {
       return { status: 404, message: "Δεν βρέθηκαν αναζητήσεις διαδρομών" };
-      // res
-      //   .status(404)
-      //   .json({ message: "Δεν βρέθηκαν αναζητήσεις διαδρομών!" });
     }
   } catch (error) {
     console.log(Error);

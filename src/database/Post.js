@@ -31,12 +31,6 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
-// import "moment/locale/gr";
-// moment.locale("gr");
-// ==== code for db
-
-// *** ADD ***
-const { savePost } = require("./utils");
 
 const getAllPosts = () => {
   return "All posts";

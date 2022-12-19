@@ -75,10 +75,13 @@ const getReviews = async (req) => {
       } else if (user == null) {
         //UNREALISTIC CASE
         r.dataValues["fullname"] = "Ο χρήστης δεν υπάρχει";
-        r.dataValues.imagepath = "Η εικόνα δεν υπάρχει";
+
+        r.dataValues.imagepath = null;
       } else {
         r.dataValues["fullname"] = user.fullname;
-        r.dataValues.imagepath = "images/" + r.emailreviewer + ".jpeg";
+        if (user.photo !== null)
+          r.dataValues.imagepath = "images/" + r.emailreviewer + ".jpeg";
+        else r.dataValues.imagepath = null;
       }
     }
     //PAGINATION

@@ -5,7 +5,7 @@ Accept-Language: en
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -20,25 +20,6 @@ Content-Type: application/json
         "email": "lefterisevagelinos1996@gmail.com",
         "currentPassword": "11111",
         "pass": "111111"
-    }
-}
-
-###
-POST http://localhost:3000/users/updateProfile
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTNUMTI6MjM6MjYuMTQ1WiIsImlhdCI6MTY3MDkzNDIwNiwiZXhwIjoxNjc2MTE4MjA2fQ.hfELI1RRGmQ6hPztdwtMxogP3rkO8X2P7RLFyQUM9E8
-
-
-{
-    "data": {
-        "fullname": "George",
-        "mobile": "6975620785",
-        "age": "26/06/1995",
-        "facebook": null,
-        "instagram": null,
-        "car": "nissan",
-        "cardate": "2005",
-        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
     }
 }
 
@@ -246,7 +227,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevagelinos199@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -296,7 +277,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service epistrefei post vasei id
-GET http://localhost:3000/posts/getPostPerId?postid=1825
+GET http://localhost:3000/posts/getPostPerId?postid=1851
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEzVDExOjM1OjEyLjQ5NVoiLCJpYXQiOjE2NzA5MzEzMTIsImV4cCI6MTY3NjExNTMxMn0.nWSTnBBjVpX8CpA9Vm0UhMtFFvzGizZhQ7fBV9HQjnM
 
@@ -485,7 +466,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service that returns all the favourites of one user
 GET http://localhost:3000/posts/getFavourites
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTlUMTQ6NTM6MTguMDg4WiIsImlhdCI6MTY3MTQ2MTU5OCwiZXhwIjoxNjc2NjQ1NTk4fQ.V5fKkIoXeqWQja7g6xQRZ0SP1AdwrcQWvfGGlWqNd1w
 
 ###
 #service that returns all the favourites of one user
@@ -493,42 +474,7 @@ GET http://192.168.1.7:3000/test
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
 
-###
-#ALL NEW APIS 
-POST http://localhost:3000/posts/createPost
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEwLTI2VDE0OjU3OjI4LjI5MVoiLCJpYXQiOjE2NjY3OTYyNDgsImV4cCI6MTY3MTk4MDI0OH0.aqDYU4dG3OfcVJ39eiLxiAAqU2y8V8-A_1dLpfDq2EA
 
-{
-    "data": {
-        "email": "user6@gmail.com",
-        "date": "2021-10-05",
-        "startplace": "ασδ",
-        "startcoord": "123",
-        "endplace": "δσαasd",
-        "endcoord": "321asd",
-        "numseats": 4,
-        "startdate": "2022-12-22",
-        "enddate": null,
-        "returnStartDate": null,
-        "returnEndDate": null,
-        "withReturn": false,
-        "costperseat": 40,
-        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-        "petAllowed": true,
-        "isFavourite": false,
-        "moreplaces": [
-            {
-                    "place": "lamia",
-                    "placecoords": "3211"
-            },
-            {
-                    "place": "lamia",
-                    "placecoords": "3211"
-            }
-        ]
-    }
-}
 
 ###
 POST http://localhost:3000/users/register
@@ -536,7 +482,7 @@ Content-Type: application/json
 
 {
     "data":{
-        "email": "lollololol@opa.com",
+        "email": "lefterisevagelinos1996@gmail.com",
         "password": "12345",
         "mobile": "6975620785",
         "fullname": "lefos evan",
@@ -556,15 +502,49 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "fullname": "George",
-        "mobile": "6975620785",
-        "age": 19,
+        "age": "26/06/1995",
         "facebook": null,
         "instagram": null,
         "car": "nissan",
         "cardate": "2002",
-        "gender": "female",
+        "gender": "male",
         "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
 
+    }
+}
+###
+#ALL NEW APIS 
+POST http://localhost:3000/posts/createPost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEwLTI2VDE0OjU3OjI4LjI5MVoiLCJpYXQiOjE2NjY3OTYyNDgsImV4cCI6MTY3MTk4MDI0OH0.aqDYU4dG3OfcVJ39eiLxiAAqU2y8V8-A_1dLpfDq2EA
+
+{
+    "data": {
+        "email": "user0@gmail.com",
+        "date": "2021-10-05",
+        "startplace": "Αθήνα",
+        "startcoord": "37.9838096,23.7275388",
+        "endplace": "Βόλος",
+        "endcoord": "39.366584,22.9506769",
+        "numseats": 4,
+        "startdate": "2022-12-22",
+        "enddate": null,
+        "returnStartDate": null,
+        "returnEndDate": null,
+        "withReturn": false,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "petAllowed": false,
+        "isFavourite": false,
+        "moreplaces": [
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            },
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            }
+        ]
     }
 }
 
@@ -575,18 +555,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevgelinos1996@gmail.com",
-        "startplace": "ασδ",
-        "startcoord": "123",
-        "endplace": "δσα",
-        "endcoord": "321asd",
-        "startdate": "2022-12-22",
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "Αθήνα",
+        "startcoord": "37.9838096,23.7275388",
+        "endplace": "Βόλος",
+        "endcoord": "39.366584,22.9506769",
+        "startdate": null,
         "enddate": null,
         "page": 1,
-        "age": null,
-        "age_end": null,
+        "age": 18,
+        "age_end": 70,
         "car": null,
-        "cardate": null,
+        "cardate": "2000",
         "gender": null,
         "withReturn": null,
         "petAllowed": null,
@@ -604,7 +584,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
     "data": {
         "startplace": "ασδ",
         "startcoord": "123",
-        "page": 3
+        "page": 1
     }
 }
 

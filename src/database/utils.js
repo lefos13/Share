@@ -93,7 +93,7 @@ const checkPass = async (result, user, fcmToken, email) => {
       const photoPath = "./uploads/" + data.email + ".jpeg";
       if (fs.existsSync(photoPath)) {
         rest.photo = "images/" + data.email + ".jpeg";
-      }
+      } else rest.photo = null;
       // console.log("useraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       return {
         status: 200,
