@@ -58,6 +58,7 @@ const Reviews = sequelize.define(
     },
   },
   {
+    timezone: "+02:00",
     freezeTableName: true,
     timestamps: false,
   }

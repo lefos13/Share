@@ -76,8 +76,11 @@ const interested = async (req) => {
   try {
     let extra = req.body.extra;
     // console.log(req.query);
-    var results = null;
-
+    let data = req.body.data;
+    // console.log(data);
+    if (data.email == null) {
+      return { status: 401, message: "Χωρίς Email!" };
+    }
     let curtime = moment().endOf("day").format("YYYY-MM-DD hh:mm:ss");
     let starttime = moment().startOf("day").format("YYYY-MM-DD hh:mm:ss");
     // console.log(curtime, starttime);
@@ -87,9 +90,10 @@ const interested = async (req) => {
     // console.log(dateOfInterest);
 
     var row = {
-      email: req.body.data.email,
-      postid: req.body.data.postid,
+      email: data.email,
+      postid: data.postid,
       date: dateOfInterest,
+      note: data.note,
       isVerified: false,
       isNotified: false,
       ownerNotified: false,
@@ -97,11 +101,9 @@ const interested = async (req) => {
     // console.log(row.date);
     //CHECK IF THE CLIENT IS THE OWNER OF THE POST
     const isPostOwner = await Post.isPostOwner(row);
-
-    if (isPostOwner > 0) {
-      throw 1;
-    } else if (isPostOwner == null) {
-      throw new Error("Something went wrong in checking the post owner");
+    if (isPostOwner === false) throw new Error("Db error");
+    else if (isPostOwner > 0) {
+      throw 1; //abstract case
     }
 
     const interest = await PostInterested.findOne(row.email, row.postid);
@@ -131,6 +133,12 @@ const interested = async (req) => {
           throw new Error("Something went wrong with creation of interest!");
         //Section for notificaiton through firebase
         const postForFunction = await Post.findOne(row.postid);
+        if (postForFunction == null) {
+          return {
+            status: 406,
+            message: "Το συγκεκριμένο ride δεν υπάρχει πια!",
+          };
+        }
         fun.toNotifyOwner(postForFunction.email, extra, row.postid);
         // return the right results to the controller
         console.log(row.date);
@@ -372,6 +380,12 @@ const getPostsUser = async (req) => {
       ? (totallength = count / 10)
       : (totallength = count / 10 - mod / 10 + 1);
 
+    if (data.page > totallength) {
+      return {
+        status: 404,
+        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+      };
+    }
     for await (post of finalarr) {
       if (IsJsonString(post.moreplaces)) {
         post.moreplaces = JSON.parse(post.moreplaces);
@@ -622,6 +636,7 @@ const getIntPost = async (req) => {
           user.dataValues = { ...user.dataValues, ...testdata };
           user.dataValues.isVerified = one.isVerified;
           user.dataValues.piid = one.piid;
+          user.dataValues.note = one.note;
           // console.log(JSON.stringify(testdata));
           allUsers.push(user);
         } else {
@@ -657,7 +672,12 @@ const getIntPost = async (req) => {
       mod == 0
         ? (totallength = isAny / 10)
         : (totallength = isAny / 10 - mod / 10 + 1);
-
+      if (data.page > totallength) {
+        return {
+          status: 404,
+          message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+        };
+      }
       let response = {
         users: finalarr,
         post: fullpost,
@@ -735,13 +755,22 @@ const verInterested = async (req) => {
 
     //GETTING THE SUM OF THE VERIFIED
     const allIntersted = await PostInterested.countVerified(data.postid);
-    if (allIntersted == null) {
+    if (allIntersted === null) {
       throw new Error("Error at getting the count of the verified");
     }
 
-    //GETTING THE DATA OF THE CORRESPONDIND POST
+    let curDate = moment();
+    //GETTING THE DATA OF THE CORRESPONDING POST
+    const pst = await Post.findExpired(data.postid, curDate);
+    if (pst == null)
+      return {
+        status: 406,
+        message:
+          "Το Ride αυτό έχει λήξει, αδύνατη η έγκριση/αφαίρεση έγκρισης χρηστών!",
+      };
     const post = await Post.findOne(data.postid);
-    if (!post) throw new Error("Error at finding the post");
+    if (post === false) throw new Error("Error at finding the post");
+    // console.log(post.toJSON());
 
     if (allIntersted < post.numseats || results.isVerified == true) {
       if (results.isVerified === false) {
@@ -754,17 +783,29 @@ const verInterested = async (req) => {
           post.email,
           results.email
         );
-        if (!toReviewExists)
+        if (toReviewExists === false)
           throw new Error("Error at finding possible review");
         //If there is no possible review, create a new one
         if (toReviewExists == null) {
-          const reviewMade = await ToReview.createOne(
-            post.email,
-            results.email,
-            post.enddate,
-            results.piid
-          );
-          if (!reviewMade) throw new Error("Error at creating possible review");
+          if (post.enddate == null) {
+            const reviewMade = await ToReview.createOne(
+              post.email,
+              results.email,
+              post.startdate,
+              results.piid
+            );
+            if (reviewMade === false)
+              throw new Error("Error at creating possible review");
+          } else {
+            const reviewMade = await ToReview.createOne(
+              post.email,
+              results.email,
+              post.enddate,
+              results.piid
+            );
+            if (reviewMade === false)
+              throw new Error("Error at creating possible review");
+          }
         } else {
           //if a review is done already check if the driver and the passenger have the right emails.
 
@@ -800,6 +841,7 @@ const verInterested = async (req) => {
             if (!updated) throw new Error("Error at resseting the flags");
           }
         }
+
         fun.toNotifyTheVerified(results.email, post.postid, post.email);
         return { status: 200, message: "Επιτυχής έγκριση ενδιαφερόμενου!" };
       } else {

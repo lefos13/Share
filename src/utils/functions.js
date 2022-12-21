@@ -214,6 +214,7 @@ module.exports = {
       }).catch((err) => {
         throw err;
       });
+
       let message = {
         data: {
           type: "receiveApproval",
@@ -287,6 +288,39 @@ module.exports = {
 
   applyFilters: async (data, array) => {
     try {
+      //filter for available seats
+      if (data.seats != null) {
+        // let counter = 1;
+        // for await (ar of array) {
+        //   const countVer = await PostInterested.count({
+        //     where: {
+        //       postid: ar.post.postid,
+        //       isVerified: true,
+        //     },
+        //   }).catch((err) => {
+        //     throw err;
+        //   });
+        //   // console.log("Verified people: ", countVer);
+        //   // console.log("Available seats: ", ar.post.numseats - countVer);
+        //   if (parseInt(data.seats) > ar.post.numseats - countVer) {
+        //     // console.log("Remove post!");
+        //     array = _.filter(array, (obj) => {
+        //       return obj.post.postid != ar.post.postid;
+        //     });
+        //   }
+        // }
+        array = _.filter(array, (obj) => {
+          return obj.post.numseats >= parseInt(data.seats);
+        });
+      }
+
+      //filter for driver's rating
+      if (data.driverRating != null) {
+        array = _.filter(array, (obj) => {
+          return obj.user.average >= parseInt(data.driverRating);
+        });
+      }
+
       if (data.age != null) {
         // afairese ta post twn xrhstwn pou einai panw apo data.age_end
         array = _.filter(array, (obj) => {

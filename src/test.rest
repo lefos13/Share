@@ -5,7 +5,7 @@ Accept-Language: en
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -185,7 +185,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "postid": 1825
+        "postid": 1849,
+        "note": "blabla"
     }
 }
 
@@ -227,7 +228,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -240,7 +241,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
+        "email": "user0@gmail.com",
         "page": 1
     }
 }
@@ -254,8 +255,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "emailreviewer": "user0@gmail.com",
-        "email": "user1@gmail.com",
+        "emailreviewer": "lefterisevagelinos1996@gmail.com",
+        "email": "user0@gmail.com",
         "rating": 4,
         "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
     }
@@ -320,20 +321,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 }
 
 ###
-
-#service epistrefei lista me endiaferomenous gia ta posts enos user
-POST http://localhost:3000/getInterested
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
-
-{
-    "data": {
-        "email": "user0@gmail.com",
-        "page": 1
-    }
-}
-###
-
 #service epistrefei lista me endiaferomenous gia ena post
 POST http://localhost:3000/posts/getIntPost
 Content-Type: application/json
@@ -341,7 +328,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "postid": 1825,
+        "postid": 1849,
         "page": 1
     }
 }
@@ -365,12 +352,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 // verify an insterested user to a post
 POST http://localhost:3000/posts/verInterested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE5VDE1OjQ1OjE3LjU5OFoiLCJpYXQiOjE2NzE0NjQ3MTcsImV4cCI6MTY3NjY0ODcxN30.WBx6Yobse5TbkOypQ2w95x6_U1O5Ej_ch9jzGieCo08
 
 {
     "data": {
-        "postid": 1809,
-        "piid": 396
+        "postid": 1849,
+        "piid": 478
     }
 }
 
@@ -379,7 +366,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 //service to notify someone that has been verified for a post that he is interested
 GET http://localhost:3000/users/notifyMe
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTIxVDE2OjQ2OjI2LjQ1NloiLCJpYXQiOjE2NzE2NDExODYsImV4cCI6MTY3NjgyNTE4Nn0.Uhrf67WeZRPsKgkI8RfeEL2w3Xdvibaz3ADK-ZmbGiw
 
 ###
 // mainEmail: se afto to email tha ginontai generated ta posts. 
@@ -571,7 +558,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
         "withReturn": null,
         "petAllowed": null,
         "returnStartDate": null,
-        "returnEndDate": null
+        "returnEndDate": null,
+        "driverRating": null,
+        "seats": "4"
     }
 }
 

@@ -61,6 +61,10 @@ const PostInterested = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
+    note: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,

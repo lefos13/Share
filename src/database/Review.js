@@ -10,17 +10,6 @@ const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
 // END OF SECTION (ENV VAR)
 
 // code for db
-const { Sequelize, DataTypes, fn } = require("sequelize");
-const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
-  host: HOST,
-  dialect: "mysql",
-  logging: true,
-  dialectOptions: {
-    dateStrings: true,
-    typeCast: true,
-  },
-});
 
 const Users = require("../modules/user");
 const Posts = require("../modules/post");
@@ -83,10 +72,12 @@ const saveReview = async (data) => {
 
 const updateReview = async (review, data) => {
   try {
+    let curDate = moment();
     await review
       .update({
         rating: data.rating,
         text: data.text,
+        createdAt: curDate,
       })
       .catch((err) => {
         throw err;

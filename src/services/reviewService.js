@@ -36,6 +36,7 @@ const getReviews = async (req) => {
       where: {
         email: data.email,
       },
+      order: [["createdAt", "DESC"]],
     };
 
     const revfound = await Review.findAndCountAll(query);
@@ -53,6 +54,7 @@ const getReviews = async (req) => {
       where: {
         email: data.email,
       },
+      order: [["createdAt", "DESC"]],
     };
 
     const rev = await Review.findAndCountAll(query);
@@ -95,7 +97,12 @@ const getReviews = async (req) => {
     mod == 0
       ? (totallength = rev.count / 20)
       : (totallength = rev.count / 20 - mod / 20 + 1);
-
+    if (data.page > totallength) {
+      return {
+        status: 404,
+        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+      };
+    }
     const response = {
       body: {
         reviews: finalarr,
@@ -184,7 +191,9 @@ const createReview = async (req) => {
       }
 
       if (possibleReview == null) {
-        throw new Error(" H KATAGRAFH STON PINAKA TO REVIEWS DEN UPARXEI");
+        throw new Error(
+          " H KATAGRAFH STON PINAKA TO REVIEWS DEN UPARXEI -- Βάσει flow αυτό δεν θα έπρεπε να συμβαίνει"
+        ); //abstract error
       }
 
       const flag = await Review.updateReview(revExist, data);

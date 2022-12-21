@@ -7,6 +7,7 @@ const Request = require("../database/Request");
 const Post = require("../database/Post");
 const PostInt = require("../database/PostInterested");
 const ToReview = require("../database/ToReview");
+const PostInterested = require("../database/PostInterested");
 const bcrypt = require("bcrypt");
 var otpGenerator = require("otp-generator");
 const saltRounds = 10;
@@ -38,13 +39,6 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   },
 });
 
-const getAllUsers = () => {
-  return;
-};
-
-const getOneUser = () => {
-  return;
-};
 // create User service
 const createNewUser = async (req) => {
   try {
@@ -73,7 +67,7 @@ const createNewUser = async (req) => {
       const buffer = Buffer.from(base64, "base64");
       fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
     }
-
+    // console.log(final);
     return final;
   } catch (error) {
     console.log(error);
@@ -278,6 +272,7 @@ const login = async (req) => {
     let autoLogin = req.body.data.autoLogin;
     // console.log(req.body);
     let fcmToken = req.body.data.fcmToken;
+    console.log(data);
 
     // CHECK IF USER EXISTS
     const user = await User.findOneUser(email);
@@ -318,7 +313,7 @@ const login = async (req) => {
           } else {
             rest.photo = null;
           }
-          //MISING FCM TOKEN CODE
+          //FCM TOKEN CODE
           let fcmDone = await saveFcm(data.fcmToken, data.email);
           if (fcmDone === false) {
             throw new Error("Error at creating/updating the fcmToken");
@@ -361,6 +356,7 @@ const loginThirdParty = async (req) => {
     let data = req.body.data;
     let userRegistered = false;
     let forceUpdate = false;
+    console.log(data);
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;
     const user = await User.findOneUser(data.email);
@@ -475,7 +471,6 @@ const searchUser = async (req) => {
     let hasInterested = false;
     let hasIntPosts = false;
     let reviewable = false;
-    let isVisible = false;
 
     let findUserQuery = {
       attributes: {
@@ -611,22 +606,66 @@ const searchUser = async (req) => {
       }
     }
 
-    let imagePath;
-
+    let imagePath = null;
     if (found.photo !== null) imagePath = "images/" + found.email + ".jpeg";
-    else imagePath = null;
+
+    let peopleDriven = 0;
+    let ridesTaken = 0;
+
+    //========= ridesTaken functionality ===========
+    let curDate = moment();
+    //Get all the interests that i am verified
+    const allInt = await PostInterested.findAllVerifed(data.email);
+    if (allInt === false) {
+      throw new Error(
+        "Something went wrong with findind all the verified interests"
+      );
+    }
+    //Count the posts that are expired
+    for await (int of allInt) {
+      let postExp = await Post.findExpired(int.postid, curDate);
+      if (postExp === false) {
+        throw new Error("Something went wrong with db function");
+      }
+      // console.log(postExp);
+      if (postExp == null) {
+        ridesTaken++;
+      }
+    }
+    // console.log("rides taken", ridesTaken);
+    //ridesTaken --- END
+
+    //==========================
+    //peopleDriven functionality
+
+    //Get all my expired posts
+    const allExpired = await Post.findAllExpired(data.email, curDate);
+    if (allExpired === false) {
+      throw new Error("Something went wrong with db function");
+    }
+    // console.log(allExpired);
+    //count all the interested users that are verifed
+    for await (post of allExpired) {
+      let count = await PostInterested.countVerified(post.postid);
+      if (count === false) {
+        throw new Error("Something went wrong with db function");
+      }
+      peopleDriven = peopleDriven + count;
+    }
+    //peopleDriven --- END
 
     const responseData = {
       user: found,
       average: average,
       count: revfound.count,
+      ridesTaken: ridesTaken,
+      peopleDriven: peopleDriven,
       hasFavourites: hasFavourites, // boolean if the user has any favourites
       hasRequests: hasRequests, //boolean if the user has any post requsts
       hasPosts: hasPosts, //boolean gia to an o xrhshs exei posts
       hasInterested: hasInterested, // boolean gia to an o xrhsths endiaferetai gia posts
       interestedForYourPosts: hasIntPosts, // boolean gia to an uparxoun endiaferomenoi twn post tou user
       reviewAble: reviewable, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
-      isVisible: isVisible, //Boolean for the phone to be visible or not.
       image: imagePath,
       message: "Ο χρήστης βρέθηκε",
     };
@@ -726,8 +765,6 @@ const notifyMe = async (req) => {
 };
 
 module.exports = {
-  getAllUsers,
-  getOneUser,
   createNewUser,
   updateOneUser,
   deleteOneUser,

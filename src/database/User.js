@@ -53,6 +53,7 @@ const register = async (data) => {
 
     return { status: 200, data: data };
   } catch (err) {
+    // console.log(err);
     if (err.parent.errno == 1062) {
       let data = {
         message: "Βρέθηκε λογαριασμός με το ίδιο email.",

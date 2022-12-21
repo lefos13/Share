@@ -112,7 +112,7 @@ const isPostOwner = async (row) => {
     return checkPost;
   } catch (error) {
     console.log(error);
-    return null;
+    return false;
   }
 };
 
@@ -324,8 +324,56 @@ const findAllFavourites = async (email) => {
   }
 };
 
+const findExpired = async (postid, date) => {
+  try {
+    const post = await Posts.findOne({
+      where: {
+        postid: postid,
+        [Op.or]: [
+          { enddate: { [Op.gte]: date } }, //enddate megalutero tou curdate
+          {
+            [Op.and]: [{ enddate: null }, { startdate: { [Op.gte]: date } }],
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return post;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const findAllExpired = async (email, date) => {
+  try {
+    const post = await Posts.findAll({
+      where: {
+        email: email,
+        [Op.or]: [
+          { enddate: { [Op.lte]: date } }, //enddate megalutero tou curdate
+          {
+            [Op.and]: [{ enddate: null }, { startdate: { [Op.lte]: date } }],
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return post;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
+  findAllExpired,
   getAllPosts,
+  findExpired,
   createNewPost,
   countPosts,
   isPostOwner,

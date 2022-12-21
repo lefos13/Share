@@ -42,6 +42,7 @@ const findOne = async (email, postid) => {
   // code to count posts of a user the current day
 };
 
+// destroy the interest
 const destroyOne = async (email, postid) => {
   try {
     const deleted = await PostInterested.destroy({
@@ -59,6 +60,7 @@ const destroyOne = async (email, postid) => {
   }
 };
 
+//get the count of interests between two dates of a user
 const getCountOfUser = async (email, starttime, curtime) => {
   try {
     const count = await PostInterested.count({
@@ -76,6 +78,7 @@ const getCountOfUser = async (email, starttime, curtime) => {
   }
 };
 
+// create an interest
 const createInterest = async (row) => {
   try {
     const inter = await PostInterested.create(row).catch((err) => {
@@ -89,6 +92,7 @@ const createInterest = async (row) => {
   }
 };
 
+// find all interests of a user
 const findAny = async (email) => {
   try {
     const found = await PostInterested.findAll({
@@ -135,6 +139,7 @@ const updateNotify = async (postInt) => {
   }
 };
 
+// find all per id of post
 const findAllPerId = async (postid) => {
   try {
     const interested = await PostInterested.findAll({
@@ -151,6 +156,7 @@ const findAllPerId = async (postid) => {
   }
 };
 
+// destroy all interested users per post id
 const detroyAllPerPost = async (postid) => {
   try {
     const interested = await PostInterested.destroy({
@@ -167,6 +173,7 @@ const detroyAllPerPost = async (postid) => {
   }
 };
 
+//delete one interest
 const deleteOne = async (piid) => {
   try {
     const del = await PostInterested.destroy({
@@ -183,6 +190,7 @@ const deleteOne = async (piid) => {
   }
 };
 
+//find one interest by id
 const findOneById = async (piid) => {
   try {
     const results = await PostInterested.findOne({
@@ -199,6 +207,7 @@ const findOneById = async (piid) => {
   }
 };
 
+// count verified for specific postid
 const countVerified = async (postid) => {
   try {
     const allIntersted = await PostInterested.count({
@@ -228,6 +237,7 @@ const updateVerify = async (postInt) => {
   }
 };
 
+//reset every flag of an interest (notified, verified)
 const resetFlags = async (postInt) => {
   try {
     await postInt
@@ -260,10 +270,30 @@ const getInterestedIfVerified = async (postid, email) => {
   }
 };
 
+// find all interests of a user that are verified
+const findAllVerifed = async (email) => {
+  try {
+    const found = await PostInterested.findAll({
+      where: {
+        email: email,
+        isVerified: true,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return found;
+  } catch (error) {
+    console.log("Inside findAny of postinterested:", error);
+    return false;
+  }
+  // code to count posts of a user the current day
+};
+
 // *** ADD ***
 
 module.exports = {
   findOne,
+  findAllVerifed,
   destroyOne,
   getCountOfUser,
   createInterest,

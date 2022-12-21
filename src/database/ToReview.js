@@ -154,6 +154,7 @@ const findIfExists = async (email1, email2) => {
 
 const createOne = async (driverEmail, passengerEmail, endDate, piid) => {
   try {
+    // console.log(endDate);
     const newToReview = await ToReview.create({
       driverEmail: driverEmail,
       passengerEmail: passengerEmail,
