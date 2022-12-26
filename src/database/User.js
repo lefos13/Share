@@ -34,16 +34,23 @@ const moment = require("moment-timezone");
 // ==== code for db
 
 // *** ADD ***
-const register = async (data) => {
+const register = async (data, msg) => {
   try {
     // console.log(data);
     let user = await Users.create(data).catch((err) => {
-      throw err;
+      // console.log("sameuser");
+      if (err.parent.errno == 1062) {
+        let data = {
+          message: msg.sameEmail,
+        };
+        throw { status: 405, data: data };
+      }
     });
-    let { password, mobile, ...rest } = data;
+
+    let { password, ...rest } = data;
 
     results = {
-      message: "Εγγραφήκατε επιτυχώς!",
+      message: msg.regSuc,
       user: rest,
     };
 
@@ -53,19 +60,9 @@ const register = async (data) => {
 
     return { status: 200, data: data };
   } catch (err) {
-    // console.log(err);
-    if (err.parent.errno == 1062) {
-      let data = {
-        message: "Βρέθηκε λογαριασμός με το ίδιο email.",
-      };
-      return { status: 405, data: data };
-    } else {
-      // console.log(err);
-      let data = {
-        message: "Κάτι πήγε στραβά. Προσπάθησε ξανά αργότερα.",
-      };
-      return { status: 500, data: data };
-    }
+    if (err.status == 405) {
+      return err;
+    } else return { status: 500 };
   }
 };
 

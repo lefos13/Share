@@ -2,26 +2,20 @@
 const postService = require("../services/postService");
 const moment = require("moment-timezone");
 moment.tz.setDefault("Europe/Athens");
-const getAllPosts = (req, res) => {
-  const allPosts = postService.getAllPosts();
-  res.send("Get all workouts");
-};
 
-const getOnePost = (req, res) => {
-  const onePost = postService.getOnePost();
-  res.send("Get an existing workout");
-};
+const { determineLang } = require("../utils/functions");
 
 const createNewPost = async (req, res) => {
   try {
-    const newPost = await postService.createNewPost(req.body.data);
-    if (newPost.status == 500) throw "error";
+    let msg = await determineLang(req);
+    const newPost = await postService.createNewPost(req.body.data, req);
+    if (newPost.status == 500) throw msg;
     res
       .status(newPost.status)
       .json({ message: newPost.data, postid: newPost.postid });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
@@ -37,17 +31,20 @@ const deleteOnePost = (req, res) => {
 
 const interested = async (req, res) => {
   try {
+    let msg = await determineLang(req);
     // console.log("asd");
     const data = await postService.interested(req);
-    if (data.status == 200) {
+    if (data.status == 500) {
+      throw msg;
+    } else if (data.status == 200) {
       // console.log(data.body.date);
       res.json({ body: data.body, message: data.message });
     } else {
       res.status(data.status).json({ message: data.message });
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
@@ -214,8 +211,6 @@ const getFavourites = async (req, res) => {
 };
 
 module.exports = {
-  getAllPosts,
-  getOnePost,
   createNewPost,
   updateOnePost,
   deleteOnePost,

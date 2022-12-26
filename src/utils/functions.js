@@ -40,7 +40,20 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const { response } = require("express");
+const fs = require("fs");
 
+const determineLang = async (req) => {
+  try {
+    let lang = req.headers["accept-language"];
+    let msg;
+    if (lang == "en") msg = JSON.parse(fs.readFileSync("./lang/english.json"));
+    else msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
+    return msg;
+  } catch (error) {
+    console.log(error);
+    return "el";
+  }
+};
 const IsJsonString = async (str) => {
   try {
     JSON.parse(str);
@@ -290,25 +303,6 @@ module.exports = {
     try {
       //filter for available seats
       if (data.seats != null) {
-        // let counter = 1;
-        // for await (ar of array) {
-        //   const countVer = await PostInterested.count({
-        //     where: {
-        //       postid: ar.post.postid,
-        //       isVerified: true,
-        //     },
-        //   }).catch((err) => {
-        //     throw err;
-        //   });
-        //   // console.log("Verified people: ", countVer);
-        //   // console.log("Available seats: ", ar.post.numseats - countVer);
-        //   if (parseInt(data.seats) > ar.post.numseats - countVer) {
-        //     // console.log("Remove post!");
-        //     array = _.filter(array, (obj) => {
-        //       return obj.post.postid != ar.post.postid;
-        //     });
-        //   }
-        // }
         array = _.filter(array, (obj) => {
           return obj.post.numseats >= parseInt(data.seats);
         });
@@ -323,12 +317,28 @@ module.exports = {
 
       if (data.age != null) {
         // afairese ta post twn xrhstwn pou einai panw apo data.age_end
+
         array = _.filter(array, (obj) => {
-          return parseInt(obj.user.age) <= data.age_end;
+          let splitted = obj.user.age.split("/");
+          let ageDate = moment()
+            .set("year", parseInt(splitted[2]))
+            .set("month", parseInt(splitted[1]) - 1)
+            .set("date", parseInt(splitted[0]));
+
+          let calcAge = moment().diff(ageDate, "years");
+
+          return calcAge <= data.age_end;
         });
         // afairese ta post twn xrhstwn pou einai katw apo data.age
         array = _.filter(array, (obj) => {
-          return parseInt(obj.user.age) >= data.age;
+          let splitted = obj.user.age.split("/");
+          let ageDate = moment()
+            .set("year", parseInt(splitted[2]))
+            .set("month", parseInt(splitted[1]) - 1)
+            .set("date", parseInt(splitted[0]));
+
+          let calcAge = moment().diff(ageDate, "years");
+          return calcAge >= data.age;
         });
       }
       if (data.car != null) {
@@ -478,4 +488,5 @@ module.exports = {
 
     return fnd;
   },
+  determineLang,
 };

@@ -26,10 +26,6 @@ const Users = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    mobile: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     fullname: {
       type: DataTypes.STRING,
       allowNull: false,

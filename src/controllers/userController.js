@@ -2,6 +2,9 @@
 const { result } = require("lodash");
 const { checkPass } = require("../database/utils");
 const userService = require("../services/userService");
+const fs = require("fs");
+const { determineLang } = require("../utils/functions");
+
 const getAllUsers = (req, res) => {
   const allUsers = userService.getAllUsers();
   res.send("Get all workouts");
@@ -14,23 +17,27 @@ const getOneUser = (req, res) => {
 
 const createNewUser = async (req, res) => {
   try {
+    let msg = await determineLang(req);
     const newUser = await userService.createNewUser(req);
-    if (newUser.status == 500) throw "Error";
+    if (newUser.status == 500) throw msg;
     res.status(newUser.status).json(newUser.data);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
 const createToken = async (req, res) => {
   try {
-    const newToken = await userService.createToken(req);
+    let msg = await determineLang(req);
+    // console.log(msg);
+    let newToken = await userService.createToken(req);
     if (newToken.status == 200) res.status(newToken.status).json(newToken.data);
+    else if (newToken.status == 500) throw msg;
     else res.status(newToken.status).json({ message: newToken.data });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+  } catch (msg) {
+    // console.log(error);
+    res.status(500).json({ message: msg.errorMessage });
   }
 };
 
@@ -46,11 +53,13 @@ const updateOneUser = async (req, res) => {
 
 const updatePass = async (req, res) => {
   try {
+    let msg = await determineLang(req);
     const updatedUser = await userService.updatePass(req);
+    if (updatedUser.status == 500) throw msg;
     res.status(updatedUser.status).json({ message: updatedUser.message });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
@@ -66,26 +75,31 @@ const userVerify = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    let msg = await determineLang(req);
     const results = await userService.login(req);
-
+    if (results.status == 500) {
+      throw msg;
+    }
     res.status(results.status).json({
       message: results.message,
       user: results.user,
       forceUpdate: results.forceUpdate,
     });
   } catch (error) {
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
 const sendOtp = async (req, res) => {
   try {
+    let msg = await determineLang(req);
     const results = await userService.sendOtp(req);
+    if (results.status == 500) throw msg;
     res
       .status(results.status)
       .json({ message: results.message, otp: results.otp });
   } catch (error) {
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
@@ -114,12 +128,13 @@ const notifyMe = async (req, res) => {
 
 const loginThirdParty = async (req, res) => {
   try {
+    let msg = await determineLang(req);
     const results = await userService.loginThirdParty(req);
-    if (results.status == 500) throw "error";
+    if (results.status == 500) throw msg;
     else res.status(results.status).json(results.response);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 

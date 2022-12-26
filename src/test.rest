@@ -14,6 +14,7 @@ Accept-Language: en
 #service pou kanei update to password you user sth vash
 POST http://localhost:3000/users/updateUserPass
 Content-Type: application/json
+Accept-Language: en
 
 {
     "data":{
@@ -26,8 +27,9 @@ Content-Type: application/json
 ###
 
 #service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
-POST  http://192.168.1.7:3000/users/register
+POST  http://localhost:3000/users/register
 Content-Type: application/json
+Accept-Language: en
 
 {
     "data":{
@@ -48,6 +50,7 @@ Content-Type: application/json
 #service pou kanei verify to xrhsth sth vash dedomenwn, afou kanei epibebaiwsh to otp tou ston client
 POST http://localhost:3000/users/verify
 Content-Type: application/json
+Accept-Language: en
 
 {
     "data":{
@@ -61,6 +64,7 @@ Content-Type: application/json
 POST http://localhost:3000/users/login
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMDhUMTk6MzY6MDcuMDIyWiIsImlhdCI6MTY2NzkzNjE2NywiZXhwIjoxNjczMTIwMTY3fQ.Rm7X-PLNZBFnmAEssYrXCJr1Mxv_KxnoGa0ojWbfG_E
+Accept-Language: en
 
 {
     "data":{
@@ -73,6 +77,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 POST http://localhost:3000/users/loginThirdParty
 Content-Type: application/json
+Accept-Language: en
 
 {
     "data": {
@@ -88,18 +93,13 @@ Content-Type: application/json
 #service poy stelnei otp ston xrhsth kai ston client gia epibebaiwsh
 POST http://localhost:3000/users/passotp
 Content-Type: application/json
+Accept-Language: en
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "lefterisevagelinos199@gmail.com"
     }
 }
-
-###
-
-POST http://localhost:3000/setVisible
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTMxVDA5OjAwOjI3LjQ5NloiLCJpYXQiOjE2NDg3MTcyMjcsImV4cCI6MTY1MzkwMTIyN30.kkSrxOTXM7gPgORYf_AE4Q50cOR_OZ0Lk8cIUgn1eho
 
 ###
 
@@ -107,6 +107,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 POST http://localhost:3000/posts/createpost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMDhUMTk6MzY6MDcuMDIyWiIsImlhdCI6MTY2NzkzNjE2NywiZXhwIjoxNjczMTIwMTY3fQ.Rm7X-PLNZBFnmAEssYrXCJr1Mxv_KxnoGa0ojWbfG_E
+Accept-Language: en
 
 {
     "data": {
@@ -144,6 +145,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/createpost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEyVDE5OjQ4OjMwLjg3NVoiLCJpYXQiOjE2NzA4NzQ1MTAsImV4cCI6MTY3NjA1ODUxMH0.lZsv25J64lxVhOw8FtWionb5ZSJQl0bptPkV4Ww-Ifs
+Accept-Language: en
 
 {
     "data": {
@@ -543,24 +545,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "Αθήνα",
-        "startcoord": "37.9838096,23.7275388",
-        "endplace": "Βόλος",
-        "endcoord": "39.366584,22.9506769",
+        "startplace": "ασδ",
+        "startcoord": "1234",
+        "endplace": "δσα",
+        "endcoord": "3215",
         "startdate": null,
         "enddate": null,
         "page": 1,
         "age": 18,
         "age_end": 70,
         "car": null,
-        "cardate": "2000",
+        "cardate": null,
         "gender": null,
         "withReturn": null,
         "petAllowed": null,
         "returnStartDate": null,
         "returnEndDate": null,
         "driverRating": null,
-        "seats": "4"
+        "seats": null
     }
 }
 

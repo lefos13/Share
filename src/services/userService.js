@@ -14,7 +14,7 @@ const saltRounds = 10;
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { verification, checkPass, saveFcm } = require("../database/utils");
-const { insertAver } = require("../utils/functions");
+const { insertAver, determineLang } = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 
@@ -42,17 +42,11 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 // create User service
 const createNewUser = async (req) => {
   try {
+    let msg = await determineLang(req);
     var data = req.body.data;
     let photo = data.photo;
     //Calculate age
-    let splitted = data.age.split("/");
-    let ageDate = moment()
-      .set("year", parseInt(splitted[2]))
-      .set("month", parseInt(splitted[1]) - 1)
-      .set("date", parseInt(splitted[0]));
 
-    let calcAge = moment().diff(ageDate, "years");
-    data.age = calcAge;
     //===========
 
     data["verified"] = true;
@@ -60,7 +54,7 @@ const createNewUser = async (req) => {
     let salt = await bcrypt.genSalt(saltRounds);
     data.password = await bcrypt.hash(data.password, salt);
 
-    const final = await User.register(data);
+    const final = await User.register(data, msg);
     if (final.status == 200) {
       // console.log("Uploading new photo...");
       let base64 = photo;
@@ -81,16 +75,8 @@ const updateOneUser = async (req) => {
     let data = req.body.data;
     let email = req.body.extra;
     //Calculate age
-    let splitted = data.age.split("/");
-    let ageDate = moment()
-      .set("year", parseInt(splitted[2]))
-      .set("month", parseInt(splitted[1]) - 1)
-      .set("date", parseInt(splitted[0]));
 
-    let calcAge = moment().diff(ageDate, "years");
-    data.age = calcAge;
-
-    console.log(data.age);
+    // console.log(data.age);
 
     //===========
 
@@ -116,21 +102,14 @@ const updateOneUser = async (req) => {
 const createToken = async (data) => {
   try {
     let email = data.body.data.email;
-    let lang = data.headers["accept-language"];
-    if (lang == "en") {
-      lang = fs.readFileSync("lang/english.json");
-      lang = JSON.parse(lang);
-    } else if (lang == "gr") {
-      lang = fs.readFileSync("lang/greek.json");
-      lang = JSON.parse(lang);
-    }
+    let msg = await determineLang(data);
     const user = await User.findOneUser(email);
     if (user === false) {
       // if error with the db
       throw 500;
     } else if (user == null) {
       //if user doesnt exist
-      return { status: 404, data: "Ο χρήστης δεν βρέθηκε!" };
+      return { status: 404, data: msg.userNull };
     } else if (user.verified === false) {
       //if user isnt verified
       var otp = otpGenerator.generate(4, {
@@ -141,7 +120,7 @@ const createToken = async (data) => {
       });
 
       let response = {
-        message: "Πρέπει να επιβεβαιώσεις το email σου.",
+        message: msg.confirmEmail,
         email: email,
         otp: otp,
       };
@@ -156,14 +135,14 @@ const createToken = async (data) => {
       const accessToken = jwt.sign(payload, TOKEN_KEY, { expiresIn: "60d" });
       // console.log(accessToken);
       const fdata = {
-        message: "Επιτυχής δημιουργία του token",
+        message: msg.tokenSuc,
         accessToken: accessToken,
       };
       return { status: 200, data: fdata };
     }
   } catch (error) {
     console.log(error);
-    return { status: 500, data: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
@@ -172,6 +151,7 @@ const updatePass = async (req) => {
     let data = req.body.data;
     let email = req.body.data.email;
     let password = req.body.data.pass;
+    let msg = await determineLang(req);
     const userExist = await User.findOneUser(email);
     if (userExist === false) throw new Error("Error at finding the user");
     // CHECK IF THE UPDATE IS FOR A NEW GOOGLE USER
@@ -189,10 +169,10 @@ const updatePass = async (req) => {
       if (user === false) {
         throw new Error("Error at updating the password");
       } else {
-        return { status: 200, message: "Ο κωδικός ανανεώθηκε!" };
+        return { status: 200, message: msg.upPassSuc };
       }
     } else if (data.currentPassword == null) {
-      console.log("Changing password from forgot procedure...");
+      // console.log("Changing password from forgot procedure...");
       // GENERATE HASH FOR THE PASSWORD GIVEN
       const salt = await bcrypt.genSalt(saltRounds);
       let hash = await bcrypt.hash(password, salt);
@@ -201,16 +181,16 @@ const updatePass = async (req) => {
       const user = await User.updatePassUser(email, hash);
 
       if (user === null) {
-        return { status: 404, message: "Ο χρήστης δεν βρέθηκε." };
+        return { status: 404, message: msg.userNull };
       } else if (user === false) {
         throw new Error(
           "Κάτι πήγε στραβά μέσα στο Function updatePassUser στο αρχείο database/User.js"
         );
       } else {
-        return { status: 200, message: "Ο κωδικός ανανεώθηκε." };
+        return { status: 200, message: msg.upPassSuc };
       }
     } else {
-      console.log("Changing password normally...");
+      // console.log("Changing password normally...");
       let curPass = data.currentPassword;
       const salt = await bcrypt.genSalt(saltRounds);
       let hash = await bcrypt.hash(password, salt);
@@ -219,14 +199,14 @@ const updatePass = async (req) => {
       if (!compareNew) {
         return {
           status: 406,
-          message: "Λανθασμένος τρέχων κωδικός!",
+          message: msg.wrongPass,
         };
       }
       const compareOld = await bcrypt.compare(password, userExist.password);
       if (compareOld) {
         return {
           status: 406,
-          message: "Ο νέος κωδικός είναι ο ίδιος με τον παλιό!",
+          message: msg.curEqualOld,
         };
       }
 
@@ -234,12 +214,12 @@ const updatePass = async (req) => {
       if (updatedPass === false) {
         throw new Error("Error at updating the password");
       }
-      return { status: 200, message: "Ο κωδικός ανανεώθηκε!" };
+      return { status: 200, message: msg.upPassSuc };
     }
     // USER
   } catch (err) {
     console.error(err);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
@@ -272,13 +252,14 @@ const login = async (req) => {
     let autoLogin = req.body.data.autoLogin;
     // console.log(req.body);
     let fcmToken = req.body.data.fcmToken;
-    console.log(data);
+    // console.log(data);
+    let msg = await determineLang(req);
 
     // CHECK IF USER EXISTS
     const user = await User.findOneUser(email);
 
     if (user == null) {
-      return { status: 404, message: "Ο χρήστης δεν βρέθηκε!" };
+      return { status: 404, message: msg.userNull };
     } else if (user === false) {
       throw new Error("Σφάλμα στην findOneUser του User.js");
     } else {
@@ -286,7 +267,7 @@ const login = async (req) => {
       if (user.verified === false) {
         return {
           status: 405,
-          message: "Πρέπει να επιβεβαιώσεις το email σου.",
+          message: msg.confirmEmail,
         };
       } else {
         // CHECK IF THE PASS IS GOOGLE FIXED ONE
@@ -297,12 +278,11 @@ const login = async (req) => {
         if (campareGooglePass === true && autoLogin === false) {
           return {
             status: 406,
-            message:
-              "Για να συνδεθείς με email και password θα πρέπει να ορίσεις νέο password. Πάτα Οκ για να το ορίσεις ή συνδέσου με google Sign in!",
+            message: msg.norLoginAfterGoogle,
           };
         } else if (user.isThirdPartyLogin === true && autoLogin === true) {
           //case that is google signed in and go for autologin
-          console.log("case that is google signed in and go for autologin");
+          // console.log("case that is google signed in and go for autologin");
           let userData = user.toJSON();
           let { password, mobile, photo, ...rest } = userData;
           //TEMP CODE FOR PHOTO
@@ -321,12 +301,12 @@ const login = async (req) => {
           //
           return {
             status: 200,
-            message: "Επιτυχής είσοδος!",
+            message: msg.loginSuc,
             user: rest,
             forceUpdate: false,
           };
         } else {
-          console.log("case with normal login");
+          // console.log("case with normal login");
           // CHECK IF THE PASS IS RIGHT
           const result = await bcrypt.compare(pass, user.password);
 
@@ -347,16 +327,17 @@ const login = async (req) => {
     }
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
 const loginThirdParty = async (req) => {
   try {
+    let msg = await determineLang(req);
     let data = req.body.data;
     let userRegistered = false;
     let forceUpdate = false;
-    console.log(data);
+    // console.log(data);
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;
     const user = await User.findOneUser(data.email);
@@ -394,7 +375,7 @@ const loginThirdParty = async (req) => {
         status: 200,
         response: {
           user: rest,
-          message: "Επιτυχής είσοδος!",
+          message: msg.loginSuc,
           forceUpdate: forceUpdate,
           userRegistered: userRegistered,
         },
@@ -421,7 +402,7 @@ const loginThirdParty = async (req) => {
       rest.isThirdPartyLogin = true;
       const response = {
         user: rest,
-        message: "Επιτυχής είσοδος!",
+        message: msg.loginSuc,
         forceUpdate: forceUpdate,
         userRegistered: userRegistered,
       };
@@ -440,6 +421,7 @@ const loginThirdParty = async (req) => {
 
 const sendOtp = async (req) => {
   try {
+    let msg = await determineLang(req);
     var email = req.body.data.email;
 
     var otp = otpGenerator.generate(4, {
@@ -453,11 +435,11 @@ const sendOtp = async (req) => {
 
     return {
       status: 200,
-      message: "Έλεγξε το email σου για τον ειδικό κωδικό.",
+      message: msg.otpSent,
       otp: otp,
     };
   } catch (error) {
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 

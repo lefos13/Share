@@ -12,6 +12,7 @@ const {
   insertAver,
   applyFilters,
   IsJsonString,
+  determineLang,
 } = require("../utils/functions");
 const _ = require("lodash");
 // enviroment variables
@@ -40,8 +41,9 @@ const RFC_H = "DD/MM/YYYY HH:mm";
 const RFC_ONLYM = "DD/MM/YYYY";
 
 // create post service
-const createNewPost = async (data) => {
+const createNewPost = async (data, req) => {
   try {
+    const msg = await determineLang(req);
     const postToInsert = {
       ...data,
     };
@@ -55,20 +57,20 @@ const createNewPost = async (data) => {
       if (newPost !== false)
         message = {
           status: 200,
-          data: "Η υποβολή πραγματοποιήθηκε επιτυχώς.",
+          data: msg.createRideSuc,
           postid: newPost.postid,
         };
-      else message = { status: 500, data: "Κάτι πήγε λάθος" };
+      else message = { status: 500 };
     } else {
       message = {
         status: 405,
-        data: "Έχεις κάνει ήδη 3 post σήμερα! Προσπάθησε ξανά αύριο.",
+        data: msg.threeRides,
       };
     }
     return message;
   } catch (error) {
     console.log(error);
-    return false;
+    return { status: 500 };
   }
 };
 
@@ -260,6 +262,7 @@ const searchPosts = async (req) => {
     // ==========  if startdate is null, then search from the current date to a month after today.
 
     let found = await Post.findAndCountAll(query);
+    console.log(found);
     if (found.count == 0) {
       return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
     } else if (found == null) {

@@ -1,4 +1,16 @@
 {
   "errorMessage": "Κάτι πήγε στραβά!",
-  "tokenCreation": "Επιτυχής δημιουργία του token"
+  "tokenSuc": "Επιτυχής δημιουργία του token",
+  "userNull": "Ο χρήστης δεν βρέθηκε!",
+  "confirmEmail": "Πρέπει να επιβεβαιώσεις το e-mail σου!",
+  "upPassSuc": "Ο κωδικός σου άλλαξε!",
+  "wrongPass": "Λάθος τρέχων κωδικός!",
+  "curEqualOld": "Ο νέος κωδικός σου είναι ίδιος με τον τρέχων!",
+  "regSuc": "Ο λογαριασμός σου εγγράφηκε επιτυχώς!",
+  "sameEmail": "Υπάρχει ήδη λογαριασμός με αυτό το e-mail!",
+  "norLoginAfterGoogle": "Για να συνδεθείς με email και password θα πρέπει να ορίσεις νέο password. Πάτα Οκ για να το ορίσεις ή συνδέσου με google Sign in!",
+  "loginSuc": "Καλώς ήρθες στο OURIDE!",
+  "otpSent": "Έλεγξε το e-mail σου για τον ειδικό κωδικό!",
+  "createRideSuc": "Έφτιαξες ένα νέο Ride!",
+  "threeRides": "Έχεις ήδη 3 Rides σήμερα!"
 }

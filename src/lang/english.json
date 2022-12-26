@@ -1,4 +1,16 @@
 {
   "errorMessage": "Something went wrong!",
-  "tokenCreation": "Succesfull creation of token"
+  "tokenSuc": "Succesfull creation of token",
+  "userNull": "User not found!",
+  "confirmEmail": "You have to confirm your e-mail!",
+  "upPassSuc": "Your password has been changed!",
+  "wrongPass": "Wrong current password!",
+  "curEqualOld": "Your new password is the same as the old!",
+  "regSuc": "You registered your account!",
+  "sameEmail": "There is already an account with this e-mail!",
+  "norLoginAfterGoogle": "To login with email and password you will have to define a new password. Tap ok to procceed or login with google sing-in!",
+  "loginSuc": "Welcome to OURIDE!",
+  "otpSent": "Check your email for the special code!",
+  "createRideSuc": "You created a new Ride!",
+  "threeRides": "You have created 3 Rides already today!"
 }
