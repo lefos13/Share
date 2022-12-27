@@ -68,9 +68,20 @@ const register = async (data, msg) => {
 
 const updateUser = async (data, email) => {
   try {
-    console.log(data);
-    const user = await Users.update(
-      {
+    // console.log(data);
+    const user = await Users.findOne({
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    let photoData;
+    data.photo == null ? (photoData = user.photo) : (photoData = 1);
+
+    await user
+      .update({
         fullname: data.fullname,
         age: data.age,
         facebook: data.facebook,
@@ -78,16 +89,11 @@ const updateUser = async (data, email) => {
         car: data.car,
         cardate: data.cardate,
         gender: data.gender,
-        photo: 1,
-      },
-      {
-        where: {
-          email: email,
-        },
-      }
-    ).catch((err) => {
-      throw err;
-    });
+        photo: photoData,
+      })
+      .catch((err) => {
+        throw err;
+      });
     return user;
   } catch (err) {
     console.log(err);

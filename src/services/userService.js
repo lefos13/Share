@@ -74,11 +74,10 @@ const updateOneUser = async (req) => {
     let photo = req.body.data.photo;
     let data = req.body.data;
     let email = req.body.extra;
-    //Calculate age
 
-    // console.log(data.age);
-
-    //===========
+    // if (data.fullname == null) {
+    //   delete data.fullname;
+    // }
 
     const res = await User.updateUser(data, email);
     if (res === false) {

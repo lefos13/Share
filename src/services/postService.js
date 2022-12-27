@@ -270,6 +270,7 @@ const searchPosts = async (req) => {
     }
 
     for await (fnd of found.rows) {
+      fnd.dataValues.isFavourite = false;
       // console.log(fnd.toJSON());
       if (IsJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
@@ -321,7 +322,7 @@ const searchPosts = async (req) => {
 
     let filteredArray = await applyFilters(data, array);
     if (filteredArray === false) {
-      throw err;
+      throw new Error("Error at filters");
     } else if (filteredArray.length == 0) {
       return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
     }
@@ -1014,11 +1015,12 @@ const feedScreen = async (req) => {
     let found = await Post.findAndCountAll(query);
     if (found.count == 0) {
       return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
-    } else if (found == null) {
+    } else if (found === null) {
       throw new Error("Something went wrong in searching the posts");
     }
 
     for await (fnd of found.rows) {
+      fnd.dataValues.isFavourite = false;
       if (IsJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }

@@ -50,12 +50,13 @@ const interested = async (req, res) => {
 
 const searchPosts = async (req, res) => {
   try {
+    let msg = await determineLang(req);
     let data = await postService.searchPosts(req);
-    if (data.status == 500) throw "error";
+    if (data.status == 500) throw msg;
     res.status(data.status).json({ body: data.body, message: data.message });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
