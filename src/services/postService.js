@@ -370,6 +370,7 @@ const getPostsUser = async (req) => {
     if (found === false) {
       throw new Error("Error with finding the posts of the user");
     }
+    // console.log(found);
 
     let rows = found.rows;
     let count = found.count;
@@ -387,7 +388,7 @@ const getPostsUser = async (req) => {
     if (data.page > totallength) {
       return {
         status: 404,
-        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όρια!",
       };
     }
     for await (post of finalarr) {
@@ -395,10 +396,26 @@ const getPostsUser = async (req) => {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
 
+      //Mark posts that are expired
+      let curDate = moment();
+      let startdate = moment(post.startdate).set("hour", 23).set("minute", 59);
+      let enddate;
+      // if there is an enddate
+      if (post.enddate != null) {
+        enddate = moment(post.enddate).set("hour", 23).set("minute", 59);
+        if (startdate.isSameOrAfter(curDate) || enddate.isSameOrAfter(curDate))
+          post.dataValues.isExpired = false;
+        else post.dataValues.isExpired = true;
+      } else {
+        // if there isnt any enddate
+        // console.log(curDate, startdate);
+        if (startdate.isSameOrAfter(curDate)) post.dataValues.isExpired = false;
+        else post.dataValues.isExpired = true;
+      }
+      //====
+
       post = await fun.fixAllDates(post);
 
-      let rows = found.rows;
-      let count = found.count;
       //get the data of user
       let user = await User.findOneLight(post.email);
       if (user === false) {
@@ -911,7 +928,7 @@ const handleFavourite = async (req) => {
     let postid = req.body.data.postid;
 
     const countAll = await Post.countFavourites(email);
-    if (countAll == null)
+    if (countAll === null)
       throw new Error("Error at counting the favourites of user");
 
     const post = await Post.findOne(postid);
@@ -942,7 +959,6 @@ const handleFavourite = async (req) => {
 const getFavourites = async (req) => {
   try {
     let email = req.body.extra;
-    moment.locale("en");
 
     const user = await User.findOneLight(email);
     if (user === false) throw new Error("Error at finding the user data");

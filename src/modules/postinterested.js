@@ -13,18 +13,14 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   dialect: "mysql",
   logging: true,
   dialectOptions: {
-    dateStrings: true,
     typeCast: function (field, next) {
-      // for reading from database
-      // console.log(field.type);
-      if (field.type == "DATETIME") {
-        // console.log("!!!!!!!!!!!!!!!!!!!!!!", field.string());
-        return field.string();
+      if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
+        return new Date(field.string() + "Z");
       }
       return next();
     },
   },
-  timezone: "+02:00",
+  timezone: "+02:00", // for writing to database
 });
 
 const PostInterested = sequelize.define(

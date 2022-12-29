@@ -70,19 +70,7 @@ const createNewPost = async (data) => {
     var postdate = moment();
     data.date = postdate;
 
-    //fix for return dates if not given
-    // if (data.withReturn == false) {
-    //   data.returnStartDate = moment();
-    //   data.returnEndDate = moment();
-    // } else if (data.withReturn == true && data.returnEndDate == null) {
-    //   // console.log("gamw ton antitheo sou");
-    //   data.returnEndDate = data.returnStartDate;
-    // }
     console.log(data);
-    // fix gia to enddate==null
-    // if (data.enddate === null) {
-    //   data.enddate = data.startdate;
-    // }
 
     const post = await Posts.create(data).catch((err) => {
       throw err;
@@ -198,6 +186,7 @@ const findAllPastHalfYear = async (email, today) => {
           },
         ],
       },
+      order: [["isFavourite", "DESC"]],
     }).catch((err) => {
       throw err;
     });
@@ -274,6 +263,7 @@ const deleteFavourite = async (postid) => {
     await Posts.update(
       {
         isFavourite: false,
+        favouriteDate: null,
       },
       { where: { postid: postid } }
     ).catch((err) => {
@@ -289,9 +279,11 @@ const deleteFavourite = async (postid) => {
 
 const makeFavourite = async (postid) => {
   try {
+    let curDate = moment();
     await Posts.update(
       {
         isFavourite: true,
+        favouriteDate: curDate,
       },
       { where: { postid: postid } }
     ).catch((err) => {
@@ -312,7 +304,7 @@ const findAllFavourites = async (email) => {
         email: email,
         isFavourite: true,
       },
-      order: [["date", "DESC"]],
+      order: [["favouriteDate", "DESC"]],
     }).catch((err) => {
       throw err;
     });

@@ -11,9 +11,14 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
-  // dialectOptions: {
-  //   useUTC: false, // for reading from database
-  // },
+  dialectOptions: {
+    typeCast: function (field, next) {
+      if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
+        return new Date(field.string() + "Z");
+      }
+      return next();
+    },
+  },
   timezone: "+02:00", // for writing to database
   logging: true,
 });
@@ -94,6 +99,11 @@ const Posts = sequelize.define(
     isFavourite: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+    },
+    favouriteDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
     },
   },
   {

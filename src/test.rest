@@ -106,7 +106,7 @@ Accept-Language: en
 #service pou ftiaxneis ena post
 POST http://localhost:3000/posts/createpost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTI3VDExOjA0OjQ3LjYxM1oiLCJpYXQiOjE2NzIxMzkwODcsImV4cCI6MTY3NzMyMzA4N30.RWciZJ5YU73iQzrpcozE5yggXL68q9CT78RcfZEepwk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTI4VDE1OjU3OjU2LjQ0NVoiLCJpYXQiOjE2NzIyNDMwNzYsImV4cCI6MTY3NzQyNzA3Nn0.TyLTYgaCTFvo6CeZX9mAwh7TOpHqBaDsDDw7Mjgw3Vg
 Accept-Language: en
 
 {
@@ -273,7 +273,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 
 {
     "data": {
-        "email": "user2@gmail.com",
+        "email": "user0@gmail.com",
         "page": 1
     }
 }
@@ -358,8 +358,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1849,
-        "piid": 478
+        "postid": 1819,
+        "piid": 462
     }
 }
 
@@ -447,7 +447,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1825
+        "postid": 1809
     }
 }
 
@@ -455,7 +455,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 #service that returns all the favourites of one user
 GET http://localhost:3000/posts/getFavourites
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTlUMTQ6NTM6MTguMDg4WiIsImlhdCI6MTY3MTQ2MTU5OCwiZXhwIjoxNjc2NjQ1NTk4fQ.V5fKkIoXeqWQja7g6xQRZ0SP1AdwrcQWvfGGlWqNd1w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
 
 ###
 #service that returns all the favourites of one user
@@ -506,18 +506,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 #ALL NEW APIS 
 POST http://localhost:3000/posts/createPost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEwLTI2VDE0OjU3OjI4LjI5MVoiLCJpYXQiOjE2NjY3OTYyNDgsImV4cCI6MTY3MTk4MDI0OH0.aqDYU4dG3OfcVJ39eiLxiAAqU2y8V8-A_1dLpfDq2EA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTI4VDE1OjU3OjU2LjQ0NVoiLCJpYXQiOjE2NzIyNDMwNzYsImV4cCI6MTY3NzQyNzA3Nn0.TyLTYgaCTFvo6CeZX9mAwh7TOpHqBaDsDDw7Mjgw3Vg
 
 {
     "data": {
         "email": "user0@gmail.com",
         "date": "2021-10-05",
-        "startplace": "Αθήνα",
-        "startcoord": "37.9838096,23.7275388",
-        "endplace": "Βόλος",
-        "endcoord": "39.366584,22.9506769",
+        "startplace": "Volos",
+        "startcoord": "39.366584,22.9506769",
+        "endplace": "Athens",
+        "endcoord": "37.9838096,23.7275388", 
         "numseats": 4,
-        "startdate": "2022-12-22",
+        "startdate": "2022-12-30",
         "enddate": null,
         "returnStartDate": null,
         "returnEndDate": null,

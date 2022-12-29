@@ -57,6 +57,14 @@ const { Op } = require("sequelize");
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
+  dialectOptions: {
+    typeCast: function (field, next) {
+      if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
+        return new Date(field.string() + "Z");
+      }
+      return next();
+    },
+  },
   logging: true,
   timezone: "+02:00",
   dialectOptions: {

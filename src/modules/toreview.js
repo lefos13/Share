@@ -11,6 +11,15 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
+  dialectOptions: {
+    typeCast: function (field, next) {
+      if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
+        return new Date(field.string() + "Z");
+      }
+      return next();
+    },
+  },
+  timezone: "+02:00", // for writing to database
   logging: true,
 });
 
