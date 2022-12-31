@@ -216,6 +216,21 @@ const updateLoginState = async (email, state) => {
   }
 };
 
+const updateLang = async (email, lang) => {
+  try {
+    const user = await Users.update(
+      { lastLang: lang },
+      { where: { email: email } }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   register,
   updateUser,
@@ -226,4 +241,5 @@ module.exports = {
   findOneLight,
   saveViaGoogle,
   updateLoginState,
+  updateLang,
 };

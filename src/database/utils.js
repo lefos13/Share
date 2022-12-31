@@ -60,7 +60,7 @@ const verification = async (otp, email) => {
   }
 };
 
-const checkPass = async (result, user, fcmToken, email) => {
+const checkPass = async (result, user, fcmToken, email, msg) => {
   try {
     if (result) {
       //console.log(user.toJSON());
@@ -97,16 +97,16 @@ const checkPass = async (result, user, fcmToken, email) => {
       // console.log("useraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       return {
         status: 200,
-        message: "Επιτυχής είσοδος.",
+        message: msg.loginSuc,
         user: rest,
         forceUpdate: false,
       };
     } else {
-      return { status: 405, message: "Λάθος κωδικός." };
+      return { status: 405, message: msg.loginFailed };
     }
   } catch (err) {
     console.log(err);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 

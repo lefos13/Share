@@ -64,13 +64,13 @@ const countPosts = async (user) => {
 };
 
 // *** ADD ***
-const createNewPost = async (data) => {
+const createNewPost = async (data, msg) => {
   try {
     //get current date
     var postdate = moment();
     data.date = postdate;
 
-    console.log(data);
+    // console.log(data);
 
     const post = await Posts.create(data).catch((err) => {
       throw err;
@@ -78,7 +78,8 @@ const createNewPost = async (data) => {
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //Firebase newRide notification
-    pushNotifications(post);
+
+    pushNotifications(post, msg);
     return post;
   } catch (error) {
     console.log(error);
@@ -186,7 +187,7 @@ const findAllPastHalfYear = async (email, today) => {
           },
         ],
       },
-      order: [["isFavourite", "DESC"]],
+      order: [["date", "DESC"]],
     }).catch((err) => {
       throw err;
     });

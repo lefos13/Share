@@ -37,6 +37,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 //CREATE A FAVOURITE SEARCH IF THERE IS LESS THAN 10 OF THEM ALREADY
 const addFavouriteSearch = async (req) => {
   try {
+    let msg = await fun.determineLang(req);
     let email = req.body.extra;
     let data = req.body.data;
     let curDate = moment();
@@ -49,12 +50,12 @@ const addFavouriteSearch = async (req) => {
       throw new Error("Something went wrong at finding favourite search");
     else {
       if (exist != null) {
-        return { status: 406, message: "Η αγαπημένη αναζήτηση υπάρχει ήδη!" };
+        return { status: 406, message: msg.favSearchExists };
       }
     }
     const count = await LastSearch.countFavourites(email);
     if (count > 9) {
-      return { status: 406, message: "Έχεις ήδη δέκα αγαπημένες αναζητήσεις!" };
+      return { status: 406, message: msg.tenFavSearches };
     } else {
       const doneFavourite = await LastSearch.createFavourite(data);
       if (doneFavourite === false) {
@@ -98,18 +99,18 @@ const addFavouriteSearch = async (req) => {
     return {
       status: 200,
       data: finalData,
-      message: "Επιτυχής δημιουργία αγαπημένης αναζήτησης!",
+      message: msg.newFavSearch,
     };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε λάθος!" };
+    return { status: 500 };
   }
 };
 
 const getAllSearches = async (req) => {
   try {
     let email = req.body.extra;
-    let data = req.body.data;
+    let msg = await fun.determineLang(req);
 
     let allSearches = await LastSearch.getAll(email);
     if (allSearches === false) {
@@ -144,11 +145,11 @@ const getAllSearches = async (req) => {
     return {
       status: 200,
       data: finalData,
-      message: "Βρεθηκαν αναζητήσεις!",
+      message: msg.foundSearches,
     };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε λάθος!" };
+    return { status: 500 };
   }
 };
 
@@ -194,16 +195,16 @@ const deleteFavourite = async (req) => {
       favouriteSearches: favSearches,
       lastSearches: lastSearches,
     };
-    console.log(finalData);
+    // console.log(finalData);
 
     return {
       status: 200,
       data: finalData,
-      message: "Η αγαπημένη αναζήτηση διαγράφηκε!",
+      message: msg.favSearchDeleted,
     };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε λάθος!" };
+    return { status: 500 };
   }
 };
 

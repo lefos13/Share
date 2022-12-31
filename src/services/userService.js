@@ -71,30 +71,27 @@ const createNewUser = async (req) => {
 
 const updateOneUser = async (req) => {
   try {
+    let msg = await determineLang(req);
     let photo = req.body.data.photo;
     let data = req.body.data;
     let email = req.body.extra;
-
-    // if (data.fullname == null) {
-    //   delete data.fullname;
-    // }
 
     const res = await User.updateUser(data, email);
     if (res === false) {
       throw new Error("Error at updating profile");
     }
     if (photo != null) {
-      console.log("Uploading new photo");
+      // console.log("Uploading new photo");
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
       // console.log(buffer);
       fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
     }
 
-    return { status: 200, message: "Η ενημέρωση έγινε επιτυχώς!" };
+    return { status: 200, message: msg.updateProfile };
   } catch (err) {
     console.log(err);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
@@ -105,7 +102,7 @@ const createToken = async (data) => {
     const user = await User.findOneUser(email);
     if (user === false) {
       // if error with the db
-      throw 500;
+      throw msg;
     } else if (user == null) {
       //if user doesnt exist
       return { status: 404, data: msg.userNull };
@@ -222,10 +219,6 @@ const updatePass = async (req) => {
   }
 };
 
-const deleteOneUser = async () => {
-  return;
-};
-
 const userVerify = async (req) => {
   try {
     var email = req.body.data.email;
@@ -298,6 +291,10 @@ const login = async (req) => {
             throw new Error("Error at creating/updating the fcmToken");
           }
           //
+          const updateLang = await User.updateLang(user.email, msg.lang);
+          if (updateLang === false) {
+            throw new Error("Error at updating lastLang");
+          }
           return {
             status: 200,
             message: msg.loginSuc,
@@ -309,7 +306,13 @@ const login = async (req) => {
           // CHECK IF THE PASS IS RIGHT
           const result = await bcrypt.compare(pass, user.password);
 
-          let whatToReturn = await checkPass(result, user, fcmToken, email);
+          let whatToReturn = await checkPass(
+            result,
+            user,
+            fcmToken,
+            email,
+            msg
+          );
           //update the login state
           if (autoLogin === false && whatToReturn.status == 200) {
             whatToReturn.user.isThirdPartyLogin = false;
@@ -318,7 +321,10 @@ const login = async (req) => {
               throw new Error("Error at updating the state of the user");
             }
           }
-
+          const updateLang = await User.updateLang(user.email, msg.lang);
+          if (updateLang === false) {
+            throw new Error("Error at updating lastLang");
+          }
           return whatToReturn;
           // ============
         }
@@ -410,6 +416,10 @@ const loginThirdParty = async (req) => {
       if (updatedState === false)
         throw new Error("Error at updating the login state!");
 
+      const updatedLang = User.updateLang(rest.email, msg.lang);
+      if (updatedLang === false) {
+        throw new Error("Error at updating the last lang");
+      }
       return { status: 200, response: response };
     }
   } catch (error) {
@@ -452,6 +462,7 @@ const searchUser = async (req) => {
     let hasInterested = false;
     let hasIntPosts = false;
     let reviewable = false;
+    const msg = await determineLang(req);
 
     let findUserQuery = {
       attributes: {
@@ -648,12 +659,12 @@ const searchUser = async (req) => {
       interestedForYourPosts: hasIntPosts, // boolean gia to an uparxoun endiaferomenoi twn post tou user
       reviewAble: reviewable, //boolean gia to an o xrhsths mporei na kanei review se afto to profil
       image: imagePath,
-      message: "Ο χρήστης βρέθηκε",
+      message: msg.userFound,
     };
     return { status: 200, data: responseData };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
@@ -661,6 +672,7 @@ const notifyMe = async (req) => {
   try {
     let extra = req.body.extra;
     let arrayOfUsers = [];
+    const msg = await determineLang(req);
 
     let dateToCheck = moment().subtract(1, "days");
 
@@ -737,18 +749,17 @@ const notifyMe = async (req) => {
     else
       return {
         status: 404,
-        message: "Δεν βρέθηκαν χρήστες ως προς αξιολόγηση!",
+        message: msg.usersToReview,
       };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!", error: error };
+    return { status: 500 };
   }
 };
 
 module.exports = {
   createNewUser,
   updateOneUser,
-  deleteOneUser,
   createToken,
   updatePass,
   userVerify,

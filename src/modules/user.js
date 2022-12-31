@@ -66,6 +66,10 @@ const Users = sequelize.define(
       allowNull: true,
       defaultValue: 0,
     },
+    lastLang: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,

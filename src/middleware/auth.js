@@ -10,6 +10,9 @@ const jwt = require("jsonwebtoken");
 
 const authenticateToken = (req, res, next) => {
   try {
+    // const lang = req.headers["Accept-language"];
+    // console.log(lang);
+    // console.log(req.headers);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     // console.log(token);

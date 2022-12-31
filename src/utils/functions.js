@@ -42,16 +42,30 @@ const FcmToken = require("../modules/fcmtoken");
 const { response } = require("express");
 const fs = require("fs");
 
+const getLang = async (lang) => {
+  let msg;
+  if (lang == "EN") msg = JSON.parse(fs.readFileSync("./lang/english.json"));
+  else if (lang == "GR") msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
+  else msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
+
+  // console.log(msg);
+  return msg;
+};
 const determineLang = async (req) => {
   try {
-    let lang = req.headers["accept-language"];
+    let lang = req.headers["language"];
     let msg;
-    if (lang == "en") msg = JSON.parse(fs.readFileSync("./lang/english.json"));
+    // console.log(lang);
+    if (lang == "EN") msg = JSON.parse(fs.readFileSync("./lang/english.json"));
+    else if (lang == "GR")
+      msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
     else msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
+    // console.log("MY LANGUAGE IS: ", lang);
+    // console.log(msg);
     return msg;
   } catch (error) {
     console.log(error);
-    return "el";
+    return "GR";
   }
 };
 const IsJsonString = async (str) => {
@@ -88,6 +102,13 @@ const newRide = async (postid, emailArray, postOwner) => {
     let postIdString = postid.toString();
 
     for await (f of fcmTokens) {
+      const userToNotify = await Users.findOne({
+        where: { email: f.email },
+      }).catch((err) => {
+        throw err;
+      });
+      let msg = await getLang(userToNotify.lastLang);
+      console.log(msg, userToNotify.lastLang);
       let message = {
         data: {
           type: "newRide",
@@ -98,7 +119,9 @@ const newRide = async (postid, emailArray, postOwner) => {
         token: f.fcmToken,
         notification: {
           title:
-            "Ο χρήστης " + owner.fullname + " έφτιαξε ένα ride που ζητήσατε!",
+            msg.firebase.request_part1 +
+            owner.fullname +
+            msg.firebase.request_part2,
           body: "TEST MESSAGE",
         },
       };
@@ -169,6 +192,8 @@ module.exports = {
         throw err;
       });
 
+      let msg = await getLang(user.lastLang);
+
       const fcmData = await FcmToken.findOne({
         where: {
           email: emailToNotify,
@@ -190,8 +215,11 @@ module.exports = {
         data: data,
         token: fcmToken,
         notification: {
-          title: "Ενδιαφέρθηκε ο " + user.fullname,
-          body: "Περιμένει την έγκρισή σου...",
+          title:
+            msg.firebase.request_part1 +
+            user.fullname +
+            msg.firebase.liked_post,
+          body: msg.firebase.liked_post2,
         },
       };
 
@@ -228,6 +256,16 @@ module.exports = {
         throw err;
       });
 
+      const toNotifyUser = await Users.findOne({
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      const msg = await getLang(toNotifyUser.lastLang);
+
       let message = {
         data: {
           type: "receiveApproval",
@@ -238,7 +276,9 @@ module.exports = {
         token: fcmToken.fcmToken,
         notification: {
           title:
-            "Ο χρήστης " + user.fullname + " σας ενέκρινε να ταξιδέψετε μαζί!",
+            msg.firebase.request_part1 +
+            user.fullname +
+            msg.firebase.request_part3,
           body: "TEST MESSAGE",
         },
       };
@@ -406,7 +446,7 @@ module.exports = {
     }
     return true;
   },
-  pushNotifications: async (post) => {
+  pushNotifications: async (post, msg) => {
     try {
       let arrayToNotify = [];
       // GATHER ALL THE REQUESTS WITH THE SPECIFIC STARTCOORD AND THE ENDCOORD OF THE POST THAT HAS BEEN CREATED
@@ -414,6 +454,7 @@ module.exports = {
         where: {
           startcoord: post.startcoord,
           endcoord: post.endcoord,
+          email: { [Op.ne]: post.email },
         },
       }).catch((err) => {
         console.log("Inside function that pushes notifications, threw error!");
@@ -436,6 +477,7 @@ module.exports = {
       const allRequests2 = await SearchPost.findAll({
         where: {
           startcoord: post.startcoord,
+          email: { [Op.ne]: post.email },
         },
       }).catch((err) => {
         console.log("Inside function that pushes notifications, threw error!");
@@ -465,7 +507,7 @@ module.exports = {
       // HERE YOU SEND THE NOTIFICATIONS
       if (toSendNotification) {
         // Data for the notification, postid and the array of users
-        newRide(post.postid, arrayToNotify, post.email);
+        newRide(post.postid, arrayToNotify, post.email, msg);
       } else {
         console.log("No request is found to be valid for the new post");
       }
@@ -496,4 +538,5 @@ module.exports = {
     return fnd;
   },
   determineLang,
+  getLang,
 };

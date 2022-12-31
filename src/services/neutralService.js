@@ -42,15 +42,16 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 
 const sendReport = async (req) => {
   try {
+    let msg = await fun.determineLang(req);
     let extra = req.body.extra;
     let text = req.body.text;
     let flag = fun.sendReport(text, extra);
     // await sendReport(text, extra);
 
-    return { status: 200, message: "Ευχαριστούμε για το feedback" };
+    return { status: 200, message: msg.feedbackSuc };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε λάθος!" };
+    return { status: 500 };
   }
 };
 
@@ -61,7 +62,7 @@ const getTerms = async (req) => {
     return { status: 200, file: file };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε λάθος!" };
+    return { status: 500 };
   }
 };
 

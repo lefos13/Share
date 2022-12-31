@@ -10,11 +10,13 @@ const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
 const moment = require("moment");
 const Request = require("../database/Request");
 const { fixDate } = require("../database/utils");
+const { determineLang } = require("../utils/functions");
 
 const createRequest = async (req) => {
   try {
     let data = req.body.data;
     let email = req.body.extra;
+    let msg = await determineLang(req);
 
     let curTime = moment();
     data.created_at = curTime;
@@ -40,24 +42,25 @@ const createRequest = async (req) => {
       if (request === false) {
         throw new Error("Error at creation of request");
       }
-      return { status: 200, request: request, message: "Επιτυχής δημιουργία!" };
+      return { status: 200, request: request, message: msg.requestCreated };
     } else if (countDub1 > 0) {
       return {
         status: 405,
-        message: "Έχεις ήδη αίτηση διαδρομής με αυτές τις τοποθεσίες! ",
+        message: msg.dubRequest,
       };
     } else {
-      return { status: 405, message: "Έχεις ήδη τρεις διαδρομές που ψάχνεις!" };
+      return { status: 405, message: msg.threeRequests };
     }
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
 const getRequests = async (req) => {
   try {
     let email = req.body.extra;
+    let msg = await determineLang(req);
     const requests = await Request.getAll(email);
     if (requests === false) {
       throw new Error("Error at getting the requests");
@@ -69,10 +72,10 @@ const getRequests = async (req) => {
       }
       return { status: 200, requests: requests };
     } else {
-      return { status: 404, message: "Δεν βρέθηκαν αναζητήσεις διαδρομών" };
+      return { status: 404, message: msg.noRequests };
     }
   } catch (error) {
-    console.log(Error);
+    console.log(error);
     return { status: 500 };
   }
 };
@@ -82,18 +85,19 @@ const deleteRequest = async (req) => {
     //CHECK
     let data = req.body.data;
     let email = req.body.extra;
+    let msg = await determineLang(req);
 
     const reqDel = await Request.deleteOne(data.postSearchId, email);
     if (reqDel == null) {
       throw new Error("Error at deleting the request");
     } else if (reqDel == 1) {
-      return { status: 200, message: "Η διαγραφή έγινε επιτυχώς!" };
+      return { status: 200, message: msg.delRequest };
     } else {
-      return { status: 404, message: "Το request δεν υπάρχει!" };
+      return { status: 404, message: msg.reqNotFound };
     }
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 

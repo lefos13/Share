@@ -53,7 +53,7 @@ const createNewPost = async (data, req) => {
     // console.log("Inside postService: " + counter);
     if (counter < 3) {
       //do it
-      const newPost = await Post.createNewPost(postToInsert);
+      const newPost = await Post.createNewPost(postToInsert, msg);
       if (newPost !== false)
         message = {
           status: 200,
@@ -80,8 +80,9 @@ const interested = async (req) => {
     // console.log(req.query);
     let data = req.body.data;
     // console.log(data);
+    let msg = await determineLang(req);
     if (data.email == null) {
-      return { status: 401, message: "Χωρίς Email!" };
+      return { status: 401, message: msg.noEmail };
     }
     let curtime = moment().endOf("day").format("YYYY-MM-DD hh:mm:ss");
     let starttime = moment().startOf("day").format("YYYY-MM-DD hh:mm:ss");
@@ -125,8 +126,7 @@ const interested = async (req) => {
       } else if (count >= 9) {
         return {
           status: 405,
-          message:
-            "Έχεις δηλώσει ήδη 10 φορές ενδιαφέρον. Δοκίμασε πάλι αύριο!",
+          message: msg.tenInterest,
         };
       } else {
         const inter = await PostInterested.createInterest(row);
@@ -138,34 +138,35 @@ const interested = async (req) => {
         if (postForFunction == null) {
           return {
             status: 406,
-            message: "Το συγκεκριμένο ride δεν υπάρχει πια!",
+            message: msg.noRide,
           };
         }
         fun.toNotifyOwner(postForFunction.email, extra, row.postid);
         // return the right results to the controller
-        console.log(row.date);
+        // console.log(row.date);
         return {
           status: 200,
           body: row,
-          message: "Ο οδηγός θα ενημερωθεί πως ενδιαφέρθηκες",
+          message: msg.validInterest,
         };
       }
     } else {
       const deleted = await PostInterested.destroyOne(row.email, row.postid);
       if (deleted == true) {
-        return { status: 200, message: "Ακυρώθηκε το ενδιαφέρον σου!" };
+        return { status: 200, message: msg.cancelInterest };
       } else {
         throw new Error("Something went wrong with canceling the interest");
       }
     }
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
 const searchPosts = async (req) => {
   try {
+    let msg = await determineLang(req);
     var data = req.body.data;
     console.log(data);
     let email = req.body.extra;
@@ -264,7 +265,7 @@ const searchPosts = async (req) => {
     let found = await Post.findAndCountAll(query);
     console.log(found);
     if (found.count == 0) {
-      return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
+      return { status: 404, message: msg.noRidesFound };
     } else if (found == null) {
       throw new Error("Something went wrong in searching the posts");
     }
@@ -324,7 +325,7 @@ const searchPosts = async (req) => {
     if (filteredArray === false) {
       throw new Error("Error at filters");
     } else if (filteredArray.length == 0) {
-      return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
+      return { status: 404, message: msg.noRidesFound };
     }
 
     //Pagination
@@ -337,7 +338,7 @@ const searchPosts = async (req) => {
     if (data.page > totallength) {
       return {
         status: 404,
-        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+        message: msg.paginationLimit,
       };
     }
 
@@ -353,15 +354,16 @@ const searchPosts = async (req) => {
       // test: array,
     };
 
-    return { status: 200, body: results, message: "Βρέθηκαν Rides" };
+    return { status: 200, body: results, message: msg.ridesFound };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
 const getPostsUser = async (req) => {
   try {
+    let msg = await determineLang(req);
     var data = req.body.data;
     let array = [];
 
@@ -374,6 +376,7 @@ const getPostsUser = async (req) => {
 
     let rows = found.rows;
     let count = found.count;
+    if (count == 0) return { status: 404, message: msg.noRidesFound };
     //PAGINATION
     let skipcount = 0;
     let takecount = 10;
@@ -388,7 +391,7 @@ const getPostsUser = async (req) => {
     if (data.page > totallength) {
       return {
         status: 404,
-        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όρια!",
+        message: msg.paginationLimit,
       };
     }
     for await (post of finalarr) {
@@ -470,18 +473,21 @@ const getPostsUser = async (req) => {
     return { status: 200, data: response };
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
 const getPostPerId = async (req) => {
   try {
+    let msg = await determineLang(req);
     var postid = req.query.postid;
     let email = req.body.extra;
 
     let post = await Post.findOne(postid);
     if (post === false) {
       throw new Error("Error at finding one post");
+    } else if (post == null) {
+      return { status: 404 };
     }
     if (IsJsonString(post.moreplaces)) {
       post.moreplaces = JSON.parse(post.moreplaces);
@@ -525,19 +531,21 @@ const getPostPerId = async (req) => {
 
     return { status: 200, data: response };
   } catch (error) {
-    console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    // console.log(error);
+    return { status: 500 };
   }
 };
 
 const getInterestedPerUser = async (req) => {
   try {
     var data = req.body.data;
-
+    let msg = await determineLang(req);
     let found = await PostInterested.findAny(data.email);
     if (found === false) {
       throw new Error("Error at getting all the interests");
     }
+
+    console.log(data);
     // console.log(found);
 
     let array = [];
@@ -589,7 +597,7 @@ const getInterestedPerUser = async (req) => {
         user.dataValues = { ...user.dataValues, ...extraData };
         let image = null;
         if (user.photo !== null) {
-          image = "images/" + fnd.email + ".jpeg";
+          image = "images/" + user.email + ".jpeg";
         }
         let results = {
           user: user,
@@ -601,19 +609,21 @@ const getInterestedPerUser = async (req) => {
       }
     }
     if (array.length == 0) {
-      return { status: 404, data: "Nothing found" };
+      // console.log("DEN VRIKA TIPOTA!!!!");
+      return { status: 404, data: msg.noLikedRides };
     } else {
+      // console.log(JSON.stringify(array), msg.foundLikedRides);
       return {
         status: 200,
         data: {
           postUser: array,
-          message: "No pagination",
+          message: msg.foundLikedRides,
         },
       };
     }
   } catch (error) {
     console.log(error);
-    return { status: 500, message: "Κάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
@@ -621,7 +631,7 @@ const getIntPost = async (req) => {
   try {
     var data = req.body.data;
     var extra = req.body.extra;
-
+    let msg = await determineLang(req);
     let posts = await Post.findOne(data.postid);
     if (posts === false) {
       throw new Error("Error at finding the requested post");
@@ -630,7 +640,7 @@ const getIntPost = async (req) => {
       posts.moreplaces = JSON.parse(posts.moreplaces);
     }
     posts = await fun.fixAllDates(posts);
-    let message = "Βρέθηκαν ενδιαφερόμενοι";
+    let message = msg.foundLikers;
     let isAny = 0;
     let fullpost;
     let allUsers = [];
@@ -682,7 +692,7 @@ const getIntPost = async (req) => {
     let image = "images/" + posts.email + ".jpeg";
 
     if (isAny > 0) {
-      message = "Βρέθηκαν ενδιαφερόμενοι";
+      message = msg.foundLikers;
       let skipcount = 0;
       let takecount = 10;
       if (data.page > 1) skipcount = data.page * 10 - 10;
@@ -696,7 +706,7 @@ const getIntPost = async (req) => {
       if (data.page > totallength) {
         return {
           status: 404,
-          message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+          message: msg.paginationLimit,
         };
       }
       let response = {
@@ -711,8 +721,8 @@ const getIntPost = async (req) => {
       };
       return { status: 200, data: response };
     } else {
-      message = "Δεν βρέθηκαν ενδιαφερόμενοι";
-      return { status: 404, data: "Δεν βρέθηκαν ενδιαφερόμενοι" };
+      message = msg.notFoundLikers;
+      return { status: 404, data: message };
     }
   } catch (error) {
     console.log(error);
@@ -724,22 +734,21 @@ const deletePost = async (req) => {
   try {
     let data = req.body.data;
 
+    let msg = await determineLang(req);
     // delete the post
     let results = await Post.deleteOne(data.postid);
-    if (results == null) {
+    if (results === null) {
       throw new Error("Error at deleting the post");
+    } else if (results == 0) {
+      return { status: 404, message: msg.noRide };
     }
     //delete the interested people of this post
     let intRes = await PostInterested.detroyAllPerPost(data.postid);
-    if (intRes == null) {
+    if (intRes === null) {
       throw new Error("Error at deleteing the interests of the post");
     }
 
-    if (results == 0) {
-      return { status: 404, message: "Το ride δεν υπάρχει!" };
-    } else {
-      return { status: 200, message: "Το post διαγράφηκε!" };
-    }
+    return { status: 200, message: msg.rideDeleted };
   } catch (error) {
     console.log(error);
     return { status: 500 };
@@ -749,15 +758,16 @@ const deletePost = async (req) => {
 const deleteInterested = async (req) => {
   try {
     var data = req.body.data;
+    let msg = await determineLang(req);
     const results = await PostInterested.deleteOne(data.piid);
     if (results == null) {
       throw new Error("Error at deleting the interest");
     }
 
     if (results == 0) {
-      return { status: 404, message: "Ο ενδιαφερόμενος δεν υπάρχει!" };
+      return { status: 404, message: msg.likerNotFound };
     } else {
-      return { status: 200, message: "Ο ενδιαφερόμενος διαγράφηκε!" };
+      return { status: 200, message: msg.likerDeleted };
     }
   } catch (error) {
     console.log(error);
@@ -768,6 +778,7 @@ const deleteInterested = async (req) => {
 const verInterested = async (req) => {
   try {
     var data = req.body.data;
+    let msg = await determineLang(req);
     //GETING THE DATA OF THE ROW THAT IS TO BE VERIFIED
     const results = await PostInterested.findOneById(data.piid);
     if (results === false) {
@@ -786,8 +797,7 @@ const verInterested = async (req) => {
     if (pst == null)
       return {
         status: 406,
-        message:
-          "Το Ride αυτό έχει λήξει, αδύνατη η έγκριση/αφαίρεση έγκρισης χρηστών!",
+        message: msg.rideExpired,
       };
     const post = await Post.findOne(data.postid);
     if (post === false) throw new Error("Error at finding the post");
@@ -864,7 +874,7 @@ const verInterested = async (req) => {
         }
 
         fun.toNotifyTheVerified(results.email, post.postid, post.email);
-        return { status: 200, message: "Επιτυχής έγκριση ενδιαφερόμενου!" };
+        return { status: 200, message: msg.likerVerified };
       } else {
         //unverify the interested user
         const reseted = await PostInterested.resetFlags(results);
@@ -908,12 +918,12 @@ const verInterested = async (req) => {
           if (!destroyed)
             throw new Error("Error at destroying the possible review");
         }
-        return { status: 200, message: "Ακύρωση έγκρισης ενδιαφερόμενου!" };
+        return { status: 200, message: msg.likerUnverified };
       }
     } else {
       return {
         status: 405,
-        message: "Έχεις καλύψει πλήρως τις διαθέσιμες θέσεις",
+        message: msg.seatsFull,
       };
     }
   } catch (error) {
@@ -924,6 +934,7 @@ const verInterested = async (req) => {
 
 const handleFavourite = async (req) => {
   try {
+    let msg = await determineLang(req);
     let email = req.body.extra;
     let postid = req.body.data.postid;
 
@@ -940,18 +951,18 @@ const handleFavourite = async (req) => {
         throw new Error("Error at deleting the favourite");
       return {
         status: 200,
-        message: "Το ride αφαιρέθηκε από τα αγαπημένα σου!",
+        message: msg.favRideDeleted,
       };
     }
     if (countAll < 10) {
       const newFav = await Post.makeFavourite(postid);
       if (newFav === false) throw new Error("Error at declaring new favourite");
-      return { status: 200, message: "To ride προστέθηκε στα αγαπημένα σου" };
+      return { status: 200, message: msg.favRideRegistered };
     } else {
-      return { status: 405, message: "Έχεις ήδη 10 αγαπημένα ride" };
+      return { status: 405, message: msg.tenFavourites };
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return { status: 500 };
   }
 };
@@ -959,7 +970,7 @@ const handleFavourite = async (req) => {
 const getFavourites = async (req) => {
   try {
     let email = req.body.extra;
-
+    let msg = await determineLang(req);
     const user = await User.findOneLight(email);
     if (user === false) throw new Error("Error at finding the user data");
 
@@ -970,7 +981,7 @@ const getFavourites = async (req) => {
     if (allFavourites === false)
       throw new Error("Error at getting all the favourites");
     else if (allFavourites.length == 0) {
-      return { status: 404, message: "Δεν βρέθηκαν αγαπημένα Rides" };
+      return { status: 404, message: msg.noFavourites };
     }
 
     let allResults = [];
@@ -999,6 +1010,7 @@ const getFavourites = async (req) => {
 
 const feedScreen = async (req) => {
   try {
+    let msg = await determineLang(req);
     var data = req.body.data;
     let email = req.body.extra;
     let array = [];
@@ -1030,7 +1042,7 @@ const feedScreen = async (req) => {
     // get all the rides based on the query above
     let found = await Post.findAndCountAll(query);
     if (found.count == 0) {
-      return { status: 404, message: "Δεν υπάρχει καμία διαδρομή!" };
+      return { status: 404, message: msg.noRidesFound };
     } else if (found === null) {
       throw new Error("Something went wrong in searching the posts");
     }
@@ -1099,7 +1111,7 @@ const feedScreen = async (req) => {
     if (data.page > totallength) {
       return {
         status: 404,
-        message: "You asked for a page over the limit of pages",
+        message: msg.paginationLimit,
       };
     }
     let results = {
@@ -1107,7 +1119,7 @@ const feedScreen = async (req) => {
       totalPages: totallength,
       pageLength: finalarr.length,
     };
-    return { status: 200, body: results, message: "Βρέθηκαν Rides" };
+    return { status: 200, body: results, message: msg.ridesFound };
   } catch (error) {
     console.log(error);
     return { status: 500 };

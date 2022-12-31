@@ -1,7 +1,7 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
 POST http://localhost:3000/users/createtoken
 Content-Type: application/json
-Accept-Language: en
+Accept-Language: EN
 
 {
     "data":{
@@ -14,7 +14,7 @@ Accept-Language: en
 #service pou kanei update to password you user sth vash
 POST http://localhost:3000/users/updateUserPass
 Content-Type: application/json
-Accept-Language: en
+Accept-Language: EN
 
 {
     "data":{
@@ -29,7 +29,7 @@ Accept-Language: en
 #service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
 POST  http://localhost:3000/users/register
 Content-Type: application/json
-Accept-Language: en
+Accept-Language: EN
 
 {
     "data":{
@@ -50,7 +50,7 @@ Accept-Language: en
 #service pou kanei verify to xrhsth sth vash dedomenwn, afou kanei epibebaiwsh to otp tou ston client
 POST http://localhost:3000/users/verify
 Content-Type: application/json
-Accept-Language: en
+Accept-Language: EN
 
 {
     "data":{
@@ -64,7 +64,7 @@ Accept-Language: en
 POST http://localhost:3000/users/login
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMDhUMTk6MzY6MDcuMDIyWiIsImlhdCI6MTY2NzkzNjE2NywiZXhwIjoxNjczMTIwMTY3fQ.Rm7X-PLNZBFnmAEssYrXCJr1Mxv_KxnoGa0ojWbfG_E
-Accept-Language: en
+Accept-Language: EN
 
 {
     "data":{
@@ -77,7 +77,7 @@ Accept-Language: en
 ###
 POST http://localhost:3000/users/loginThirdParty
 Content-Type: application/json
-Accept-Language: en
+Accept-Language: GR
 
 {
     "data": {
@@ -93,7 +93,7 @@ Accept-Language: en
 #service poy stelnei otp ston xrhsth kai ston client gia epibebaiwsh
 POST http://localhost:3000/users/passotp
 Content-Type: application/json
-Accept-Language: en
+Accept-Language: EN
 
 {
     "data": {
@@ -106,46 +106,8 @@ Accept-Language: en
 #service pou ftiaxneis ena post
 POST http://localhost:3000/posts/createpost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTI4VDE1OjU3OjU2LjQ0NVoiLCJpYXQiOjE2NzIyNDMwNzYsImV4cCI6MTY3NzQyNzA3Nn0.TyLTYgaCTFvo6CeZX9mAwh7TOpHqBaDsDDw7Mjgw3Vg
-Accept-Language: en
-
-{
-    "data": {
-        "email": "user0@gmail.com",
-        "date": "2021-10-05",
-        "startplace": "ασδ",
-        "startcoord": "1234",
-        "endplace": "δσα",
-        "endcoord": "3215",
-        "numseats": 2,
-        "startdate": "2022-04-22",
-        "enddate": null,
-        "returnStartDate": null,
-        "returnEndDate": null,
-        "withReturn": false,
-        "costperseat": 40,
-        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
-        "petAllowed": true,
-        "isFavourite": false,
-        "moreplaces": [
-            {
-                    "place": "lamia",
-                    "placecoords": "3211"
-            },
-            {
-                    "place": "lamia",
-                    "placecoords": "3211"
-            }
-        ]
-    }
-}
-###
-
-#service pou ftiaxneis ena post
-POST http://localhost:3000/posts/createpost
-Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEyVDE5OjQ4OjMwLjg3NVoiLCJpYXQiOjE2NzA4NzQ1MTAsImV4cCI6MTY3NjA1ODUxMH0.lZsv25J64lxVhOw8FtWionb5ZSJQl0bptPkV4Ww-Ifs
-Accept-Language: en
+Accept-Language: GR
 
 {
     "data": {
@@ -183,43 +145,15 @@ Accept-Language: en
 POST http://localhost:3000/posts/interested
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com",
-        "postid": 1849,
+        "email": "user0@gmail.com",
+        "postid": 1832,
         "note": "blabla"
     }
 }
-
-###
-
-
-
-# {
-#     "data": {
-#         "email": "cs141082@uniwa.gr",
-#         "startplace": "ασsδ",
-#         "startcoord": "123",
-#         "endplace": "δσsα",
-#         "endcoord": "321",
-#         "startdate": "2022-04-10",
-#         "enddate": "2022-04-30",
-#         "page": 1,
-#         "cost": 100,
-#         "age": 25,
-#         "age_end": 30,
-#         "car": "nissan",
-#         "cardate": 1996,
-#         "gender": "male",
-#         "withReturn": 1,
-#         "petAllowed": true,
-#         "returnStartDate": "2022-11-20",
-#         "returnEndDate": "2023-12-20"
-#     }
-# }
-
-
 
 ###
 
@@ -227,6 +161,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/users/searchuser
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMi0xMS0yNFQxMToyODowNS4wMjNaIiwiaWF0IjoxNjY5Mjg5Mjg1LCJleHAiOjE2NzQ0NzMyODV9.yFGn8s_ytYI_aEx5kauNiSHWWiQS_K0B-IqIRtSUoCo
+Accept-Language: EN
 
 {
     "data": {
@@ -240,6 +175,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/reviews/getReviews
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
@@ -254,6 +190,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/reviews/createreview
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
@@ -270,6 +207,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/getPostsUser
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
@@ -280,9 +218,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 ###
 
 #service epistrefei post vasei id
-GET http://localhost:3000/posts/getPostPerId?postid=1851
+GET http://localhost:3000/posts/getPostPerId?postid=1829
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEzVDExOjM1OjEyLjQ5NVoiLCJpYXQiOjE2NzA5MzEzMTIsImV4cCI6MTY3NjExNTMxMn0.nWSTnBBjVpX8CpA9Vm0UhMtFFvzGizZhQ7fBV9HQjnM
+Accept-Language: EN
 
 ###
 
@@ -290,6 +229,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 POST http://localhost:3000/posts/deletePost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
@@ -302,6 +242,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/deleteInterested
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
@@ -315,10 +256,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/getInterestedPerUser
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTNUMTE6NTc6NDYuMTk2WiIsImlhdCI6MTY3MDkzMjY2NiwiZXhwIjoxNjc2MTE2NjY2fQ.XSwCnqcEQwySfpLNhNlPHHaAh1334qPys7SQ8FyDixs
+language: EN
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -327,6 +269,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/getIntPost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
@@ -358,8 +301,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1819,
-        "piid": 462
+        "postid": 1832,
+        "piid": 464
     }
 }
 
@@ -371,28 +314,10 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTIxVDE2OjQ2OjI2LjQ1NloiLCJpYXQiOjE2NzE2NDExODYsImV4cCI6MTY3NjgyNTE4Nn0.Uhrf67WeZRPsKgkI8RfeEL2w3Xdvibaz3ADK-ZmbGiw
 
 ###
-// mainEmail: se afto to email tha ginontai generated ta posts. 
-// Epishs to idio email tha einai to pathitiko eimail twn reviews. (dhladh se afton tha kanoyn to review)
-// To secondaryEmail einai o emailReviewer dhladh aftow poy tha kanei to review
-// Gia na treksei duo fores h perissoteres to api prepei na allazei kathe fora to secondary email. (Den einai aparaithto na einai uparkto email)
-// postid: dineis to id apo to post sto opoio thes na ginoun generated polloi endiaferomenoi
-// postidList: lista me postid poy thes enas user na endiaferetai gia afta
-POST http://localhost:3000/dbMigration
-Content-Type: application/json
-
-{
-    "data": {
-        "mainEmail": "lefterisevagelinos1996@gmail.com",
-        "secondaryEmail": "cs1410823@uniwa.gr",
-        "postid": 849,
-        "postidList": [1564,1565,1566,1567,1568]
-    }
-}
-
-###
 POST http://localhost:3000/neutral/sendReport
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "text": "Test report"
@@ -402,16 +327,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 GET http://localhost:3000/neutral/getTerms
 Content-Type: application/text/html
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
-###
-
-POST http://localhost:3000/upload
-Content-Type: multipart/form-data; boundary=---
+Accept-Language: EN
 
 ###
 
 POST http://localhost:3000/requests/createRequest
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
+Accept-Language: EN
 
 {
     "data": {
@@ -427,11 +350,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 GET http://localhost:3000/requests/getRequests
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
+Accept-Language: EN
 
 ###
 POST http://localhost:3000/requests/deleteRequest
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
+Accept-Language: EN
 
 {
     "data": {
@@ -444,6 +369,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/handleFavourite
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
+Accept-Language: EN
 
 {
     "data": {
@@ -456,18 +382,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 GET http://localhost:3000/posts/getFavourites
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
-
-###
-#service that returns all the favourites of one user
-GET http://192.168.1.7:3000/test
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTAzLTAyVDEzOjA0OjUwLjEyOVoiLCJpYXQiOjE2NDYyMjYyOTAsImV4cCI6MTY1MTQxMDI5MH0.H1G6LpsVxZoglMmCRbcPFdinQ4Na2_-80C3N68nvDgg
-
+Accept-Language: EN
 
 
 ###
 POST http://localhost:3000/users/register
 Content-Type: application/json
+Accept-Language: EN
 
 {
     "data":{
@@ -488,6 +409,7 @@ Content-Type: application/json
 POST http://localhost:3000/users/updateProfile
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMjRUMTQ6MzU6NDQuNjczWiIsImlhdCI6MTY2OTMwMDU0NCwiZXhwIjoxNjc0NDg0NTQ0fQ.O0vRoXwCybBa9KLM48l8Crjk7Pag8_JUCYlwimawbMM
+Accept-Language: EN
 
 {
     "data": {
@@ -507,6 +429,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/createPost
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTI4VDE1OjU3OjU2LjQ0NVoiLCJpYXQiOjE2NzIyNDMwNzYsImV4cCI6MTY3NzQyNzA3Nn0.TyLTYgaCTFvo6CeZX9mAwh7TOpHqBaDsDDw7Mjgw3Vg
+Accept-Language: EN
 
 {
     "data": {
@@ -542,6 +465,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 POST http://localhost:3000/posts/searchposts
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 {
     "data": {
@@ -571,6 +495,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 POST http://localhost:3000/posts/feedScreen
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE1VDEzOjQ3OjM4LjEwM1oiLCJpYXQiOjE2NzExMTIwNTgsImV4cCI6MTY3NjI5NjA1OH0.CEbcQhtCWuuap7g2XCljelexze18A-hPRCJJnD3W0qQ
+Accept-Language: EN
 
 {
     "data": {
@@ -585,6 +510,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 POST http://localhost:3000/searches/addFavouriteSearch
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+Accept-Language: EN
 
 {
     "data": {
@@ -600,11 +526,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 GET http://localhost:3000/searches/getAllSearches
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+Accept-Language: EN
 
 ### delete one favourite search.
 POST http://localhost:3000/searches/deleteFavourite
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+Accept-Language: EN
 
 {
     "data": {

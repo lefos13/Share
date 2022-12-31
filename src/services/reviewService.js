@@ -18,6 +18,8 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   },
 });
 
+const { determineLang } = require("../utils/functions");
+
 const moment = require("moment");
 const Review = require("../database/Review");
 const User = require("../database/User");
@@ -29,6 +31,7 @@ const RFC_ONLYM = "DD/MM/YYYY";
 const getReviews = async (req) => {
   try {
     var data = req.body.data;
+    let msg = await determineLang(req);
     let query = {
       attributes:
         // [sequelize.fn("count", sequelize.col("rating")), "counter"],
@@ -76,7 +79,7 @@ const getReviews = async (req) => {
         );
       } else if (user == null) {
         //UNREALISTIC CASE
-        r.dataValues["fullname"] = "Ο χρήστης δεν υπάρχει";
+        r.dataValues["fullname"] = msg.userNull;
 
         r.dataValues.imagepath = null;
       } else {
@@ -100,7 +103,7 @@ const getReviews = async (req) => {
     if (data.page > totallength) {
       return {
         status: 404,
-        message: "Η σελίδα που αιτήθηκε είναι πέρα από τα όριο!",
+        message: msg.paginationLimit,
       };
     }
     const response = {
@@ -115,13 +118,14 @@ const getReviews = async (req) => {
     return { status: 200, response: response };
   } catch (error) {
     console.log(error);
-    return { status: 500, response: "Kάτι πήγε στραβά!" };
+    return { status: 500 };
   }
 };
 
 const createReview = async (req) => {
   try {
     var data = req.body.data;
+    let msg = await determineLang(req);
     let query = {
       attributes:
         // [sequelize.fn("count", sequelize.col("rating")), "counter"],
@@ -177,7 +181,7 @@ const createReview = async (req) => {
         review: review,
         average: average,
         count: results.count,
-        message: "Η αξιολόγηση έγινε επιτυχώς!",
+        message: msg.newReview,
       };
       return { status: 200, data: response };
     } else {
@@ -226,7 +230,7 @@ const createReview = async (req) => {
         review: revExist,
         average: average,
         count: results.count,
-        message: "Η αξιολόγηση ανανεώθηκε επιτυχώς!",
+        message: msg.updateReview,
       };
       return { status: 200, data: response };
     }

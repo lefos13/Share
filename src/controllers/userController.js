@@ -5,16 +5,6 @@ const userService = require("../services/userService");
 const fs = require("fs");
 const { determineLang } = require("../utils/functions");
 
-const getAllUsers = (req, res) => {
-  const allUsers = userService.getAllUsers();
-  res.send("Get all workouts");
-};
-
-const getOneUser = (req, res) => {
-  const oneUser = userService.getOneUser();
-  res.send("Get an existing workout");
-};
-
 const createNewUser = async (req, res) => {
   try {
     let msg = await determineLang(req);
@@ -29,6 +19,7 @@ const createNewUser = async (req, res) => {
 
 const createToken = async (req, res) => {
   try {
+    console.log(req.headers);
     let msg = await determineLang(req);
     // console.log(msg);
     let newToken = await userService.createToken(req);
@@ -43,11 +34,15 @@ const createToken = async (req, res) => {
 
 const updateOneUser = async (req, res) => {
   try {
+    const msg = await determineLang(req);
     const updatedUser = await userService.updateOneUser(req);
+    if (updatedUser.status == 500) {
+      throw msg;
+    }
     res.status(updatedUser.status).json({ message: updatedUser.message });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
@@ -105,24 +100,27 @@ const sendOtp = async (req, res) => {
 
 const searchUser = async (req, res) => {
   try {
+    const msg = await determineLang(req);
     const results = await userService.searchUser(req);
+    if (results.status == 500) throw msg;
     res.status(results.status).json(results.data);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
 const notifyMe = async (req, res) => {
   try {
+    const msg = await determineLang(req);
     const results = await userService.notifyMe(req);
-    if (results.status == 500) throw "error";
+    if (results.status == 500) throw msg;
     else if (results.status == 404)
       res.status(404).json({ message: results.message });
     else res.status(results.status).json(results.data);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Κάτι πήγε στραβά!" });
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
   }
 };
 
@@ -139,8 +137,6 @@ const loginThirdParty = async (req, res) => {
 };
 
 module.exports = {
-  getAllUsers,
-  getOneUser,
   createNewUser,
   updateOneUser,
   createToken,
