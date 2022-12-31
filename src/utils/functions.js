@@ -53,7 +53,7 @@ const getLang = async (lang) => {
 };
 const determineLang = async (req) => {
   try {
-    let lang = req.headers["language"];
+    let lang = req.headers["accept-language"];
     let msg;
     // console.log(lang);
     if (lang == "EN") msg = JSON.parse(fs.readFileSync("./lang/english.json"));
