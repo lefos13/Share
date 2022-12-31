@@ -157,6 +157,7 @@ const deleteFavourite = async (req) => {
   try {
     let email = req.body.extra;
     let data = req.body.data;
+    let msg = fun.determineLang(req);
 
     const response = await LastSearch.deleteFavourite(data.lsid, email);
     if (response === false)
