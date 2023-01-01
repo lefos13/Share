@@ -160,12 +160,12 @@ Accept-Language: EN
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
 POST http://localhost:3000/users/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMi0xMS0yNFQxMToyODowNS4wMjNaIiwiaWF0IjoxNjY5Mjg5Mjg1LCJleHAiOjE2NzQ0NzMyODV9.yFGn8s_ytYI_aEx5kauNiSHWWiQS_K0B-IqIRtSUoCo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAxVDEzOjUzOjUxLjg1NFoiLCJpYXQiOjE2NzI1ODEyMzEsImV4cCI6MTY3Nzc2NTIzMX0.0i2FuAFq6zuyeqp5xif3vxm8v_zwPkTfe1fulWo0rls
 Accept-Language: EN
 
 {
     "data": {
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -311,7 +311,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 //service to notify someone that has been verified for a post that he is interested
 GET http://localhost:3000/users/notifyMe
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTIxVDE2OjQ2OjI2LjQ1NloiLCJpYXQiOjE2NzE2NDExODYsImV4cCI6MTY3NjgyNTE4Nn0.Uhrf67WeZRPsKgkI8RfeEL2w3Xdvibaz3ADK-ZmbGiw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAxVDEzOjUzOjUxLjg1NFoiLCJpYXQiOjE2NzI1ODEyMzEsImV4cCI6MTY3Nzc2NTIzMX0.0i2FuAFq6zuyeqp5xif3vxm8v_zwPkTfe1fulWo0rls
 
 ###
 POST http://localhost:3000/neutral/sendReport

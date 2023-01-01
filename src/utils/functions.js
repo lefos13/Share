@@ -108,7 +108,7 @@ const newRide = async (postid, emailArray, postOwner) => {
         throw err;
       });
       let msg = await getLang(userToNotify.lastLang);
-      console.log(msg, userToNotify.lastLang);
+      // console.log(msg, userToNotify.lastLang);
       let message = {
         data: {
           type: "newRide",
@@ -118,11 +118,11 @@ const newRide = async (postid, emailArray, postOwner) => {
         },
         token: f.fcmToken,
         notification: {
-          title:
-            msg.firebase.request_part1 +
+          title: msg.firebase.req_title,
+          body:
+            msg.firebase.not_ver_body0 +
             owner.fullname +
             msg.firebase.request_part2,
-          body: "TEST MESSAGE",
         },
       };
       allMessages.push(message);
@@ -215,11 +215,11 @@ module.exports = {
         data: data,
         token: fcmToken,
         notification: {
-          title:
-            msg.firebase.request_part1 +
+          title: msg.firebase.not_owner_title,
+          body:
+            msg.firebase.not_ver_body0 +
             user.fullname +
             msg.firebase.liked_post,
-          body: msg.firebase.liked_post2,
         },
       };
 
@@ -275,11 +275,11 @@ module.exports = {
         },
         token: fcmToken.fcmToken,
         notification: {
-          title:
-            msg.firebase.request_part1 +
+          title: msg.firebase.not_ver_title,
+          body:
+            msg.firebase.not_ver_body0 +
             user.fullname +
-            msg.firebase.request_part3,
-          body: "TEST MESSAGE",
+            msg.firebase.not_ver_body,
         },
       };
       admin

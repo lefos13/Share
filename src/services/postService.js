@@ -816,6 +816,7 @@ const verInterested = async (req) => {
         );
         if (toReviewExists === false)
           throw new Error("Error at finding possible review");
+
         //If there is no possible review, create a new one
         if (toReviewExists == null) {
           if (post.enddate == null) {
@@ -846,12 +847,16 @@ const verInterested = async (req) => {
             toReviewExists.driverEmail != post.email &&
             toReviewExists.driverEmail == results.email
           ) {
+            let enddate;
+            post.enddate == null
+              ? (enddate = post.startdate)
+              : (enddate = post.enddate);
             const reversed = await ToReview.reverseUsers(
               toReviewExists,
               post.email,
               results.email,
               results.piid,
-              post.enddate
+              enddate
             );
             if (!reversed)
               throw new Error(
