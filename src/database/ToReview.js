@@ -280,7 +280,25 @@ const findAllMyFinished = async (passengerEmail, driverEmail, dateToCheck) => {
     return false;
   }
 };
+
+const deleteAllPerUser = async (email) => {
+  try {
+    await ToReview.destroy({
+      where: {
+        [Op.or]: [{ passengerEmail: email }, { driverEmail: email }],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
 module.exports = {
+  deleteAllPerUser,
   findForProfile,
   findForCreatingReview,
   setDriverDone,

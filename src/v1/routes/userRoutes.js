@@ -91,6 +91,13 @@ router.post(
   userController.loginThirdParty
 );
 
+router.post(
+  "/deleteUser",
+  [authenticateToken],
+  cors(corsOptions),
+  userController.deleteUser
+);
+
 router.get("/1", [], cors(corsOptions), (req, res) => {
   res.json({ message: 1 });
 });

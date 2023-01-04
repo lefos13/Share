@@ -136,7 +136,20 @@ const loginThirdParty = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const results = await userService.deleteUser(req);
+    if (results.status == 500) throw msg;
+    else res.status(results.status).json(results.response);
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
 module.exports = {
+  deleteUser,
   createNewUser,
   updateOneUser,
   createToken,

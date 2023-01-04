@@ -29,6 +29,7 @@ const { EMAIL, PASSEMAIL, HOST, USER, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
+const Users = require("../modules/user");
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
@@ -290,11 +291,17 @@ const login = async (req) => {
           if (fcmDone === false) {
             throw new Error("Error at creating/updating the fcmToken");
           }
-          //
+          //update lang for user
           const updateLang = await User.updateLang(user.email, msg.lang);
           if (updateLang === false) {
             throw new Error("Error at updating lastLang");
           }
+
+          //activate account if user was deleted
+          if (user.deleted == true) {
+            User.activateAccount(user.email);
+          }
+
           return {
             status: 200,
             message: msg.loginSuc,
@@ -325,6 +332,12 @@ const login = async (req) => {
           if (updateLang === false) {
             throw new Error("Error at updating lastLang");
           }
+
+          //activate account if user was deleted
+          if (user.deleted == true) {
+            User.activateAccount(user.email);
+          }
+
           return whatToReturn;
           // ============
         }
@@ -757,7 +770,74 @@ const notifyMe = async (req) => {
   }
 };
 
+const deleteUser = async (req) => {
+  try {
+    let msg = await determineLang(req);
+    let email = req.body.extra;
+    let curDate = moment();
+
+    //get all posts that user is interested, Find all that are active
+    const allInt = await PostInterested.findAllperUser(email);
+    if (allInt === false) {
+      throw new Error("error at finding all the interests of user");
+    }
+
+    //delete all interests of user from posts that are active
+    for await (int of allInt) {
+      // for each interest
+      // check if the post is expired.
+      let expired = await Post.findExpired(int.postid, curDate);
+      if (expired === false) throw new Error("Error at finding certain post");
+      else if (expired != null) {
+        //delete interest
+        int.destroy();
+      }
+    }
+
+    //get all active posts of user
+    const allPosts = await Post.findAllActive(email, curDate);
+    if (allPosts === false) {
+      throw new Error("error at finding acrive posts");
+    }
+
+    //delete all user's active posts and interests
+    let postIds = [];
+    _.forEach(allPosts, (val) => {
+      postIds.push(val.postid);
+    });
+    // console.log(postIds);
+
+    const deletedInts = await PostInterested.destroyPerArrayIds(postIds);
+    if (deletedInts === false) {
+      throw new Error("error at deleting the interests");
+    }
+
+    const deletedPosts = await Post.destroyAllPerIds(postIds);
+    if (deletedPosts === false) {
+      throw new Error("error at deleting active User's posts");
+    }
+
+    //delete all active potential reviews
+    const deletedToReviews = await ToReview.deleteAllPerUser(email);
+    if (deletedToReviews === false) {
+      throw new Error("error at deleting potential reviews");
+    }
+
+    //update profile
+    const deleted = await User.updateDeleted(email);
+    if (deleted === false) {
+      throw new Error("Error at updating 'deleted' of user");
+    }
+
+    return { status: 200, response: { message: "Success" } };
+  } catch (error) {
+    console.log(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
+  deleteUser,
   createNewUser,
   updateOneUser,
   createToken,

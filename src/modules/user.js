@@ -70,6 +70,10 @@ const Users = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
   },
   {
     freezeTableName: true,

@@ -231,7 +231,39 @@ const updateLang = async (email, lang) => {
   }
 };
 
+const updateDeleted = async (email) => {
+  try {
+    const user = await Users.update(
+      { deleted: true },
+      { where: { email: email } }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const activateAccount = async (email) => {
+  try {
+    const user = await Users.update(
+      { deleted: false },
+      { where: { email: email } }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
+  activateAccount,
+  updateDeleted,
   register,
   updateUser,
   findOneUser,

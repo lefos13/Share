@@ -363,8 +363,49 @@ const findAllExpired = async (email, date) => {
   }
 };
 
+const findAllActive = async (email, date) => {
+  try {
+    const post = await Posts.findAll({
+      where: {
+        email: email,
+        [Op.or]: [
+          { enddate: { [Op.gte]: date } }, //enddate megalutero tou curdate
+          {
+            [Op.and]: [{ enddate: null }, { startdate: { [Op.gte]: date } }],
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return post;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const destroyAllPerIds = async (postids) => {
+  try {
+    const post = await Posts.destroy({
+      where: {
+        postid: postids,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return post;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
 module.exports = {
+  destroyAllPerIds,
   findAllExpired,
+  findAllActive,
   getAllPosts,
   findExpired,
   createNewPost,

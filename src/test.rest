@@ -5,7 +5,7 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "user1@gmail.com"
     }
 }
 
@@ -165,7 +165,7 @@ Accept-Language: EN
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -260,7 +260,7 @@ language: EN
 
 {
     "data": {
-        "email": "user0@gmail.com"
+        "email": "user1@gmail.com"
     }
 }
 
@@ -312,6 +312,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 GET http://localhost:3000/users/notifyMe
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAxVDEzOjUzOjUxLjg1NFoiLCJpYXQiOjE2NzI1ODEyMzEsImV4cCI6MTY3Nzc2NTIzMX0.0i2FuAFq6zuyeqp5xif3vxm8v_zwPkTfe1fulWo0rls
+Accept-Language: EN
 
 ###
 POST http://localhost:3000/neutral/sendReport
@@ -540,3 +541,8 @@ Accept-Language: EN
     }
 }
 
+### delete one favourite search.
+POST http://localhost:3000/users/deleteUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAyVDE2OjU5OjIyLjIzNFoiLCJpYXQiOjE2NzI2Nzg3NjIsImV4cCI6MTY3Nzg2Mjc2Mn0.6WvIjbeaF8GLMK4HzEroIXNMGUo_z61rO4VQwaKMz0M
+Accept-Language: EN

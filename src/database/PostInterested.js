@@ -289,9 +289,63 @@ const findAllVerifed = async (email) => {
   // code to count posts of a user the current day
 };
 
+const findAllperUser = async (email) => {
+  try {
+    const all = await PostInterested.findAll({
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return all;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+// destroy all interested users per post id
+const detroyAllPerUser = async (postid, email) => {
+  try {
+    const deleted = await PostInterested.destroy({
+      where: {
+        postid: postid,
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+// destroy all interested users per post id
+const destroyPerArrayIds = async (postids) => {
+  try {
+    const deleted = await PostInterested.destroy({
+      where: {
+        postid: postids,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 // *** ADD ***
 
 module.exports = {
+  destroyPerArrayIds,
+  findAllperUser,
+  detroyAllPerUser,
   findOne,
   findAllVerifed,
   destroyOne,
