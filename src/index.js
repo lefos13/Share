@@ -259,12 +259,7 @@ app.use(
     target: API_SERVICE_URL2,
     changeOrigin: true,
     pathRewrite: async function (path, req) {
-      // const should_add_something = await httpRequestToDecideSomething(path);
-      // console.log(path);
-      // path = "input=volos&key=" + GOOGLE_KEY;
-      // console.log(path);
-      // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
-      path += "&result_type=locality&key=" + GOOGLE_KEY;
+      path += "&language=el&result_type=locality&key=" + GOOGLE_KEY;
       console.log(path);
       return path;
     },

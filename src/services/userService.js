@@ -433,6 +433,11 @@ const loginThirdParty = async (req) => {
       if (updatedLang === false) {
         throw new Error("Error at updating the last lang");
       }
+
+      //activate account if user was deleted
+      if (user.deleted == true) {
+        User.activateAccount(user.email);
+      }
       return { status: 200, response: response };
     }
   } catch (error) {
@@ -495,6 +500,10 @@ const searchUser = async (req) => {
     };
     //get user with no password
     let found = await User.findOneUserQuery(findUserQuery);
+    console.log("USER DELETED:", found.deleted);
+    if (found.deleted === true) {
+      return { status: 404, message: msg.userDeleted };
+    }
 
     //get Reviews and Count
     let revfound = await Review.findAndCountAll(reviewsQuery);
@@ -821,6 +830,12 @@ const deleteUser = async (req) => {
     const deletedToReviews = await ToReview.deleteAllPerUser(email);
     if (deletedToReviews === false) {
       throw new Error("error at deleting potential reviews");
+    }
+
+    //delete all requests of the user
+    const deletedReq = await Request.deletePerUser(email);
+    if (deletedReq === false) {
+      throw new Error("Error at deleting requests");
     }
 
     //update profile

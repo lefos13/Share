@@ -103,6 +103,9 @@ const searchUser = async (req, res) => {
     const msg = await determineLang(req);
     const results = await userService.searchUser(req);
     if (results.status == 500) throw msg;
+    else if (results.status == 404) {
+      res.status(404).json({ message: results.message });
+    }
     res.status(results.status).json(results.data);
   } catch (error) {
     // console.log(error);

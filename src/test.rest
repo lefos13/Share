@@ -5,7 +5,7 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "user1@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -113,15 +113,15 @@ Accept-Language: GR
     "data": {
         "email": "user1@gmail.com",
         "date": "2022-06-26",
-        "startplace": "Βόλος",
-        "startcoord": "123",
-        "endplace": "Αθήνα",
-        "endcoord": "321",
+        "startplace": "Αθήνα",
+        "startcoord": "37.9838096,23.7275388",
+        "endplace": "Βόλος",
+        "endcoord": "39.366584,22.9506769",
         "numseats": 2,
-        "startdate": "2022-12-22",
-        "enddate": "2022-12-22",
-        "returnStartDate": "2022-12-20",
-        "returnEndDate": "2022-12-21",
+        "startdate": "2023-01-22",
+        "enddate": null,
+        "returnStartDate": null,
+        "returnEndDate": null,
         "withReturn": false,
         "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
         "petAllowed": true,
@@ -165,7 +165,7 @@ Accept-Language: EN
 
 {
     "data": {
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -260,7 +260,7 @@ language: EN
 
 {
     "data": {
-        "email": "user1@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -544,5 +544,5 @@ Accept-Language: EN
 ### delete one favourite search.
 POST http://localhost:3000/users/deleteUser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAyVDE2OjU5OjIyLjIzNFoiLCJpYXQiOjE2NzI2Nzg3NjIsImV4cCI6MTY3Nzg2Mjc2Mn0.6WvIjbeaF8GLMK4HzEroIXNMGUo_z61rO4VQwaKMz0M
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDEtMDVUMTQ6MTM6NDAuNTY3WiIsImlhdCI6MTY3MjkyODAyMCwiZXhwIjoxNjc4MTEyMDIwfQ.vecQIJHzEsoFSqEcYWsT3l-FBopqlByRxWFLwQ901ww
 Accept-Language: EN

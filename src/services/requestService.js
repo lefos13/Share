@@ -60,6 +60,7 @@ const createRequest = async (req) => {
 const getRequests = async (req) => {
   try {
     let email = req.body.extra;
+    console.log(email, "Ψάχνει για τα requests!!!!!");
     let msg = await determineLang(req);
     const requests = await Request.getAll(email);
     if (requests === false) {
@@ -72,6 +73,7 @@ const getRequests = async (req) => {
       }
       return { status: 200, requests: requests };
     } else {
+      console.log("NO REQUESTS!!!!");
       return { status: 404, message: msg.noRequests };
     }
   } catch (error) {

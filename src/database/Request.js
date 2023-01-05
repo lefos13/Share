@@ -114,10 +114,28 @@ const deleteOne = async (postId, email) => {
   }
 };
 
+const deletePerUser = async (email) => {
+  try {
+    const deleted = await SearchPost.destroy({
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   requestCount,
   requestCountDub,
   saveRequest,
   getAll,
   deleteOne,
+  deletePerUser,
 };

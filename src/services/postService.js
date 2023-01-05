@@ -545,7 +545,7 @@ const getInterestedPerUser = async (req) => {
       throw new Error("Error at getting all the interests");
     }
 
-    console.log(data);
+    // console.log(data);
     // console.log(found);
 
     let array = [];
@@ -561,6 +561,7 @@ const getInterestedPerUser = async (req) => {
         if (IsJsonString(post.moreplaces)) {
           post.moreplaces = JSON.parse(post.moreplaces);
         }
+        post.dataValues.isFavourite = false;
         postI.dataValues.date = moment(postI.dataValues.date).format(RFC_H);
 
         post = await fun.fixAllDates(post);

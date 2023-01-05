@@ -55,6 +55,7 @@
   "loginFailed": "Wrong username or password!",
   "userFound": "The user has been found!",
   "usersToReview": "We didn't find any users that you can review!",
+  "userDeleted": "User deleted his account!",
   "firebase": {
     "not_ver_title": "Travel approval",
     "not_ver_body": " approved you to travel together!",
