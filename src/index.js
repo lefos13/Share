@@ -43,7 +43,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 // get the values from the .env file
-const { HOST, USER, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } = process.env;
+const { HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } = process.env;
 
 Date.prototype.addHours = function (h) {
   this.setTime(this.getTime() + h * 60 * 60 * 1000);
@@ -54,7 +54,7 @@ Date.prototype.addHours = function (h) {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   dialectOptions: {
