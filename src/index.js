@@ -266,4 +266,212 @@ app.use(
   })
 );
 
-http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
+const port = 3000;
+
+let server = http.listen(port, () =>
+  console.error("listening on http://0.0.0.0:3000/")
+);
+
+//socket functionality for chat
+let io = require("socket.io")(server);
+
+const { v4: uuidv4 } = require("uuid");
+
+const users = {};
+
+let conversations = [];
+
+const createUsersOnline = (userId) => {
+  const values = Object.values(users);
+  const onlyWithUsernames = values.filter((u) => u.username != undefined);
+  console.log({ onlyWithUsernames });
+  return onlyWithUsernames;
+};
+
+io.on("connection", (socket) => {
+  socket.on("disconnect", () => {
+    delete users[socket.id];
+
+    io.emit("action", {
+      type: "users_online",
+      data: createUsersOnline(socket.id),
+    });
+
+    conversations = conversations.filter((conv) => conv.socketId != socket.id);
+
+    io.emit("action", { type: "conversations", data: conversations });
+  });
+
+  socket.on("action", (action) => {
+    switch (action.type) {
+      //once user logs in this case is triggered, here we want to send to this user a list
+      //of all the conversations(user got approval from others or gave aprroval)
+      //also when i initialize a chat conversation i need a unique id so i emit
+      //the self_user to the client so i can initialize the chat with this id
+
+      case "server/join":
+        const uuid = uuidv4();
+        users[socket.id] = { userId: uuid };
+        users[socket.id].email = action.data.email;
+
+        conversations.push({
+          userId: uuid,
+          socketId: socket.id,
+          username: action.data.username,
+          photo: "images/" + action.data.email + ".jpeg",
+          email: action.data.email,
+          lastMessage: "last message",
+          isLastMessageMine: true,
+          isUserOnline: false,
+          lastMessageTime: "12:30",
+          isRead: true,
+          expiresIn: "13 Δεκ 2022",
+          messages: [],
+        });
+
+        //i use io emit to emit in all sockets connected
+        //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
+
+        io.emit("action", { type: "conversations", data: conversations });
+        socket.emit("action", { type: "self_user", data: users[socket.id] });
+        break;
+
+      case "server/app_in_background": {
+        //app in background, do not close the socket connection
+        break;
+      }
+
+      case "server/conversation_opened": {
+        //this is triggered when i get to the personal chat and the message is not read.
+        //so we must set it to read
+
+        const conversationId = action.data.conversationId;
+        const isOpened = action.data.isOpened;
+        const itemToUpdate = conversations.find(
+          (item) => item.userId === conversationId
+        );
+        const index = conversations.indexOf(itemToUpdate);
+        itemToUpdate.isRead = isOpened;
+        conversations[index] = itemToUpdate;
+
+        break;
+      }
+
+      case "server/private_message":
+        const conversationId = action.data.conversationId; // this is the receipient id
+        const from = action.data.senderId; //this is my id
+        const fromEmail = action.data.senderEmail; //this is my id
+
+        const userValues = Object.values(users);
+        const socketIds = Object.keys(users);
+
+        for (let i = 0; i < userValues.length; i++) {
+          if (userValues[i].userId === conversationId) {
+            const socketId = socketIds[i];
+            io.to(socketId).emit("action", {
+              type: "private_message",
+              data: {
+                ...action.data,
+                conversationId: from,
+                senderEmail: fromEmail,
+              },
+            });
+            break;
+          }
+        }
+        break;
+    }
+  });
+});
+
+//http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
+
+/*
+
+{
+
+  "572ca747-4ed5-42a2-89b8-b150b93221d6": {   //conversation id
+
+    "messages": [
+
+      {
+
+        "_id": "b32d7799-7f84-4e53-9a86-bb2793d1384e",
+
+        "createdAt": "2022-09-27T11:43:07.606Z",
+
+        "text": "Ff",
+
+        "user": {
+
+          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"  //this id is mine
+
+        }
+
+      },
+
+      {
+
+        "_id": "22cc4dc6-b5d1-4906-9f27-62e605c90486",
+
+        "createdAt": "2022-09-27T11:43:03.074Z",
+
+        "text": "😘",
+
+        "user": {
+
+          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"
+
+        }
+
+      },
+
+      {
+
+        "_id": "f1cc7a06-ec38-40d6-85a5-d56c691fa5ff",
+
+        "createdAt": "2022-09-27T11:42:55.030Z",
+
+        "text": "Kk",
+
+        "user": {
+
+          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"
+
+        }
+
+      },
+
+      {
+
+        "_id": "7d471fc6-4f08-498d-ab05-0a7ba52f2444",
+
+        "createdAt": "2022-09-27T11:42:03.913Z",
+
+        "text": "Nnn",
+
+        "user": {
+
+          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"
+
+        }
+
+      }
+
+    ],
+
+    "username": "giannis fragoulis"
+
+  },
+
+  "a13306e6-ec82-40db-9ac7-15d3ddde88cf": {
+
+    "messages": [],
+
+    "username": "user1"
+
+  }
+
+}
+
+*/

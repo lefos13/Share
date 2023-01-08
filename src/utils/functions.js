@@ -138,15 +138,6 @@ const newRide = async (postid, emailArray, postOwner) => {
       .catch((err) => {
         console.log("Error to send massive notifications: " + err);
       });
-    // admin
-    //   .messaging()
-    //   .send(message)
-    //   .then((response) => {
-    //     console.log("Success: ", response);
-    //   })
-    //   .catch((err) => {
-    //     throw err;
-    //   });
 
     // console.log("ALL USERS TO BE NOTIFIED: " + string2); ///test log
   } catch (error) {
