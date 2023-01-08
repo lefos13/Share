@@ -1,0 +1,548 @@
+#service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
+POST http://157.230.18.246:3000/users/createtoken
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
+
+###
+
+#service pou kanei update to password you user sth vash
+POST http://157.230.18.246:3000/users/updateUserPass
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com",
+        "currentPassword": "11111",
+        "pass": "111111"
+    }
+}
+
+###
+
+#service poy kanei register ton xrhsth sth vash kai stelnei amesws otp gia epivevaish tou email
+POST  http://157.230.18.246:3000/users/register
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com",
+        "password": "12345",
+        "mobile": "6975620785",
+        "fullname": "lefos evan",
+        "gender": "male",
+        "car": null,
+        "cardate": null,
+        "age": "26/06/1998",
+        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
+    }
+}
+
+###
+
+#service pou kanei verify to xrhsth sth vash dedomenwn, afou kanei epibebaiwsh to otp tou ston client
+POST http://157.230.18.246:3000/users/verify
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
+
+###
+
+#service pou elegxei ta stoixeia tou xrhsth otan kanei login
+POST http://157.230.18.246:3000/users/login
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMDhUMTk6MzY6MDcuMDIyWiIsImlhdCI6MTY2NzkzNjE2NywiZXhwIjoxNjczMTIwMTY3fQ.Rm7X-PLNZBFnmAEssYrXCJr1Mxv_KxnoGa0ojWbfG_E
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com",
+        "pass": "12345",
+        "autoLogin": true,
+        "fcmToken": null
+    }
+}
+###
+POST http://157.230.18.246:3000/users/loginThirdParty
+Content-Type: application/json
+Accept-Language: GR
+
+{
+    "data": {
+        "fullname": "George1",
+        "email": "lefterisevagelinos1996@gmail.com",
+        "password": "google_sign_in_pass",
+        "fcmToken": null
+    }
+}
+
+###
+
+#service poy stelnei otp ston xrhsth kai ston client gia epibebaiwsh
+POST http://157.230.18.246:3000/users/passotp
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data": {
+        "email": "lefterisevagelinos199@gmail.com"
+    }
+}
+
+###
+
+#service pou ftiaxneis ena post
+POST http://157.230.18.246:3000/posts/createpost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEyVDE5OjQ4OjMwLjg3NVoiLCJpYXQiOjE2NzA4NzQ1MTAsImV4cCI6MTY3NjA1ODUxMH0.lZsv25J64lxVhOw8FtWionb5ZSJQl0bptPkV4Ww-Ifs
+Accept-Language: GR
+
+{
+    "data": {
+        "email": "user1@gmail.com",
+        "date": "2022-06-26",
+        "startplace": "Αθήνα",
+        "startcoord": "37.9838096,23.7275388",
+        "endplace": "Βόλος",
+        "endcoord": "39.366584,22.9506769",
+        "numseats": 2,
+        "startdate": "2023-01-22",
+        "enddate": null,
+        "returnStartDate": null,
+        "returnEndDate": null,
+        "withReturn": false,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "petAllowed": true,
+        "isFavourite": false,
+        "moreplaces": [
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            },
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            }
+        ]
+    }
+}
+
+###
+
+#service poy kaleis gia na deiksei kapoios endiaferon gia ena post
+POST http://157.230.18.246:3000/posts/interested
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "email": "user0@gmail.com",
+        "postid": 1832,
+        "note": "blabla"
+    }
+}
+
+###
+
+#service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
+POST http://157.230.18.246:3000/users/searchuser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAxVDEzOjUzOjUxLjg1NFoiLCJpYXQiOjE2NzI1ODEyMzEsImV4cCI6MTY3Nzc2NTIzMX0.0i2FuAFq6zuyeqp5xif3vxm8v_zwPkTfe1fulWo0rls
+Accept-Language: EN
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
+
+###
+
+#get reviews
+POST http://157.230.18.246:3000/reviews/getReviews
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "email": "user0@gmail.com",
+        "page": 1
+    }
+}
+
+###
+
+#Service pou eisagei ena review sth vash
+POST http://157.230.18.246:3000/reviews/createreview
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "emailreviewer": "lefterisevagelinos1996@gmail.com",
+        "email": "user0@gmail.com",
+        "rating": 4,
+        "text": "Πολύ καλός οδηγός, αλλά μιλάει συνέχεια"
+    }
+}
+
+###
+
+#service epistrefei lista me posts enos xrhsth
+POST http://157.230.18.246:3000/posts/getPostsUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "email": "user0@gmail.com",
+        "page": 1
+    }
+}
+###
+
+#service epistrefei post vasei id
+GET http://157.230.18.246:3000/posts/getPostPerId?postid=1829
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEzVDExOjM1OjEyLjQ5NVoiLCJpYXQiOjE2NzA5MzEzMTIsImV4cCI6MTY3NjExNTMxMn0.nWSTnBBjVpX8CpA9Vm0UhMtFFvzGizZhQ7fBV9HQjnM
+Accept-Language: EN
+
+###
+
+//Διαγρφή post μαζί με τους ενδιαφερόμενους του post
+POST http://157.230.18.246:3000/posts/deletePost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "postid": 1732
+    }
+}
+###
+
+#delete of interested
+POST http://157.230.18.246:3000/posts/deleteInterested
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "piid": 395
+    }
+}
+
+###
+
+#service poy epistrefei ta post gia ta opoia einai interested o user
+POST http://157.230.18.246:3000/posts/getInterestedPerUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTNUMTE6NTc6NDYuMTk2WiIsImlhdCI6MTY3MDkzMjY2NiwiZXhwIjoxNjc2MTE2NjY2fQ.XSwCnqcEQwySfpLNhNlPHHaAh1334qPys7SQ8FyDixs
+language: EN
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
+
+###
+#service epistrefei lista me endiaferomenous gia ena post
+POST http://157.230.18.246:3000/posts/getIntPost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "postid": 1849,
+        "page": 1
+    }
+}
+###
+
+GET http://157.230.18.246:3000/autocomplete/json?input=αθη
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+
+###
+GET http://157.230.18.246:3000/details/json?place_id=ChIJ8UNwBh-9oRQR3Y1mdkU1Nic
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+
+###
+GET http://157.230.18.246:3000/geocode/json?latlng=37.983810,23.727539
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTA1VDE4OjA5OjM5LjQ1N1oiLCJpYXQiOjE2NzI5NDIxNzksImV4cCI6MTY3ODEyNjE3OX0.utSnEPCryXCbxp_GstEZnapYXmk-36RWvOzFEtpdkvI
+
+###
+// verify an insterested user to a post
+POST http://157.230.18.246:3000/posts/verInterested
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE5VDE1OjQ1OjE3LjU5OFoiLCJpYXQiOjE2NzE0NjQ3MTcsImV4cCI6MTY3NjY0ODcxN30.WBx6Yobse5TbkOypQ2w95x6_U1O5Ej_ch9jzGieCo08
+
+{
+    "data": {
+        "postid": 1832,
+        "piid": 464
+    }
+}
+
+###
+
+//service to notify someone that has been verified for a post that he is interested
+GET http://157.230.18.246:3000/users/notifyMe
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAxVDEzOjUzOjUxLjg1NFoiLCJpYXQiOjE2NzI1ODEyMzEsImV4cCI6MTY3Nzc2NTIzMX0.0i2FuAFq6zuyeqp5xif3vxm8v_zwPkTfe1fulWo0rls
+Accept-Language: EN
+
+###
+POST http://157.230.18.246:3000/neutral/sendReport
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "text": "Test report"
+}
+###
+
+GET http://157.230.18.246:3000/neutral/getTerms
+Content-Type: application/text/html
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+###
+
+POST http://157.230.18.246:3000/requests/createRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
+Accept-Language: EN
+
+{
+    "data": {
+        "startplace": "Volos",
+        "startcoord": "1234",
+        "endplace": "Athens",
+        "endcoord": "3215"
+    }
+}
+
+###
+
+GET http://157.230.18.246:3000/requests/getRequests
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
+Accept-Language: EN
+
+###
+POST http://157.230.18.246:3000/requests/deleteRequest
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTFUMTY6NTg6NTcuODg0WiIsImlhdCI6MTY2ODE4NTkzNywiZXhwIjoxNjczMzY5OTM3fQ.WsB22dWgg5t7BDXFu4WGhnQNSNp7cCWFYwv3yRgu6gA
+Accept-Language: EN
+
+{
+    "data": {
+        "postSearchId": 19
+    }
+}
+
+###
+#service που προσθέτει/αφαιρεί ένα ποστ από τα αγαπημένα
+POST http://157.230.18.246:3000/posts/handleFavourite
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
+Accept-Language: EN
+
+{
+    "data": {
+        "postid": 1809
+    }
+}
+
+###
+#service that returns all the favourites of one user
+GET http://157.230.18.246:3000/posts/getFavourites
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
+Accept-Language: EN
+
+
+###
+POST http://157.230.18.246:3000/users/register
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com",
+        "password": "12345",
+        "mobile": "6975620785",
+        "fullname": "lefos evan",
+        "gender": "male",
+        "car": null,
+        "cardate": null,
+        "age": "26/06/1996",
+        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
+    }
+}
+
+###
+#"/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
+POST http://157.230.18.246:3000/users/updateProfile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDEtMDZUMTg6MzU6NDEuMDUxWiIsImlhdCI6MTY3MzAzMDE0MSwiZXhwIjoxNjc4MjE0MTQxfQ.O33_zq24c4_-6uiM_GQsfbqMHR5FPsEMdxGDweeAEsU
+Accept-Language: EN
+
+{
+    "data": {
+        "fullname": "George",
+        "age": "26/06/1995",
+        "facebook": null,
+        "instagram": null,
+        "car": "nissan",
+        "cardate": "2002",
+        "gender": "male",
+        "photo": "/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYACgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooA//Z"
+
+    }
+}
+###
+#ALL NEW APIS 
+POST http://157.230.18.246:3000/posts/createPost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTI4VDE1OjU3OjU2LjQ0NVoiLCJpYXQiOjE2NzIyNDMwNzYsImV4cCI6MTY3NzQyNzA3Nn0.TyLTYgaCTFvo6CeZX9mAwh7TOpHqBaDsDDw7Mjgw3Vg
+Accept-Language: EN
+
+{
+    "data": {
+        "email": "user0@gmail.com",
+        "date": "2021-10-05",
+        "startplace": "Volos",
+        "startcoord": "39.366584,22.9506769",
+        "endplace": "Athens",
+        "endcoord": "37.9838096,23.7275388", 
+        "numseats": 4,
+        "startdate": "2022-12-30",
+        "enddate": null,
+        "returnStartDate": null,
+        "returnEndDate": null,
+        "withReturn": false,
+        "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+        "petAllowed": false,
+        "isFavourite": false,
+        "moreplaces": [
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            },
+            {
+                    "place": "lamia",
+                    "placecoords": "3211"
+            }
+        ]
+    }
+}
+
+###service pou sou epistrefei lista me posts (paginated ana 20 kai ordered me vasi imeromhnia)
+POST http://157.230.18.246:3000/posts/searchposts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
+
+{
+    "data": {
+        "email": "lefterisevagelinos1996@gmail.com",
+        "startplace": "ασδ",
+        "startcoord": "1234",
+        "endplace": "δσα",
+        "endcoord": "3215",
+        "startdate": null,
+        "enddate": null,
+        "page": 1,
+        "age": 18,
+        "age_end": 70,
+        "car": null,
+        "cardate": null,
+        "gender": null,
+        "withReturn": null,
+        "petAllowed": null,
+        "returnStartDate": null,
+        "returnEndDate": null,
+        "driverRating": null,
+        "seats": null
+    }
+}
+
+### feed Screen
+POST http://157.230.18.246:3000/posts/feedScreen
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE1VDEzOjQ3OjM4LjEwM1oiLCJpYXQiOjE2NzExMTIwNTgsImV4cCI6MTY3NjI5NjA1OH0.CEbcQhtCWuuap7g2XCljelexze18A-hPRCJJnD3W0qQ
+Accept-Language: EN
+
+{
+    "data": {
+        "startplace": "ασδ",
+        "startcoord": "123",
+        "page": 1
+    }
+}
+
+### SECTION WITH LAST SEARCHES FUNCTIONALITY
+### add favourite search
+POST http://157.230.18.246:3000/searches/addFavouriteSearch
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+Accept-Language: EN
+
+{
+    "data": {
+        "startPlace": "ασδ",
+        "startCoord": "123",
+        "endPlace": "δσα",
+        "endCoord": "321",
+        "isFavourite": true
+    }
+}
+
+### get all searches.
+GET http://157.230.18.246:3000/searches/getAllSearches
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+Accept-Language: EN
+
+### delete one favourite search.
+POST http://157.230.18.246:3000/searches/deleteFavourite
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTItMTJUMTE6MjY6MTMuOTE5WiIsImlhdCI6MTY3MDg0NDM3MywiZXhwIjoxNjc2MDI4MzczfQ.wmiWCxuxH_ceqXbbRyqNV8tRKqhqpMQlFIojyJC_goI
+Accept-Language: EN
+
+{
+    "data": {
+        "lsid": 67
+    }
+}
+
+### delete one favourite search.
+POST http://157.230.18.246:3000/users/deleteUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDEtMDVUMTQ6MTM6NDAuNTY3WiIsImlhdCI6MTY3MjkyODAyMCwiZXhwIjoxNjc4MTEyMDIwfQ.vecQIJHzEsoFSqEcYWsT3l-FBopqlByRxWFLwQ901ww
+Accept-Language: EN
