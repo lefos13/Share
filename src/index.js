@@ -75,6 +75,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 
 const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
+const ConvUsers = require("./modules/convusers");
 
 function authenticateToken(req, res, next) {
   try {
@@ -221,6 +222,9 @@ app.use(
     pathRewrite: async function (path, req) {
       // const should_add_something = await httpRequestToDecideSomething(path);
       console.log(path);
+      let lang = req.headers["accept-language"];
+      // if(lang == "GR")
+
       // path = "input=volos&key=" + GOOGLE_KEY;
       // console.log(path);
       // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
@@ -276,110 +280,178 @@ let server = http.listen(port, () =>
 let io = require("socket.io")(server);
 
 const { v4: uuidv4 } = require("uuid");
+const Users = require("./modules/user");
 
-const users = {};
+// const users = {};
 
-let conversations = [];
+// let conversations = [];
 
-const createUsersOnline = (userId) => {
-  const values = Object.values(users);
-  const onlyWithUsernames = values.filter((u) => u.username != undefined);
-  console.log({ onlyWithUsernames });
-  return onlyWithUsernames;
-};
+// const createUsersOnline = (userId) => {
+//   const values = Object.values(users);
+//   const onlyWithUsernames = values.filter((u) => u.username != undefined);
+//   console.log({ onlyWithUsernames });
+//   return onlyWithUsernames;
+// };
 
 io.on("connection", (socket) => {
   socket.on("disconnect", () => {
-    delete users[socket.id];
-
-    io.emit("action", {
-      type: "users_online",
-      data: createUsersOnline(socket.id),
-    });
-
-    conversations = conversations.filter((conv) => conv.socketId != socket.id);
-
-    io.emit("action", { type: "conversations", data: conversations });
+    // delete users[socket.id];
+    // io.emit("action", {
+    //   type: "users_online",
+    //   data: createUsersOnline(socket.id),
+    // });
+    // conversations = conversations.filter((conv) => conv.socketId != socket.id);
+    // io.emit("action", { type: "conversations", data: conversations });
   });
 
-  socket.on("action", (action) => {
-    switch (action.type) {
-      //once user logs in this case is triggered, here we want to send to this user a list
-      //of all the conversations(user got approval from others or gave aprroval)
-      //also when i initialize a chat conversation i need a unique id so i emit
-      //the self_user to the client so i can initialize the chat with this id
+  socket.on("action", async (action) => {
+    try {
+      switch (action.type) {
+        //once user logs in this case is triggered, here we want to send to this user a list
+        //of all the conversations(user got approval from others or gave aprroval)
+        //also when i initialize a chat conversation i need a unique id so i emit
+        //the self_user to the client so i can initialize the chat with this id
+        case "server/join":
+          //define a uuidv4 for the user
+          const uuid = uuidv4();
+          //mark the socket id for the certain user
+          // users[socket.id] = { userId: uuid };
+          // users[socket.id].email = action.data.email;
 
-      case "server/join":
-        const uuid = uuidv4();
-        users[socket.id] = { userId: uuid };
-        users[socket.id].email = action.data.email;
+          //log all data of the user
+          console.log(
+            "This user just logged in and connected with sockets: ",
+            action.data.email,
+            " with socket.id:",
+            socket.id
+          );
+          let conversations = [];
+          const otherUsers = [];
+          //Find all user's active chats and part2: extract the other user
+          const dbConvs = await ConvUsers.findAll({
+            where: {
+              convid: { [Op.substring]: action.data.email },
+            },
+          }).catch((err) => {
+            throw err;
+          });
 
-        conversations.push({
-          userId: uuid,
-          socketId: socket.id,
-          username: action.data.username,
-          photo: "images/" + action.data.email + ".jpeg",
-          email: action.data.email,
-          lastMessage: "last message",
-          isLastMessageMine: true,
-          isUserOnline: false,
-          lastMessageTime: "12:30",
-          isRead: true,
-          expiresIn: "13 Δεκ 2022",
-          messages: [],
-        });
+          // part2
+          _.forEach(dbConvs, (value) => {
+            const mails = value.convid.split("_");
+            if (mails[0] != action.data.email) {
+              console.log("Users that i have a chat with", mails[0]);
+              otherUsers.push({
+                mail: mails[0],
+                expiresIn: value.expiresIn,
+                messages: value.messages,
+              });
+            } else if (mails[1] != action.data.email) {
+              console.log("Users that i have a chat with", mails[1]);
+              otherUsers.push({
+                mail: mails[1],
+                expiresIn: value.expiresIn,
+                messages: value.messages,
+              });
+            }
+          });
 
-        //i use io emit to emit in all sockets connected
-        //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
+          //import into convs list all the data that are required for the emition
+          for await (u of otherUsers) {
+            let data = {};
+            const us = await Users.findOne({ where: { email: u.mail } }).catch(
+              (err) => {
+                throw err;
+              }
+            );
+            data.conversationId = uuidv4();
+            data.socketId = socket.id; //need to change
+            data.username = us.fullname;
+            if (us.photo != null) data.photo = "images/" + u.mail + ".jpeg";
+            else data.photo = null;
+            data.email = u.mail;
+            data.lastMessage = "last test message"; //need to change
+            data.isLastMessageMine = true; //need to change
+            data.isUserOnline = true; // i will check if user has a socketid in db
+            data.lastMessageTime = "12:30"; //need to change
+            data.isRead = true; //need to change
+            data.expiresIn = u.expiresIn;
+            data.messages = u.messages;
 
-        io.emit("action", { type: "conversations", data: conversations });
-        socket.emit("action", { type: "self_user", data: users[socket.id] });
-        break;
-
-      case "server/app_in_background": {
-        //app in background, do not close the socket connection
-        break;
-      }
-
-      case "server/conversation_opened": {
-        //this is triggered when i get to the personal chat and the message is not read.
-        //so we must set it to read
-
-        const conversationId = action.data.conversationId;
-        const isOpened = action.data.isOpened;
-        const itemToUpdate = conversations.find(
-          (item) => item.userId === conversationId
-        );
-        const index = conversations.indexOf(itemToUpdate);
-        itemToUpdate.isRead = isOpened;
-        conversations[index] = itemToUpdate;
-
-        break;
-      }
-
-      case "server/private_message":
-        const conversationId = action.data.conversationId; // this is the receipient id
-        const from = action.data.senderId; //this is my id
-        const fromEmail = action.data.senderEmail; //this is my id
-
-        const userValues = Object.values(users);
-        const socketIds = Object.keys(users);
-
-        for (let i = 0; i < userValues.length; i++) {
-          if (userValues[i].userId === conversationId) {
-            const socketId = socketIds[i];
-            io.to(socketId).emit("action", {
-              type: "private_message",
-              data: {
-                ...action.data,
-                conversationId: from,
-                senderEmail: fromEmail,
-              },
-            });
-            break;
+            conversations.push(data);
           }
+          console.log(JSON.stringify(conversations));
+          //emit the action to the user
+
+          // conversations.push({
+          //   userId: uuid,
+          //   socketId: socket.id,
+          //   username: action.data.username,
+          //   photo: "images/" + action.data.email + ".jpeg",
+          //   email: action.data.email,
+          //   lastMessage: "last message",
+          //   isLastMessageMine: true,
+          //   isUserOnline: false,
+          //   lastMessageTime: "12:30",
+          //   isRead: true,
+          //   expiresIn: "13 Δεκ 2022",
+          //   messages: [],
+          // });
+
+          //i use io emit to emit in all sockets connected
+          //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
+          socket.emit("action", { type: "conversations", data: conversations });
+          socket.emit("action", { type: "self_user", data: { userId: uuid } });
+          break;
+
+        case "server/app_in_background": {
+          //app in background, do not close the socket connection
+          break;
         }
-        break;
+
+        case "server/conversation_opened": {
+          //this is triggered when i get to the personal chat and the message is not read.
+          //so we must set it to read
+
+          // const conversationId = action.data.conversationId;
+          // const isOpened = action.data.isOpened;
+          // const itemToUpdate = conversations.find(
+          //   (item) => item.userId === conversationId
+          // );
+          // const index = conversations.indexOf(itemToUpdate);
+          // itemToUpdate.isRead = isOpened;
+          // conversations[index] = itemToUpdate;
+
+          break;
+        }
+
+        case "server/private_message":
+
+        // const conversationId = action.data.conversationId; // this is the receipient id
+        // const from = action.data.senderId; //this is my id
+        // const fromEmail = action.data.senderEmail; //this is my id
+
+        // const userValues = Object.values(users);
+        // const socketIds = Object.keys(users);
+
+        // for (let i = 0; i < userValues.length; i++) {
+        //   if (userValues[i].userId === conversationId) {
+        //     const socketId = socketIds[i];
+        //     io.to(socketId).emit("action", {
+        //       type: "private_message",
+        //       data: {
+        //         ...action.data,
+        //         conversationId: from,
+        //         senderEmail: fromEmail,
+        //       },
+        //     });
+        //     break;
+        //   }
+        // }
+        // break;
+      }
+    } catch (error) {
+      console.log(error);
     }
   });
 });
@@ -405,6 +477,9 @@ io.on("connection", (socket) => {
         "user": {
 
           "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"  //this id is mine
+          "email": "email",
+          "name": "asda",
+          "avatar" "image"
 
         }
 

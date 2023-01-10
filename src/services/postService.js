@@ -7,6 +7,7 @@ const User = require("../database/User");
 const Review = require("../database/Review");
 const ToReview = require("../database/ToReview");
 const LastSearch = require("../database/LastSearch");
+const ConvUsers = require("../database/ConvUsers");
 const fun = require("../utils/functions");
 const {
   insertAver,
@@ -34,6 +35,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   },
 });
 const moment = require("moment-timezone");
+// const ConvUsers = require("../modules/convusers");
 moment.tz.setDefault("Europe/Athens");
 moment.locale("el");
 
@@ -522,6 +524,12 @@ const getPostPerId = async (req) => {
     if (user.photo !== null) {
       image = "images/" + user.email + ".jpeg";
     }
+
+    //if user is not the the owner of the post
+    if (user.email != email && post.isFavourite == true) {
+      post.dataValues.isFavourite = false;
+    }
+
     const response = {
       imagePath: image,
       interested: interested,
@@ -878,6 +886,22 @@ const verInterested = async (req) => {
             if (!updated) throw new Error("Error at resseting the flags");
           }
         }
+
+        //CREATION OF NEW CHAT
+        let expiresIn;
+        if (post.enddate == null) {
+          expiresIn = moment(post.startdate).add(1, "months");
+        } else {
+          expiresIn = moment(post.enddate).add(1, "months");
+        }
+        const chatMade = await ConvUsers.saveOne({
+          convid: post.email + "_" + results.email,
+          expiresIn: expiresIn,
+          messages: null,
+        });
+        if (chatMade === false)
+          throw new Error("Error at creating new chat between the users");
+        //END OF CREATION OF NEW CHAT
 
         fun.toNotifyTheVerified(results.email, post.postid, post.email);
         return { status: 200, message: msg.likerVerified };

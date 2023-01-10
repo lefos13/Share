@@ -279,9 +279,10 @@ Accept-Language: EN
 }
 ###
 
-GET http://localhost:3000/autocomplete/json?input=αθη
+GET http://localhost:3000/autocomplete/json?input=athe
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Accept-Language: EN
 
 ###
 GET http://localhost:3000/details/json?place_id=ChIJ8UNwBh-9oRQR3Y1mdkU1Nic

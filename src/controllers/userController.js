@@ -19,7 +19,7 @@ const createNewUser = async (req, res) => {
 
 const createToken = async (req, res) => {
   try {
-    console.log(req.headers);
+    // console.log(req.headers);
     let msg = await determineLang(req);
     // console.log(msg);
     let newToken = await userService.createToken(req);
