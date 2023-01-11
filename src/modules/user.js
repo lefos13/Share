@@ -74,6 +74,11 @@ const Users = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
     },
+    socketId: {
+      type: DataTypes.STRING,
+      defaultValue: null,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,

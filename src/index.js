@@ -76,6 +76,8 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
 const Posts = require("./modules/post");
 const PostInterested = require("./modules/postinterested");
 const ConvUsers = require("./modules/convusers");
+const Conv = require("./database/ConvUsers");
+const User = require("./database/User");
 
 function authenticateToken(req, res, next) {
   try {
@@ -281,6 +283,8 @@ let io = require("socket.io")(server);
 
 const { v4: uuidv4 } = require("uuid");
 const Users = require("./modules/user");
+const { valuesIn } = require("lodash");
+const { IsJsonString } = require("./utils/functions");
 
 // const users = {};
 
@@ -312,12 +316,6 @@ io.on("connection", (socket) => {
         //also when i initialize a chat conversation i need a unique id so i emit
         //the self_user to the client so i can initialize the chat with this id
         case "server/join":
-          //define a uuidv4 for the user
-          const uuid = uuidv4();
-          //mark the socket id for the certain user
-          // users[socket.id] = { userId: uuid };
-          // users[socket.id].email = action.data.email;
-
           //log all data of the user
           console.log(
             "This user just logged in and connected with sockets: ",
@@ -325,8 +323,17 @@ io.on("connection", (socket) => {
             " with socket.id:",
             socket.id
           );
+          // console.log(socket);
+          const addedSocketId = await User.addSocketId(
+            socket.id,
+            action.data.email
+          );
+          if (addedSocketId === false)
+            throw new Error("Error at updating the socket id");
+
           let conversations = [];
           const otherUsers = [];
+
           //Find all user's active chats and part2: extract the other user
           const dbConvs = await ConvUsers.findAll({
             where: {
@@ -338,6 +345,8 @@ io.on("connection", (socket) => {
 
           // part2
           _.forEach(dbConvs, (value) => {
+            // console.log(value.toJSON());
+            let convid = value.convid;
             const mails = value.convid.split("_");
             if (mails[0] != action.data.email) {
               console.log("Users that i have a chat with", mails[0]);
@@ -345,6 +354,7 @@ io.on("connection", (socket) => {
                 mail: mails[0],
                 expiresIn: value.expiresIn,
                 messages: value.messages,
+                convid: convid,
               });
             } else if (mails[1] != action.data.email) {
               console.log("Users that i have a chat with", mails[1]);
@@ -352,6 +362,7 @@ io.on("connection", (socket) => {
                 mail: mails[1],
                 expiresIn: value.expiresIn,
                 messages: value.messages,
+                convid: convid,
               });
             }
           });
@@ -364,44 +375,57 @@ io.on("connection", (socket) => {
                 throw err;
               }
             );
-            data.conversationId = uuidv4();
+            // console.log("CONVERSATION ID SEND:", u.convid);
+            data.conversationId = u.convid;
             data.socketId = socket.id; //need to change
             data.username = us.fullname;
             if (us.photo != null) data.photo = "images/" + u.mail + ".jpeg";
             else data.photo = null;
             data.email = u.mail;
-            data.lastMessage = "last test message"; //need to change
-            data.isLastMessageMine = true; //need to change
-            data.isUserOnline = true; // i will check if user has a socketid in db
-            data.lastMessageTime = "12:30"; //need to change
-            data.isRead = true; //need to change
-            data.expiresIn = u.expiresIn;
-            data.messages = u.messages;
 
+            data.isUserOnline = false;
+            let socketList = await io.fetchSockets();
+            // console.log(socketList);
+            _.forEach(socketList, (val) => {
+              // console.log(val.id);
+              if (val.id == us.socketId) data.isUserOnline = true;
+            });
+
+            data.expiresIn = u.expiresIn;
+            if (IsJsonString(u.messages) && u.messages != null) {
+              // order
+              u.messages = JSON.parse(u.messages);
+              u.messages.sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+              });
+              data.messages = u.messages;
+              data.lastMessage = u.messages[0].text;
+              data.isLastMessageMine =
+                u.messages[0].user._id == action.data.email ? true : false;
+              data.lastMessageTime = moment(u.messages[0].createdAt).format(
+                "HH:MM:SS"
+              ); //need to change
+              data.isRead = true; //need to change
+              // console.log(u.messages);
+            } else {
+              data.messages = [];
+              data.isRead = true;
+              data.lastMessage = "No messages sent yet!";
+              data.lastMessageTime = "00:00:00";
+              data.isLastMessageMine = false;
+            }
+
+            console.log(data);
             conversations.push(data);
           }
-          console.log(JSON.stringify(conversations));
-          //emit the action to the user
-
-          // conversations.push({
-          //   userId: uuid,
-          //   socketId: socket.id,
-          //   username: action.data.username,
-          //   photo: "images/" + action.data.email + ".jpeg",
-          //   email: action.data.email,
-          //   lastMessage: "last message",
-          //   isLastMessageMine: true,
-          //   isUserOnline: false,
-          //   lastMessageTime: "12:30",
-          //   isRead: true,
-          //   expiresIn: "13 Δεκ 2022",
-          //   messages: [],
-          // });
 
           //i use io emit to emit in all sockets connected
           //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
           socket.emit("action", { type: "conversations", data: conversations });
-          socket.emit("action", { type: "self_user", data: { userId: uuid } });
+          socket.emit("action", {
+            type: "self_user",
+            data: { userId: action.data.email },
+          });
           break;
 
         case "server/app_in_background": {
@@ -412,7 +436,7 @@ io.on("connection", (socket) => {
         case "server/conversation_opened": {
           //this is triggered when i get to the personal chat and the message is not read.
           //so we must set it to read
-
+          console.log("Coversation opened:", action.data.conversationId);
           // const conversationId = action.data.conversationId;
           // const isOpened = action.data.isOpened;
           // const itemToUpdate = conversations.find(
@@ -426,127 +450,43 @@ io.on("connection", (socket) => {
         }
 
         case "server/private_message":
+          // console.log(action.data);
 
-        // const conversationId = action.data.conversationId; // this is the receipient id
-        // const from = action.data.senderId; //this is my id
-        // const fromEmail = action.data.senderEmail; //this is my id
+          // console.log(socket);
 
-        // const userValues = Object.values(users);
-        // const socketIds = Object.keys(users);
+          const conversationId = action.data.conversationId; // this is the receipient id
+          const from = action.data.senderId; //this is my id
+          const fromEmail = action.data.senderEmail; //this is my id
 
-        // for (let i = 0; i < userValues.length; i++) {
-        //   if (userValues[i].userId === conversationId) {
-        //     const socketId = socketIds[i];
-        //     io.to(socketId).emit("action", {
-        //       type: "private_message",
-        //       data: {
-        //         ...action.data,
-        //         conversationId: from,
-        //         senderEmail: fromEmail,
-        //       },
-        //     });
-        //     break;
-        //   }
-        // }
-        // break;
+          // const userValues = Object.values(users);
+          const conversation = await Conv.findOne(conversationId);
+          if (conversation === false) {
+            return new Error("Conversation finding error");
+          }
+          // console.log(conversation.toJSON());
+          const mails = conversation.convid.split("_");
+          let receiver;
+          mails[0] == fromEmail ? (receiver = mails[1]) : (receiver = mails[0]);
+
+          const recUser = await User.findOneLight(receiver);
+          const recSocketId = recUser.socketId;
+
+          io.to(recSocketId).emit("action", {
+            type: "private_message",
+            data: {
+              ...action.data,
+              conversationId: conversationId,
+              senderEmail: fromEmail,
+            },
+          });
+
+          const addedMessage = await Conv.addMessage(
+            conversationId,
+            action.data.message
+          );
       }
     } catch (error) {
       console.log(error);
     }
   });
 });
-
-//http.listen(3000, () => console.error("listening on http://0.0.0.0:3000/"));
-
-/*
-
-{
-
-  "572ca747-4ed5-42a2-89b8-b150b93221d6": {   //conversation id
-
-    "messages": [
-
-      {
-
-        "_id": "b32d7799-7f84-4e53-9a86-bb2793d1384e",
-
-        "createdAt": "2022-09-27T11:43:07.606Z",
-
-        "text": "Ff",
-
-        "user": {
-
-          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"  //this id is mine
-          "email": "email",
-          "name": "asda",
-          "avatar" "image"
-
-        }
-
-      },
-
-      {
-
-        "_id": "22cc4dc6-b5d1-4906-9f27-62e605c90486",
-
-        "createdAt": "2022-09-27T11:43:03.074Z",
-
-        "text": "😘",
-
-        "user": {
-
-          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"
-
-        }
-
-      },
-
-      {
-
-        "_id": "f1cc7a06-ec38-40d6-85a5-d56c691fa5ff",
-
-        "createdAt": "2022-09-27T11:42:55.030Z",
-
-        "text": "Kk",
-
-        "user": {
-
-          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"
-
-        }
-
-      },
-
-      {
-
-        "_id": "7d471fc6-4f08-498d-ab05-0a7ba52f2444",
-
-        "createdAt": "2022-09-27T11:42:03.913Z",
-
-        "text": "Nnn",
-
-        "user": {
-
-          "_id": "af95de9f-c9bd-4194-b26b-3d3d73bec5bf"
-
-        }
-
-      }
-
-    ],
-
-    "username": "giannis fragoulis"
-
-  },
-
-  "a13306e6-ec82-40db-9ac7-15d3ddde88cf": {
-
-    "messages": [],
-
-    "username": "user1"
-
-  }
-
-}
-
-*/

@@ -261,7 +261,39 @@ const activateAccount = async (email) => {
   }
 };
 
+const addSocketId = async (socketId, email) => {
+  try {
+    const user = await Users.update(
+      { socketId: socketId },
+      { where: { email: email } }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const removeSocketId = async (email) => {
+  try {
+    const user = await Users.update(
+      { socketId: null },
+      { where: { email: email } }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
+  removeSocketId,
+  addSocketId,
   activateAccount,
   updateDeleted,
   register,
