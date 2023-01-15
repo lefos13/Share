@@ -787,6 +787,7 @@ const deleteInterested = async (req) => {
 const verInterested = async (req) => {
   try {
     var data = req.body.data;
+    let chatCreated = false;
     let msg = await determineLang(req);
     //GETING THE DATA OF THE ROW THAT IS TO BE VERIFIED
     const results = await PostInterested.findOneById(data.piid);
@@ -894,17 +895,44 @@ const verInterested = async (req) => {
         } else {
           expiresIn = moment(post.enddate).add(1, "months");
         }
-        const chatMade = await ConvUsers.saveOne({
-          convid: post.email + "_" + results.email,
-          expiresIn: expiresIn,
-          messages: null,
-        });
-        if (chatMade === false)
-          throw new Error("Error at creating new chat between the users");
+        const chatExists = await ConvUsers.checkIfExists(
+          post.email,
+          results.email
+        );
+        if (chatExists === false)
+          //error at finding chat
+          throw new Error("Error at finding if chat Exists");
+        else if (chatExists != null) {
+          //chat exists from older post so the expireDate is updated
+          const updated = await ConvUsers.updateExpireDate(
+            chatExists,
+            expiresIn
+          );
+          if (updated === false) {
+            throw new Error("Error at updating the existing chat");
+          } else if (updated === "0") {
+            chatCreated = null;
+          }
+        } else {
+          //chat doesn't exist at all so a new one is created
+          const chatMade = await ConvUsers.saveOne({
+            convid: post.email + " " + results.email,
+            expiresIn: expiresIn,
+            messages: null,
+          });
+          if (chatMade === false)
+            throw new Error("Error at creating new chat between the users");
+          chatCreated = true;
+        }
+
         //END OF CREATION OF NEW CHAT
 
         fun.toNotifyTheVerified(results.email, post.postid, post.email);
-        return { status: 200, message: msg.likerVerified };
+        return {
+          status: 200,
+          message: msg.likerVerified,
+          chatCreated: chatCreated,
+        };
       } else {
         //unverify the interested user
         const reseted = await PostInterested.resetFlags(results);
@@ -948,6 +976,35 @@ const verInterested = async (req) => {
           if (!destroyed)
             throw new Error("Error at destroying the possible review");
         }
+
+        //Delete the chat if expire date is same as the possible expire date
+        //else do not delete the chat
+        console.log(results.email, post.email);
+        let expiresIn;
+        if (post.enddate == null) {
+          expiresIn = moment(post.startdate)
+            .add(1, "months")
+            .format("YYYY-MM-DD");
+        } else {
+          expiresIn = moment(post.enddate)
+            .add(1, "months")
+            .format("YYYY-MM-DD");
+        }
+        const chat = await ConvUsers.checkIfExists(results.email, post.email);
+        // console.log(chat.convid);
+        // console.log(expiresIn.format("YYYY-MM-DD") == chat.expiresIn);
+        if (chat === false) throw new Error("error at finding existing chat");
+
+        //CHECK IF THERE IS ANY OLDER VERIFICATION OF THE USERS
+
+        //IF THERE IS ONE, CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
+        //IN THAT CASE I NEED TO UPDATE THE EXPIRATION DATE OF THE CORRESPONDING CONVERSATION
+
+        const deletedChat = await ConvUsers.deleteIfExpiresEqual(
+          chat,
+          expiresIn
+        );
+        if (deletedChat === false) throw new Error("error at deleting chat");
         return { status: 200, message: msg.likerUnverified };
       }
     } else {

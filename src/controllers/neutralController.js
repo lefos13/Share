@@ -26,7 +26,20 @@ const getTerms = async (req, res) => {
   }
 };
 
+const moreMessages = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const data = await neutralService.moreMessages(req);
+    if (data.status != 200) throw msg;
+    res.json({ data: data });
+  } catch (error) {
+    // console.log(error);
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
 module.exports = {
+  moreMessages,
   sendReport,
   getTerms,
 };

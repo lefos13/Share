@@ -1,11 +1,11 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
-POST http://localhost:3000/users/createtoken
+POST http://192.168.2.20:3000/users/createtoken
 Content-Type: application/json
 Accept-Language: EN
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 
@@ -144,13 +144,13 @@ Accept-Language: GR
 #service poy kaleis gia na deiksei kapoios endiaferon gia ena post
 POST http://localhost:3000/posts/interested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTE0VDExOjA0OjA3LjgwOFoiLCJpYXQiOjE2NzM2OTQyNDcsImV4cCI6MTY3ODg3ODI0N30.5IC3esg59oTDiqS84-AqNuHlY7wsYhaL7cddd6VX6uU
 Accept-Language: EN
 
 {
     "data": {
         "email": "user0@gmail.com",
-        "postid": 1832,
+        "postid": 1855,
         "note": "blabla"
     }
 }
@@ -302,8 +302,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 {
     "data": {
-        "postid": 1832,
-        "piid": 464
+        "postid": 1855,
+        "piid": 489
     }
 }
 
@@ -547,3 +547,18 @@ POST http://localhost:3000/users/deleteUser
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDEtMDVUMTQ6MTM6NDAuNTY3WiIsImlhdCI6MTY3MjkyODAyMCwiZXhwIjoxNjc4MTEyMDIwfQ.vecQIJHzEsoFSqEcYWsT3l-FBopqlByRxWFLwQ901ww
 Accept-Language: EN
+
+###
+POST http://localhost:3000/neutral/moreMessages
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTE1VDA5OjU3OjE3LjQ2MFoiLCJpYXQiOjE2NzM3NzY2MzcsImV4cCI6MTY3ODk2MDYzN30.OQW1vdB_PH7NFbUWyh8qoKVr_gb3cqoQHPENzoCoO1A
+Accept-Language: EN
+
+{
+    "data": {
+        "conversationId": "lefterisevagelinos1996@gmail.com user0@gmail.com",
+        "lastMessage": {
+            "_id": "0eaee02f-88a1-4ed7-829c-37a06a51e78d"
+            }
+    }
+}

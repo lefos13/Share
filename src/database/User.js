@@ -291,6 +291,23 @@ const removeSocketId = async (email) => {
   }
 };
 
+const findPerSocket = async (socketId) => {
+  try {
+    const user = await Users.findOne({
+      where: {
+        socketId: socketId,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return user;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   removeSocketId,
   addSocketId,
@@ -306,4 +323,5 @@ module.exports = {
   saveViaGoogle,
   updateLoginState,
   updateLang,
+  findPerSocket,
 };

@@ -298,14 +298,48 @@ const { IsJsonString } = require("./utils/functions");
 // };
 
 io.on("connection", (socket) => {
-  socket.on("disconnect", () => {
-    // delete users[socket.id];
-    // io.emit("action", {
-    //   type: "users_online",
-    //   data: createUsersOnline(socket.id),
-    // });
-    // conversations = conversations.filter((conv) => conv.socketId != socket.id);
-    // io.emit("action", { type: "conversations", data: conversations });
+  console.log("Someone connected");
+
+  io.to(socket.id).emit("getUserEmail");
+
+  socket.on("disconnect", async (data) => {
+    try {
+      console.log("Disconnected!!!!!", data, socket.id);
+      const user = await User.findPerSocket(socket.id);
+      if (user === false)
+        throw new Error("Cant find user that just disconnected");
+
+      const dbConvs = await ConvUsers.findAll({
+        where: {
+          convid: { [Op.substring]: user.email },
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      for await (conv of dbConvs) {
+        let emails = conv.convid.split(" ");
+        let other;
+        if (user.email != emails[0]) {
+          other = await User.findOneLight(emails[0]);
+          console.log(other);
+        } else {
+          other = await User.findOneLight(emails[1]);
+          console.log(other);
+        }
+
+        io.to(other.socketId).emit("action", {
+          type: "setIsConversationUserOnline",
+          data: {
+            conversationId: conv.convid,
+            isUserOnline: false,
+          },
+        });
+        console.log("Emitted to:", other.email, " that i am offline now!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   socket.on("action", async (action) => {
@@ -347,7 +381,7 @@ io.on("connection", (socket) => {
           _.forEach(dbConvs, (value) => {
             // console.log(value.toJSON());
             let convid = value.convid;
-            const mails = value.convid.split("_");
+            const mails = value.convid.split(" ");
             if (mails[0] != action.data.email) {
               console.log("Users that i have a chat with", mails[0]);
               otherUsers.push({
@@ -375,6 +409,14 @@ io.on("connection", (socket) => {
                 throw err;
               }
             );
+            //inform the current user of that conversation, that the user that just logged in is online
+            io.to(us.socketId).emit("action", {
+              type: "setIsConversationUserOnline",
+              data: {
+                conversationId: u.convid,
+                isUserOnline: true,
+              },
+            });
             // console.log("CONVERSATION ID SEND:", u.convid);
             data.conversationId = u.convid;
             data.socketId = socket.id; //need to change
@@ -398,20 +440,37 @@ io.on("connection", (socket) => {
               u.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
               });
-              data.messages = u.messages;
-              data.lastMessage = u.messages[0].text;
+              data.messagesLeft = u.messages.length > 20 ? true : false; //if those messages are the last 20 return false
+              //Paginate the messages and send the last 20 of them
+              var skipcount = 0;
+              var takecount = u.messages.length > 20 ? 20 : u.messages.length;
+              var finalMessages = _.take(
+                _.drop(u.messages, skipcount),
+                takecount
+              );
+
+              data.messages = finalMessages;
+              data.lastMessage = finalMessages[0].text;
               data.isLastMessageMine =
-                u.messages[0].user._id == action.data.email ? true : false;
-              data.lastMessageTime = moment(u.messages[0].createdAt).format(
-                "HH:MM:SS"
+                finalMessages[0].user._id == action.data.email ? true : false;
+              data.lastMessageTime = moment(finalMessages[0].createdAt).format(
+                "DD-MM-YYYY HH:mm"
               ); //need to change
-              data.isRead = true; //need to change
+
+              // if last message is mine then make isRead ==true
+              if (data.isLastMessageMine) {
+                data.isRead = true;
+              } else {
+                // check if the user has read it in the past
+                data.isRead = finalMessages[0].isRead;
+              }
+
               // console.log(u.messages);
             } else {
               data.messages = [];
               data.isRead = true;
               data.lastMessage = "No messages sent yet!";
-              data.lastMessageTime = "00:00:00";
+              data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
 
@@ -428,28 +487,7 @@ io.on("connection", (socket) => {
           });
           break;
 
-        case "server/app_in_background": {
-          //app in background, do not close the socket connection
-          break;
-        }
-
-        case "server/conversation_opened": {
-          //this is triggered when i get to the personal chat and the message is not read.
-          //so we must set it to read
-          console.log("Coversation opened:", action.data.conversationId);
-          // const conversationId = action.data.conversationId;
-          // const isOpened = action.data.isOpened;
-          // const itemToUpdate = conversations.find(
-          //   (item) => item.userId === conversationId
-          // );
-          // const index = conversations.indexOf(itemToUpdate);
-          // itemToUpdate.isRead = isOpened;
-          // conversations[index] = itemToUpdate;
-
-          break;
-        }
-
-        case "server/private_message":
+        case "server/private_message": {
           // console.log(action.data);
 
           // console.log(socket);
@@ -464,12 +502,20 @@ io.on("connection", (socket) => {
             return new Error("Conversation finding error");
           }
           // console.log(conversation.toJSON());
-          const mails = conversation.convid.split("_");
+          const mails = conversation.convid.split(" ");
           let receiver;
           mails[0] == fromEmail ? (receiver = mails[1]) : (receiver = mails[0]);
 
+          //get data of reciever from the db
           const recUser = await User.findOneLight(receiver);
           const recSocketId = recUser.socketId;
+
+          //if receiver is online and has openned the certain conversation, mark the message as Read. Otherwise mark it as not Read.
+          if (app.locals[receiver] == conversationId) {
+            action.data.isRead = true;
+          } else {
+            action.data.isRead = false;
+          }
 
           io.to(recSocketId).emit("action", {
             type: "private_message",
@@ -484,6 +530,193 @@ io.on("connection", (socket) => {
             conversationId,
             action.data.message
           );
+          break;
+        }
+
+        case "server/personalChatOpened": {
+          console.log("Chat opened", action.data);
+          let conversationId = action.data.conversationId;
+          let senderId = action.data.senderId;
+
+          app.locals[action.data.senderId] = conversationId;
+          let mails = conversationId.split(" ");
+          let user;
+          let other;
+          if (mails[0] == senderId) {
+            user = await User.findOneLight(mails[0]);
+            other = await User.findOneLight(mails[1]);
+          } else {
+            user = await User.findOneLight(mails[1]);
+            other = await User.findOneLight(mails[0]);
+          }
+          console.log(
+            "User to inform that his message is read: ",
+            other.toJSON()
+          );
+
+          //inform the other user that i saw the message.
+          // io.to(other.socketId).emit("action", {
+          //   type: "setIsConversationSeen",
+          //   data: {
+          //     conversationId: conversationId,
+          //     seen: true,
+          //   },
+          // });
+          //inform the user that opeed the chat that he read the last message.
+          socket.emit("action", {
+            type: "setIsConversationRead",
+            data: {
+              conversationId: conversationId,
+              isRead: true,
+            },
+          });
+
+          //get conversation and mark the last message as read
+          const conv = Conv.updateLastMessage(conversationId, senderId);
+          if (conv === false) {
+            throw new Error(
+              "something went wrong with updating the last message"
+            );
+          }
+
+          break;
+        }
+
+        case "server/personalChatClosed": {
+          console.log("Chat closed", action.data);
+          console.log("App local:", app.locals[action.data.senderId]);
+          delete app.locals[action.data.senderId];
+          break;
+        }
+
+        case "server/AppInBackground": {
+          console.log("App in background:", action.data);
+          break;
+        }
+
+        case "server/AppInForeground": {
+          console.log("App in Foreground:", action.data);
+          console.log("App locals: ", app.locals);
+          break;
+        }
+
+        case "server/updateExpirationDate": {
+          console.log(action.data);
+          let userApproving = await User.findOneLight(
+            action.data.userApproving
+          );
+          let userApproved = await User.findOneLight(action.data.userApproved);
+          const conv = await Conv.checkIfExists(
+            userApproved.email,
+            userApproving.email
+          );
+          console.log(
+            "Emitting to: ",
+            userApproving.email,
+            " and",
+            userApproved.email,
+            " the new expiration date: ",
+            conv.expiresIn
+          );
+          // send the new expiration date for the right conversation id
+          io.to(userApproved.socketId).emit("action", {
+            type: "setExpirationDate",
+            data: {
+              conversationId: conv.convid,
+              expiresIn: conv.expiresIn,
+            },
+          });
+
+          io.to(userApproving.socketId).emit("action", {
+            type: "setExpirationDate",
+            data: {
+              conversationId: conv.convid,
+              expiresIn: conv.expiresIn,
+            },
+          });
+          break;
+        }
+
+        case "server/replace_socket_id": {
+          let email = action.data.senderEmail;
+          let user = await User.findOneLight(email);
+          user.update({ socketId: socket.id }).catch((err) => {
+            throw err;
+          });
+          break;
+        }
+        case "server/handShakeEstablished": {
+          let userOnline = false;
+          let userApproving = await User.findOneLight(
+            action.data.userApproving
+          );
+          let userApproved = await User.findOneLight(action.data.userApproved);
+          const conv = await Conv.checkIfExists(
+            userApproved.email,
+            userApproving.email
+          );
+
+          // send new conversation to both users.
+          // send the new expiration date for the right conversation id
+          // PREPARE DATA TO SEND TO BOTH USERS
+          let socketList = await io.fetchSockets();
+          // console.log(socketList);
+          _.forEach(socketList, (val) => {
+            // console.log(val.id);
+            if (val.id == userApproving.socketId) userOnline = true;
+          });
+
+          const dataForApprooved = {
+            conversationId: conv.convid,
+            socketId: userApproving.socketId,
+            username: userApproving.fullname,
+            photo: "images/" + userApproving.email + ".jpeg",
+            email: userApproving.email,
+            isUserOnline: userOnline,
+            expiresIn: conv.expiresIn,
+            messages: conv.messages,
+            isRead: true,
+            lastMessage: "No messages sent yet!",
+            lastMessageTime: null,
+            isLastMessageMine: false,
+          };
+
+          let user2Online = false;
+          // console.log(socketList);
+          _.forEach(socketList, (val) => {
+            // console.log(val.id);
+            if (val.id == userApproved.socketId) user2Online = true;
+          });
+          const dataForApprooving = {
+            conversationId: conv.convid,
+            socketId: userApproved.socketId,
+            username: userApproved.fullname,
+            photo: "images/" + userApproved.email + ".jpeg",
+            email: userApproved.email,
+            isUserOnline: user2Online,
+            expiresIn: conv.expiresIn,
+            messages: conv.messages,
+            isRead: true,
+            lastMessage: "No messages sent yet!",
+            lastMessageTime: null,
+            isLastMessageMine: false,
+          };
+
+          io.to(userApproved.socketId).emit("action", {
+            type: "onConversationAdded",
+            data: {
+              conversation: dataForApprooved,
+            },
+          });
+
+          io.to(userApproving.socketId).emit("action", {
+            type: "onConversationAdded",
+            data: {
+              conversation: dataForApprooving,
+            },
+          });
+          break;
+        }
       }
     } catch (error) {
       console.log(error);
