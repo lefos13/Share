@@ -300,7 +300,10 @@ const { IsJsonString } = require("./utils/functions");
 io.on("connection", (socket) => {
   console.log("Someone connected");
 
-  io.to(socket.id).emit("getUserEmail");
+  socket.emit("action", {
+    type: "getUserEmail",
+    data: {},
+  });
 
   socket.on("disconnect", async (data) => {
     try {
@@ -474,7 +477,7 @@ io.on("connection", (socket) => {
               data.isLastMessageMine = false;
             }
 
-            console.log(data);
+            // console.log(data);
             conversations.push(data);
           }
 
@@ -595,8 +598,8 @@ io.on("connection", (socket) => {
         }
 
         case "server/AppInForeground": {
-          console.log("App in Foreground:", action.data);
-          console.log("App locals: ", app.locals);
+          console.log("App in Foreground:");
+
           break;
         }
 
@@ -638,6 +641,7 @@ io.on("connection", (socket) => {
         }
 
         case "server/replace_socket_id": {
+          console.log("replACE SOCKET:", action.data);
           let email = action.data.senderEmail;
           let user = await User.findOneLight(email);
           user.update({ socketId: socket.id }).catch((err) => {
@@ -645,6 +649,7 @@ io.on("connection", (socket) => {
           });
           break;
         }
+
         case "server/handShakeEstablished": {
           let userOnline = false;
           let userApproving = await User.findOneLight(
