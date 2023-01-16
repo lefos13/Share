@@ -298,7 +298,7 @@ const { IsJsonString } = require("./utils/functions");
 // };
 
 io.on("connection", (socket) => {
-  console.log("Someone connected");
+  console.log("Someone connected:", socket.id);
 
   socket.emit("action", {
     type: "getUserEmail",
@@ -641,7 +641,7 @@ io.on("connection", (socket) => {
         }
 
         case "server/replace_socket_id": {
-          console.log("replACE SOCKET:", action.data);
+          console.log("replACE SOCKET:", action.data, socket.id);
           let email = action.data.senderEmail;
           let user = await User.findOneLight(email);
           user.update({ socketId: socket.id }).catch((err) => {
