@@ -31,7 +31,10 @@ const moreMessages = async (req, res) => {
     let msg = await determineLang(req);
     const data = await neutralService.moreMessages(req);
     if (data.status != 200) throw msg;
-    res.json({ data: data });
+    res.json({
+      messages: data.data.finalMessages,
+      messagesLeft: data.data.messagesLeft,
+    });
   } catch (error) {
     // console.log(error);
     res.status(500).json({ message: error.errorMessage });

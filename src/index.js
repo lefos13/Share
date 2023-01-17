@@ -281,21 +281,8 @@ let server = http.listen(port, () =>
 //socket functionality for chat
 let io = require("socket.io")(server);
 
-const { v4: uuidv4 } = require("uuid");
 const Users = require("./modules/user");
-const { valuesIn } = require("lodash");
 const { IsJsonString } = require("./utils/functions");
-
-// const users = {};
-
-// let conversations = [];
-
-// const createUsersOnline = (userId) => {
-//   const values = Object.values(users);
-//   const onlyWithUsernames = values.filter((u) => u.username != undefined);
-//   console.log({ onlyWithUsernames });
-//   return onlyWithUsernames;
-// };
 
 io.on("connection", (socket) => {
   console.log("Someone connected:", socket.id);
@@ -325,10 +312,10 @@ io.on("connection", (socket) => {
         let other;
         if (user.email != emails[0]) {
           other = await User.findOneLight(emails[0]);
-          console.log(other);
+          // console.log(other);
         } else {
           other = await User.findOneLight(emails[1]);
-          console.log(other);
+          // console.log(other);
         }
 
         io.to(other.socketId).emit("action", {
@@ -339,6 +326,12 @@ io.on("connection", (socket) => {
           },
         });
         console.log("Emitted to:", other.email, " that i am offline now!");
+        //delete states of user conversations
+      }
+      if (app.locals[user.email] != null) {
+        // console.log(app.locals[user.email]);
+        delete app.locals[user.email];
+        // console.log(app.locals[user.email]);
       }
     } catch (error) {
       console.log(error);
@@ -470,6 +463,7 @@ io.on("connection", (socket) => {
 
               // console.log(u.messages);
             } else {
+              console.log("NO MESSAGES FOUND!");
               data.messages = [];
               data.isRead = true;
               data.lastMessage = "No messages sent yet!";
@@ -480,7 +474,7 @@ io.on("connection", (socket) => {
             // console.log(data);
             conversations.push(data);
           }
-
+          console.log(conversations);
           //i use io emit to emit in all sockets connected
           //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
           socket.emit("action", { type: "conversations", data: conversations });
@@ -515,9 +509,9 @@ io.on("connection", (socket) => {
 
           //if receiver is online and has openned the certain conversation, mark the message as Read. Otherwise mark it as not Read.
           if (app.locals[receiver] == conversationId) {
-            action.data.isRead = true;
+            action.data.message.isRead = true;
           } else {
-            action.data.isRead = false;
+            action.data.message.isRead = false;
           }
 
           io.to(recSocketId).emit("action", {
@@ -527,6 +521,12 @@ io.on("connection", (socket) => {
               conversationId: conversationId,
               senderEmail: fromEmail,
             },
+          });
+
+          console.log({
+            ...action.data,
+            conversationId: conversationId,
+            senderEmail: fromEmail,
           });
 
           const addedMessage = await Conv.addMessage(
@@ -554,7 +554,8 @@ io.on("connection", (socket) => {
           }
           console.log(
             "User to inform that his message is read: ",
-            other.toJSON()
+            other.email,
+            "NOT YET READY!"
           );
 
           //inform the other user that i saw the message.
@@ -566,6 +567,7 @@ io.on("connection", (socket) => {
           //   },
           // });
           //inform the user that opeed the chat that he read the last message.
+
           socket.emit("action", {
             type: "setIsConversationRead",
             data: {
@@ -594,12 +596,14 @@ io.on("connection", (socket) => {
 
         case "server/AppInBackground": {
           console.log("App in background:", action.data);
+          //user should be offline right now.
+          //notifications should be send if the user is in the background
           break;
         }
 
         case "server/AppInForeground": {
           console.log("App in Foreground:");
-
+          //user should be again online
           break;
         }
 
@@ -728,3 +732,6 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+const ioObject = io;
+module.exports.io = ioObject;

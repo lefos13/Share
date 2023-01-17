@@ -42,6 +42,8 @@ moment.locale("el");
 const RFC_H = "DD/MM/YYYY HH:mm";
 const RFC_ONLYM = "DD/MM/YYYY";
 
+const socket = require("../index");
+
 // create post service
 const createNewPost = async (data, req) => {
   try {
@@ -131,6 +133,7 @@ const interested = async (req) => {
           message: msg.tenInterest,
         };
       } else {
+        //CASE THAT INTEREST IS TO BE CREATED
         const inter = await PostInterested.createInterest(row);
         // console.log(inter.date);
         if (inter === false)
@@ -153,11 +156,42 @@ const interested = async (req) => {
         };
       }
     } else {
+      //Potential expirition date of a chat
+      let post = await Post.findOne(row.postid);
+      let expiresIn;
+      if (post.enddate == null) {
+        expiresIn = moment(post.startdate)
+          .add(1, "months")
+          .format("YYYY-MM-DD");
+      } else {
+        expiresIn = moment(post.enddate).add(1, "months").format("YYYY-MM-DD");
+      }
+
+      //delete the interest of the user for the specific post
       const deleted = await PostInterested.destroyOne(row.email, row.postid);
-      if (deleted == true) {
+      if (deleted === false) {
+        throw new Error("Something went wrong with canceling the interest");
+      }
+
+      //check if there are a chat between those user
+      const chat = await ConvUsers.checkIfExists(post.email, row.email);
+      if (chat === false) throw new Error("error at finding existing chat");
+      else if (chat == null) {
+        return { status: 200, message: msg.cancelInterest };
+      }
+
+      //delete the chat if the expire dates are equal
+      const deletedChat = await ConvUsers.deleteIfExpiresEqual(chat, expiresIn);
+      if (deletedChat === "0") throw new Error("error at deleting chat");
+      else if (deletedChat === false) {
         return { status: 200, message: msg.cancelInterest };
       } else {
-        throw new Error("Something went wrong with canceling the interest");
+        return {
+          //return the conversation id if the chat is deleted
+          status: 200,
+          message: msg.cancelInterest,
+          convDeleted: deletedChat,
+        };
       }
     }
   } catch (error) {
@@ -788,6 +822,7 @@ const verInterested = async (req) => {
   try {
     var data = req.body.data;
     let chatCreated = false;
+    let io = socket.io;
     let msg = await determineLang(req);
     //GETING THE DATA OF THE ROW THAT IS TO BE VERIFIED
     const results = await PostInterested.findOneById(data.piid);
@@ -1004,8 +1039,17 @@ const verInterested = async (req) => {
           chat,
           expiresIn
         );
-        if (deletedChat === false) throw new Error("error at deleting chat");
-        return { status: 200, message: msg.likerUnverified };
+        if (deletedChat === "0") throw new Error("error at deleting chat");
+        else if (deletedChat === false) {
+          return { status: 200, message: msg.likerUnverified };
+        } else {
+          return {
+            //return the conversation id if the chat is deleted
+            status: 200,
+            message: msg.likerUnverified,
+            convDeleted: deletedChat,
+          };
+        }
       }
     } else {
       return {
