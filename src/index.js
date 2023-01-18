@@ -374,7 +374,7 @@ io.on("connection", (socket) => {
           });
 
           // part2
-          _.forEach(dbConvs, (value) => {
+          for await (value of dbConvs) {
             // console.log(value.toJSON());
             let convid = value.convid;
             const mails = value.convid.split(" ");
@@ -395,7 +395,7 @@ io.on("connection", (socket) => {
                 convid: convid,
               });
             }
-          });
+          }
 
           //import into convs list all the data that are required for the emition
           for await (u of otherUsers) {
@@ -430,7 +430,7 @@ io.on("connection", (socket) => {
             });
 
             data.expiresIn = u.expiresIn;
-            if (IsJsonString(u.messages) && u.messages != null) {
+            if (u.messages !== null) {
               // order
               u.messages = JSON.parse(u.messages);
               u.messages.sort((a, b) => {
@@ -683,7 +683,7 @@ io.on("connection", (socket) => {
             email: userApproving.email,
             isUserOnline: userOnline,
             expiresIn: conv.expiresIn,
-            messages: conv.messages,
+            messages: [],
             isRead: true,
             lastMessage: "No messages sent yet!",
             lastMessageTime: null,
@@ -704,7 +704,7 @@ io.on("connection", (socket) => {
             email: userApproved.email,
             isUserOnline: user2Online,
             expiresIn: conv.expiresIn,
-            messages: conv.messages,
+            messages: [],
             isRead: true,
             lastMessage: "No messages sent yet!",
             lastMessageTime: null,

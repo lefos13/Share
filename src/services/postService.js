@@ -186,6 +186,21 @@ const interested = async (req) => {
       else if (deletedChat === false) {
         return { status: 200, message: msg.cancelInterest };
       } else {
+        const user1 = await User.findOneLight(post.email);
+        const user2 = await User.findOneLight(row.email);
+        // console.log("Conversation id to remove: ", chat.convid);
+        io.to(user1.socketId).emit("action", {
+          type: "onConversationRemoved",
+          data: {
+            conversation: chat.convid,
+          },
+        });
+        io.to(user2.socketId).emit("action", {
+          type: "onConversationRemoved",
+          data: {
+            conversation: chat.convid,
+          },
+        });
         return {
           //return the conversation id if the chat is deleted
           status: 200,
@@ -961,7 +976,23 @@ const verInterested = async (req) => {
         }
 
         //END OF CREATION OF NEW CHAT
-
+        // console.log("SENDING FAKE MESSAGE FROM API");
+        // const fakeUser = await User.findOneLight(post.email);
+        // io.to(fakeUser.socketId).emit("action", {
+        //   type: "private_message",
+        //   data: {
+        //     message: {
+        //       text: "test message from API",
+        //       user: { _id: "lefterisevagelinos1996@gmail.com" },
+        //       createdAt: "2023-01-17T19:01:40.007Z",
+        //       _id: "d4f4499e-8add-4b58-9474-3540bfe6824b",
+        //       isRead: false,
+        //     },
+        //     conversationId: "lefterisevagelinos1996@gmail.com user0@gmail.com",
+        //     senderId: "lefterisevagelinos1996@gmail.com",
+        //     senderEmail: "lefterisevagelinos1996@gmail.com",
+        //   },
+        // });
         fun.toNotifyTheVerified(results.email, post.postid, post.email);
         return {
           status: 200,
@@ -1043,8 +1074,24 @@ const verInterested = async (req) => {
         else if (deletedChat === false) {
           return { status: 200, message: msg.likerUnverified };
         } else {
+          const user1 = await User.findOneLight(post.email);
+          const user2 = await User.findOneLight(results.email);
+          // console.log("Conversation id to remove: ", chat.convid);
+          io.to(user1.socketId).emit("action", {
+            type: "onConversationRemoved",
+            data: {
+              conversation: chat.convid,
+            },
+          });
+          io.to(user2.socketId).emit("action", {
+            type: "onConversationRemoved",
+            data: {
+              conversation: chat.convid,
+            },
+          });
           return {
             //return the conversation id if the chat is deleted
+
             status: 200,
             message: msg.likerUnverified,
             convDeleted: deletedChat,
