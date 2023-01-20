@@ -80,6 +80,7 @@ const createNewPost = async (data, req) => {
 
 const interested = async (req) => {
   try {
+    const io = socket.io;
     let extra = req.body.extra;
     // console.log(req.query);
     let data = req.body.data;
@@ -182,6 +183,7 @@ const interested = async (req) => {
 
       //delete the chat if the expire dates are equal
       const deletedChat = await ConvUsers.deleteIfExpiresEqual(chat, expiresIn);
+      console.log(deletedChat);
       if (deletedChat === "0") throw new Error("error at deleting chat");
       else if (deletedChat === false) {
         return { status: 200, message: msg.cancelInterest };

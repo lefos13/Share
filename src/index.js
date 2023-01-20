@@ -284,6 +284,8 @@ let io = require("socket.io")(server);
 const Users = require("./modules/user");
 const { IsJsonString } = require("./utils/functions");
 
+app.locals["bg"] = {};
+
 io.on("connection", (socket) => {
   console.log("Someone connected:", socket.id);
 
@@ -507,11 +509,13 @@ io.on("connection", (socket) => {
           const recUser = await User.findOneLight(receiver);
           const recSocketId = recUser.socketId;
 
-          //if receiver is online and has openned the certain conversation, mark the message as Read. Otherwise mark it as not Read.
+          //if receiver is online and has openned the certain conversation, mark the message as Seen and Read. Otherwise mark it as not Read.
           if (app.locals[receiver] == conversationId) {
             action.data.message.isRead = true;
+            action.data.message.seen = true;
           } else {
             action.data.message.isRead = false;
+            action.data.message.seen = false;
           }
 
           io.to(recSocketId).emit("action", {
@@ -552,22 +556,32 @@ io.on("connection", (socket) => {
             user = await User.findOneLight(mails[1]);
             other = await User.findOneLight(mails[0]);
           }
-          console.log(
-            "User to inform that his message is read: ",
-            other.email,
-            "NOT YET READY!"
-          );
+          // console.log(
+          //   "User to inform that his message is read: ",
+          //   other.email,
+          //   "NOT YET READY!"
+          // );
+          let seen = false;
+          //inform the other user (if he is online) that i saw the message. (Even if the last message isnt his/hers)
+          let socketList = await io.fetchSockets();
+          let online = false;
+          _.forEach(socketList, (val) => {
+            if (val.id == other.socketId) online = true;
+          });
+          console.log("Other User Online: ", online);
+          if (online) {
+            seen = true;
+            console.log("Send to, ", other.email, "That his message is read!");
+            io.to(other.socketId).emit("action", {
+              type: "setConversationSeen",
+              data: {
+                conversationId: conversationId,
+                seen: true,
+              },
+            });
+          }
 
-          //inform the other user that i saw the message.
-          // io.to(other.socketId).emit("action", {
-          //   type: "setIsConversationSeen",
-          //   data: {
-          //     conversationId: conversationId,
-          //     seen: true,
-          //   },
-          // });
           //inform the user that opeed the chat that he read the last message.
-
           socket.emit("action", {
             type: "setIsConversationRead",
             data: {
@@ -577,7 +591,7 @@ io.on("connection", (socket) => {
           });
 
           //get conversation and mark the last message as read
-          const conv = Conv.updateLastMessage(conversationId, senderId);
+          const conv = Conv.updateLastMessage(conversationId, senderId, seen);
           if (conv === false) {
             throw new Error(
               "something went wrong with updating the last message"
@@ -596,14 +610,71 @@ io.on("connection", (socket) => {
 
         case "server/AppInBackground": {
           console.log("App in background:", action.data);
+          let sender = action.data.senderEmail;
+          app.locals.bg[sender] = true;
           //user should be offline right now.
           //notifications should be send if the user is in the background
+          const dbConvs = await Conv.findAll(sender);
+          for await (let conv of dbConvs) {
+            let emails = conv.convid.split(" ");
+            let other = emails[0] == sender ? emails[1] : emails[0];
+            const otherUser = await User.findOneLight(other);
+            io.to(otherUser.socketId).emit("action", {
+              type: "setIsConversationUserOnline",
+              data: {
+                conversationId: conv.convid,
+                isUserOnline: false,
+              },
+            });
+          }
+
           break;
         }
 
         case "server/AppInForeground": {
           console.log("App in Foreground:");
+          let sender = action.data.senderEmail;
           //user should be again online
+          delete app.locals.bg[action.data.senderEmail];
+
+          const dbConvs = await Conv.findAll(sender);
+          for await (let conv of dbConvs) {
+            let emails = conv.convid.split(" ");
+            let other = emails[0] == sender ? emails[1] : emails[0];
+            const otherUser = await User.findOneLight(other);
+            io.to(otherUser.socketId).emit("action", {
+              type: "setIsConversationUserOnline",
+              data: {
+                conversationId: conv.convid,
+                isUserOnline: true,
+              },
+            });
+          }
+          break;
+        }
+
+        case "server/ActiveConversationInBackground": {
+          console.log("App in background with active Conversation");
+          console.log(action.data);
+          const user = await User.findPerSocket(socket.id);
+          delete app.locals[user.email];
+          break;
+        }
+
+        case "server/ActiveConversationInForeground": {
+          console.log("App in Foreground with active Conversation");
+          // console.log(action.data);
+          const conversationId = action.data.conversationId;
+          const user = await User.findPerSocket(socket.id);
+          app.locals[user.email] = action.data.conversationId;
+          // I NEED TO MARK THE LAST MESSAGE AS READ AND SEEN
+          //get conversation and mark the last message as read
+          const conv = Conv.updateLastMessage(conversationId, user.email);
+          if (conv === false) {
+            throw new Error(
+              "something went wrong with updating the last message"
+            );
+          }
           break;
         }
 

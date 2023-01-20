@@ -38,6 +38,23 @@ const findOne = async (convid) => {
   }
 };
 
+const findAll = async (email) => {
+  try {
+    const dbConvs = await ConvUsers.findAll({
+      where: {
+        convid: { [Op.substring]: email },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return dbConvs;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 const addMessage = async (convid, message) => {
   try {
     let results = await ConvUsers.findOne({
@@ -67,7 +84,7 @@ const addMessage = async (convid, message) => {
   }
 };
 
-const updateLastMessage = async (convid, email) => {
+const updateLastMessage = async (convid, email, seen) => {
   try {
     let results = await ConvUsers.findOne({
       where: {
@@ -89,6 +106,7 @@ const updateLastMessage = async (convid, email) => {
         } else {
           console.log("The last message is not Mine!!");
           messages[0].isRead = true;
+          messages[0].seen = true;
           await results
             .update({ messages: JSON.stringify(messages) })
             .catch((err) => {
@@ -161,6 +179,7 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
   }
 };
 module.exports = {
+  findAll,
   deleteIfExpiresEqual,
   updateExpireDate,
   checkIfExists,
