@@ -513,6 +513,13 @@ io.on("connection", (socket) => {
           if (app.locals[receiver] == conversationId) {
             action.data.message.isRead = true;
             action.data.message.seen = true;
+            socket.emit("action", {
+              type: "setConversationSeen",
+              data: {
+                conversationId: conversationId,
+                seen: true,
+              },
+            });
           } else {
             action.data.message.isRead = false;
             action.data.message.seen = false;
