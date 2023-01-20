@@ -676,6 +676,24 @@ io.on("connection", (socket) => {
           app.locals[user.email] = action.data.conversationId;
           // I NEED TO MARK THE LAST MESSAGE AS READ AND SEEN
           //get conversation and mark the last message as read
+          let mails = conversationId.split(" ");
+          // const con = await Conv.checkIfExists(mails[0],mails[1]);
+          let other = mails[0] == user.email ? mails[1] : mails[0];
+          const otherUser = await User.findOneLight(other);
+          let socketList = await io.fetchSockets();
+          let online = false;
+          _.forEach(socketList, (val) => {
+            if (val.id == otherUser.socketId) online = true;
+          });
+          if (online)
+            io.to(otherUser.socketId).emit("action", {
+              type: "setConversationSeen",
+              data: {
+                conversationId: conversationId,
+                seen: true,
+              },
+            });
+
           const conv = Conv.updateLastMessage(conversationId, user.email);
           if (conv === false) {
             throw new Error(

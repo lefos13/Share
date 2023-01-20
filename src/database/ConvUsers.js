@@ -127,8 +127,8 @@ const checkIfExists = async (email1, email2) => {
     //Find all user's active chats and part2: extract the other user
     const conv = await ConvUsers.findOne({
       where: {
-        convid: { [Op.substring]: email1 },
-        convid: { [Op.substring]: email2 },
+        convid: email1 + " " + email2,
+        convid: email2 + " " + email1,
       },
     }).catch((err) => {
       throw err;

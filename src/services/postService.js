@@ -943,10 +943,12 @@ const verInterested = async (req) => {
         //CREATION OF NEW CHAT
         let expiresIn;
         if (post.enddate == null) {
+          //change for the return date also
           expiresIn = moment(post.startdate).add(1, "months");
         } else {
           expiresIn = moment(post.enddate).add(1, "months");
         }
+
         const chatExists = await ConvUsers.checkIfExists(
           post.email,
           results.email
