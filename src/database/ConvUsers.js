@@ -125,10 +125,10 @@ const updateLastMessage = async (convid, email, seen) => {
 const checkIfExists = async (email1, email2) => {
   try {
     //Find all user's active chats and part2: extract the other user
+    console.log("QUERY TO FIND THE DAMN CHAT:");
     const conv = await ConvUsers.findOne({
       where: {
-        convid: email1 + " " + email2,
-        convid: email2 + " " + email1,
+        convid: { [Op.or]: [email1 + " " + email2, email2 + " " + email1] },
       },
     }).catch((err) => {
       throw err;
