@@ -178,7 +178,29 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
     return "0";
   }
 };
+
+const updateDate = async (convid, date) => {
+  try {
+    const updated = await ConvUsers.update(
+      {
+        expiresIn: date,
+      },
+      {
+        where: {
+          convid: convid,
+        },
+      }
+    ).catch((err) => {
+      throw err;
+    });
+
+    return true;
+  } catch (error) {
+    console.log(error, "IN UPDATEDATE OF CONVUSERS");
+  }
+};
 module.exports = {
+  updateDate,
   findAll,
   deleteIfExpiresEqual,
   updateExpireDate,

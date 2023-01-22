@@ -260,7 +260,7 @@ language: EN
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "user0@gmail.com"
     }
 }
 

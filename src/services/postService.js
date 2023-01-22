@@ -664,6 +664,7 @@ const getInterestedPerUser = async (req) => {
           imagePath: image,
           post: tempPost,
           interested: true,
+          isApproved: postI.isVerified,
         };
         array.push(results);
       }
@@ -948,7 +949,7 @@ const verInterested = async (req) => {
         } else {
           expiresIn = moment(post.enddate).add(1, "months");
         }
-
+        console.log("NEW EXPIRATION DATE", expiresIn);
         const chatExists = await ConvUsers.checkIfExists(
           post.email,
           results.email
@@ -958,6 +959,7 @@ const verInterested = async (req) => {
           throw new Error("Error at finding if chat Exists");
         else if (chatExists != null) {
           //chat exists from older post so the expireDate is updated
+          console.log("Chat to be updated:", chatExists.convid);
           const updated = await ConvUsers.updateExpireDate(
             chatExists,
             expiresIn
@@ -980,23 +982,7 @@ const verInterested = async (req) => {
         }
 
         //END OF CREATION OF NEW CHAT
-        // console.log("SENDING FAKE MESSAGE FROM API");
-        // const fakeUser = await User.findOneLight(post.email);
-        // io.to(fakeUser.socketId).emit("action", {
-        //   type: "private_message",
-        //   data: {
-        //     message: {
-        //       text: "test message from API",
-        //       user: { _id: "lefterisevagelinos1996@gmail.com" },
-        //       createdAt: "2023-01-17T19:01:40.007Z",
-        //       _id: "d4f4499e-8add-4b58-9474-3540bfe6824b",
-        //       isRead: false,
-        //     },
-        //     conversationId: "lefterisevagelinos1996@gmail.com user0@gmail.com",
-        //     senderId: "lefterisevagelinos1996@gmail.com",
-        //     senderEmail: "lefterisevagelinos1996@gmail.com",
-        //   },
-        // });
+
         fun.toNotifyTheVerified(results.email, post.postid, post.email);
         return {
           status: 200,
@@ -1047,8 +1033,7 @@ const verInterested = async (req) => {
             throw new Error("Error at destroying the possible review");
         }
 
-        //Delete the chat if expire date is same as the possible expire date
-        //else do not delete the chat
+        //Delete the chat if ....
         console.log(results.email, post.email);
         let expiresIn;
         if (post.enddate == null) {
@@ -1066,40 +1051,161 @@ const verInterested = async (req) => {
         if (chat === false) throw new Error("error at finding existing chat");
 
         //CHECK IF THERE IS ANY OLDER VERIFICATION OF THE USERS
-
-        //IF THERE IS ONE, CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
-        //IN THAT CASE I NEED TO UPDATE THE EXPIRATION DATE OF THE CORRESPONDING CONVERSATION
-
-        const deletedChat = await ConvUsers.deleteIfExpiresEqual(
-          chat,
-          expiresIn
+        let curDate = moment();
+        //find all active posts of passenger
+        let allActivePassenger = await Post.findAllActive(
+          results.email,
+          curDate
         );
-        if (deletedChat === "0") throw new Error("error at deleting chat");
-        else if (deletedChat === false) {
-          return { status: 200, message: msg.likerUnverified };
-        } else {
-          const user1 = await User.findOneLight(post.email);
-          const user2 = await User.findOneLight(results.email);
-          // console.log("Conversation id to remove: ", chat.convid);
-          io.to(user1.socketId).emit("action", {
-            type: "onConversationRemoved",
-            data: {
-              conversation: chat.convid,
-            },
-          });
-          io.to(user2.socketId).emit("action", {
-            type: "onConversationRemoved",
-            data: {
-              conversation: chat.convid,
-            },
-          });
-          return {
-            //return the conversation id if the chat is deleted
+        //find all active posts of driver
+        let allActiveDriver = await Post.findAllActive(post.email, curDate);
+        let postListPassenger = [];
+        let postListDriver = [];
+        //get all the ids of passenger
+        _.forEach(allActivePassenger, (val) => {
+          postListPassenger.push(val.postid);
+        });
+        //get all the ids of driver
+        _.forEach(allActiveDriver, (val) => {
+          postListDriver.push(val.postid);
+        });
+        // find if the passenger is interested and verified to any of the posts of driver
+        let allVerPassenger = [];
+        if (postListDriver.length > 0)
+          allVerPassenger = await PostInterested.findAllVerifedPerPost(
+            results.email,
+            postListDriver
+          );
+        // find if the driver is interested and verified to any of the posts of passenger
+        let allVerDriver = [];
+        if (postListPassenger.length > 0)
+          allVerDriver = await PostInterested.findAllVerifedPerPost(
+            post.email,
+            postListPassenger
+          );
 
-            status: 200,
-            message: msg.likerUnverified,
-            convDeleted: deletedChat,
-          };
+        let expirationDates = [];
+        if (allVerPassenger.length > 0) {
+          // get the expiration dates
+          _.forEach(allVerPassenger, (val) => {
+            _.forEach(allActiveDriver, (postv) => {
+              if (val.postid == postv.postid) {
+                console.log(
+                  "FOUND A POST THAT PASSENGER IS ALREADY VERIFIED BY DRIVER",
+                  postv.postid
+                );
+                let expires;
+                if (postv.enddate == null) {
+                  expires = moment(postv.startdate)
+                    .add(1, "months")
+                    .format("YYYY-MM-DD");
+                } else {
+                  expires = moment(postv.enddate)
+                    .add(1, "months")
+                    .format("YYYY-MM-DD");
+                }
+                expirationDates.push(expires);
+              }
+            });
+          });
+        }
+        if (allVerDriver.length > 0) {
+          // get the expiration dates
+          _.forEach(allVerDriver, (val) => {
+            _.forEach(allActivePassenger, (postv) => {
+              if (val.postid == postv.postid) {
+                console.log(
+                  "FOUND A POST THAT DRIVER IS ALREADY VERIFIED BY PASSENGER",
+                  postv.postid
+                );
+                let expires;
+                if (postv.enddate == null) {
+                  expires = moment(postv.startdate)
+                    .add(1, "months")
+                    .format("YYYY-MM-DD");
+                } else {
+                  expires = moment(postv.enddate)
+                    .add(1, "months")
+                    .format("YYYY-MM-DD");
+                }
+                expirationDates.push(expires);
+              }
+            });
+          });
+        }
+        console.log(expirationDates);
+        let toDelete = true;
+        if (expirationDates.length > 0) {
+          toDelete = false;
+
+          //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
+          expirationDates = expirationDates.map((d) => moment(d));
+          let maxDate = moment.max(expirationDates);
+          console.log("The biggest date after current chat date is", maxDate);
+          //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
+
+          let updated = await ConvUsers.updateDate(chat.convid, maxDate);
+          if (updated === false)
+            throw new Error("Didnt update the conv expiration date");
+          //EMIT THE EXPIRATION DATE CHANGE
+          let driver = await User.findOneLight(post.email);
+          io.to(driver.socketId).emit("action", {
+            type: "setExpirationDate",
+            data: {
+              conversationId: chat.convid,
+              expiresIn: maxDate.format("YYYY-MM-DD"),
+            },
+          });
+
+          let passenger = await User.findOneLight(results.email);
+          io.to(passenger.socketId).emit("action", {
+            type: "setExpirationDate",
+            data: {
+              conversationId: chat.convid,
+              expiresIn: maxDate.format("YYYY-MM-DD"),
+            },
+          });
+        } else {
+          console.log(
+            "FOUND NO OTHER VERIFIED POSTS SO I CAN UPDATE THE EXPIRATION DATE OF THE COVERSATION"
+          );
+        }
+
+        if (toDelete) {
+          const deletedChat = await ConvUsers.deleteIfExpiresEqual(
+            chat,
+            expiresIn
+          );
+
+          if (deletedChat === "0") throw new Error("error at deleting chat");
+          else if (deletedChat === false) {
+            return { status: 200, message: msg.likerUnverified };
+          } else {
+            const user1 = await User.findOneLight(post.email);
+            const user2 = await User.findOneLight(results.email);
+            // console.log("Conversation id to remove: ", chat.convid);
+            io.to(user1.socketId).emit("action", {
+              type: "onConversationRemoved",
+              data: {
+                conversation: chat.convid,
+              },
+            });
+            io.to(user2.socketId).emit("action", {
+              type: "onConversationRemoved",
+              data: {
+                conversation: chat.convid,
+              },
+            });
+            return {
+              //return the conversation id if the chat is deleted
+
+              status: 200,
+              message: msg.likerUnverified,
+              convDeleted: deletedChat,
+            };
+          }
+        } else {
+          return { status: 200, message: msg.likerUnverified };
         }
       }
     } else {
