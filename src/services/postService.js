@@ -730,6 +730,7 @@ const getInterestedPerUser = async (req) => {
   try {
     var data = req.body.data;
     let msg = await determineLang(req);
+    //GET ALL INTERESTS OF A USER
     let found = await PostInterested.findAny(data.email);
     if (found === false) {
       throw new Error("Error at getting all the interests");
@@ -739,24 +740,30 @@ const getInterestedPerUser = async (req) => {
     // console.log(found);
 
     let array = [];
-    for await (postI of found) {
+    // FOR EACH INTEREST
+    for await (let postI of found) {
       let curDate = moment();
 
+      //FIND THE POST ONLY IF THE POST IS ACTIVE
       let post = await Post.findOneNotOwnerGTEToday(
         postI.postid,
         data.email,
         curDate
       );
+      //IF YOU FOUND SUCH A POST
       if (post != null) {
+        // PARSE THE MOREPLACES IF THERE IS ANY
         if (IsJsonString(post.moreplaces)) {
           post.moreplaces = JSON.parse(post.moreplaces);
         }
+        //NULIFY THE ISFAVOURITE VALUE (WE DONT NEED IT HERE)
         post.dataValues.isFavourite = false;
+        //MAKE THE DATE OF INTEREST THE RIGHT FORMAT
         postI.dataValues.date = moment(postI.dataValues.date).format(RFC_H);
-
+        //MAKE ALL THE OTHER DATES THE RIGHT FORMAT
         post = await fun.fixAllDates(post);
 
-        // sugxwneush post kai stoixeia endiaferomenou
+        // CHECK IF THE USER IS NOTIFIED (OLD CASE)
         if (postI.isNotified === false) {
           let flag = await PostInterested.updateNotify(postI);
           if (flag == null) {
@@ -773,23 +780,30 @@ const getInterestedPerUser = async (req) => {
             ...post.dataValues,
             ...{ withColor: false },
           };
+
+        // ADD THE RIGHT DATA OF THE INTERESTED OBJECT
         let tempPost = {
           ...post.dataValues,
           ...{ piid: postI.piid, dateOfInterest: postI.date },
         };
 
+        // GET THE DATA OF THE OWNER OF THE POST
         let user = await User.findOneLight(post.dataValues.email);
         if (user === false) {
           throw new Error("Error at finding the user of the post");
         }
 
+        //INSERT THE AVERAGE RATING VALUES TO THE OBJECT OF THE USER
         let extraData = await insertAver(user);
-
         user.dataValues = { ...user.dataValues, ...extraData };
+
+        // CHECK IF THERE IS AN IMAGE SO DEFINE IT
         let image = null;
         if (user.photo !== null) {
           image = "images/" + user.email + ".jpeg";
         }
+
+        // SUM UP THE RESULTS AND PUSH THEM INTO AN ARRAY
         let results = {
           user: user,
           imagePath: image,
@@ -800,6 +814,7 @@ const getInterestedPerUser = async (req) => {
         array.push(results);
       }
     }
+    // IF YOU DIDNT FIND ANY RETURN 404
     if (array.length == 0) {
       // console.log("DEN VRIKA TIPOTA!!!!");
       return { status: 404, data: msg.noLikedRides };

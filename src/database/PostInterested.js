@@ -99,6 +99,7 @@ const findAny = async (email) => {
       where: {
         email: email,
       },
+      order: [["date", "DESC"]],
     }).catch((err) => {
       throw err;
     });
