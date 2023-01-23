@@ -173,6 +173,34 @@ const deleteOldPosts = schedule.scheduleJob("0 0 1 */1 *", async function () {
   }
 });
 
+// */1 * * * * Every minute
+// */5 * * * * * Every 5 seconds
+// 30 0 * * * Every 12:30 after midnight
+const deleteConversations = schedule.scheduleJob(
+  "30 0 * * *", //every 12:30 after midnight
+  async function () {
+    try {
+      let curTime = moment().format("hh:mm:ss");
+      console.log("Conversations deleting", curTime);
+
+      let dateToCheck = moment().format("YYYY-MM-DD");
+      const expired = await Conv.getAllExpired(dateToCheck);
+      if (expired.length > 0) {
+        _.forEach(expired, (val) => {
+          console.log("Conversation deleted: ", val.convid);
+          val.destroy().catch((err) => {
+            throw err;
+          });
+        });
+      } else {
+        console.log("No Conversations found to delete!");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+);
+
 //cors configuration
 const whitelist = ["*"];
 const corsOptions = {

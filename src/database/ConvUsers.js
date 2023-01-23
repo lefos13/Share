@@ -199,7 +199,25 @@ const updateDate = async (convid, date) => {
     console.log(error, "IN UPDATEDATE OF CONVUSERS");
   }
 };
+
+const getAllExpired = async (date) => {
+  try {
+    const all = ConvUsers.findAll({
+      where: {
+        expiresIn: { [Op.lte]: date },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return all;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
+  getAllExpired,
   updateDate,
   findAll,
   deleteIfExpiresEqual,
