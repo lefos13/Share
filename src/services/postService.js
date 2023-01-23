@@ -161,11 +161,9 @@ const interested = async (req) => {
       let post = await Post.findOne(row.postid);
       let expiresIn;
       if (post.enddate == null) {
-        expiresIn = moment(post.startdate)
-          .add(1, "months")
-          .format("YYYY-MM-DD");
+        expiresIn = moment(post.startdate).add(1, "weeks").format("YYYY-MM-DD");
       } else {
-        expiresIn = moment(post.enddate).add(1, "months").format("YYYY-MM-DD");
+        expiresIn = moment(post.enddate).add(1, "weeks").format("YYYY-MM-DD");
       }
 
       //delete the interest of the user for the specific post
@@ -227,11 +225,11 @@ const interested = async (req) => {
                 let expires;
                 if (postv.enddate == null) {
                   expires = moment(postv.startdate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 } else {
                   expires = moment(postv.enddate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 }
                 expirationDates.push(expires);
@@ -252,11 +250,11 @@ const interested = async (req) => {
                 let expires;
                 if (postv.enddate == null) {
                   expires = moment(postv.startdate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 } else {
                   expires = moment(postv.enddate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 }
                 expirationDates.push(expires);
@@ -1092,9 +1090,9 @@ const verInterested = async (req) => {
         let expiresIn;
         if (post.enddate == null) {
           //change for the return date also
-          expiresIn = moment(post.startdate).add(1, "months");
+          expiresIn = moment(post.startdate).add(1, "weeks");
         } else {
-          expiresIn = moment(post.enddate).add(1, "months");
+          expiresIn = moment(post.enddate).add(1, "weeks");
         }
         console.log("NEW EXPIRATION DATE", expiresIn);
         const chatExists = await ConvUsers.checkIfExists(
@@ -1189,12 +1187,10 @@ const verInterested = async (req) => {
         let expiresIn;
         if (post.enddate == null) {
           expiresIn = moment(post.startdate)
-            .add(1, "months")
+            .add(1, "weeks")
             .format("YYYY-MM-DD");
         } else {
-          expiresIn = moment(post.enddate)
-            .add(1, "months")
-            .format("YYYY-MM-DD");
+          expiresIn = moment(post.enddate).add(1, "weeks").format("YYYY-MM-DD");
         }
         const chat = await ConvUsers.checkIfExists(results.email, post.email);
         // console.log(chat.convid);
@@ -1248,11 +1244,11 @@ const verInterested = async (req) => {
                 let expires;
                 if (postv.enddate == null) {
                   expires = moment(postv.startdate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 } else {
                   expires = moment(postv.enddate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 }
                 expirationDates.push(expires);
@@ -1272,11 +1268,11 @@ const verInterested = async (req) => {
                 let expires;
                 if (postv.enddate == null) {
                   expires = moment(postv.startdate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 } else {
                   expires = moment(postv.enddate)
-                    .add(1, "months")
+                    .add(1, "weeks")
                     .format("YYYY-MM-DD");
                 }
                 expirationDates.push(expires);

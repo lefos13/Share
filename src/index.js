@@ -5,6 +5,8 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const moment = require("moment-timezone");
 moment.tz.setDefault("Europe/Athens");
 
+let allowCrypto = false;
+
 //limit the size of request
 var bodyParser = require("body-parser");
 app.use(bodyParser.json({ limit: "5mb", type: "application/json" }));
@@ -310,7 +312,11 @@ let server = http.listen(port, () =>
 let io = require("socket.io")(server);
 
 const Users = require("./modules/user");
-const { IsJsonString } = require("./utils/functions");
+const {
+  IsJsonString,
+  encryptMessages,
+  decryptMessages,
+} = require("./utils/functions");
 
 app.locals["bg"] = {};
 
@@ -475,6 +481,9 @@ io.on("connection", (socket) => {
                 takecount
               );
 
+              if (allowCrypto)
+                finalMessages = await decryptMessages(finalMessages);
+
               data.messages = finalMessages;
               data.lastMessage = finalMessages[0].text;
               data.isLastMessageMine =
@@ -515,12 +524,7 @@ io.on("connection", (socket) => {
           break;
 
         case "server/private_message": {
-          // console.log(action.data);
-
-          // console.log(socket);
-
           const conversationId = action.data.conversationId; // this is the receipient id
-          const from = action.data.senderId; //this is my id
           const fromEmail = action.data.senderEmail; //this is my id
 
           // const userValues = Object.values(users);
@@ -562,15 +566,19 @@ io.on("connection", (socket) => {
             },
           });
 
-          console.log({
-            ...action.data,
-            conversationId: conversationId,
-            senderEmail: fromEmail,
-          });
-
+          // console.log({
+          //   ...action.data,
+          //   conversationId: conversationId,
+          //   senderEmail: fromEmail,
+          // });
+          let messages = [];
+          if (allowCrypto)
+            messages = await encryptMessages([action.data.message]);
+          else messages.push(action.data.message);
+          // let blabla = await decryptMessages(messages);
           const addedMessage = await Conv.addMessage(
             conversationId,
-            action.data.message
+            messages[0]
           );
           break;
         }
@@ -799,11 +807,15 @@ io.on("connection", (socket) => {
             if (val.id == userApproving.socketId) userOnline = true;
           });
 
+          let photoApproving =
+            userApproving.photo != null
+              ? "images/" + userApproving.email + ".jpeg"
+              : null;
           const dataForApprooved = {
             conversationId: conv.convid,
             socketId: userApproving.socketId,
             username: userApproving.fullname,
-            photo: "images/" + userApproving.email + ".jpeg",
+            photo: photoApproving,
             email: userApproving.email,
             isUserOnline: userOnline,
             expiresIn: conv.expiresIn,
@@ -820,11 +832,16 @@ io.on("connection", (socket) => {
             // console.log(val.id);
             if (val.id == userApproved.socketId) user2Online = true;
           });
+
+          let photoApproved =
+            userApproved.photo != null
+              ? "images/" + userApproved.email + ".jpeg"
+              : null;
           const dataForApprooving = {
             conversationId: conv.convid,
             socketId: userApproved.socketId,
             username: userApproved.fullname,
-            photo: "images/" + userApproved.email + ".jpeg",
+            photo: photoApproved,
             email: userApproved.email,
             isUserOnline: user2Online,
             expiresIn: conv.expiresIn,

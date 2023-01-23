@@ -1,5 +1,5 @@
 // In src/services/Userservice.js
-
+let allowCrypto = false;
 // *** ADD *** (methods for all the Users that access data in db)
 const User = require("../database/User");
 const Review = require("../database/Review");
@@ -15,7 +15,11 @@ const saltRounds = 10;
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { verification, checkPass } = require("../database/utils");
-const { insertAver, determineLang } = require("../utils/functions");
+const {
+  insertAver,
+  determineLang,
+  decryptMessages,
+} = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 const fun = require("../utils/functions");
@@ -112,7 +116,7 @@ const moreMessages = async (req) => {
     console.log("takecount:", takecount);
     var finalMessages = _.take(_.drop(allMessages, skipcount), takecount);
     // console.log(finalMessages);
-
+    if (allowCrypto) finalMessages = await decryptMessages(finalMessages);
     //check if the are more messages after those
     let messagesLeft = allMessages.length - counter > 20 ? true : false;
     console.log(allMessages.length - counter);

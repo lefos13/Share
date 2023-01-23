@@ -14,7 +14,17 @@ admin.initializeApp({
 var _ = require("lodash");
 
 const Review = require("../database/Review");
-const { EMAIL, PASSEMAIL, DATABASE, USER, PASS, HOST } = process.env;
+const {
+  EMAIL,
+  PASSEMAIL,
+  DATABASE,
+  USER,
+  PASS,
+  HOST,
+  TOKEN_KEY,
+  IVHEX,
+  KEYCRYPTO,
+} = process.env;
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
@@ -42,6 +52,43 @@ const FcmToken = require("../modules/fcmtoken");
 const { response } = require("express");
 const fs = require("fs");
 
+const crypto = require("crypto");
+const algorithm = "aes-256-cbc";
+const key = KEYCRYPTO;
+const iv = Buffer.from(IVHEX, "hex");
+
+const encryptMessages = async (messages) => {
+  try {
+    console.log(messages);
+
+    _.forEach(messages, (val) => {
+      const cipher = crypto.createCipheriv(algorithm, key, iv);
+      val.text = cipher.update(val.text, "utf-8", "hex");
+      val.text += cipher.final("hex");
+    });
+    // console.log("Encrypted messages:", messages);
+    return messages;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const decryptMessages = async (messages) => {
+  try {
+    console.log(messages);
+    _.forEach(messages, (val) => {
+      const decipher = crypto.createDecipheriv(algorithm, key, iv);
+      val.text = decipher.update(val.text, "hex", "utf-8");
+      val.text = decipher.final("utf-8");
+    });
+    // console.log("Decrypted messages:", messages);
+    return messages;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
 const getLang = async (lang) => {
   let msg;
   if (lang == "EN") msg = JSON.parse(fs.readFileSync("./lang/english.json"));
@@ -146,6 +193,8 @@ const newRide = async (postid, emailArray, postOwner) => {
 };
 
 module.exports = {
+  encryptMessages,
+  decryptMessages,
   IsJsonString,
   sendReport: async (text, email) => {
     try {
