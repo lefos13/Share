@@ -185,7 +185,9 @@ const verInterested = async (req, res) => {
     } else if (data.status == 405) {
       res.status(405).json({ message: data.message });
     } else {
-      res.status(data.status).json({ message: data.message });
+      res
+        .status(data.status)
+        .json({ message: data.message, chatCreated: data.chatCreated });
     }
   } catch (error) {
     // console.log(error);

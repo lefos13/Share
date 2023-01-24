@@ -46,4 +46,11 @@ router.get(
   cors(corsOptions),
   neutralController.getTerms
 );
+
+router.post(
+  "/moreMessages",
+  [authenticateToken],
+  cors(corsOptions),
+  neutralController.moreMessages
+);
 module.exports = router;

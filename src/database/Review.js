@@ -49,7 +49,7 @@ const findOne = async (email, emailReviewer) => {
     }).catch((err) => {
       throw err;
     });
-    console.log(revExist);
+    // console.log(revExist);
     return revExist;
   } catch (error) {
     console.log(error);

@@ -99,6 +99,7 @@ const findAny = async (email) => {
       where: {
         email: email,
       },
+      order: [["date", "DESC"]],
     }).catch((err) => {
       throw err;
     });
@@ -289,6 +290,25 @@ const findAllVerifed = async (email) => {
   // code to count posts of a user the current day
 };
 
+const findAllVerifedPerPost = async (email, postList) => {
+  try {
+    const found = await PostInterested.findAll({
+      where: {
+        email: email,
+        isVerified: true,
+        postid: postList,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return found;
+  } catch (error) {
+    console.log("Inside findAllVerifedPerPost of postinterested:", error);
+    return false;
+  }
+  // code to count posts of a user the current day
+};
+
 const findAllperUser = async (email) => {
   try {
     const all = await PostInterested.findAll({
@@ -343,6 +363,7 @@ const destroyPerArrayIds = async (postids) => {
 // *** ADD ***
 
 module.exports = {
+  findAllVerifedPerPost,
   destroyPerArrayIds,
   findAllperUser,
   detroyAllPerUser,
