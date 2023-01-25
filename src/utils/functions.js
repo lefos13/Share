@@ -53,6 +53,7 @@ const { response } = require("express");
 const fs = require("fs");
 
 const crypto = require("crypto");
+const User = require("../database/User");
 const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
@@ -192,7 +193,69 @@ const newRide = async (postid, emailArray, postOwner) => {
   }
 };
 
+const sendMessage = async (
+  messageSent,
+  receiverObj,
+  senderEmail,
+  conversationId
+) => {
+  try {
+    let msg = await getLang(receiverObj.lastLang);
+
+    const sender = await User.findOneLight(senderEmail);
+    if (sender === false) throw new Error("Didnt find user");
+
+    const fcm = await FcmToken.findOne({
+      where: {
+        email: receiverObj.email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    console.log(
+      "SENDINT NOTIFICATION WITH BODY: " +
+        msg.firebase.not_ver_body0 +
+        sender.fullname +
+        msg.firebase.sent +
+        messageSent.text
+    );
+
+    let data = {
+      type: "chatReceivedMessage",
+      conversationId: conversationId,
+      message: messageSent.toString(),
+    };
+    let message = {
+      data: data,
+      token: fcm.fcmToken,
+      notification: {
+        title: msg.firebase.new_message,
+        body:
+          msg.firebase.not_ver_body0 +
+          sender.fullname +
+          msg.firebase.sent +
+          messageSent.text,
+      },
+    };
+
+    admin
+      .messaging()
+      .send(message)
+      .then((response) => {
+        console.log("Success: ", response);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  } catch (error) {
+    console.log("INSIDE FIREBASE FUNCTION FOR MESSAGE NOTIFICATION");
+    console.log(error);
+  }
+};
+
 module.exports = {
+  sendMessage,
   encryptMessages,
   decryptMessages,
   IsJsonString,

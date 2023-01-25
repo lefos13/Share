@@ -196,17 +196,84 @@ const reverseUsers = async (
   }
 };
 
-const resetFlags = async (toReviewExists, piid) => {
+const resetFlags = async (toReviewExists, piid, enddate) => {
   try {
     await toReviewExists
       .update({
         driverDone: false,
         passengerDone: false,
+        enddate: enddate,
         piid: piid,
       })
       .catch((err) => {
         throw err;
       });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const denyReview = async (toReviewExists) => {
+  try {
+    await toReviewExists
+      .update({
+        driverDone: true,
+        passengerDone: true,
+      })
+      .catch((err) => {
+        throw err;
+      });
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const newReview = async (toReviewExists, date, piid) => {
+  try {
+    await toReviewExists
+      .update({
+        driverDone: false,
+        passengerDone: false,
+        endDate: date,
+        piid: piid,
+      })
+      .catch((err) => {
+        throw err;
+      });
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const newReviewAndReverse = async (
+  toReviewExists,
+  newDriver,
+  newPassenger,
+  date,
+  piid
+) => {
+  try {
+    await toReviewExists
+      .update({
+        driverEmail: newDriver,
+        passengerEmail: newPassenger,
+        driverDone: false,
+        passengerDone: false,
+        endDate: date,
+        piid: piid,
+      })
+      .catch((err) => {
+        throw err;
+      });
+
     return true;
   } catch (error) {
     console.log(error);
@@ -228,6 +295,8 @@ const updateInVer = async (
         passengerEmail: passengerEmail,
         piid: piid,
         endDate: enddate,
+        passengerDone: true,
+        driverDone: true,
       },
       {
         where: {
@@ -298,6 +367,9 @@ const deleteAllPerUser = async (email) => {
   }
 };
 module.exports = {
+  denyReview,
+  newReviewAndReverse,
+  newReview,
   deleteAllPerUser,
   findForProfile,
   findForCreatingReview,

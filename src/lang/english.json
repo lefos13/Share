@@ -39,7 +39,7 @@
   "noFavourites": "We didn't find any favourite Rides",
   "favSearchExists": "This favourite search already exists!",
   "tenFavSearches": "You already have 10 favourite searches!",
-  "newFavSearch": "You added a new favourite search!",
+  "newFavSearch": "This search saved to favourites!",
   "foundSearches": "We found your searches!",
   "favSearchDeleted": "Favourite search removed!",
   "feedbackSuc": "Thank you for your feedback!",
@@ -57,6 +57,7 @@
   "usersToReview": "We didn't find any users that you can review!",
   "userDeleted": "User deleted his account!",
   "noUserThatliked": "The interest of the user is deleted!",
+  "deleteUser": "You account has been deleted succesfully!",
   "firebase": {
     "not_ver_title": "Travel approval",
     "not_ver_body": " approved you to travel together!",
@@ -65,6 +66,8 @@
     "req_title": "A new Ride is posted!",
     "request_part2": " made a Ride that you requested!",
     "liked_post": " liked one of your Rides!",
-    "liked_post2": "Don't let her/him wait for you!"
+    "liked_post2": "Don't let her/him wait for you!",
+    "new_message": "New message",
+    "sent": " sent you: "
   }
 }

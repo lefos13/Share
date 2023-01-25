@@ -316,6 +316,7 @@ const {
   IsJsonString,
   encryptMessages,
   decryptMessages,
+  sendMessage,
 } = require("./utils/functions");
 
 app.locals["bg"] = {};
@@ -563,20 +564,36 @@ io.on("connection", (socket) => {
             action.data.message.seen = false;
           }
 
-          io.to(recSocketId).emit("action", {
-            type: "private_message",
-            data: {
-              ...action.data,
-              conversationId: conversationId,
-              senderEmail: fromEmail,
-            },
+          let online = false;
+          let socketList = await io.fetchSockets(); //get all sockets
+          _.forEach(socketList, (val) => {
+            if (val.id == recUser.socketId) online = true;
           });
 
-          // console.log({
-          //   ...action.data,
-          //   conversationId: conversationId,
-          //   senderEmail: fromEmail,
-          // });
+          let inBackground = false;
+          if (app.locals.bg[recUser.email] != null) inBackground = true;
+
+          // emit the message if the user is online
+          if (online)
+            io.to(recSocketId).emit("action", {
+              type: "private_message",
+              data: {
+                ...action.data,
+                conversationId: conversationId,
+                senderEmail: fromEmail,
+              },
+            });
+
+          //send notification for offline or background user
+          if (!online || inBackground) {
+            sendMessage(
+              action.data.message,
+              recUser,
+              fromEmail,
+              conversationId
+            );
+          }
+
           let messages = [];
           if (allowCrypto)
             messages = await encryptMessages([action.data.message]);
@@ -617,6 +634,7 @@ io.on("connection", (socket) => {
           _.forEach(socketList, (val) => {
             if (val.id == other.socketId) online = true;
           });
+
           console.log("Other User Online: ", online);
           if (online) {
             seen = true;

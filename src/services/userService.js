@@ -844,7 +844,7 @@ const deleteUser = async (req) => {
       throw new Error("Error at updating 'deleted' of user");
     }
 
-    return { status: 200, response: { message: "Success" } };
+    return { status: 200, response: { message: msg.deleteUser } };
   } catch (error) {
     console.log(error);
     return { status: 500 };

@@ -986,6 +986,7 @@ const deleteInterested = async (req) => {
 const verInterested = async (req) => {
   try {
     var data = req.body.data;
+    let curDate = moment();
     let chatCreated = false;
     let io = socket.io;
     let msg = await determineLang(req);
@@ -1002,7 +1003,6 @@ const verInterested = async (req) => {
       throw new Error("Error at getting the count of the verified");
     }
 
-    let curDate = moment();
     //GETTING THE DATA OF THE CORRESPONDING POST
     const pst = await Post.findExpired(data.postid, curDate);
     if (pst == null)
@@ -1060,30 +1060,49 @@ const verInterested = async (req) => {
           ) {
             let enddate;
             post.enddate == null
-              ? (enddate = post.startdate)
-              : (enddate = post.enddate);
-            const reversed = await ToReview.reverseUsers(
-              toReviewExists,
-              post.email,
-              results.email,
-              results.piid,
-              enddate
-            );
-            if (!reversed)
-              throw new Error(
-                "Error at reversing the users of possible review"
+              ? (enddate = moment(post.startdate))
+              : (enddate = moment(post.enddate));
+
+            let objEndDate = moment(toReviewExists.endDate);
+
+            if (enddate.isSameOrBefore(objEndDate)) {
+              const reversed = await ToReview.reverseUsers(
+                toReviewExists,
+                post.email,
+                results.email,
+                results.piid,
+                enddate
               );
+              if (reversed === false)
+                throw new Error("error at reversing and updating to review");
+            }
+          } else {
+            let enddate;
+            post.enddate == null
+              ? (enddate = moment(post.startdate))
+              : (enddate = moment(post.enddate));
+
+            let objEndDate = moment(toReviewExists.endDate);
+
+            if (enddate.isSameOrBefore(objEndDate)) {
+              const reversed = await ToReview.newReview(
+                toReviewExists,
+                enddate,
+                data.piid
+              );
+              if (reversed === false)
+                throw new Error("error at reversing and updating to review");
+            }
           }
 
           //if a review is done already by the owner of the post and the owner is marked as driver
-          //update him as false so he can review again the same user
-          if (
-            toReviewExists.driverDone == true &&
-            toReviewExists.driverEmail == post.email
-          ) {
+          //update him as false so he can review again the same user and update the enddate of the toReview row
+          if (toReviewExists.driverEmail == post.email) {
+            console.log("UPDATING FLAGS ETC");
             const updated = await ToReview.resetFlags(
               toReviewExists,
-              data.piid
+              data.piid,
+              post.enddate
             );
             if (!updated) throw new Error("Error at resseting the flags");
           }
@@ -1142,52 +1161,155 @@ const verInterested = async (req) => {
           chatCreated: chatCreated,
         };
       } else {
+        let dateToCompare = null;
         //unverify the interested user
         const reseted = await PostInterested.resetFlags(results);
         if (!reseted) {
           throw new Error("Error at reseting the flag of interested");
         }
-        // delete possible review notification
-        // check if the unverification should destroy the possible review
-        // get all posts of current passenger
-        const passengerPosts = await Post.findAllOfUser(results.email);
-        if (!passengerPosts)
-          throw new Error("Error at finding all the posts of user");
-        let flagCounter = 0;
 
-        //Check if the current driver was ever interested for a post of current passenger
-        for await (p of passengerPosts) {
-          const intP = await PostInterested.getInterestedIfVerified(
-            p.postid,
-            post.email
+        // ====== check if the unverification should destroy the possible review =======
+
+        // get the toReview object between those two users
+        const toReviewExists = await ToReview.findIfExists(
+          post.email,
+          results.email
+        );
+        if (toReviewExists === false)
+          throw new Error("Error at finding the toreview");
+
+        // if driver is owner check all older posts and decide if you need to update the flags or deny review
+        if (toReviewExists.driverEmail === post.email) {
+          console.log("OWNER IS CURRENTLY DRIVER");
+          // const denied = await ToReview.denyReview(toReviewExists);
+          // if (denied)
+          //   throw new Error("Error at denieing review for both users!");
+          const allActiveDriver = await Post.findAllActive(
+            toReviewExists.driverEmail,
+            moment()
           );
-          if (intP === false)
-            throw new Error("Error at geting the PP if verified");
-
-          // if you find such a post, then update the possible review and dont delete it
-          if (intP != null) {
-            flagCounter++;
-            const updated = await ToReview.updateInVer(
-              p.email,
-              intP.email,
-              intP.piid,
-              p.enddate,
-              results.piid
+          if (allActiveDriver.length > 0) {
+            console.log("FOUND ACTIVE POSTS FOR DRIVER");
+            let allPostIds = [];
+            _.forEach(allActiveDriver, (val) => {
+              allPostIds.push(val.postid);
+            });
+            const allVerified = await PostInterested.findAllVerifedPerPost(
+              toReviewExists.passengerEmail,
+              allPostIds
             );
+            if (allVerified.length > 0) {
+              console.log(
+                "FOUND VERIFED INTERESTS OF PASSENGER FOR THE ACTIVE POSTS OF DRIVER"
+              );
+              //Check the enddates of active verifed posts and get the oldest
+              let dates = [];
+              for await (let val of allVerified) {
+                let tempPost = await Post.findOne(val.postid);
+                tempPost.enddate != null
+                  ? dates.push({ d: tempPost.enddate, p: val.piid })
+                  : dates.push({ d: tempPost.startdate, p: val.piid });
+              }
 
-            if (updated === false)
-              throw new Error("Error at updating the possible review");
+              let newdates = dates.map((d) => moment(d.d));
+              let minDate = moment.min(newdates);
+              let piid;
+              _.forEach(dates, (d) => {
+                if (moment(d.d).isSame(minDate)) {
+                  piid = d.p;
+                }
+              });
+              dateToCompare = minDate;
+              console.log("CHANGE DATE TO: ", minDate);
+              const newToReview = await ToReview.newReview(
+                toReviewExists,
+                minDate,
+                piid
+              );
+              if (!newToReview)
+                throw new Error(
+                  "Error at updating the toreview object with older data"
+                );
+            }
           }
         }
-        if (flagCounter == 0) {
-          const destroyed = await ToReview.deleteOne(results.piid);
-          if (!destroyed)
+        // console.log(object);
+
+        const activePassengerPosts = await Post.findAllActive(
+          results.email,
+          moment()
+        );
+
+        let passengerPostsIds = [];
+        if (activePassengerPosts.length > 0) {
+          console.log("FOUND ACTIVE POSTS OF PASSENGER");
+          _.forEach(activePassengerPosts, (val) => {
+            passengerPostsIds.push(val.postid);
+          });
+
+          const allVerifiedOfDriver =
+            await PostInterested.findAllVerifedPerPost(
+              post.email,
+              passengerPostsIds
+            );
+
+          if (allVerifiedOfDriver.length > 0) {
+            console.log("FOUND VERIFICATION FOR THESE ACTIVE POSTS");
+            let dates = [];
+            for await (let val of allVerifiedOfDriver) {
+              let tempPost = await Post.findOne(val.postid);
+              tempPost.enddate != null
+                ? dates.push({ d: tempPost.enddate, p: val.piid })
+                : dates.push({ d: tempPost.startdate, p: val.piid });
+            }
+
+            let newDates = dates.map((d) => moment(d.d));
+            let minDate = moment.min(newDates);
+            let greater = false;
+            if (dateToCompare !== null) {
+              greater = minDate.isSameOrAfter(dateToCompare);
+            }
+            if (!greater) {
+              console.log("CHANGE DATE TO: ", minDate);
+              let piid;
+              _.forEach(dates, (d) => {
+                if (moment(d.d).isSame(minDate)) {
+                  piid = d.p;
+                }
+              });
+              let passenger = await PostInterested.findOneById(piid);
+              let driver =
+                passenger.email == toReviewExists.passengerEmail
+                  ? toReviewExists.driverEmail
+                  : toReviewExists.passengerEmail;
+
+              // minDate = minDate.format("YYYY-MM-DD")
+              const newToReview = await ToReview.newReviewAndReverse(
+                toReviewExists,
+                driver,
+                passenger.email,
+                minDate,
+                piid
+              );
+              if (!newToReview)
+                throw new Error("error at updating the toreview object");
+            }
+          } else if (dateToCompare == null) {
+            console.log("DENYING TOREVIEW");
+            const destroyed = await ToReview.denyReview(toReviewExists);
+            if (destroyed === false)
+              throw new Error("Error at destroying the possible review");
+          }
+        } else if (dateToCompare == null) {
+          console.log("DENYING TOREVIEW");
+          const destroyed = await ToReview.denyReview(toReviewExists);
+          if (destroyed === false)
             throw new Error("Error at destroying the possible review");
         }
 
-        //Delete the chat if ....
-        console.log(results.email, post.email);
+        //=================== DELETE THE CHAT CASE  ....
         let expiresIn;
+
         if (post.enddate == null) {
           expiresIn = moment(post.startdate)
             .add(1, "weeks")
