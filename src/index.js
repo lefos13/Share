@@ -369,6 +369,10 @@ io.on("connection", (socket) => {
         delete app.locals[user.email];
         // console.log(app.locals[user.email]);
       }
+
+      if (app.locals.bg[user.email] != null) {
+        delete app.locals.bg[user.email];
+      }
     } catch (error) {
       console.log(error);
     }
@@ -464,6 +468,8 @@ io.on("connection", (socket) => {
               // console.log(val.id);
               if (val.id == us.socketId) data.isUserOnline = true;
             });
+
+            if (app.locals.bg[us.email] != null) data.isUserOnline = false;
 
             data.expiresIn = u.expiresIn;
             if (u.messages !== null) {
@@ -730,12 +736,21 @@ io.on("connection", (socket) => {
               },
             });
 
+          socket.emit("action", {
+            type: "setIsConversationRead",
+            data: {
+              conversationId: conversationId,
+              isRead: true,
+            },
+          });
+
           const conv = Conv.updateLastMessage(conversationId, user.email);
           if (conv === false) {
             throw new Error(
               "something went wrong with updating the last message"
             );
           }
+
           break;
         }
 

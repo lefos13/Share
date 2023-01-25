@@ -475,6 +475,7 @@ const searchPosts = async (req) => {
         );
       }
       var flag;
+      let isApproved = false;
       // insert the review average and count inside the object of the user
       let extraData = await insertAver(user);
       user.dataValues = { ...user.dataValues, ...extraData };
@@ -487,6 +488,7 @@ const searchPosts = async (req) => {
         flag = false;
       } else {
         flag = true;
+        if (interested.isVerified == true) isApproved = true;
       }
       let imagePath = null;
       if (user.photo !== null) {
@@ -497,6 +499,7 @@ const searchPosts = async (req) => {
         imagePath: imagePath,
         post: fnd,
         interested: flag,
+        isApproved: isApproved,
       };
       array.push(results);
     }
@@ -1504,6 +1507,7 @@ const feedScreen = async (req) => {
         );
       }
       var flag;
+      let isApproved = false;
       // insert the review average and count inside the object of the user
       let extraData = await insertAver(user);
       user.dataValues = { ...user.dataValues, ...extraData };
@@ -1515,6 +1519,7 @@ const feedScreen = async (req) => {
         flag = false;
       } else {
         flag = true;
+        if (interested.isVerified == true) isApproved = true;
       }
       let image = null;
       if (user.photo !== null) {
@@ -1525,6 +1530,7 @@ const feedScreen = async (req) => {
         imagePath: image,
         post: fnd,
         interested: flag,
+        isApproved: isApproved,
       };
       array.push(results);
     }
