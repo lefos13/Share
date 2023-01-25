@@ -340,7 +340,7 @@ module.exports = {
     }
   },
 
-  toNotifyTheVerified: async (email, postid, ownerEmail) => {
+  toNotifyTheVerified: async (email, postid, ownerEmail, convId) => {
     try {
       let postIdString = postid.toString();
       const user = await Users.findOne({
@@ -368,13 +368,14 @@ module.exports = {
       });
 
       const msg = await getLang(toNotifyUser.lastLang);
-
+      // console.log(convId);
       let message = {
         data: {
           type: "receiveApproval",
           postid: postIdString,
           email: user.email, // owner email
           fullname: user.fullname, // owner email
+          conversationId: convId,
         },
         token: fcmToken.fcmToken,
         notification: {

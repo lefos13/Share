@@ -1153,8 +1153,11 @@ const verInterested = async (req) => {
         }
 
         //END OF CREATION OF NEW CHAT
-
-        fun.toNotifyTheVerified(results.email, post.postid, post.email);
+        let convid =
+          chatExists != null
+            ? chatExists.convid
+            : post.email + " " + results.email;
+        fun.toNotifyTheVerified(results.email, post.postid, post.email, convid);
         return {
           status: 200,
           message: msg.likerVerified,
