@@ -1017,7 +1017,10 @@ const verInterested = async (req) => {
 
             let objEndDate = moment(toReviewExists.endDate);
 
-            if (enddate.isSameOrBefore(objEndDate)) {
+            let crDate = moment();
+            let forceChange = objEndDate.isBefore(crDate);
+
+            if (enddate.isSameOrBefore(objEndDate) || forceChange) {
               const reversed = await ToReview.reverseUsers(
                 toReviewExists,
                 post.email,
@@ -1036,7 +1039,10 @@ const verInterested = async (req) => {
 
             let objEndDate = moment(toReviewExists.endDate);
 
-            if (enddate.isSameOrBefore(objEndDate)) {
+            let crDate = moment();
+            let forceChange = objEndDate.isBefore(crDate);
+
+            if (enddate.isSameOrBefore(objEndDate) || forceChange) {
               const reversed = await ToReview.newReview(
                 toReviewExists,
                 enddate,
@@ -1061,7 +1067,7 @@ const verInterested = async (req) => {
 
         //CREATION OF NEW CHAT
         let expiresIn = await determineExpirationDate(post);
-
+        console.log("New Chat expiration Date:", expiresIn);
         const chatExists = await ConvUsers.checkIfExists(
           post.email,
           results.email
@@ -1245,6 +1251,7 @@ const verInterested = async (req) => {
 
         //=================== DELETE THE CHAT CASE  ....
         let expiresIn = await determineExpirationDate(post);
+        console.log("Date to check for the destruction of chat:", expiresIn);
         const chat = await ConvUsers.checkIfExists(results.email, post.email);
 
         if (chat === false) throw new Error("error at finding existing chat");
@@ -1339,7 +1346,7 @@ const verInterested = async (req) => {
             },
           });
         }
-
+        console.log("TO DELETE", toDelete);
         if (toDelete) {
           const deletedChat = await ConvUsers.deleteIfExpiresEqual(
             chat,
