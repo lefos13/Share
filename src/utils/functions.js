@@ -18,7 +18,7 @@ const {
   EMAIL,
   PASSEMAIL,
   DATABASE,
-  USER,
+  USERR,
   PASS,
   HOST,
   TOKEN_KEY,
@@ -28,7 +28,7 @@ const {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,
