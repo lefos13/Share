@@ -1244,7 +1244,7 @@ const verInterested = async (req) => {
         }
 
         //=================== DELETE THE CHAT CASE  ....
-        let expiresIn = determineExpirationDate(post);
+        let expiresIn = await determineExpirationDate(post);
         const chat = await ConvUsers.checkIfExists(results.email, post.email);
 
         if (chat === false) throw new Error("error at finding existing chat");
