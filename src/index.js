@@ -34,7 +34,6 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    console.log(file, req.body);
     cb(null, file.originalname);
   },
 });
@@ -75,38 +74,12 @@ const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   },
 });
 
-const Posts = require("./modules/post");
-const PostInterested = require("./modules/postinterested");
 const ConvUsers = require("./modules/convusers");
 const Conv = require("./database/ConvUsers");
 const User = require("./database/User");
+const Post = require("./database/Post");
 
-function authenticateToken(req, res, next) {
-  try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    // console.log(token);
-    if (token == null) return res.sendStatus(401);
-
-    jwt.verify(token, TOKEN_KEY, (err, email) => {
-      if (err)
-        return res.json({
-          body: null,
-          message: "Token expired or didnt even exist",
-        });
-      else {
-        // console.log("inside auth: " + JSON.stringify(req.body.data));
-        // console.log("Athenticated: " + email.email + "lol");
-        console.log("Authenticated:", email.email);
-        req.body["extra"] = email.email;
-      }
-      next();
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Something went wrong!" });
-  }
-}
+const { authenticateToken } = require("./middleware/auth");
 //ROUTES IMPORT
 
 // *** ADD ***
@@ -128,48 +101,30 @@ checkconnection();
 
 const schedule = require("node-schedule");
 
-//run once a time to delete old posts from the database
-const deleteOldPosts = schedule.scheduleJob("0 0 1 */1 *", async function () {
+//run once a time to delete old posts from the database 45 0 * * *
+const deleteOldPosts = schedule.scheduleJob("45 0 * * *", async function () {
   // const deleteOldPosts = schedule.scheduleJob("*/1 * * * * *", async function () {
   try {
-    // console.log("Posts are being deleted");
-    var today = new Date("2022-12-01");
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(
-      today.getMonth() + 1 > 3
-        ? today.getMonth() + 1 - 3
-        : 12 - 3 + today.getMonth() + 1
-    ).padStart(2, "0"); //January is 0!
-    var yyyy = today.getFullYear();
+    //find all posts that are expired
+    let posts = await Post.globalAllExpired();
 
-    today.getMonth() + 1 <= 3 ? yyyy-- : yyyy;
+    //check if any post is expired more than 3 months and delete it along with all those that was interested to them
+    let curDate = moment();
+    for await (let post of posts) {
+      let endDate =
+        post.enddate != null ? moment(post.enddate) : moment(post.startdate);
 
-    today = yyyy + "-" + mm + "-" + dd;
-    console.log(today);
-    //find all posts that their enddate is older than curdate
-    await Posts.findAll({
-      where: { enddate: { [Op.lt]: today } },
-    }).then(async (res) => {
-      if (res.length != 0) {
-        for await (r of res) {
-          //find interested of post
-          const postInt = await PostInterested.findAll({
-            where: {
-              postid: r.postid,
-            },
-          });
-          if (postInt.length != 0) {
-            for await (p of postInt) {
-              //destroy interested
-              p.destroy();
-            }
-          }
-
-          //destroy post
-          r.destroy();
-        }
+      let months = curDate.diff(endDate, "months");
+      let postIds = [];
+      if (months >= 3) {
+        postIds.push(post.postid);
+        post.destroy();
       }
-    });
+
+      if (postIds.length > 0) {
+        let intDestroyed = await destroyPerArrayIds(postIds);
+      }
+    }
   } catch (err) {
     console.error(err);
   }
@@ -183,19 +138,15 @@ const deleteConversations = schedule.scheduleJob(
   async function () {
     try {
       let curTime = moment().format("hh:mm:ss");
-      console.log("Conversations deleting", curTime);
 
       let dateToCheck = moment().format("YYYY-MM-DD");
       const expired = await Conv.getAllExpired(dateToCheck);
       if (expired.length > 0) {
         _.forEach(expired, (val) => {
-          console.log("Conversation deleted: ", val.convid);
           val.destroy().catch((err) => {
             throw err;
           });
         });
-      } else {
-        console.log("No Conversations found to delete!");
       }
     } catch (err) {
       console.error(err);
@@ -253,12 +204,11 @@ app.use(
     changeOrigin: true,
     pathRewrite: async function (path, req) {
       // const should_add_something = await httpRequestToDecideSomething(path);
-      console.log(path);
       let lang = req.headers["accept-language"];
       // if(lang == "GR")
 
       // path = "input=volos&key=" + GOOGLE_KEY;
-      // console.log(path);
+
       // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
       path += "&components=country:gr&types=(cities)&key=" + GOOGLE_KEY;
       return path;
@@ -276,9 +226,9 @@ app.use(
     changeOrigin: true,
     pathRewrite: async function (path, req) {
       // const should_add_something = await httpRequestToDecideSomething(path);
-      console.log(path);
+
       // path = "input=volos&key=" + GOOGLE_KEY;
-      // console.log(path);
+
       // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
       path += "&fields=geometry&key=" + GOOGLE_KEY;
       return path;
@@ -296,7 +246,7 @@ app.use(
     changeOrigin: true,
     pathRewrite: async function (path, req) {
       path += "&language=el&result_type=locality&key=" + GOOGLE_KEY;
-      console.log(path);
+
       return path;
     },
   })
@@ -316,13 +266,14 @@ const {
   IsJsonString,
   encryptMessages,
   decryptMessages,
+  sendMessage,
+  getLang,
 } = require("./utils/functions");
+const { destroyPerArrayIds } = require("./database/PostInterested");
 
 app.locals["bg"] = {};
 
 io.on("connection", (socket) => {
-  console.log("Someone connected:", socket.id);
-
   socket.emit("action", {
     type: "getUserEmail",
     data: {},
@@ -330,7 +281,6 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", async (data) => {
     try {
-      console.log("Disconnected!!!!!", data, socket.id);
       const user = await User.findPerSocket(socket.id);
       if (user === false)
         throw new Error("Cant find user that just disconnected");
@@ -348,10 +298,8 @@ io.on("connection", (socket) => {
         let other;
         if (user.email != emails[0]) {
           other = await User.findOneLight(emails[0]);
-          // console.log(other);
         } else {
           other = await User.findOneLight(emails[1]);
-          // console.log(other);
         }
 
         io.to(other.socketId).emit("action", {
@@ -361,16 +309,18 @@ io.on("connection", (socket) => {
             isUserOnline: false,
           },
         });
-        console.log("Emitted to:", other.email, " that i am offline now!");
+
         //delete states of user conversations
       }
       if (app.locals[user.email] != null) {
-        // console.log(app.locals[user.email]);
         delete app.locals[user.email];
-        // console.log(app.locals[user.email]);
+      }
+
+      if (app.locals.bg[user.email] != null) {
+        delete app.locals.bg[user.email];
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   });
 
@@ -383,13 +333,10 @@ io.on("connection", (socket) => {
         //the self_user to the client so i can initialize the chat with this id
         case "server/join":
           //log all data of the user
-          console.log(
-            "This user just logged in and connected with sockets: ",
-            action.data.email,
-            " with socket.id:",
-            socket.id
-          );
-          // console.log(socket);
+
+          const initiator = await User.findOneLight(action.data.email);
+          let msg = await getLang(initiator.lastLang);
+
           const addedSocketId = await User.addSocketId(
             socket.id,
             action.data.email
@@ -411,11 +358,9 @@ io.on("connection", (socket) => {
 
           // part2
           for await (value of dbConvs) {
-            // console.log(value.toJSON());
             let convid = value.convid;
             const mails = value.convid.split(" ");
             if (mails[0] != action.data.email) {
-              console.log("Users that i have a chat with", mails[0]);
               otherUsers.push({
                 mail: mails[0],
                 expiresIn: value.expiresIn,
@@ -423,7 +368,6 @@ io.on("connection", (socket) => {
                 convid: convid,
               });
             } else if (mails[1] != action.data.email) {
-              console.log("Users that i have a chat with", mails[1]);
               otherUsers.push({
                 mail: mails[1],
                 expiresIn: value.expiresIn,
@@ -449,7 +393,7 @@ io.on("connection", (socket) => {
                 isUserOnline: true,
               },
             });
-            // console.log("CONVERSATION ID SEND:", u.convid);
+
             data.conversationId = u.convid;
             data.socketId = socket.id; //need to change
             data.username = us.fullname;
@@ -459,11 +403,12 @@ io.on("connection", (socket) => {
 
             data.isUserOnline = false;
             let socketList = await io.fetchSockets();
-            // console.log(socketList);
+
             _.forEach(socketList, (val) => {
-              // console.log(val.id);
               if (val.id == us.socketId) data.isUserOnline = true;
             });
+
+            if (app.locals.bg[us.email] != null) data.isUserOnline = false;
 
             data.expiresIn = u.expiresIn;
             if (u.messages !== null) {
@@ -499,21 +444,17 @@ io.on("connection", (socket) => {
                 // check if the user has read it in the past
                 data.isRead = finalMessages[0].isRead;
               }
-
-              // console.log(u.messages);
             } else {
-              console.log("NO MESSAGES FOUND!");
               data.messages = [];
               data.isRead = true;
-              data.lastMessage = "No messages sent yet!";
+              data.lastMessage = msg.noMessages;
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
 
-            // console.log(data);
             conversations.push(data);
           }
-          console.log(conversations);
+
           //i use io emit to emit in all sockets connected
           //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
           socket.emit("action", { type: "conversations", data: conversations });
@@ -532,7 +473,7 @@ io.on("connection", (socket) => {
           if (conversation === false) {
             return new Error("Conversation finding error");
           }
-          // console.log(conversation.toJSON());
+
           const mails = conversation.convid.split(" ");
           let receiver;
           mails[0] == fromEmail ? (receiver = mails[1]) : (receiver = mails[0]);
@@ -557,20 +498,36 @@ io.on("connection", (socket) => {
             action.data.message.seen = false;
           }
 
-          io.to(recSocketId).emit("action", {
-            type: "private_message",
-            data: {
-              ...action.data,
-              conversationId: conversationId,
-              senderEmail: fromEmail,
-            },
+          let online = false;
+          let socketList = await io.fetchSockets(); //get all sockets
+          _.forEach(socketList, (val) => {
+            if (val.id == recUser.socketId) online = true;
           });
 
-          // console.log({
-          //   ...action.data,
-          //   conversationId: conversationId,
-          //   senderEmail: fromEmail,
-          // });
+          let inBackground = false;
+          if (app.locals.bg[recUser.email] != null) inBackground = true;
+
+          // emit the message if the user is online
+          if (online)
+            io.to(recSocketId).emit("action", {
+              type: "private_message",
+              data: {
+                ...action.data,
+                conversationId: conversationId,
+                senderEmail: fromEmail,
+              },
+            });
+
+          //send notification for offline or background user
+          if (!online || inBackground) {
+            sendMessage(
+              action.data.message,
+              recUser,
+              fromEmail,
+              conversationId
+            );
+          }
+
           let messages = [];
           if (allowCrypto)
             messages = await encryptMessages([action.data.message]);
@@ -584,7 +541,6 @@ io.on("connection", (socket) => {
         }
 
         case "server/personalChatOpened": {
-          console.log("Chat opened", action.data);
           let conversationId = action.data.conversationId;
           let senderId = action.data.senderId;
 
@@ -599,11 +555,7 @@ io.on("connection", (socket) => {
             user = await User.findOneLight(mails[1]);
             other = await User.findOneLight(mails[0]);
           }
-          // console.log(
-          //   "User to inform that his message is read: ",
-          //   other.email,
-          //   "NOT YET READY!"
-          // );
+
           let seen = false;
           //inform the other user (if he is online) that i saw the message. (Even if the last message isnt his/hers)
           let socketList = await io.fetchSockets();
@@ -611,10 +563,10 @@ io.on("connection", (socket) => {
           _.forEach(socketList, (val) => {
             if (val.id == other.socketId) online = true;
           });
-          console.log("Other User Online: ", online);
+
           if (online) {
             seen = true;
-            console.log("Send to, ", other.email, "That his message is read!");
+
             io.to(other.socketId).emit("action", {
               type: "setConversationSeen",
               data: {
@@ -645,14 +597,11 @@ io.on("connection", (socket) => {
         }
 
         case "server/personalChatClosed": {
-          console.log("Chat closed", action.data);
-          console.log("App local:", app.locals[action.data.senderId]);
           delete app.locals[action.data.senderId];
           break;
         }
 
         case "server/AppInBackground": {
-          console.log("App in background:", action.data);
           let sender = action.data.senderEmail;
           app.locals.bg[sender] = true;
           //user should be offline right now.
@@ -675,7 +624,6 @@ io.on("connection", (socket) => {
         }
 
         case "server/AppInForeground": {
-          console.log("App in Foreground:");
           let sender = action.data.senderEmail;
           //user should be again online
           delete app.locals.bg[action.data.senderEmail];
@@ -697,16 +645,12 @@ io.on("connection", (socket) => {
         }
 
         case "server/ActiveConversationInBackground": {
-          console.log("App in background with active Conversation");
-          console.log(action.data);
           const user = await User.findPerSocket(socket.id);
           delete app.locals[user.email];
           break;
         }
 
         case "server/ActiveConversationInForeground": {
-          console.log("App in Foreground with active Conversation");
-          // console.log(action.data);
           const conversationId = action.data.conversationId;
           const user = await User.findPerSocket(socket.id);
           app.locals[user.email] = action.data.conversationId;
@@ -730,17 +674,25 @@ io.on("connection", (socket) => {
               },
             });
 
+          socket.emit("action", {
+            type: "setIsConversationRead",
+            data: {
+              conversationId: conversationId,
+              isRead: true,
+            },
+          });
+
           const conv = Conv.updateLastMessage(conversationId, user.email);
           if (conv === false) {
             throw new Error(
               "something went wrong with updating the last message"
             );
           }
+
           break;
         }
 
         case "server/updateExpirationDate": {
-          console.log(action.data);
           let userApproving = await User.findOneLight(
             action.data.userApproving
           );
@@ -749,14 +701,7 @@ io.on("connection", (socket) => {
             userApproved.email,
             userApproving.email
           );
-          console.log(
-            "Emitting to: ",
-            userApproving.email,
-            " and",
-            userApproved.email,
-            " the new expiration date: ",
-            conv.expiresIn
-          );
+
           // send the new expiration date for the right conversation id
           io.to(userApproved.socketId).emit("action", {
             type: "setExpirationDate",
@@ -777,7 +722,6 @@ io.on("connection", (socket) => {
         }
 
         case "server/replace_socket_id": {
-          console.log("replACE SOCKET:", action.data, socket.id);
           let email = action.data.senderEmail;
           let user = await User.findOneLight(email);
           user.update({ socketId: socket.id }).catch((err) => {
@@ -801,9 +745,8 @@ io.on("connection", (socket) => {
           // send the new expiration date for the right conversation id
           // PREPARE DATA TO SEND TO BOTH USERS
           let socketList = await io.fetchSockets();
-          // console.log(socketList);
+
           _.forEach(socketList, (val) => {
-            // console.log(val.id);
             if (val.id == userApproving.socketId) userOnline = true;
           });
 
@@ -827,9 +770,8 @@ io.on("connection", (socket) => {
           };
 
           let user2Online = false;
-          // console.log(socketList);
+
           _.forEach(socketList, (val) => {
-            // console.log(val.id);
             if (val.id == userApproved.socketId) user2Online = true;
           });
 
@@ -869,7 +811,7 @@ io.on("connection", (socket) => {
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   });
 });

@@ -15,7 +15,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
   //   useUTC: false, // for reading from database
   // },
   timezone: "+02:00", // for writing to database
-  logging: true,
+  logging: false,
 });
 
 const ConvUsers = sequelize.define(

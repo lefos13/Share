@@ -53,39 +53,63 @@ const { response } = require("express");
 const fs = require("fs");
 
 const crypto = require("crypto");
+const User = require("../database/User");
 const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
 
+const determineExpirationDate = async (post) => {
+  try {
+    let expiresIn;
+    if (!post.withReturn) {
+      if (post.enddate == null) {
+        //change for the return date also
+        expiresIn = moment(post.startdate).add(1, "weeks");
+      } else {
+        expiresIn = moment(post.enddate).add(1, "weeks");
+      }
+    } else {
+      if (post.returnEndDate == null) {
+        //change for the return date also
+        expiresIn = moment(post.returnStartDate).add(1, "weeks");
+      } else {
+        expiresIn = moment(post.returnEndDate).add(1, "weeks");
+      }
+    }
+
+    return expiresIn;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 const encryptMessages = async (messages) => {
   try {
-    console.log(messages);
-
     _.forEach(messages, (val) => {
       const cipher = crypto.createCipheriv(algorithm, key, iv);
       val.text = cipher.update(val.text, "utf-8", "hex");
       val.text += cipher.final("hex");
     });
-    // console.log("Encrypted messages:", messages);
+
     return messages;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
 
 const decryptMessages = async (messages) => {
   try {
-    console.log(messages);
     _.forEach(messages, (val) => {
       const decipher = crypto.createDecipheriv(algorithm, key, iv);
       val.text = decipher.update(val.text, "hex", "utf-8");
       val.text = decipher.final("utf-8");
     });
-    // console.log("Decrypted messages:", messages);
+
     return messages;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -95,23 +119,21 @@ const getLang = async (lang) => {
   else if (lang == "GR") msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
   else msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
 
-  // console.log(msg);
   return msg;
 };
 const determineLang = async (req) => {
   try {
     let lang = req.headers["accept-language"];
     let msg;
-    // console.log(lang);
+
     if (lang == "EN") msg = JSON.parse(fs.readFileSync("./lang/english.json"));
     else if (lang == "GR")
       msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
     else msg = JSON.parse(fs.readFileSync("./lang/greek.json"));
-    // console.log("MY LANGUAGE IS: ", lang);
-    // console.log(msg);
+
     return msg;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return "GR";
   }
 };
@@ -155,7 +177,7 @@ const newRide = async (postid, emailArray, postOwner) => {
         throw err;
       });
       let msg = await getLang(userToNotify.lastLang);
-      // console.log(msg, userToNotify.lastLang);
+
       let message = {
         data: {
           type: "newRide",
@@ -183,16 +205,67 @@ const newRide = async (postid, emailArray, postOwner) => {
         console.log("Success: " + response);
       })
       .catch((err) => {
-        console.log("Error to send massive notifications: " + err);
+        console.error("Error to send massive notifications: " + err);
       });
-
-    // console.log("ALL USERS TO BE NOTIFIED: " + string2); ///test log
   } catch (error) {
-    console.log("Inside Newride  ============= " + error);
+    console.error("Inside Newride  ============= " + error);
+  }
+};
+
+const sendMessage = async (
+  messageSent,
+  receiverObj,
+  senderEmail,
+  conversationId
+) => {
+  try {
+    let msg = await getLang(receiverObj.lastLang);
+
+    const sender = await User.findOneLight(senderEmail);
+    if (sender === false) throw new Error("Didnt find user");
+
+    const fcm = await FcmToken.findOne({
+      where: {
+        email: receiverObj.email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    let data = {
+      type: "chatReceivedMessage",
+      conversationId: conversationId,
+      message: messageSent.toString(),
+    };
+    let message = {
+      data: data,
+      token: fcm.fcmToken,
+      notification: {
+        title: msg.firebase.new_message,
+        body:
+          msg.firebase.not_ver_body0 +
+          sender.fullname +
+          msg.firebase.sent +
+          messageSent.text,
+      },
+    };
+
+    admin
+      .messaging()
+      .send(message)
+      .then((response) => {
+        console.log("Success: ", response);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  } catch (error) {
+    console.error(error);
   }
 };
 
 module.exports = {
+  sendMessage,
   encryptMessages,
   decryptMessages,
   IsJsonString,
@@ -277,7 +350,7 @@ module.exports = {
     }
   },
 
-  toNotifyTheVerified: async (email, postid, ownerEmail) => {
+  toNotifyTheVerified: async (email, postid, ownerEmail, convId) => {
     try {
       let postIdString = postid.toString();
       const user = await Users.findOne({
@@ -312,6 +385,7 @@ module.exports = {
           postid: postIdString,
           email: user.email, // owner email
           fullname: user.fullname, // owner email
+          conversationId: convId,
         },
         token: fcmToken.fcmToken,
         notification: {
@@ -332,7 +406,7 @@ module.exports = {
           throw err;
         });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   },
 
@@ -454,8 +528,7 @@ module.exports = {
           let postEndDate = new Date(obj.post.returnEndDate);
           let searchStartDate = new Date(data.returnStartDate);
           let searchEndDate = new Date(data.returnEndDate);
-          // console.log("Checking return start: " + searchStartDate);
-          // console.log("Checking return end: " + searchEndDate);
+
           return (
             obj.post.withReturn == true &&
             ((searchStartDate.getTime() >= postStartDate.getTime() &&
@@ -474,7 +547,7 @@ module.exports = {
       }
       return array;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return false;
     }
   },
@@ -497,7 +570,9 @@ module.exports = {
           email: { [Op.ne]: post.email },
         },
       }).catch((err) => {
-        console.log("Inside function that pushes notifications, threw error!");
+        console.error(
+          "Inside function that pushes notifications, threw error!"
+        );
         throw err;
       });
 
@@ -520,7 +595,9 @@ module.exports = {
           email: { [Op.ne]: post.email },
         },
       }).catch((err) => {
-        console.log("Inside function that pushes notifications, threw error!");
+        console.error(
+          "Inside function that pushes notifications, threw error!"
+        );
         throw err;
       });
 
@@ -528,11 +605,6 @@ module.exports = {
       if (allRequests2.length > 0) {
         for await (req of allRequests2) {
           let moreplaces = post.moreplaces;
-          // console.log(post.moreplaces);
-          // if (IsJsonString(post.moreplaces)) {
-          //   // FIXXXXXXXXX
-          //   moreplaces = JSON.parse(post.moreplaces);
-          // }
 
           for await (place of moreplaces) {
             if (place.placecoords == req.endcoord) {
@@ -548,13 +620,10 @@ module.exports = {
       if (toSendNotification) {
         // Data for the notification, postid and the array of users
         newRide(post.postid, arrayToNotify, post.email, msg);
-      } else {
-        console.log("No request is found to be valid for the new post");
       }
     } catch (err) {
-      console.log("Error inside try and catch!!!!!", err);
+      console.error("Error inside try and catch!!!!!", err);
     }
-    // console.log("Inside func", post);
   },
   fixAllDates: async (fnd) => {
     fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
@@ -579,4 +648,5 @@ module.exports = {
   },
   determineLang,
   getLang,
+  determineExpirationDate,
 };

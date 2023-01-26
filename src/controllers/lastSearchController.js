@@ -11,7 +11,6 @@ const addFavouriteSearch = async (req, res) => {
     }
     res.status(data.status).json({ message: data.message, data: data.data });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -25,7 +24,6 @@ const getAllSearches = async (req, res) => {
     }
     res.status(data.status).json({ message: data.message, data: data.data });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -39,7 +37,6 @@ const deleteFavourite = async (req, res) => {
     }
     res.status(data.status).json({ message: data.message, data: data.data });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };

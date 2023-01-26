@@ -15,7 +15,6 @@ const createNewPost = async (req, res) => {
       .status(newPost.status)
       .json({ message: newPost.data, postid: newPost.postid });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -33,18 +32,16 @@ const deleteOnePost = (req, res) => {
 const interested = async (req, res) => {
   try {
     let msg = await determineLang(req);
-    // console.log("asd");
+
     const data = await postService.interested(req);
     if (data.status == 500) {
       throw msg;
     } else if (data.status == 200) {
-      // console.log(data.body.date);
       res.json({ body: data.body, message: data.message });
     } else {
       res.status(data.status).json({ message: data.message });
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -56,7 +53,6 @@ const searchPosts = async (req, res) => {
     if (data.status == 500) throw msg;
     res.status(data.status).json({ body: data.body, message: data.message });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -72,7 +68,6 @@ const getPostsUser = async (req, res) => {
     }
     res.status(data.status).json(data.data);
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -86,7 +81,6 @@ const feedScreen = async (req, res) => {
     }
     res.status(data.status).json({ body: data.body, message: data.message });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -102,7 +96,6 @@ const getPostPerId = async (req, res) => {
     }
     res.status(data.status).json(data.data);
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -120,7 +113,6 @@ const getInterestedPerUser = async (req, res) => {
       res.status(data.status).json(data.data);
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -137,7 +129,6 @@ const getIntPost = async (req, res) => {
       res.status(data.status).json(data.data);
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -154,7 +145,6 @@ const deletePost = async (req, res) => {
       res.status(data.status).json({ message: data.message });
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -171,7 +161,6 @@ const deleteInterested = async (req, res) => {
       res.status(data.status).json({ message: data.message });
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -190,7 +179,6 @@ const verInterested = async (req, res) => {
         .json({ message: data.message, chatCreated: data.chatCreated });
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -207,7 +195,6 @@ const handleFavourite = async (req, res) => {
       res.status(data.status).json({ message: data.message });
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -224,7 +211,6 @@ const getFavourites = async (req, res) => {
       res.status(data.status).json({ favourites: data.data });
     }
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };

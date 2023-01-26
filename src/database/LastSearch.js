@@ -49,7 +49,6 @@ const createIfNotExist = async (data) => {
         ],
       },
     });
-    // console.log(data);
 
     //if it exists
     if (exist === null) {
@@ -96,7 +95,7 @@ const createIfNotExist = async (data) => {
     }
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -126,7 +125,7 @@ const favouriteExist = async (data) => {
 
     return found;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -137,7 +136,7 @@ const createFavourite = async (data) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -154,7 +153,7 @@ const countFavourites = async (email) => {
     });
     return count;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -172,7 +171,7 @@ const getAll = async (email) => {
 
     return searches;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -228,7 +227,7 @@ const deleteFavourite = async (lsid, email) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };

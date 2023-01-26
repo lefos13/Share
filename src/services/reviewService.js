@@ -51,7 +51,6 @@ const getReviews = async (req) => {
       total = r.toJSON().total;
     }
     var average = total / revfound.count;
-    console.log("total: " + total + " count: " + revfound.count);
 
     query = {
       where: {
@@ -95,7 +94,7 @@ const getReviews = async (req) => {
     if (data.page > 1) skipcount = data.page * 20 - 20;
     var finalarr = _.take(_.drop(rev.rows, skipcount), takecount);
     let mod = rev.count % 20;
-    // console.log(mod);
+
     let totallength = 1;
     mod == 0
       ? (totallength = rev.count / 20)
@@ -117,7 +116,7 @@ const getReviews = async (req) => {
     };
     return { status: 200, response: response };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -156,7 +155,6 @@ const createReview = async (req) => {
       }
       // if the reviewer is the driver then update the driver
       if (possibleReview.driverEmail == review.emailreviewer) {
-        // console.log("Driver done review");
         await ToReview.setDriverDone(possibleReview);
       } else {
         //IF THE REVIEWER IS THE PASSENGER UPDATE THE PASSENGER
@@ -173,7 +171,6 @@ const createReview = async (req) => {
 
       var total = null;
       for await (r of rows) {
-        // console.log(results.count);
         total = r.toJSON().total;
       }
       var average = total / results.count;
@@ -222,7 +219,6 @@ const createReview = async (req) => {
 
       var total = null;
       for await (r of rows) {
-        // console.log(results.count);
         total = r.toJSON().total;
       }
       var average = total / results.count;
@@ -235,7 +231,7 @@ const createReview = async (req) => {
       return { status: 200, data: response };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };

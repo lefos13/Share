@@ -11,11 +11,9 @@ const jwt = require("jsonwebtoken");
 const authenticateToken = (req, res, next) => {
   try {
     // const lang = req.headers["Accept-language"];
-    // console.log(lang);
-    // console.log(req.headers);
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    // console.log(token);
+
     if (token == null) return res.sendStatus(401);
 
     jwt.verify(token, TOKEN_KEY, (err, email) => {
@@ -25,9 +23,6 @@ const authenticateToken = (req, res, next) => {
           message: "Token expired or didnt even exist",
         });
       else {
-        // console.log("inside auth: " + JSON.stringify(req.body.data));
-        // console.log("Athenticated: " + email.email + "lol");
-        console.log("Authenticated:", email.email);
         req.body["extra"] = email.email;
       }
       next();

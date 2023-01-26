@@ -41,7 +41,7 @@ const addFavouriteSearch = async (req) => {
     let email = req.body.extra;
     let data = req.body.data;
     let curDate = moment();
-    // console.log(data);
+
     data.isUpdated = curDate;
     data.isCreated = curDate;
     data.email = email;
@@ -74,7 +74,7 @@ const addFavouriteSearch = async (req) => {
     }
     let lastSearches = [];
     let favSearches = [];
-    // console.log(allSearches);
+
     _.forEach(allSearches, (val) => {
       if (val.isFavourite) favSearches.push(val);
       else lastSearches.push(val);
@@ -102,7 +102,7 @@ const addFavouriteSearch = async (req) => {
       message: msg.newFavSearch,
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -120,7 +120,6 @@ const getAllSearches = async (req) => {
     }
     let lastSearches = [];
     let favSearches = [];
-    // console.log(allSearches);
     _.forEach(allSearches, (val) => {
       if (val.isFavourite) favSearches.push(val);
       else lastSearches.push(val);
@@ -141,14 +140,13 @@ const getAllSearches = async (req) => {
       favouriteSearches: favSearches,
       lastSearches: lastSearches,
     };
-    // console.log(finalData);
     return {
       status: 200,
       data: finalData,
       message: msg.foundSearches,
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -172,7 +170,7 @@ const deleteFavourite = async (req) => {
     }
     let lastSearches = [];
     let favSearches = [];
-    // console.log(allSearches);
+
     _.forEach(allSearches, (val) => {
       if (val.isFavourite) {
         favSearches.push(val.toJSON());
@@ -196,7 +194,6 @@ const deleteFavourite = async (req) => {
       favouriteSearches: favSearches,
       lastSearches: lastSearches,
     };
-    // console.log(finalData);
 
     return {
       status: 200,
@@ -204,7 +201,7 @@ const deleteFavourite = async (req) => {
       message: msg.favSearchDeleted,
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };

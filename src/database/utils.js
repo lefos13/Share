@@ -56,14 +56,13 @@ const verification = async (otp, email) => {
         "</b></h1>", // html body bale enan diko s xristi tha kanw ena register
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
 const checkPass = async (result, user, fcmToken, email, msg) => {
   try {
     if (result) {
-      //console.log(user.toJSON());
       let data = user.toJSON();
       data.password = null;
       if (fcmToken != null) {
@@ -94,7 +93,6 @@ const checkPass = async (result, user, fcmToken, email, msg) => {
       if (fs.existsSync(photoPath)) {
         rest.photo = "images/" + data.email + ".jpeg";
       } else rest.photo = null;
-      // console.log("useraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       return {
         status: 200,
         message: msg.loginSuc,
@@ -105,7 +103,7 @@ const checkPass = async (result, user, fcmToken, email, msg) => {
       return { status: 405, message: msg.loginFailed };
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return { status: 500 };
   }
 };
@@ -135,7 +133,7 @@ const saveFcm = async (fcmToken, email) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -146,13 +144,12 @@ const fixDate = async (date) => {
     let dateonly = moment(tempd).format("DD/MM/YYYY");
     let newtime = moment(tempd).format("hh:mm");
 
-    // console.log(dateonly, newtime);
     return {
       dateMonthDay: dateonly,
       hoursMinutes: newtime,
     };
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 

@@ -8,6 +8,7 @@ const Post = require("../database/Post");
 const PostInt = require("../database/PostInterested");
 const ToReview = require("../database/ToReview");
 const PostInterested = require("../database/PostInterested");
+const ConvUsers = require("../database/ConvUsers");
 const bcrypt = require("bcrypt");
 var otpGenerator = require("otp-generator");
 const saltRounds = 10;
@@ -57,15 +58,14 @@ const createNewUser = async (req) => {
 
     const final = await User.register(data, msg);
     if (final.status == 200) {
-      // console.log("Uploading new photo...");
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
       fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
     }
-    // console.log(final);
+
     return final;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -82,16 +82,15 @@ const updateOneUser = async (req) => {
       throw new Error("Error at updating profile");
     }
     if (photo != null) {
-      // console.log("Uploading new photo");
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
-      // console.log(buffer);
+
       fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
     }
 
     return { status: 200, message: msg.updateProfile };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return { status: 500 };
   }
 };
@@ -130,7 +129,7 @@ const createToken = async (data) => {
         data: new Date(),
       };
       const accessToken = jwt.sign(payload, TOKEN_KEY, { expiresIn: "60d" });
-      // console.log(accessToken);
+
       const fdata = {
         message: msg.tokenSuc,
         accessToken: accessToken,
@@ -138,7 +137,7 @@ const createToken = async (data) => {
       return { status: 200, data: fdata };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -169,7 +168,6 @@ const updatePass = async (req) => {
         return { status: 200, message: msg.upPassSuc };
       }
     } else if (data.currentPassword == null) {
-      // console.log("Changing password from forgot procedure...");
       // GENERATE HASH FOR THE PASSWORD GIVEN
       const salt = await bcrypt.genSalt(saltRounds);
       let hash = await bcrypt.hash(password, salt);
@@ -187,7 +185,6 @@ const updatePass = async (req) => {
         return { status: 200, message: msg.upPassSuc };
       }
     } else {
-      // console.log("Changing password normally...");
       let curPass = data.currentPassword;
       const salt = await bcrypt.genSalt(saltRounds);
       let hash = await bcrypt.hash(password, salt);
@@ -232,7 +229,7 @@ const userVerify = async (req) => {
       );
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500, message: "Κάτι πήγε στραβά!" };
   }
 };
@@ -243,9 +240,9 @@ const login = async (req) => {
     var email = req.body.data.email;
     var pass = req.body.data.pass;
     let autoLogin = req.body.data.autoLogin;
-    // console.log(req.body);
+
     let fcmToken = req.body.data.fcmToken;
-    // console.log(data);
+
     let msg = await determineLang(req);
 
     // CHECK IF USER EXISTS
@@ -275,7 +272,7 @@ const login = async (req) => {
           };
         } else if (user.isThirdPartyLogin === true && autoLogin === true) {
           //case that is google signed in and go for autologin
-          // console.log("case that is google signed in and go for autologin");
+
           let userData = user.toJSON();
           let { password, mobile, photo, ...rest } = userData;
           //TEMP CODE FOR PHOTO
@@ -309,7 +306,6 @@ const login = async (req) => {
             forceUpdate: false,
           };
         } else {
-          // console.log("case with normal login");
           // CHECK IF THE PASS IS RIGHT
           const result = await bcrypt.compare(pass, user.password);
 
@@ -344,7 +340,7 @@ const login = async (req) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -355,7 +351,7 @@ const loginThirdParty = async (req) => {
     let data = req.body.data;
     let userRegistered = false;
     let forceUpdate = false;
-    // console.log(data);
+
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;
     const user = await User.findOneUser(data.email);
@@ -441,7 +437,7 @@ const loginThirdParty = async (req) => {
       return { status: 200, response: response };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -500,7 +496,7 @@ const searchUser = async (req) => {
     };
     //get user with no password
     let found = await User.findOneUserQuery(findUserQuery);
-    console.log("USER DELETED:", found.deleted);
+
     if (found.deleted === true) {
       return { status: 404, message: msg.userDeleted };
     }
@@ -641,12 +637,12 @@ const searchUser = async (req) => {
       if (postExp === false) {
         throw new Error("Something went wrong with db function");
       }
-      // console.log(postExp);
+
       if (postExp == null) {
         ridesTaken++;
       }
     }
-    // console.log("rides taken", ridesTaken);
+
     //ridesTaken --- END
 
     //==========================
@@ -657,7 +653,7 @@ const searchUser = async (req) => {
     if (allExpired === false) {
       throw new Error("Something went wrong with db function");
     }
-    // console.log(allExpired);
+
     //count all the interested users that are verifed
     for await (post of allExpired) {
       let count = await PostInterested.countVerified(post.postid);
@@ -685,7 +681,7 @@ const searchUser = async (req) => {
     };
     return { status: 200, data: responseData };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -746,7 +742,6 @@ const notifyMe = async (req) => {
           throw new Error("User doesnt exist");
         }
 
-        // console.log(user);
         const reviewExist = await Review.findOne(val.passengerEmail, extra);
         if (reviewExist === false) throw new Error("Error at finding review");
 
@@ -774,7 +769,7 @@ const notifyMe = async (req) => {
         message: msg.usersToReview,
       };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -803,6 +798,10 @@ const deleteUser = async (req) => {
       }
     }
 
+    //delete all chats of user
+    const deletedChat = await ConvUsers.deleteAll(email);
+    if (!deletedChat) throw new Error("Error at deleting the chats!");
+
     //get all active posts of user
     const allPosts = await Post.findAllActive(email, curDate);
     if (allPosts === false) {
@@ -814,7 +813,6 @@ const deleteUser = async (req) => {
     _.forEach(allPosts, (val) => {
       postIds.push(val.postid);
     });
-    // console.log(postIds);
 
     const deletedInts = await PostInterested.destroyPerArrayIds(postIds);
     if (deletedInts === false) {
@@ -844,9 +842,9 @@ const deleteUser = async (req) => {
       throw new Error("Error at updating 'deleted' of user");
     }
 
-    return { status: 200, response: { message: msg.userDeletion } };
+    return { status: 200, response: { message: msg.deleteUser } };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };

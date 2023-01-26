@@ -45,7 +45,6 @@ const countPosts = async (user) => {
     var endDay = moment();
     endDay.set({ hour: 23, minute: 59, second: 59, millisecond: 0 });
 
-    console.log(startDay, endDay);
     const numOfPosts = await Posts.count({
       where: {
         date: { [Op.between]: [startDay, endDay] },
@@ -54,10 +53,9 @@ const countPosts = async (user) => {
     }).catch((err) => {
       throw err;
     });
-    console.log(numOfPosts + " <---res === Inside countPosts()");
     return numOfPosts;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
   // code to count posts of a user the current day
@@ -70,8 +68,6 @@ const createNewPost = async (data, msg) => {
     var postdate = moment();
     data.date = postdate;
 
-    // console.log(data);
-
     const post = await Posts.create(data).catch((err) => {
       throw err;
     });
@@ -82,7 +78,7 @@ const createNewPost = async (data, msg) => {
     pushNotifications(post, msg);
     return post;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
   // logic for the creation of post in db
@@ -100,7 +96,7 @@ const isPostOwner = async (row) => {
     });
     return checkPost;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -117,7 +113,6 @@ const findOne = async (postid) => {
 
     return postForFunction;
   } catch (error) {
-    console.log("Inside findOne: ", error);
     return false;
   }
 };
@@ -141,7 +136,7 @@ const findOneNotOwnerGTEToday = async (postid, email, date) => {
 
     return post;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -153,7 +148,7 @@ const findAndCountAll = async (query) => {
     });
     return found;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -170,7 +165,7 @@ const countAllPastHalfYear = async (email, today) => {
     });
     return count;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -193,7 +188,7 @@ const findAllPastHalfYear = async (email, today) => {
     });
     return all;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -210,7 +205,7 @@ const countFavourites = async (email) => {
     });
     return countFavourites;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -222,7 +217,7 @@ const countPostsQuery = async (query) => {
     });
     return countPosts;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -238,7 +233,7 @@ const deleteOne = async (postid) => {
     });
     return countPosts;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -254,7 +249,7 @@ const findAllOfUser = async (email) => {
     });
     return passengerPosts;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -273,7 +268,7 @@ const deleteFavourite = async (postid) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -293,7 +288,7 @@ const makeFavourite = async (postid) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -312,7 +307,7 @@ const findAllFavourites = async (email) => {
 
     return allFavourites;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -335,7 +330,7 @@ const findExpired = async (postid, date) => {
 
     return post;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -358,7 +353,7 @@ const findAllExpired = async (email, date) => {
 
     return post;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -381,7 +376,7 @@ const findAllActive = async (email, date) => {
 
     return post;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -398,11 +393,35 @@ const destroyAllPerIds = async (postids) => {
 
     return post;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    return false;
+  }
+};
+
+const globalAllExpired = async () => {
+  try {
+    let date = moment();
+    const post = await Posts.findAll({
+      where: {
+        [Op.or]: [
+          { enddate: { [Op.lte]: date } }, //enddate megalutero tou curdate
+          {
+            [Op.and]: [{ enddate: null }, { startdate: { [Op.lte]: date } }],
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return post;
+  } catch (error) {
+    console.error(error);
     return false;
   }
 };
 module.exports = {
+  globalAllExpired,
   destroyAllPerIds,
   findAllExpired,
   findAllActive,
