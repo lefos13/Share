@@ -11,7 +11,7 @@ const { HOST, USER, PASS, DATABASE } = process.env;
 const sequelize = new Sequelize(DATABASE, USER, PASS, {
   host: HOST,
   dialect: "mysql",
-  logging: true,
+  logging: false,
   dialectOptions: {
     typeCast: function (field, next) {
       if (

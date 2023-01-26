@@ -34,7 +34,7 @@ const findAndCountAll = async (query) => {
 
     return results;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -49,10 +49,9 @@ const findOne = async (email, emailReviewer) => {
     }).catch((err) => {
       throw err;
     });
-    // console.log(revExist);
     return revExist;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -65,7 +64,7 @@ const saveReview = async (data) => {
 
     return review;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -84,7 +83,7 @@ const updateReview = async (review, data) => {
       });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };

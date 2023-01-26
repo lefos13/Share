@@ -20,7 +20,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASS, {
     },
   },
   timezone: "+02:00", // for writing to database
-  logging: true,
+  logging: false,
 });
 
 const Posts = sequelize.define(

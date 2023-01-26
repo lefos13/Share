@@ -29,7 +29,7 @@ const createRequest = async (req) => {
       data.startcoord,
       data.endcoord
     );
-    console.log(count, countDub1);
+
     if (count == null || countDub1 == null) {
       throw new Error("Error at counting the requests");
     }
@@ -38,7 +38,7 @@ const createRequest = async (req) => {
     if (count < 3 && countDub1 == 0) {
       //CREATE THE REQUEST
       const request = await Request.saveRequest(data);
-      // console.log(request);
+
       if (request === false) {
         throw new Error("Error at creation of request");
       }
@@ -52,7 +52,7 @@ const createRequest = async (req) => {
       return { status: 405, message: msg.threeRequests };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -60,7 +60,7 @@ const createRequest = async (req) => {
 const getRequests = async (req) => {
   try {
     let email = req.body.extra;
-    console.log(email, "Ψάχνει για τα requests!!!!!");
+
     let msg = await determineLang(req);
     const requests = await Request.getAll(email);
     if (requests === false) {
@@ -73,11 +73,10 @@ const getRequests = async (req) => {
       }
       return { status: 200, requests: requests };
     } else {
-      console.log("NO REQUESTS!!!!");
       return { status: 404, message: msg.noRequests };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -98,7 +97,7 @@ const deleteRequest = async (req) => {
       return { status: 404, message: msg.reqNotFound };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };

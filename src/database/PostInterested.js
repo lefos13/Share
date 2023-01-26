@@ -36,7 +36,7 @@ const findOne = async (email, postid) => {
     });
     return found;
   } catch (error) {
-    console.log("Inside findOne of postinterested:", error);
+    console.error("Inside findOne of postinterested:", error);
     return false;
   }
   // code to count posts of a user the current day
@@ -73,7 +73,7 @@ const getCountOfUser = async (email, starttime, curtime) => {
     });
     return count;
   } catch (error) {
-    console.log("Inside getCountofUser:", error);
+    console.error("Inside getCountofUser:", error);
     return null;
   }
 };
@@ -84,10 +84,9 @@ const createInterest = async (row) => {
     const inter = await PostInterested.create(row).catch((err) => {
       throw err;
     });
-    // console.log(row.date, inter.date);
     return inter;
   } catch (error) {
-    console.log("Inside createInterest: ", error);
+    console.error("Inside createInterest: ", error);
     return false;
   }
 };
@@ -105,7 +104,7 @@ const findAny = async (email) => {
     });
     return found;
   } catch (error) {
-    console.log("Inside findAny of postinterested:", error);
+    console.error("Inside findAny of postinterested:", error);
     return false;
   }
   // code to count posts of a user the current day
@@ -284,7 +283,7 @@ const findAllVerifed = async (email) => {
     });
     return found;
   } catch (error) {
-    console.log("Inside findAny of postinterested:", error);
+    console.error("Inside findAllVerifed of postinterested:", error);
     return false;
   }
   // code to count posts of a user the current day
@@ -303,7 +302,7 @@ const findAllVerifedPerPost = async (email, postList) => {
     });
     return found;
   } catch (error) {
-    console.log("Inside findAllVerifedPerPost of postinterested:", error);
+    console.error("Inside findAllVerifedPerPost of postinterested:", error);
     return false;
   }
   // code to count posts of a user the current day

@@ -56,7 +56,7 @@ const sendReport = async (req) => {
 
     return { status: 200, message: msg.feedbackSuc };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -67,7 +67,7 @@ const getTerms = async (req) => {
 
     return { status: 200, file: file };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -76,8 +76,6 @@ const moreMessages = async (req) => {
   try {
     let data = req.body.data;
     const msg = await determineLang(req);
-
-    console.log(req.body.data);
 
     let conversationId = data.conversationId;
     let message = data.lastMessage;
@@ -96,14 +94,9 @@ const moreMessages = async (req) => {
     let counter = 0;
     let key;
     _.forEach(allMessages, (mes) => {
-      // console.log(mes._id.valueOf() === message._id.valueOf());
-      // console.log(mes._id);
-      // console.log(message._id);
-      // console.log();
       if (mes._id === message._id) {
         counter++;
         key = counter;
-        console.log("Key of the array is:", key, " and message is: ", mes);
         return false;
       }
       counter++;
@@ -113,13 +106,12 @@ const moreMessages = async (req) => {
     var skipcount = counter;
     var takecount =
       allMessages.length - counter > 20 ? 20 : allMessages.length - counter;
-    console.log("takecount:", takecount);
+
     var finalMessages = _.take(_.drop(allMessages, skipcount), takecount);
-    // console.log(finalMessages);
+
     if (allowCrypto) finalMessages = await decryptMessages(finalMessages);
     //check if the are more messages after those
     let messagesLeft = allMessages.length - counter > 20 ? true : false;
-    console.log(allMessages.length - counter);
 
     return {
       status: 200,
@@ -129,7 +121,7 @@ const moreMessages = async (req) => {
       },
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };

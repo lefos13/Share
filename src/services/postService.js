@@ -14,6 +14,7 @@ const {
   applyFilters,
   IsJsonString,
   determineLang,
+  determineExpirationDate,
 } = require("../utils/functions");
 const _ = require("lodash");
 // enviroment variables
@@ -54,7 +55,7 @@ const createNewPost = async (data, req) => {
     let message = null;
     //Check if the user has done more than three posts current day.
     const counter = await Post.countPosts(postToInsert.email);
-    // console.log("Inside postService: " + counter);
+
     if (counter < 3) {
       //do it
       const newPost = await Post.createNewPost(postToInsert, msg);
@@ -73,7 +74,7 @@ const createNewPost = async (data, req) => {
     }
     return message;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -82,20 +83,17 @@ const interested = async (req) => {
   try {
     const io = socket.io;
     let extra = req.body.extra;
-    // console.log(req.query);
+
     let data = req.body.data;
-    // console.log(data);
+
     let msg = await determineLang(req);
     if (data.email == null) {
       return { status: 401, message: msg.noEmail };
     }
     let curtime = moment().endOf("day").format("YYYY-MM-DD hh:mm:ss");
     let starttime = moment().startOf("day").format("YYYY-MM-DD hh:mm:ss");
-    // console.log(curtime, starttime);
-    // console.log("Moment curdate: ", cur, endDate);
 
     let dateOfInterest = moment();
-    // console.log(dateOfInterest);
 
     var row = {
       email: data.email,
@@ -106,7 +104,7 @@ const interested = async (req) => {
       isNotified: false,
       ownerNotified: false,
     };
-    // console.log(row.date);
+
     //CHECK IF THE CLIENT IS THE OWNER OF THE POST
     const isPostOwner = await Post.isPostOwner(row);
     if (isPostOwner === false) throw new Error("Db error");
@@ -136,7 +134,7 @@ const interested = async (req) => {
       } else {
         //CASE THAT INTEREST IS TO BE CREATED
         const inter = await PostInterested.createInterest(row);
-        // console.log(inter.date);
+
         if (inter === false)
           throw new Error("Something went wrong with creation of interest!");
         //Section for notificaiton through firebase
@@ -149,7 +147,7 @@ const interested = async (req) => {
         }
         fun.toNotifyOwner(postForFunction.email, extra, row.postid);
         // return the right results to the controller
-        // console.log(row.date);
+
         return {
           status: 200,
           body: row,
@@ -159,12 +157,7 @@ const interested = async (req) => {
     } else {
       //Potential expirition date of a chat
       let post = await Post.findOne(row.postid);
-      let expiresIn;
-      if (post.enddate == null) {
-        expiresIn = moment(post.startdate).add(1, "weeks").format("YYYY-MM-DD");
-      } else {
-        expiresIn = moment(post.enddate).add(1, "weeks").format("YYYY-MM-DD");
-      }
+      let expiresIn = await determineExpirationDate(post);
 
       //delete the interest of the user for the specific post
       const deleted = await PostInterested.destroyOne(row.email, row.postid);
@@ -215,55 +208,28 @@ const interested = async (req) => {
         let expirationDates = [];
         if (allVerPassenger.length > 0) {
           // get the expiration dates
-          _.forEach(allVerPassenger, (val) => {
-            _.forEach(allActiveDriver, (postv) => {
+          for await (let val of allVerPassenger) {
+            for await (let postv of allActiveDriver) {
               if (val.postid == postv.postid) {
-                console.log(
-                  "FOUND A POST THAT PASSENGER IS ALREADY VERIFIED BY DRIVER",
-                  postv.postid
-                );
-                let expires;
-                if (postv.enddate == null) {
-                  expires = moment(postv.startdate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                } else {
-                  expires = moment(postv.enddate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                }
+                let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
               }
-            });
-          });
+            }
+          }
         }
 
         if (allVerDriver.length > 0) {
           // get the expiration dates
-          _.forEach(allVerDriver, (val) => {
-            _.forEach(allActivePassenger, (postv) => {
+          for await (let val of allVerDriver) {
+            for await (let postv of allActivePassenger) {
               if (val.postid == postv.postid) {
-                console.log(
-                  "FOUND A POST THAT DRIVER IS ALREADY VERIFIED BY PASSENGER",
-                  postv.postid
-                );
-                let expires;
-                if (postv.enddate == null) {
-                  expires = moment(postv.startdate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                } else {
-                  expires = moment(postv.enddate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                }
+                let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
               }
-            });
-          });
+            }
+          }
         }
 
-        console.log(expirationDates);
         let toDelete = true;
         if (expirationDates.length > 0) {
           toDelete = false;
@@ -271,7 +237,7 @@ const interested = async (req) => {
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
-          console.log("The biggest date after current chat date is", maxDate);
+
           //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
 
           let updated = await ConvUsers.updateDate(chat.convid, maxDate);
@@ -295,10 +261,6 @@ const interested = async (req) => {
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
           });
-        } else {
-          console.log(
-            "FOUND NO OTHER VERIFIED POSTS SO I CAN UPDATE THE EXPIRATION DATE OF THE COVERSATION"
-          );
         }
         if (toDelete) {
           const deletedChat = await ConvUsers.deleteIfExpiresEqual(
@@ -312,7 +274,7 @@ const interested = async (req) => {
           } else {
             const user1 = await User.findOneLight(post.email);
             const user2 = await User.findOneLight(row.email);
-            // console.log("Conversation id to remove: ", chat.convid);
+
             io.to(user1.socketId).emit("action", {
               type: "onConversationRemoved",
               data: {
@@ -339,7 +301,7 @@ const interested = async (req) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -348,7 +310,7 @@ const searchPosts = async (req) => {
   try {
     let msg = await determineLang(req);
     var data = req.body.data;
-    console.log(data);
+
     let email = req.body.extra;
     if (data.startdate == null) {
       data.startdate = moment().format("YYYY-MM-DD");
@@ -443,7 +405,7 @@ const searchPosts = async (req) => {
     // ==========  if startdate is null, then search from the current date to a month after today.
 
     let found = await Post.findAndCountAll(query);
-    console.log(found);
+
     if (found.count == 0) {
       return { status: 404, message: msg.noRidesFound };
     } else if (found == null) {
@@ -452,7 +414,7 @@ const searchPosts = async (req) => {
 
     for await (fnd of found.rows) {
       fnd.dataValues.isFavourite = false;
-      // console.log(fnd.toJSON());
+
       if (IsJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
@@ -479,7 +441,6 @@ const searchPosts = async (req) => {
       // insert the review average and count inside the object of the user
       let extraData = await insertAver(user);
       user.dataValues = { ...user.dataValues, ...extraData };
-      // console.log(user.dataValues);
 
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(data.email, fnd.postid);
@@ -508,7 +469,6 @@ const searchPosts = async (req) => {
     if (filteredArray === false) {
       throw new Error("Error at filters");
     } else if (filteredArray.length == 0) {
-      console.log("DIDNT FOUND ANY POSTS (FILTERED)");
       return { status: 404, message: msg.noRidesFound };
     }
 
@@ -520,7 +480,6 @@ const searchPosts = async (req) => {
       : (totallength = filteredArray.length / 10 - mod / 10 + 1);
     //CHECK IF ARRAY IS EMPTY AND SEND THE RESULTS
     if (data.page > totallength) {
-      console.log("DIDNT FOUND ANY POSTS");
       return {
         status: 404,
         message: msg.paginationLimit,
@@ -531,7 +490,7 @@ const searchPosts = async (req) => {
     var takecount = 10;
     if (data.page > 1) skipcount = data.page * 10 - 10;
     var finalarr = _.take(_.drop(filteredArray, skipcount), takecount);
-    console.log("POSTS THAT I FOUND: ", finalarr);
+
     results = {
       postUser: finalarr,
       totalPages: totallength,
@@ -541,7 +500,7 @@ const searchPosts = async (req) => {
 
     return { status: 200, body: results, message: msg.ridesFound };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -557,7 +516,6 @@ const getPostsUser = async (req) => {
     if (found === false) {
       throw new Error("Error with finding the posts of the user");
     }
-    // console.log(found);
 
     let rows = found.rows;
     let count = found.count;
@@ -596,7 +554,7 @@ const getPostsUser = async (req) => {
         else post.dataValues.isExpired = true;
       } else {
         // if there isnt any enddate
-        // console.log(curDate, startdate);
+
         if (startdate.isSameOrAfter(curDate)) post.dataValues.isExpired = false;
         else post.dataValues.isExpired = true;
       }
@@ -657,7 +615,7 @@ const getPostsUser = async (req) => {
 
     return { status: 200, data: response };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -722,7 +680,7 @@ const getPostPerId = async (req) => {
 
     return { status: 200, data: response };
   } catch (error) {
-    // console.log(error);
+    // console.error(error);
     return { status: 500 };
   }
 };
@@ -736,9 +694,6 @@ const getInterestedPerUser = async (req) => {
     if (found === false) {
       throw new Error("Error at getting all the interests");
     }
-
-    // console.log(data);
-    // console.log(found);
 
     let array = [];
     // FOR EACH INTEREST
@@ -817,10 +772,8 @@ const getInterestedPerUser = async (req) => {
     }
     // IF YOU DIDNT FIND ANY RETURN 404
     if (array.length == 0) {
-      // console.log("DEN VRIKA TIPOTA!!!!");
       return { status: 404, data: msg.noLikedRides };
     } else {
-      // console.log(JSON.stringify(array), msg.foundLikedRides);
       return {
         status: 200,
         data: {
@@ -830,7 +783,7 @@ const getInterestedPerUser = async (req) => {
       };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -876,7 +829,7 @@ const getIntPost = async (req) => {
           user.dataValues.isVerified = one.isVerified;
           user.dataValues.piid = one.piid;
           user.dataValues.note = one.note;
-          // console.log(JSON.stringify(testdata));
+
           allUsers.push(user);
         } else {
           allUsers.push({
@@ -906,7 +859,7 @@ const getIntPost = async (req) => {
       if (data.page > 1) skipcount = data.page * 10 - 10;
       let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
       let mod = isAny % 10;
-      // console.log(mod);
+
       let totallength = 1;
       mod == 0
         ? (totallength = isAny / 10)
@@ -933,7 +886,7 @@ const getIntPost = async (req) => {
       return { status: 404, data: message };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -958,7 +911,7 @@ const deletePost = async (req) => {
 
     return { status: 200, message: msg.rideDeleted };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -978,7 +931,7 @@ const deleteInterested = async (req) => {
       return { status: 200, message: msg.likerDeleted };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -1012,7 +965,6 @@ const verInterested = async (req) => {
       };
     const post = await Post.findOne(data.postid);
     if (post === false) throw new Error("Error at finding the post");
-    // console.log(post.toJSON());
 
     if (allIntersted < post.numseats || results.isVerified == true) {
       if (results.isVerified === false) {
@@ -1098,7 +1050,6 @@ const verInterested = async (req) => {
           //if a review is done already by the owner of the post and the owner is marked as driver
           //update him as false so he can review again the same user and update the enddate of the toReview row
           if (toReviewExists.driverEmail == post.email) {
-            console.log("UPDATING FLAGS ETC");
             const updated = await ToReview.resetFlags(
               toReviewExists,
               data.piid,
@@ -1109,14 +1060,8 @@ const verInterested = async (req) => {
         }
 
         //CREATION OF NEW CHAT
-        let expiresIn;
-        if (post.enddate == null) {
-          //change for the return date also
-          expiresIn = moment(post.startdate).add(1, "weeks");
-        } else {
-          expiresIn = moment(post.enddate).add(1, "weeks");
-        }
-        console.log("NEW EXPIRATION DATE", expiresIn);
+        let expiresIn = await determineExpirationDate(post);
+
         const chatExists = await ConvUsers.checkIfExists(
           post.email,
           results.email
@@ -1124,9 +1069,10 @@ const verInterested = async (req) => {
         if (chatExists === false)
           //error at finding chat
           throw new Error("Error at finding if chat Exists");
-        else if (chatExists != null) {
-          //chat exists from older post so the expireDate is updated
-          console.log("Chat to be updated:", chatExists.convid);
+
+        if (chatExists != null) {
+          //chat exists from older post so the expireDate is to be updates if it is older than current expire date
+
           const updated = await ConvUsers.updateExpireDate(
             chatExists,
             expiresIn
@@ -1138,10 +1084,7 @@ const verInterested = async (req) => {
           }
         } else {
           //chat doesn't exist at all so a new one is created
-          console.log(
-            "CONV ID BEFORE IT IS CREATED: ",
-            post.email + " " + results.email
-          );
+
           const chatMade = await ConvUsers.saveOne({
             convid: post.email + " " + results.email,
             expiresIn: expiresIn,
@@ -1151,8 +1094,8 @@ const verInterested = async (req) => {
             throw new Error("Error at creating new chat between the users");
           chatCreated = true;
         }
-
         //END OF CREATION OF NEW CHAT
+
         let convid =
           chatExists != null
             ? chatExists.convid
@@ -1162,6 +1105,7 @@ const verInterested = async (req) => {
           status: 200,
           message: msg.likerVerified,
           chatCreated: chatCreated,
+          conversationId: convid,
         };
       } else {
         let dateToCompare = null;
@@ -1183,7 +1127,6 @@ const verInterested = async (req) => {
 
         // if driver is owner check all older posts and decide if you need to update the flags or deny review
         if (toReviewExists.driverEmail === post.email) {
-          console.log("OWNER IS CURRENTLY DRIVER");
           // const denied = await ToReview.denyReview(toReviewExists);
           // if (denied)
           //   throw new Error("Error at denieing review for both users!");
@@ -1192,7 +1135,6 @@ const verInterested = async (req) => {
             moment()
           );
           if (allActiveDriver.length > 0) {
-            console.log("FOUND ACTIVE POSTS FOR DRIVER");
             let allPostIds = [];
             _.forEach(allActiveDriver, (val) => {
               allPostIds.push(val.postid);
@@ -1202,9 +1144,6 @@ const verInterested = async (req) => {
               allPostIds
             );
             if (allVerified.length > 0) {
-              console.log(
-                "FOUND VERIFED INTERESTS OF PASSENGER FOR THE ACTIVE POSTS OF DRIVER"
-              );
               //Check the enddates of active verifed posts and get the oldest
               let dates = [];
               for await (let val of allVerified) {
@@ -1223,7 +1162,7 @@ const verInterested = async (req) => {
                 }
               });
               dateToCompare = minDate;
-              console.log("CHANGE DATE TO: ", minDate);
+
               const newToReview = await ToReview.newReview(
                 toReviewExists,
                 minDate,
@@ -1236,7 +1175,6 @@ const verInterested = async (req) => {
             }
           }
         }
-        // console.log(object);
 
         const activePassengerPosts = await Post.findAllActive(
           results.email,
@@ -1245,7 +1183,6 @@ const verInterested = async (req) => {
 
         let passengerPostsIds = [];
         if (activePassengerPosts.length > 0) {
-          console.log("FOUND ACTIVE POSTS OF PASSENGER");
           _.forEach(activePassengerPosts, (val) => {
             passengerPostsIds.push(val.postid);
           });
@@ -1257,7 +1194,6 @@ const verInterested = async (req) => {
             );
 
           if (allVerifiedOfDriver.length > 0) {
-            console.log("FOUND VERIFICATION FOR THESE ACTIVE POSTS");
             let dates = [];
             for await (let val of allVerifiedOfDriver) {
               let tempPost = await Post.findOne(val.postid);
@@ -1273,7 +1209,6 @@ const verInterested = async (req) => {
               greater = minDate.isSameOrAfter(dateToCompare);
             }
             if (!greater) {
-              console.log("CHANGE DATE TO: ", minDate);
               let piid;
               _.forEach(dates, (d) => {
                 if (moment(d.d).isSame(minDate)) {
@@ -1298,31 +1233,20 @@ const verInterested = async (req) => {
                 throw new Error("error at updating the toreview object");
             }
           } else if (dateToCompare == null) {
-            console.log("DENYING TOREVIEW");
             const destroyed = await ToReview.denyReview(toReviewExists);
             if (destroyed === false)
               throw new Error("Error at destroying the possible review");
           }
         } else if (dateToCompare == null) {
-          console.log("DENYING TOREVIEW");
           const destroyed = await ToReview.denyReview(toReviewExists);
           if (destroyed === false)
             throw new Error("Error at destroying the possible review");
         }
 
         //=================== DELETE THE CHAT CASE  ....
-        let expiresIn;
-
-        if (post.enddate == null) {
-          expiresIn = moment(post.startdate)
-            .add(1, "weeks")
-            .format("YYYY-MM-DD");
-        } else {
-          expiresIn = moment(post.enddate).add(1, "weeks").format("YYYY-MM-DD");
-        }
+        let expiresIn = determineExpirationDate(post);
         const chat = await ConvUsers.checkIfExists(results.email, post.email);
-        // console.log(chat.convid);
-        // console.log(expiresIn.format("YYYY-MM-DD") == chat.expiresIn);
+
         if (chat === false) throw new Error("error at finding existing chat");
 
         //CHECK IF THERE IS ANY OLDER VERIFICATION OF THE USERS
@@ -1362,53 +1286,27 @@ const verInterested = async (req) => {
         let expirationDates = [];
         if (allVerPassenger.length > 0) {
           // get the expiration dates
-          _.forEach(allVerPassenger, (val) => {
-            _.forEach(allActiveDriver, (postv) => {
+          for await (let val of allVerPassenger) {
+            for await (let postv of allActiveDriver) {
               if (val.postid == postv.postid) {
-                console.log(
-                  "FOUND A POST THAT PASSENGER IS ALREADY VERIFIED BY DRIVER",
-                  postv.postid
-                );
-                let expires;
-                if (postv.enddate == null) {
-                  expires = moment(postv.startdate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                } else {
-                  expires = moment(postv.enddate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                }
+                let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
               }
-            });
-          });
+            }
+          }
         }
         if (allVerDriver.length > 0) {
           // get the expiration dates
-          _.forEach(allVerDriver, (val) => {
-            _.forEach(allActivePassenger, (postv) => {
+          for await (let val of allVerDriver) {
+            for await (let postv of allActivePassenger) {
               if (val.postid == postv.postid) {
-                console.log(
-                  "FOUND A POST THAT DRIVER IS ALREADY VERIFIED BY PASSENGER",
-                  postv.postid
-                );
-                let expires;
-                if (postv.enddate == null) {
-                  expires = moment(postv.startdate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                } else {
-                  expires = moment(postv.enddate)
-                    .add(1, "weeks")
-                    .format("YYYY-MM-DD");
-                }
+                let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
               }
-            });
-          });
+            }
+          }
         }
-        console.log(expirationDates);
+
         let toDelete = true;
         if (expirationDates.length > 0) {
           toDelete = false;
@@ -1416,7 +1314,7 @@ const verInterested = async (req) => {
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
-          console.log("The biggest date after current chat date is", maxDate);
+
           //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
 
           let updated = await ConvUsers.updateDate(chat.convid, maxDate);
@@ -1440,10 +1338,6 @@ const verInterested = async (req) => {
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
           });
-        } else {
-          console.log(
-            "FOUND NO OTHER VERIFIED POSTS SO I CAN UPDATE THE EXPIRATION DATE OF THE COVERSATION"
-          );
         }
 
         if (toDelete) {
@@ -1458,7 +1352,7 @@ const verInterested = async (req) => {
           } else {
             const user1 = await User.findOneLight(post.email);
             const user2 = await User.findOneLight(results.email);
-            // console.log("Conversation id to remove: ", chat.convid);
+
             io.to(user1.socketId).emit("action", {
               type: "onConversationRemoved",
               data: {
@@ -1490,7 +1384,7 @@ const verInterested = async (req) => {
       };
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -1525,7 +1419,7 @@ const handleFavourite = async (req) => {
       return { status: 405, message: msg.tenFavourites };
     }
   } catch (error) {
-    // console.log(error);
+    // console.error(error);
     return { status: 500 };
   }
 };
@@ -1566,7 +1460,7 @@ const getFavourites = async (req) => {
     }
     return { status: 200, data: allResults };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -1601,7 +1495,6 @@ const feedScreen = async (req) => {
       order: [["date", "DESC"]],
     };
 
-    // console.log(email, data, query);
     // get all the rides based on the query above
     let found = await Post.findAndCountAll(query);
     if (found.count == 0) {
@@ -1667,7 +1560,7 @@ const feedScreen = async (req) => {
     var finalarr = _.take(_.drop(array, skipcount), takecount);
 
     var mod = array.length % 10;
-    // console.log(mod);
+
     var totallength = 1;
     mod == 0
       ? (totallength = array.length / 10)
@@ -1687,7 +1580,7 @@ const feedScreen = async (req) => {
     };
     return { status: 200, body: results, message: msg.ridesFound };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { status: 500 };
   }
 };

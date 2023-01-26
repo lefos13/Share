@@ -42,7 +42,7 @@ const requestCount = async (email) => {
     });
     return count;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -60,7 +60,7 @@ const requestCountDub = async (email, startCoord, endCoord) => {
     });
     return countDubl;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -68,12 +68,11 @@ const requestCountDub = async (email, startCoord, endCoord) => {
 const saveRequest = async (data) => {
   try {
     const request1 = await SearchPost.create(data).catch((err) => {
-      console.log("Error sto creation of request");
       throw err;
     });
     return request1;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -85,12 +84,11 @@ const getAll = async (email) => {
         email: email,
       },
     }).catch((err) => {
-      console.log(err);
       throw err;
     });
     return requests;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -103,13 +101,11 @@ const deleteOne = async (postId, email) => {
         email: email,
       },
     }).catch((err) => {
-      console.log("error kata thn diagrafh enos request");
       throw err;
     });
-    // console.log(reqDel);
     return reqDel;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -126,7 +122,7 @@ const deletePerUser = async (email) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };

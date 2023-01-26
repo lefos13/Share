@@ -36,9 +36,7 @@ const moment = require("moment-timezone");
 // *** ADD ***
 const register = async (data, msg) => {
   try {
-    // console.log(data);
     let user = await Users.create(data).catch((err) => {
-      // console.log("sameuser");
       if (err.parent.errno == 1062) {
         let data = {
           message: msg.sameEmail,
@@ -68,7 +66,6 @@ const register = async (data, msg) => {
 
 const updateUser = async (data, email) => {
   try {
-    // console.log(data);
     const user = await Users.findOne({
       where: {
         email: email,
@@ -96,7 +93,7 @@ const updateUser = async (data, email) => {
       });
     return user;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 };
@@ -113,7 +110,7 @@ const updatePassUser = async (email, newpass) => {
     });
     return user;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -125,11 +122,11 @@ const findOneUser = async (email) => {
         email: email,
       },
     }).catch((err) => {
-      console.log("Error:" + err);
+      throw err;
     });
     return user;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -141,7 +138,7 @@ const findOneUserQuery = async (query) => {
     });
     return user;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -160,14 +157,13 @@ const findOneLight = async (email) => {
     });
     return user;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
 
 const userVerify = async (email) => {
   try {
-    // console.log(email);
     const updatedUser = await Users.update(
       { verified: true },
       {
@@ -178,13 +174,12 @@ const userVerify = async (email) => {
     ).catch((err) => {
       throw err;
     });
-    // console.log(updatedUser[0]);
     if (updatedUser[0] == 0) {
       return false;
     }
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -196,7 +191,7 @@ const saveViaGoogle = async (data) => {
     });
     return userSaved;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -211,7 +206,7 @@ const updateLoginState = async (email, state) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -226,7 +221,7 @@ const updateLang = async (email, lang) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -241,7 +236,7 @@ const updateDeleted = async (email) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -256,7 +251,7 @@ const activateAccount = async (email) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -271,7 +266,7 @@ const addSocketId = async (socketId, email) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -286,7 +281,7 @@ const removeSocketId = async (email) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -303,7 +298,7 @@ const findPerSocket = async (socketId) => {
 
     return user;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };

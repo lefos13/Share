@@ -12,22 +12,19 @@ const createNewUser = async (req, res) => {
     if (newUser.status == 500) throw msg;
     res.status(newUser.status).json(newUser.data);
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
 
 const createToken = async (req, res) => {
   try {
-    // console.log(req.headers);
     let msg = await determineLang(req);
-    // console.log(msg);
+
     let newToken = await userService.createToken(req);
     if (newToken.status == 200) res.status(newToken.status).json(newToken.data);
     else if (newToken.status == 500) throw msg;
     else res.status(newToken.status).json({ message: newToken.data });
   } catch (msg) {
-    // console.log(error);
     res.status(500).json({ message: msg.errorMessage });
   }
 };
@@ -41,7 +38,6 @@ const updateOneUser = async (req, res) => {
     }
     res.status(updatedUser.status).json({ message: updatedUser.message });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -53,7 +49,6 @@ const updatePass = async (req, res) => {
     if (updatedUser.status == 500) throw msg;
     res.status(updatedUser.status).json({ message: updatedUser.message });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -63,7 +58,6 @@ const userVerify = async (req, res) => {
     const updatedUser = await userService.userVerify(req);
     res.status(updatedUser.status).json({ message: updatedUser.message });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Κάτι πήγε στραβά!" });
   }
 };
@@ -108,7 +102,6 @@ const searchUser = async (req, res) => {
     }
     res.status(results.status).json(results.data);
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -122,7 +115,6 @@ const notifyMe = async (req, res) => {
       res.status(404).json({ message: results.message });
     else res.status(results.status).json(results.data);
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -134,7 +126,6 @@ const loginThirdParty = async (req, res) => {
     if (results.status == 500) throw msg;
     else res.status(results.status).json(results.response);
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
@@ -146,7 +137,6 @@ const deleteUser = async (req, res) => {
     if (results.status == 500) throw msg;
     else res.status(results.status).json(results.response);
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };

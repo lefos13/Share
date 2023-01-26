@@ -43,7 +43,6 @@ const deleteRequest = async (req, res) => {
     if (data.status == 500) throw msg;
     res.status(data.status).json({ message: data.message });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };

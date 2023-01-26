@@ -16,7 +16,7 @@ const saveOne = async (data) => {
 
     return results;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -33,7 +33,7 @@ const findOne = async (convid) => {
 
     return results;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -50,7 +50,7 @@ const findAll = async (email) => {
 
     return dbConvs;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -71,7 +71,6 @@ const addMessage = async (convid, message) => {
     }
 
     messages.push(message);
-    // console.log(messages);
 
     await results
       .update({ messages: JSON.stringify(messages) })
@@ -79,7 +78,7 @@ const addMessage = async (convid, message) => {
         throw err;
       });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -102,9 +101,7 @@ const updateLastMessage = async (convid, email, seen) => {
         });
         // check if the last message is of the user that openned the chat
         if (messages[0].user._id == email) {
-          console.log("The last message is Mine!!!");
         } else {
-          console.log("The last message is not Mine!!");
           messages[0].isRead = true;
           messages[0].seen = true;
           await results
@@ -117,7 +114,7 @@ const updateLastMessage = async (convid, email, seen) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -125,7 +122,6 @@ const updateLastMessage = async (convid, email, seen) => {
 const checkIfExists = async (email1, email2) => {
   try {
     //Find all user's active chats and part2: extract the other user
-    console.log("QUERY TO FIND THE DAMN CHAT:");
     const conv = await ConvUsers.findOne({
       where: {
         convid: { [Op.or]: [email1 + " " + email2, email2 + " " + email1] },
@@ -136,7 +132,7 @@ const checkIfExists = async (email1, email2) => {
 
     return conv;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -144,7 +140,6 @@ const checkIfExists = async (email1, email2) => {
 const updateExpireDate = async (convObj, expiresIn) => {
   try {
     let tesDate = moment(convObj.expiresIn);
-    console.log(tesDate);
     if (tesDate > expiresIn) {
       return "0";
     } else {
@@ -155,7 +150,7 @@ const updateExpireDate = async (convObj, expiresIn) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -163,7 +158,6 @@ const updateExpireDate = async (convObj, expiresIn) => {
 const deleteIfExpiresEqual = async (convObj, expiresIn) => {
   try {
     let convid = false;
-    // console.log(convObj.expiresIn, expiresIn);
     if (convObj != null)
       if (convObj.expiresIn == expiresIn) {
         convid = convObj.convid;
@@ -174,7 +168,7 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
 
     return convid;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return "0";
   }
 };
@@ -196,7 +190,7 @@ const updateDate = async (convid, date) => {
 
     return true;
   } catch (error) {
-    console.log(error, "IN UPDATEDATE OF CONVUSERS");
+    console.error(error, "IN UPDATEDATE OF CONVUSERS");
   }
 };
 
@@ -212,11 +206,29 @@ const getAllExpired = async (date) => {
 
     return all;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+  }
+};
+
+const deleteAll = async (email) => {
+  try {
+    let deleted = await ConvUsers.destroy({
+      where: {
+        convid: { [Op.substring]: email },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
 };
 
 module.exports = {
+  deleteAll,
   getAllExpired,
   updateDate,
   findAll,

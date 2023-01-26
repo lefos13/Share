@@ -62,7 +62,7 @@ const findForProfile = async (searcherEmail, profileEmail, dateToCheck) => {
     });
     return possibleReviews;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -92,7 +92,7 @@ const findForCreatingReview = async (review) => {
 
     return possibleReview;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -108,7 +108,7 @@ const setDriverDone = async (possibleReview) => {
       });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -124,7 +124,7 @@ const setPassengerDone = async (possibleReview) => {
       });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -147,14 +147,13 @@ const findIfExists = async (email1, email2) => {
     });
     return toReviewExists;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
 
 const createOne = async (driverEmail, passengerEmail, endDate, piid) => {
   try {
-    // console.log(endDate);
     const newToReview = await ToReview.create({
       driverEmail: driverEmail,
       passengerEmail: passengerEmail,
@@ -165,7 +164,7 @@ const createOne = async (driverEmail, passengerEmail, endDate, piid) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -178,7 +177,6 @@ const reverseUsers = async (
   enddate
 ) => {
   try {
-    console.log(enddate);
     const newToReview = await toReview
       .update({
         driverEmail: driverEmail,
@@ -191,7 +189,7 @@ const reverseUsers = async (
       });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -210,7 +208,7 @@ const resetFlags = async (toReviewExists, piid, enddate) => {
       });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -228,7 +226,7 @@ const denyReview = async (toReviewExists) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -248,7 +246,7 @@ const newReview = async (toReviewExists, date, piid) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -276,7 +274,7 @@ const newReviewAndReverse = async (
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -308,7 +306,7 @@ const updateInVer = async (
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -324,7 +322,7 @@ const deleteOne = async (piid) => {
     });
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -345,7 +343,7 @@ const findAllMyFinished = async (passengerEmail, driverEmail, dateToCheck) => {
 
     return possibleReviews;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
@@ -362,7 +360,7 @@ const deleteAllPerUser = async (email) => {
 
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };
