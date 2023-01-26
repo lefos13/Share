@@ -159,7 +159,7 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
   try {
     let convid = false;
     if (convObj != null)
-      if (convObj.expiresIn == expiresIn) {
+      if (moment(convObj.expiresIn).isSame(expiresIn)) {
         convid = convObj.convid;
         await convObj.destroy().catch((err) => {
           throw err;
