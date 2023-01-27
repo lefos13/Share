@@ -104,7 +104,7 @@ const decryptMessages = async (messages) => {
     _.forEach(messages, (val) => {
       const decipher = crypto.createDecipheriv(algorithm, key, iv);
       val.text = decipher.update(val.text, "hex", "utf-8");
-      val.text = decipher.final("utf-8");
+      val.text += decipher.final("utf-8");
     });
 
     return messages;

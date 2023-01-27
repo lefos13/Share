@@ -5,7 +5,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const moment = require("moment-timezone");
 moment.tz.setDefault("Europe/Athens");
 
-let allowCrypto = false;
+let allowCrypto = true;
 
 //limit the size of request
 var bodyParser = require("body-parser");

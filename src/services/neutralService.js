@@ -1,5 +1,5 @@
 // In src/services/Userservice.js
-let allowCrypto = false;
+let allowCrypto = true;
 // *** ADD *** (methods for all the Users that access data in db)
 const User = require("../database/User");
 const Review = require("../database/Review");
