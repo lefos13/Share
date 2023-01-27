@@ -86,11 +86,11 @@ const determineExpirationDate = async (post) => {
 
 const encryptMessages = async (messages) => {
   try {
-    _.forEach(messages, (val) => {
+    for await (let val of messages) {
       const cipher = crypto.createCipheriv(algorithm, key, iv);
       val.text = cipher.update(val.text, "utf-8", "hex");
       val.text += cipher.final("hex");
-    });
+    }
 
     return messages;
   } catch (error) {
@@ -101,11 +101,11 @@ const encryptMessages = async (messages) => {
 
 const decryptMessages = async (messages) => {
   try {
-    _.forEach(messages, (val) => {
+    for await (let val of messages) {
       const decipher = crypto.createDecipheriv(algorithm, key, iv);
       val.text = decipher.update(val.text, "hex", "utf-8");
       val.text = decipher.final("utf-8");
-    });
+    }
 
     return messages;
   } catch (error) {
