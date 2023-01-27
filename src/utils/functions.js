@@ -18,7 +18,7 @@ const {
   EMAIL,
   PASSEMAIL,
   DATABASE,
-  USER,
+  USERR,
   PASS,
   HOST,
   TOKEN_KEY,
@@ -28,7 +28,7 @@ const {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USER, PASS, {
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,
@@ -86,12 +86,13 @@ const determineExpirationDate = async (post) => {
 
 const encryptMessages = async (messages) => {
   try {
-    _.forEach(messages, (val) => {
+    // console.log("Before encryption: ", messages);
+    for await (let val of messages) {
       const cipher = crypto.createCipheriv(algorithm, key, iv);
       val.text = cipher.update(val.text, "utf-8", "hex");
       val.text += cipher.final("hex");
-    });
-
+    }
+    // console.log("After encryption ", messages);
     return messages;
   } catch (error) {
     console.error(error);
@@ -101,12 +102,14 @@ const encryptMessages = async (messages) => {
 
 const decryptMessages = async (messages) => {
   try {
-    _.forEach(messages, (val) => {
+    // console.log("Before decryption: ", messages);
+    for await (let val of messages) {
       const decipher = crypto.createDecipheriv(algorithm, key, iv);
       val.text = decipher.update(val.text, "hex", "utf-8");
       val.text += decipher.final("utf-8");
-    });
+    }
 
+    // console.log("after decryption: ", messages);
     return messages;
   } catch (error) {
     console.error(error);
