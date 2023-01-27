@@ -5,7 +5,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const moment = require("moment-timezone");
 moment.tz.setDefault("Europe/Athens");
 
-let allowCrypto = false;
+let allowCrypto = true;
 
 //limit the size of request
 var bodyParser = require("body-parser");
@@ -284,7 +284,11 @@ io.on("connection", (socket) => {
       const user = await User.findPerSocket(socket.id);
       if (user === false)
         throw new Error("Cant find user that just disconnected");
+      else if (user == null) {
+        throw "User not found on disconnect!";
+      }
 
+      console.log("User disconnecting: ", user.email);
       const dbConvs = await ConvUsers.findAll({
         where: {
           convid: { [Op.substring]: user.email },
@@ -293,7 +297,7 @@ io.on("connection", (socket) => {
         throw err;
       });
 
-      for await (conv of dbConvs) {
+      for await (let conv of dbConvs) {
         let emails = conv.convid.split(" ");
         let other;
         if (user.email != emails[0]) {
@@ -302,6 +306,13 @@ io.on("connection", (socket) => {
           other = await User.findOneLight(emails[1]);
         }
 
+        console.log(
+          "Emiting to",
+          other.email,
+          " that",
+          user.email,
+          " is offline!"
+        );
         io.to(other.socketId).emit("action", {
           type: "setIsConversationUserOnline",
           data: {
@@ -335,6 +346,7 @@ io.on("connection", (socket) => {
           //log all data of the user
 
           const initiator = await User.findOneLight(action.data.email);
+          if (initiator == null) break;
           let msg = await getLang(initiator.lastLang);
 
           const addedSocketId = await User.addSocketId(
@@ -509,17 +521,29 @@ io.on("connection", (socket) => {
 
           // emit the message if the user is online
           if (online)
-            io.to(recSocketId).emit("action", {
-              type: "private_message",
-              data: {
-                ...action.data,
-                conversationId: conversationId,
-                senderEmail: fromEmail,
-              },
-            });
+            console.log(
+              "User",
+              fromEmail,
+              " emiting message to online user:",
+              recUser.email
+            );
+          io.to(recSocketId).emit("action", {
+            type: "private_message",
+            data: {
+              ...action.data,
+              conversationId: conversationId,
+              senderEmail: fromEmail,
+            },
+          });
 
           //send notification for offline or background user
           if (!online || inBackground) {
+            console.log(
+              "User",
+              fromEmail,
+              " emiting notification to online user:",
+              recUser.email
+            );
             sendMessage(
               action.data.message,
               recUser,
