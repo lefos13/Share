@@ -64,12 +64,19 @@ const verifyFCMToken = async (fcmToken) => {
   try {
     return admin.messaging().send(
       {
-        data: "",
+        data: {
+          title: "asdasd",
+        },
         token: fcmToken,
+        notification: {
+          title: "",
+          body: "",
+        },
       },
       true
     );
   } catch (error) {
+    // console.error(error);
     console.log("Inside Validation!");
     return false;
   }
@@ -193,7 +200,13 @@ const newRide = async (postid, emailArray, postOwner) => {
     for await (f of fcmTokens) {
       let toSend = false;
 
-      toSend = await verifyFCMToken(fcm.fcmtoken);
+      await verifyFCMToken(f.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
       if (toSend !== false) {
         const userToNotify = await Users.findOne({
           where: { email: f.email },
@@ -262,7 +275,13 @@ const sendMessage = async (
     let toSend = false;
 
     if (fcm != null) {
-      toSend = await verifyFCMToken(fcm.fcmtoken);
+      await verifyFCMToken(fcm.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
     } else {
       throw "User hasnt the app anymore!";
     }
@@ -300,6 +319,7 @@ const sendMessage = async (
       fcm.destroy();
     }
   } catch (error) {
+    // console.error("aaaaaaaaaaaaaaaaaaaaaaa");
     console.error(error);
   }
 };
@@ -358,7 +378,13 @@ module.exports = {
       let toSend = false;
 
       if (fcmData != null) {
-        toSend = await verifyFCMToken(fcm.fcmtoken);
+        await verifyFCMToken(fcmData.fcmToken)
+          .then(() => {
+            toSend = true;
+          })
+          .catch(() => {
+            toSend = false;
+          });
       } else {
         throw "User hasnt the app anymore!";
       }
@@ -423,7 +449,13 @@ module.exports = {
 
       let toSend = false;
       if (fcmToken != null) {
-        toSend = await verifyFCMToken(fcm.fcmtoken);
+        await verifyFCMToken(fcmToken.fcmToken)
+          .then(() => {
+            toSend = true;
+          })
+          .catch(() => {
+            toSend = false;
+          });
       } else {
         throw "User hasnt the app anymore!";
       }
