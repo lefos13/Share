@@ -54,9 +54,26 @@ const fs = require("fs");
 
 const crypto = require("crypto");
 const User = require("../database/User");
+const { reject } = require("lodash");
+const e = require("express");
 const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
+
+const verifyFCMToken = async (fcmToken) => {
+  try {
+    return admin.messaging().send(
+      {
+        data: "",
+        token: fcmToken,
+      },
+      true
+    );
+  } catch (error) {
+    console.log("Inside Validation!");
+    return false;
+  }
+};
 
 const determineExpirationDate = async (post) => {
   try {
@@ -174,42 +191,49 @@ const newRide = async (postid, emailArray, postOwner) => {
     let postIdString = postid.toString();
 
     for await (f of fcmTokens) {
-      const userToNotify = await Users.findOne({
-        where: { email: f.email },
-      }).catch((err) => {
-        throw err;
-      });
-      let msg = await getLang(userToNotify.lastLang);
+      let toSend = false;
 
-      let message = {
-        data: {
-          type: "newRide",
-          postid: postIdString,
-          email: owner.email, // owner email
-          fullname: owner.fullname, // owner email
-        },
-        token: f.fcmToken,
-        notification: {
-          title: msg.firebase.req_title,
-          body:
-            msg.firebase.not_ver_body0 +
-            owner.fullname +
-            msg.firebase.request_part2,
-        },
-      };
-      allMessages.push(message);
-      // allTokens.push(f.fcmToken);
+      toSend = await verifyFCMToken(fcm.fcmtoken);
+      if (toSend !== false) {
+        const userToNotify = await Users.findOne({
+          where: { email: f.email },
+        }).catch((err) => {
+          throw err;
+        });
+        let msg = await getLang(userToNotify.lastLang);
+
+        let message = {
+          data: {
+            type: "newRide",
+            postid: postIdString,
+            email: owner.email, // owner email
+            fullname: owner.fullname, // owner email
+          },
+          token: f.fcmToken,
+          notification: {
+            title: msg.firebase.req_title,
+            body:
+              msg.firebase.not_ver_body0 +
+              owner.fullname +
+              msg.firebase.request_part2,
+          },
+        };
+        allMessages.push(message);
+        // allTokens.push(f.fcmToken);
+      } else {
+        f.destroy();
+      }
     }
-
-    admin
-      .messaging()
-      .sendAll(allMessages)
-      .then((response) => {
-        console.log("Success: " + response);
-      })
-      .catch((err) => {
-        console.error("Error to send massive notifications: " + err);
-      });
+    if (allMessages.length > 0)
+      admin
+        .messaging()
+        .sendAll(allMessages)
+        .then((response) => {
+          console.log("Success: " + response);
+        })
+        .catch((err) => {
+          console.error("Error to send massive notifications: " + err);
+        });
   } catch (error) {
     console.error("Inside Newride  ============= " + error);
   }
@@ -235,33 +259,46 @@ const sendMessage = async (
       throw err;
     });
 
-    let data = {
-      type: "chatReceivedMessage",
-      conversationId: conversationId,
-      message: messageSent.toString(),
-    };
-    let message = {
-      data: data,
-      token: fcm.fcmToken,
-      notification: {
-        title: msg.firebase.new_message,
-        body:
-          msg.firebase.not_ver_body0 +
-          sender.fullname +
-          msg.firebase.sent +
-          messageSent.text,
-      },
-    };
+    let toSend = false;
 
-    admin
-      .messaging()
-      .send(message)
-      .then((response) => {
-        console.log("Success: ", response);
-      })
-      .catch((err) => {
-        throw err;
-      });
+    if (fcm != null) {
+      toSend = await verifyFCMToken(fcm.fcmtoken);
+    } else {
+      throw "User hasnt the app anymore!";
+    }
+
+    if (toSend !== false) {
+      let data = {
+        type: "chatReceivedMessage",
+        conversationId: conversationId,
+        message: messageSent.toString(),
+      };
+      let message = {
+        data: data,
+        token: fcm.fcmToken,
+        notification: {
+          title: msg.firebase.new_message,
+          body:
+            msg.firebase.not_ver_body0 +
+            sender.fullname +
+            msg.firebase.sent +
+            messageSent.text,
+        },
+      };
+
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      console.log("Deleted fcm token of", fcm.email);
+      fcm.destroy();
+    }
   } catch (error) {
     console.error(error);
   }
@@ -318,36 +355,48 @@ module.exports = {
         throw err;
       });
 
-      let postString = postid.toString();
-      let fcmToken = fcmData.fcmToken;
-      let data = {
-        type: "receiveInterest",
-        postid: postString,
-        email: emailAction,
-        fullname: user.fullname,
-      };
+      let toSend = false;
 
-      let message = {
-        data: data,
-        token: fcmToken,
-        notification: {
-          title: msg.firebase.not_owner_title,
-          body:
-            msg.firebase.not_ver_body0 +
-            user.fullname +
-            msg.firebase.liked_post,
-        },
-      };
+      if (fcmData != null) {
+        toSend = await verifyFCMToken(fcm.fcmtoken);
+      } else {
+        throw "User hasnt the app anymore!";
+      }
 
-      admin
-        .messaging()
-        .send(message)
-        .then((response) => {
-          console.log("Success: ", response);
-        })
-        .catch((err) => {
-          throw err;
-        });
+      if (toSend !== false) {
+        let postString = postid.toString();
+        let fcmToken = fcmData.fcmToken;
+        let data = {
+          type: "receiveInterest",
+          postid: postString,
+          email: emailAction,
+          fullname: user.fullname,
+        };
+
+        let message = {
+          data: data,
+          token: fcmToken,
+          notification: {
+            title: msg.firebase.not_owner_title,
+            body:
+              msg.firebase.not_ver_body0 +
+              user.fullname +
+              msg.firebase.liked_post,
+          },
+        };
+
+        admin
+          .messaging()
+          .send(message)
+          .then((response) => {
+            console.log("Success: ", response);
+          })
+          .catch((err) => {
+            throw err;
+          });
+      } else {
+        fcmData.destroy();
+      }
     } catch (error) {
       console.error(error);
     }
@@ -372,42 +421,53 @@ module.exports = {
         throw err;
       });
 
-      const toNotifyUser = await Users.findOne({
-        where: {
-          email: email,
-        },
-      }).catch((err) => {
-        throw err;
-      });
+      let toSend = false;
+      if (fcmToken != null) {
+        toSend = await verifyFCMToken(fcm.fcmtoken);
+      } else {
+        throw "User hasnt the app anymore!";
+      }
 
-      const msg = await getLang(toNotifyUser.lastLang);
-
-      let message = {
-        data: {
-          type: "receiveApproval",
-          postid: postIdString,
-          email: user.email, // owner email
-          fullname: user.fullname, // owner email
-          conversationId: convId,
-        },
-        token: fcmToken.fcmToken,
-        notification: {
-          title: msg.firebase.not_ver_title,
-          body:
-            msg.firebase.not_ver_body0 +
-            user.fullname +
-            msg.firebase.not_ver_body,
-        },
-      };
-      admin
-        .messaging()
-        .send(message)
-        .then((response) => {
-          console.log("Success: ", response);
-        })
-        .catch((err) => {
+      if (toSend !== false) {
+        const toNotifyUser = await Users.findOne({
+          where: {
+            email: email,
+          },
+        }).catch((err) => {
           throw err;
         });
+
+        const msg = await getLang(toNotifyUser.lastLang);
+
+        let message = {
+          data: {
+            type: "receiveApproval",
+            postid: postIdString,
+            email: user.email, // owner email
+            fullname: user.fullname, // owner email
+            conversationId: convId,
+          },
+          token: fcmToken.fcmToken,
+          notification: {
+            title: msg.firebase.not_ver_title,
+            body:
+              msg.firebase.not_ver_body0 +
+              user.fullname +
+              msg.firebase.not_ver_body,
+          },
+        };
+        admin
+          .messaging()
+          .send(message)
+          .then((response) => {
+            console.log("Success: ", response);
+          })
+          .catch((err) => {
+            throw err;
+          });
+      } else {
+        fcmToken.destroy();
+      }
     } catch (error) {
       console.error(error);
     }
