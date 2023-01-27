@@ -106,7 +106,7 @@ const decryptMessages = async (messages) => {
     for await (let val of messages) {
       const decipher = crypto.createDecipheriv(algorithm, key, iv);
       val.text = decipher.update(val.text, "hex", "utf-8");
-      val.text = decipher.final("utf-8");
+      val.text += decipher.final("utf-8");
     }
 
     console.log("after decryption: ", messages);
