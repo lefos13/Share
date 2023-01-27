@@ -479,6 +479,7 @@ io.on("connection", (socket) => {
         case "server/private_message": {
           const conversationId = action.data.conversationId; // this is the receipient id
           const fromEmail = action.data.senderEmail; //this is my id
+          let dataForNotificaiton = action.data.message;
 
           // const userValues = Object.values(users);
           const conversation = await Conv.findOne(conversationId);
@@ -544,8 +545,8 @@ io.on("connection", (socket) => {
               " emiting notification to online user:",
               recUser.email
             );
-            sendMessage(
-              action.data.message,
+            await sendMessage(
+              dataForNotificaiton,
               recUser,
               fromEmail,
               conversationId
