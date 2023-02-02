@@ -167,10 +167,10 @@ const determineLang = async (req) => {
 const IsJsonString = async (str) => {
   try {
     JSON.parse(str);
+    return true;
   } catch (e) {
     return false;
   }
-  return true;
 };
 
 const newRide = async (postid, emailArray, postOwner) => {
@@ -649,10 +649,10 @@ module.exports = {
   IsJsonString: (str) => {
     try {
       JSON.parse(str);
+      return true;
     } catch (e) {
       return false;
     }
-    return true;
   },
   pushNotifications: async (post, msg) => {
     try {

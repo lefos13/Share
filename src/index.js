@@ -344,6 +344,7 @@ io.on("connection", (socket) => {
         //the self_user to the client so i can initialize the chat with this id
         case "server/join":
           //log all data of the user
+          console.log("call server Join!!!");
 
           const initiator = await User.findOneLight(action.data.email);
           if (initiator == null) break;
@@ -425,7 +426,9 @@ io.on("connection", (socket) => {
             data.expiresIn = u.expiresIn;
             if (u.messages !== null) {
               // order
-              u.messages = JSON.parse(u.messages);
+              let toJson = IsJsonString(u.messages);
+              console.log("IS JSON: ", toJson);
+              if (toJson) u.messages = JSON.parse(u.messages);
               u.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
               });
@@ -463,7 +466,7 @@ io.on("connection", (socket) => {
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
-
+            console.log(data.username);
             conversations.push(data);
           }
 

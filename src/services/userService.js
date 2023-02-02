@@ -242,6 +242,7 @@ const login = async (req) => {
     let autoLogin = req.body.data.autoLogin;
 
     let fcmToken = req.body.data.fcmToken;
+    console.log("FCM TOKEN LOGIN: ", fcmToken);
 
     let msg = await determineLang(req);
 
