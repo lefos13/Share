@@ -596,12 +596,14 @@ module.exports = {
           return calcAge >= data.age;
         });
       }
+
       if (data.car != null) {
         //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
         array = _.filter(array, (obj) => {
           return obj.user.car == data.car;
         });
       }
+
       if (data.cardate != null) {
         //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
         array = _.filter(array, (obj) => {
@@ -610,29 +612,56 @@ module.exports = {
           return parseInt(obj.user.cardate) >= data.cardate;
         });
       }
+
       if (data.gender != null) {
         //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
         array = _.filter(array, (obj) => {
           return obj.user.gender == data.gender;
         });
       }
+
       if (data.withReturn != null) {
         //afairese ta post twn xrhstwn pou den exoun epistrofh
         array = _.filter(array, (obj) => {
-          let postStartDate = new Date(obj.post.returnStartDate);
-          let postEndDate = new Date(obj.post.returnEndDate);
-          let searchStartDate = new Date(data.returnStartDate);
-          let searchEndDate = new Date(data.returnEndDate);
-
-          return (
-            obj.post.withReturn == true &&
-            ((searchStartDate.getTime() >= postStartDate.getTime() &&
-              searchStartDate.getTime() <= postEndDate.getTime()) ||
-              (searchEndDate.getTime() <= postEndDate.getTime() &&
-                searchEndDate.getTime() >= postStartDate.getTime()) ||
-              (searchStartDate.getTime() <= postStartDate.getTime() &&
-                searchEndDate.getTime() >= postEndDate.getTime()))
-          );
+          let postStartDate = moment(obj.post.returnStartDate);
+          let postEndDate =
+            data.post.returnEndDate != null
+              ? moment(obj.post.returnEndDate)
+              : null;
+          let searchStartDate = moment(data.returnStartDate);
+          let searchEndDate =
+            data.returnEndDate != null ? moment(data.returnEndDate) : null;
+          if (obj.post.withReturn == false) return false;
+          //case 1 User asked for one return date
+          if (searchEndDate == null) {
+            // case that the post has only a startreturndate
+            if (postEndDate == null && searchStartDate.isSame(postStartDate))
+              return true;
+            else if (
+              postEndDate != null &&
+              searchStartDate.isSameOrBefore(postEndDate) &&
+              searchStartDate.isSameOrAfter(postStartDate)
+            ) {
+              return true;
+            } else return false;
+          } else {
+            // case 2 user asked for a range of dates
+            if (
+              postEndDate == null &&
+              searchStartDate.isSameOrBefore(postStartDate) &&
+              searchEndDate.isSameOrAfter(postStartDate)
+            ) {
+              return true;
+            } else if (
+              (postEndDate != null &&
+                searchStartDate.isBetween(postStartDate, postEndDate)) ||
+              searchEndDate.isBetween(postStartDate, postEndDate)
+            ) {
+              return true;
+            } else {
+              return false;
+            }
+          }
         });
       }
       if (data.petAllowed != null) {
