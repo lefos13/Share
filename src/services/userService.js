@@ -237,12 +237,12 @@ const userVerify = async (req) => {
 const login = async (req) => {
   try {
     let data = req.body.data;
+    console.log("Data for login user:", data);
     var email = req.body.data.email;
     var pass = req.body.data.pass;
     let autoLogin = req.body.data.autoLogin;
 
     let fcmToken = req.body.data.fcmToken;
-    console.log("FCM TOKEN LOGIN: ", fcmToken);
 
     let msg = await determineLang(req);
 
@@ -350,6 +350,7 @@ const loginThirdParty = async (req) => {
   try {
     let msg = await determineLang(req);
     let data = req.body.data;
+    console.log("Data for google log in:", data);
     let userRegistered = false;
     let forceUpdate = false;
 
