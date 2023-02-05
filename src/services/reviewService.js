@@ -134,6 +134,8 @@ const createReview = async (req) => {
       },
     };
     const revExist = await Review.findOne(data.email, data.emailreviewer);
+    console.log("Email Reviewer:", data.emailreviewer);
+    console.log("Email Reviewed:", data.email);
     if (revExist === false) {
       throw new Error("Something went wrong with finding an existing review");
     } else if (revExist == null) {
@@ -153,6 +155,7 @@ const createReview = async (req) => {
           "H KATAGRAFH STON PINAKA TWN PITHANWN REVIEWS DEN UPARXEI === BUG"
         );
       }
+      console.log("Possible review Data:", possibleReview.toJSON());
       // if the reviewer is the driver then update the driver
       if (possibleReview.driverEmail == review.emailreviewer) {
         await ToReview.setDriverDone(possibleReview);

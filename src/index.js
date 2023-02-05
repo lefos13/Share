@@ -281,6 +281,8 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", async (data) => {
     try {
+      console.log("Disconnect reason: ", data);
+      console.log("Socket disconnecting: ", socket.id);
       const user = await User.findPerSocket(socket.id);
       if (user === false)
         throw new Error("Cant find user that just disconnected");
@@ -408,7 +410,7 @@ io.on("connection", (socket) => {
             });
 
             data.conversationId = u.convid;
-            data.socketId = socket.id; //need to change
+            data.socketId = socket.id;
             data.username = us.fullname;
             if (us.photo != null) data.photo = "images/" + u.mail + ".jpeg";
             else data.photo = null;
@@ -427,7 +429,7 @@ io.on("connection", (socket) => {
             if (u.messages !== null) {
               // order
               let toJson = IsJsonString(u.messages);
-              console.log("IS JSON: ", toJson);
+              // console.log("IS JSON: ", toJson);
               if (toJson) u.messages = JSON.parse(u.messages);
               u.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
@@ -466,7 +468,7 @@ io.on("connection", (socket) => {
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
-            console.log(data.username);
+            // console.log(data.username);
             conversations.push(data);
           }
 
@@ -763,11 +765,13 @@ io.on("connection", (socket) => {
           let userApproving = await User.findOneLight(
             action.data.userApproving
           );
+          let msgUserApproving = await getLang(userApproving.lastLang);
           let userApproved = await User.findOneLight(action.data.userApproved);
           const conv = await Conv.checkIfExists(
             userApproved.email,
             userApproving.email
           );
+          let msgUserApproved = await getLang(userApproved.lastLang);
 
           // send new conversation to both users.
           // send the new expiration date for the right conversation id
@@ -792,7 +796,7 @@ io.on("connection", (socket) => {
             expiresIn: conv.expiresIn,
             messages: [],
             isRead: true,
-            lastMessage: "No messages sent yet!",
+            lastMessage: msgUserApproved.noMessages,
             lastMessageTime: null,
             isLastMessageMine: false,
           };
@@ -817,7 +821,7 @@ io.on("connection", (socket) => {
             expiresIn: conv.expiresIn,
             messages: [],
             isRead: true,
-            lastMessage: "No messages sent yet!",
+            lastMessage: msgUserApproving.noMessages,
             lastMessageTime: null,
             isLastMessageMine: false,
           };

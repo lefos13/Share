@@ -639,8 +639,7 @@ module.exports = {
               return true;
             else if (
               postEndDate != null &&
-              searchStartDate.isSameOrBefore(postEndDate) &&
-              searchStartDate.isSameOrAfter(postStartDate)
+              searchStartDate.isBetween(postStartDate, postEndDate)
             ) {
               return true;
             } else return false;
@@ -648,8 +647,7 @@ module.exports = {
             // case 2 user asked for a range of dates
             if (
               postEndDate == null &&
-              searchStartDate.isSameOrBefore(postStartDate) &&
-              searchEndDate.isSameOrAfter(postStartDate)
+              postStartDate.isBetween(searchStartDate, searchEndDate)
             ) {
               return true;
             } else if (

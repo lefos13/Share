@@ -763,9 +763,16 @@ const notifyMe = async (req) => {
         arrayOfUsers.push(user);
       }
     }
-    if (arrayOfUsers.length > 0)
+    if (arrayOfUsers.length > 0) {
+      console.log(
+        "User:",
+        extra,
+        " has:",
+        arrayOfUsers.length,
+        " other users for review!"
+      );
       return { status: 200, data: { usersToReview: arrayOfUsers } };
-    else
+    } else
       return {
         status: 404,
         message: msg.usersToReview,
