@@ -31,7 +31,7 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
-const { getLang } = require("../utils/functions");
+const fun = require("../utils/functions");
 // ==== code for db
 
 const verification = async (otp, email) => {
@@ -47,7 +47,7 @@ const verification = async (otp, email) => {
       host: "smtp.gmail.com",
     });
     let user = await User.findOneLight(email);
-    let msg = await getLang(user.lastLang);
+    let msg = await fun.getLang(user.lastLang);
 
     // send mail with defined transport object
     info = await transporter.sendMail({
