@@ -365,7 +365,9 @@ module.exports = {
         throw err;
       });
 
-      let msg = await getLang(user.lastLang);
+      const userToNotify = await User.findOneLight(emailToNotify);
+
+      let msg = await getLang(userToNotify.lastLang);
 
       const fcmData = await FcmToken.findOne({
         where: {

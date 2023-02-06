@@ -56,7 +56,7 @@ const createNewPost = async (data, req) => {
     //Check if the user has done more than three posts current day.
     const counter = await Post.countPosts(postToInsert.email);
 
-    if (counter < 3) {
+    if (counter < 30) {
       //do it
       const newPost = await Post.createNewPost(postToInsert, msg);
       if (newPost !== false)
