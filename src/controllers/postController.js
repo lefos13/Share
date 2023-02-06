@@ -176,7 +176,7 @@ const verInterested = async (req, res) => {
     } else {
       res
         .status(data.status)
-        .json({ message: data.message, chatCreated: data.chatCreated });
+        .json({ message: data.message, chatCreated: data.chatCreated, conversationId: data.conversationId });
     }
   } catch (error) {
     res.status(500).json({ message: error.errorMessage });

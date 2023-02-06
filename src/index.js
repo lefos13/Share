@@ -571,6 +571,7 @@ io.on("connection", (socket) => {
         }
 
         case "server/personalChatOpened": {
+          console.log("personalChatOpened data: ", action.data.senderId);
           let conversationId = action.data.conversationId;
           let senderId = action.data.senderId;
 
@@ -627,11 +628,13 @@ io.on("connection", (socket) => {
         }
 
         case "server/personalChatClosed": {
+          console.log("personalChatClosed data: ", action.data.senderId);
           delete app.locals[action.data.senderId];
           break;
         }
 
         case "server/AppInBackground": {
+          console.log("AppInBackground data: ", action.data.senderEmail);
           let sender = action.data.senderEmail;
           app.locals.bg[sender] = true;
           //user should be offline right now.
@@ -654,6 +657,7 @@ io.on("connection", (socket) => {
         }
 
         case "server/AppInForeground": {
+          console.log("AppInForeground data: ", action.data.senderEmail);
           let sender = action.data.senderEmail;
           //user should be again online
           delete app.locals.bg[action.data.senderEmail];
@@ -675,12 +679,14 @@ io.on("connection", (socket) => {
         }
 
         case "server/ActiveConversationInBackground": {
+          console.log("ActiveConversationInBackground data: ", action.data);
           const user = await User.findPerSocket(socket.id);
           delete app.locals[user.email];
           break;
         }
 
         case "server/ActiveConversationInForeground": {
+          console.log("ActiveConversationInForeground data: ", action.data);
           const conversationId = action.data.conversationId;
           const user = await User.findPerSocket(socket.id);
           app.locals[user.email] = action.data.conversationId;
