@@ -61,7 +61,7 @@
   "noMessages": "No messages yet!",
   "firebase": {
     "not_ver_title": "Travel approval",
-    "not_ver_body": " approved you to travel together!",
+    "not_ver_body": " has approved you. You can travel together!",
     "not_ver_body0": "",
     "not_owner_title": "Someone is interested!",
     "req_title": "A new Ride is posted!",
@@ -70,5 +70,6 @@
     "liked_post2": "Don't let her/him wait for you!",
     "new_message": "New message",
     "sent": " sent you: "
-  }
+  },
+  "otpMessage": "Please copy the otp code that appears bellow and paste it on the app so you can confirm your identity: <br><h1><b>"
 }

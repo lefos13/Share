@@ -7,6 +7,8 @@ const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
   process.env;
 // END OF SECTION (ENV VAR)
 
+const User = require("../database/User");
+
 const nodemailer = require("nodemailer");
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
@@ -29,6 +31,7 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
+const { getLang } = require("../utils/functions");
 // ==== code for db
 
 const verification = async (otp, email) => {
@@ -43,17 +46,16 @@ const verification = async (otp, email) => {
       port: 465,
       host: "smtp.gmail.com",
     });
+    let user = await User.findOneLight(email);
+    let msg = await getLang(user.lastLang);
 
     // send mail with defined transport object
     info = await transporter.sendMail({
-      from: "Share the ride <share.rideotp@gmail.com",
+      from: "OuRide <ouridecommunity@gmail.com",
       to: email, // list of receivers
       subject: "OTP code", // Subject line
       text: "Here is your OTP code:", // plain text body
-      html:
-        "Παρακάτω μπορείς να αντιγράψεις το κωδικό για να τον εισάγεις στην εφαρμογή σου: <br><h1><b>" +
-        otp +
-        "</b></h1>", // html body bale enan diko s xristi tha kanw ena register
+      html: msg.otpMessage + otp + "</b></h1>", // html body bale enan diko s xristi tha kanw ena register
     });
   } catch (err) {
     console.error(err);
