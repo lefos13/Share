@@ -651,18 +651,21 @@ module.exports = {
           console.log("After search end: ", searchEndDate);
 
           // case that the post has only a startreturndate
-          if (
-            postEndDate == null &&
-            postStartDate.isBetween(searchStartDate, searchEndDate)
-          )
-            return true;
-          else if (
-            (postEndDate != null &&
-              postStartDate.isBetween(searchStartDate, searchEndDate)) ||
-            postEndDate.isBetween(searchStartDate, searchEndDate)
-          ) {
-            return true;
-          } else return false;
+          if (postEndDate == null) {
+            if (postStartDate.isBetween(searchStartDate, searchEndDate))
+              return true;
+          }
+
+          if (postEndDate != null) {
+            if (
+              postStartDate.isBetween(searchStartDate, searchEndDate) ||
+              postEndDate.isBetween(searchStartDate, searchEndDate)
+            ) {
+              return true;
+            }
+          }
+
+          return false;
         });
       }
       if (data.petAllowed != null) {
