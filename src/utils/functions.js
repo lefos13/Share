@@ -627,23 +627,14 @@ module.exports = {
         //afairese ta post twn xrhstwn pou den exoun epistrofh
         array = _.filter(array, (obj) => {
           if (obj.post.withReturn == false) return false;
-          console.log("Start return: ", obj.post.returnStartDate);
-          console.log("End return: ", obj.post.returnEndDate);
-          let postStartDate = moment(obj.post.returnStartDate);
+          let postStartDate = moment.utc(obj.post.returnStartDate);
           let postEndDate =
             obj.post.returnEndDate != null
-              ? moment(obj.post.returnEndDate)
+              ? moment.utc(obj.post.returnEndDate)
               : null;
-          let searchStartDate = moment(data.returnStartDate);
+          let searchStartDate = moment.utc(data.returnStartDate);
           let searchEndDate =
-            data.returnEndDate != null ? moment(data.returnEndDate) : null;
-
-          console.log("After Start return: ", postStartDate);
-          console.log("After End return: ", postEndDate);
-          // console.log("postStartDate", postStartDate);
-          // console.log("postEndDate", postEndDate);
-          // console.log("searchStartDate", searchStartDate);
-          // console.log("searchEndDate", searchEndDate);
+            data.returnEndDate != null ? moment.utc(data.returnEndDate) : null;
 
           //case 1 User asked for one return date
           if (searchEndDate == null) {
