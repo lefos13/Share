@@ -636,10 +636,10 @@ module.exports = {
           let searchEndDate =
             data.returnEndDate != null ? moment(data.returnEndDate) : null;
 
-          console.log("postStartDate", postStartDate);
-          console.log("postEndDate", postEndDate);
-          console.log("searchStartDate", searchStartDate);
-          console.log("searchEndDate", searchEndDate);
+          // console.log("postStartDate", postStartDate);
+          // console.log("postEndDate", postEndDate);
+          // console.log("searchStartDate", searchStartDate);
+          // console.log("searchEndDate", searchEndDate);
 
           //case 1 User asked for one return date
           if (searchEndDate == null) {
