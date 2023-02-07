@@ -627,7 +627,7 @@ module.exports = {
         array = _.filter(array, (obj) => {
           let postStartDate = moment(obj.post.returnStartDate);
           let postEndDate =
-            data.post.returnEndDate != null
+            obj.post.returnEndDate != null
               ? moment(obj.post.returnEndDate)
               : null;
           let searchStartDate = moment(data.returnStartDate);
