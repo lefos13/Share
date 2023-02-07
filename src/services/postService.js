@@ -419,8 +419,6 @@ const searchPosts = async (req) => {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
 
-      fnd = await fun.fixAllDates(fnd);
-
       let userQuery = {
         attributes: {
           exclude: ["password", "verified", "facebook", "instagram", "mobile"],
@@ -464,12 +462,16 @@ const searchPosts = async (req) => {
       };
       array.push(results);
     }
-
     let filteredArray = await applyFilters(data, array);
     if (filteredArray === false) {
       throw new Error("Error at filters");
     } else if (filteredArray.length == 0) {
       return { status: 404, message: msg.noRidesFound };
+    }
+
+    //fix dates after filters
+    for await (let arr of filteredArray) {
+      arr.post = await fun.fixAllDates(arr.post);
     }
 
     //Pagination
