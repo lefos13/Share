@@ -639,27 +639,39 @@ module.exports = {
             data.returnEndDate != null
               ? moment(data.returnEndDate)
               : moment(data.returnStartDate).add(1, "months");
-          console.log("FOR POST: ", obj.post.postid);
-          console.log("BEFORE start: ", obj.post.returnStartDate);
-          console.log("BEFORE end: ", obj.post.returnEndDate);
-          console.log("After start: ", postStartDate);
-          console.log("After end: ", postEndDate);
-          console.log("============");
-          console.log("BEFORE search start: ", data.returnStartDate);
-          console.log("BEFORE search end: ", data.returnEndDate);
-          console.log("After search start: ", searchStartDate);
-          console.log("After search end: ", searchEndDate);
+          // console.log("FOR POST: ", obj.post.postid);
+          // console.log("BEFORE start: ", obj.post.returnStartDate);
+          // console.log("BEFORE end: ", obj.post.returnEndDate);
+          // console.log("After start: ", postStartDate);
+          // console.log("After end: ", postEndDate);
+          // console.log("============");
+          // console.log("BEFORE search start: ", data.returnStartDate);
+          // console.log("BEFORE search end: ", data.returnEndDate);
+          // console.log("After search start: ", searchStartDate);
+          // console.log("After search end: ", searchEndDate);
 
           // case that the post has only a startreturndate
           if (postEndDate == null) {
-            if (postStartDate.isBetween(searchStartDate, searchEndDate))
+            if (
+              postStartDate.isBetween(
+                searchStartDate,
+                searchEndDate,
+                null,
+                "[]"
+              )
+            )
               return true;
           }
 
           if (postEndDate != null) {
             if (
-              postStartDate.isBetween(searchStartDate, searchEndDate) ||
-              postEndDate.isBetween(searchStartDate, searchEndDate)
+              postStartDate.isBetween(
+                searchStartDate,
+                searchEndDate,
+                null,
+                "[]"
+              ) ||
+              postEndDate.isBetween(searchStartDate, searchEndDate, null, "[]")
             ) {
               return true;
             }
