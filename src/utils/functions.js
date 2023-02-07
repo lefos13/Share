@@ -629,10 +629,10 @@ module.exports = {
           //check if post has return dates
           if (obj.post.withReturn == false) return false;
 
-          let postStartDate = moment.utc(obj.post.returnStartDate);
+          let postStartDate = moment(obj.post.returnStartDate);
           let postEndDate =
             obj.post.returnEndDate != null
-              ? moment.utc(obj.post.returnEndDate)
+              ? moment(obj.post.returnEndDate)
               : null;
           let searchStartDate = moment(data.returnStartDate);
           let searchEndDate =
