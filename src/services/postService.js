@@ -319,11 +319,7 @@ const searchPosts = async (req) => {
     if (data.enddate == null) {
       data.enddate = moment().add(1, "months").format("YYYY-MM-DD");
     }
-    if (data.withReturn == true && data.returnEndDate == null) {
-      data.returnEndDate = moment(data.returnStartDate)
-        .add(1, "months")
-        .format("YYYY-MM-DD");
-    }
+
     let query = {
       where: {
         // email different than one that do the search
