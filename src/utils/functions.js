@@ -636,6 +636,9 @@ module.exports = {
           let searchEndDate =
             data.returnEndDate != null ? moment.utc(data.returnEndDate) : null;
 
+          console.log("After start: ", postStartDate);
+          console.log("After end: ", postEndDate);
+
           //case 1 User asked for one return date
           if (searchEndDate == null) {
             // case that the post has only a startreturndate
