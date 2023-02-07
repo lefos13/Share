@@ -626,6 +626,7 @@ module.exports = {
         console.log("FILTERING FOR RETURN DATE!");
         //afairese ta post twn xrhstwn pou den exoun epistrofh
         array = _.filter(array, (obj) => {
+          if (obj.post.withReturn == false) return false;
           let postStartDate = moment(obj.post.returnStartDate);
           let postEndDate =
             obj.post.returnEndDate != null
@@ -639,7 +640,7 @@ module.exports = {
           console.log("postEndDate", postEndDate);
           console.log("searchStartDate", searchStartDate);
           console.log("searchEndDate", searchEndDate);
-          if (obj.post.withReturn == false) return false;
+
           //case 1 User asked for one return date
           if (searchEndDate == null) {
             // case that the post has only a startreturndate
