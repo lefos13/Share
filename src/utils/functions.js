@@ -627,6 +627,7 @@ module.exports = {
         //afairese ta post twn xrhstwn pou den exoun epistrofh
         array = _.filter(array, (obj) => {
           if (obj.post.withReturn == false) return false;
+          console.log(obj.post.returnStartDate);
           let postStartDate = moment(obj.post.returnStartDate);
           let postEndDate =
             obj.post.returnEndDate != null
@@ -636,10 +637,10 @@ module.exports = {
           let searchEndDate =
             data.returnEndDate != null ? moment(data.returnEndDate) : null;
 
-          console.log("postStartDate", postStartDate);
-          console.log("postEndDate", postEndDate);
-          console.log("searchStartDate", searchStartDate);
-          console.log("searchEndDate", searchEndDate);
+          // console.log("postStartDate", postStartDate);
+          // console.log("postEndDate", postEndDate);
+          // console.log("searchStartDate", searchStartDate);
+          // console.log("searchEndDate", searchEndDate);
 
           //case 1 User asked for one return date
           if (searchEndDate == null) {
