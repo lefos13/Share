@@ -643,15 +643,7 @@ module.exports = {
           // case that the post has only a startreturndate
           if (data.returnEndDate == null) {
             if (postEndDate == null) {
-              if (
-                postStartDate.isBetween(
-                  searchStartDate,
-                  searchEndDate,
-                  null,
-                  "[]"
-                )
-              )
-                return true;
+              if (postStartDate.isSame(searchStartDate)) return true;
             }
 
             if (postEndDate != null) {
