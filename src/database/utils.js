@@ -54,8 +54,9 @@ const verification = async (otp, email) => {
       port: 465,
       host: "smtp.gmail.com",
     });
-    let user = await User.findOneLight(email);
-    let msg = await getLang(user.lastLang);
+
+    // let user = await User.findOneLight(email);
+    let msg = await getLang("GR");
 
     // send mail with defined transport object
     info = await transporter.sendMail({
