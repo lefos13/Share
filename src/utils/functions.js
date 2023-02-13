@@ -303,7 +303,11 @@ const sendMessage = async (
             msg.firebase.sent +
             messageSent.text,
         },
-        click_action: "MainActivity",
+        android: {
+          notification: {
+            clickAction: "MainActivity",
+          },
+        },
       };
 
       admin
