@@ -302,6 +302,7 @@ const sendMessage = async (
             sender.fullname +
             msg.firebase.sent +
             messageSent.text,
+          click_action: "MY_ACTIVITY",
         },
       };
 
