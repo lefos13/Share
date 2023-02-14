@@ -9,7 +9,7 @@
   "curEqualOld": "Your new password is the same as the old!",
   "regSuc": "You registered your account!",
   "sameEmail": "There is already an account with this e-mail!",
-  "norLoginAfterGoogle": "To login with email and password you will have to define a new password. Tap ok to procceed or login with google sing-in!",
+  "norLoginAfterGoogle": "To login with email and password you need a new password. Tap \"Go\" to procceed or login with google sing-in!",
   "loginSuc": "Welcome to OURIDE!",
   "otpSent": "Check your email for the special code!",
   "createRideSuc": "You created a new Ride!",

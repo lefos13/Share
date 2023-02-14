@@ -17,6 +17,7 @@ app.use(helmet());
 
 var _ = require("lodash");
 app.use("/images", express.static("uploads"));
+app.use("/termsPolicies", express.static("termsPolicies"));
 
 //cors of course
 const cors = require("cors");
