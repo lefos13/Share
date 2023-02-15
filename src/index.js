@@ -350,7 +350,8 @@ io.on("connection", (socket) => {
           console.log("call server Join!!!");
 
           const initiator = await User.findOneLight(action.data.email);
-          if (initiator == null) break;
+          if (initiator == null) {break;}
+
           let msg = await getLang(initiator.lastLang);
 
           const addedSocketId = await User.addSocketId(
@@ -430,7 +431,7 @@ io.on("connection", (socket) => {
             if (u.messages !== null) {
               // order
               let toJson = IsJsonString(u.messages);
-              // console.log("IS JSON: ", toJson);
+              
               if (toJson) u.messages = JSON.parse(u.messages);
               u.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
@@ -469,7 +470,7 @@ io.on("connection", (socket) => {
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
-            // console.log(data.username);
+            
             conversations.push(data);
           }
 
