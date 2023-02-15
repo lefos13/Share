@@ -63,13 +63,15 @@ const sendReport = async (req) => {
 
 const getTerms = async (req) => {
   try {
-    let file = path.join(__dirname + "/../termsPolicies/terms_GR.html");
+    let file;
 
     let lang = req.headers["accept-language"];
 
     if (lang == "EN") 
       file = path.join(__dirname + "/../termsPolicies/terms_EN.html"); 
     else if (lang == "GR")
+      file = path.join(__dirname + "/../termsPolicies/terms_GR.html");
+    else
       file = path.join(__dirname + "/../termsPolicies/terms_GR.html");
 
     return { status: 200, file: file };
