@@ -467,16 +467,14 @@ io.on("connection", (socket) => {
               data.messages = [];
               data.isRead = true;
               // console.log("LAST MESSAGE:", msg.noMessages);
-              data.lastMessage = msg.noMessages;
+              data.lastMessage = null;
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
             
             conversations.push(data);
           }
-          _.forEach(conversations, val=>{
-            if(val.lastMessageTime==null) console.log("LAST MESSAGE SENT FOR EMPTY CHAT: ",val.lastMessage);
-          })
+          
           //i use io emit to emit in all sockets connected
           //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
           socket.emit("action", { type: "conversations", data: conversations });
@@ -807,7 +805,7 @@ io.on("connection", (socket) => {
             expiresIn: conv.expiresIn,
             messages: [],
             isRead: true,
-            lastMessage: msgUserApproved.noMessages,
+            lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
           };
@@ -832,7 +830,7 @@ io.on("connection", (socket) => {
             expiresIn: conv.expiresIn,
             messages: [],
             isRead: true,
-            lastMessage: msgUserApproving.noMessages,
+            lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
           };
