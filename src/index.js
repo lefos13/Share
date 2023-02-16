@@ -466,6 +466,7 @@ io.on("connection", (socket) => {
             } else {
               data.messages = [];
               data.isRead = true;
+              console.log("LAST MESSAGE:", msg.noMessages);
               data.lastMessage = msg.noMessages;
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
