@@ -466,7 +466,7 @@ io.on("connection", (socket) => {
             } else {
               data.messages = [];
               data.isRead = true;
-              console.log("LAST MESSAGE:", msg.noMessages);
+              // console.log("LAST MESSAGE:", msg.noMessages);
               data.lastMessage = msg.noMessages;
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
@@ -474,7 +474,9 @@ io.on("connection", (socket) => {
             
             conversations.push(data);
           }
-
+          _.forEach(conversations, val=>{
+            if(val.lastMessageTime==null) console.log("LAST MESSAGE SENT FOR EMPTY CHAT: ",val.lastMessage);
+          })
           //i use io emit to emit in all sockets connected
           //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
           socket.emit("action", { type: "conversations", data: conversations });
