@@ -352,7 +352,7 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
 
       let message = {
         data: {
-          type: "receiveDisapproval",
+          type: "user_disapproved",
           postid: postIdString,
           email: owner.email, // owner email
           fullname: owner.fullname, // owner email

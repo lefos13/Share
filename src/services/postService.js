@@ -1247,6 +1247,8 @@ const verInterested = async (req) => {
             throw new Error("Error at destroying the possible review");
         }
 
+        fun.toNotifyTheUnverified(results.email, post.postid, post.email);
+
         //=================== DELETE THE CHAT CASE  ....
         let expiresIn = await determineExpirationDate(post);
         console.log("Date to check for the destruction of chat:", expiresIn);
@@ -1345,6 +1347,7 @@ const verInterested = async (req) => {
           });
         }
         console.log("TO DELETE", toDelete);
+
         if (toDelete) {
           const deletedChat = await ConvUsers.deleteIfExpiresEqual(
             chat,
