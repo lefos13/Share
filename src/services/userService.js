@@ -85,11 +85,11 @@ const updateOneUser = async (req) => {
     if (photo != null) {
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
-      fs.writeFile("uploads/" + email + ".jpeg", buffer, (err) => {
-        if (err) {
-          console.error(err);
-        }
-      });
+      // fs.writeFile("uploads/" + email + ".jpeg", buffer, (err) => {
+      //   if (err) {
+      //     console.error(err);
+      //   }
+      // });
     }
 
     return { status: 200, message: msg.updateProfile };
