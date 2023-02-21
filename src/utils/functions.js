@@ -531,7 +531,7 @@ module.exports = {
         let fcmToken = fcmData.fcmToken;
         let data;
         let message;
-        if (liked) {
+        if (liked === true) {
           data = {
             type: "receiveInterest",
             postid: postString,
@@ -562,11 +562,9 @@ module.exports = {
             data: data,
             token: fcmToken,
             notification: {
-              title: msg.firebase.not_owner_title,
+              title: msg.dislike_title,
               body:
-                msg.firebase.not_ver_body0 +
-                user.fullname +
-                msg.firebase.liked_post,
+                msg.firebase.not_ver_body0 + user.fullname + msg.dislike_body,
             },
           };
         }
