@@ -350,7 +350,8 @@ io.on("connection", (socket) => {
           console.log("call server Join!!!");
 
           const initiator = await User.findOneLight(action.data.email);
-          if (initiator == null) break;
+          if (initiator == null) {break;}
+
           let msg = await getLang(initiator.lastLang);
 
           const addedSocketId = await User.addSocketId(
@@ -430,7 +431,7 @@ io.on("connection", (socket) => {
             if (u.messages !== null) {
               // order
               let toJson = IsJsonString(u.messages);
-              // console.log("IS JSON: ", toJson);
+              
               if (toJson) u.messages = JSON.parse(u.messages);
               u.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
@@ -465,14 +466,15 @@ io.on("connection", (socket) => {
             } else {
               data.messages = [];
               data.isRead = true;
-              data.lastMessage = msg.noMessages;
+              // console.log("LAST MESSAGE:", msg.noMessages);
+              data.lastMessage = null;
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
-            // console.log(data.username);
+            
             conversations.push(data);
           }
-
+          
           //i use io emit to emit in all sockets connected
           //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
           socket.emit("action", { type: "conversations", data: conversations });
@@ -803,7 +805,7 @@ io.on("connection", (socket) => {
             expiresIn: conv.expiresIn,
             messages: [],
             isRead: true,
-            lastMessage: msgUserApproved.noMessages,
+            lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
           };
@@ -828,7 +830,7 @@ io.on("connection", (socket) => {
             expiresIn: conv.expiresIn,
             messages: [],
             isRead: true,
-            lastMessage: msgUserApproving.noMessages,
+            lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
           };

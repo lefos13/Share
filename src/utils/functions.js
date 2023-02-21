@@ -110,13 +110,12 @@ const determineExpirationDate = async (post) => {
 
 const encryptMessages = async (messages) => {
   try {
-    // console.log("Before encryption: ", messages);
     for await (let val of messages) {
       const cipher = crypto.createCipheriv(algorithm, key, iv);
       val.text = cipher.update(val.text, "utf-8", "hex");
       val.text += cipher.final("hex");
     }
-    // console.log("After encryption ", messages);
+
     return messages;
   } catch (error) {
     console.error(error);
@@ -126,14 +125,12 @@ const encryptMessages = async (messages) => {
 
 const decryptMessages = async (messages) => {
   try {
-    // console.log("Before decryption: ", messages);
     for await (let val of messages) {
       const decipher = crypto.createDecipheriv(algorithm, key, iv);
       val.text = decipher.update(val.text, "hex", "utf-8");
       val.text += decipher.final("utf-8");
     }
 
-    // console.log("after decryption: ", messages);
     return messages;
   } catch (error) {
     console.error(error);
@@ -324,7 +321,145 @@ const sendMessage = async (
   }
 };
 
+const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
+  try {
+    let postIdString = postid.toString();
+    const owner = await User.findOneLight(ownerEmail);
+    let fcmToken = await FcmToken.findOne({
+      where: {
+        email: unverifiedEmail,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    let toSend = false;
+    if (fcmToken != null) {
+      await verifyFCMToken(fcmToken.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
+    } else {
+      throw "User hasnt the app anymore!";
+    }
+
+    if (toSend !== false) {
+      const toNotifyUser = await User.findOneLight(unverifiedEmail);
+
+      const msg = await getLang(toNotifyUser.lastLang);
+
+      let message = {
+        data: {
+          type: "user_disapproved",
+          postid: postIdString,
+          email: owner.email, // owner email
+          fullname: owner.fullname, // owner email
+        },
+        token: fcmToken.fcmToken,
+        notification: {
+          title: msg.firebase.unver_title,
+          body:
+            msg.firebase.not_ver_body0 +
+            owner.fullname +
+            msg.firebase.unver_body,
+        },
+      };
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      fcmToken.destroy();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const toNotifyOwner = async (emailToNotify, emailAction, postid) => {
+  try {
+    const user = await Users.findOne({
+      where: {
+        email: emailAction,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    const userToNotify = await User.findOneLight(emailToNotify);
+
+    let msg = await getLang(userToNotify.lastLang);
+
+    const fcmData = await FcmToken.findOne({
+      where: {
+        email: emailToNotify,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    let toSend = false;
+
+    if (fcmData != null) {
+      await verifyFCMToken(fcmData.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
+    } else {
+      throw "User hasnt the app anymore!";
+    }
+
+    if (toSend !== false) {
+      let postString = postid.toString();
+      let fcmToken = fcmData.fcmToken;
+      let data = {
+        type: "receiveInterest",
+        postid: postString,
+        email: emailAction,
+        fullname: user.fullname,
+      };
+
+      let message = {
+        data: data,
+        token: fcmToken,
+        notification: {
+          title: msg.firebase.not_owner_title,
+          body:
+            msg.firebase.not_ver_body0 +
+            user.fullname +
+            msg.firebase.liked_post,
+        },
+      };
+
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      fcmData.destroy();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 module.exports = {
+  toNotifyTheUnverified,
   sendMessage,
   encryptMessages,
   decryptMessages,
@@ -355,7 +490,7 @@ module.exports = {
     }
   },
 
-  toNotifyOwner: async (emailToNotify, emailAction, postid) => {
+  toNotifyOwner: async (emailToNotify, emailAction, postid, liked) => {
     try {
       const user = await Users.findOne({
         where: {
@@ -394,24 +529,47 @@ module.exports = {
       if (toSend !== false) {
         let postString = postid.toString();
         let fcmToken = fcmData.fcmToken;
-        let data = {
-          type: "receiveInterest",
-          postid: postString,
-          email: emailAction,
-          fullname: user.fullname,
-        };
+        let data;
+        let message;
+        if (liked === true) {
+          data = {
+            type: "receiveInterest",
+            postid: postString,
+            email: emailAction,
+            fullname: user.fullname,
+          };
 
-        let message = {
-          data: data,
-          token: fcmToken,
-          notification: {
-            title: msg.firebase.not_owner_title,
-            body:
-              msg.firebase.not_ver_body0 +
-              user.fullname +
-              msg.firebase.liked_post,
-          },
-        };
+          message = {
+            data: data,
+            token: fcmToken,
+            notification: {
+              title: msg.firebase.not_owner_title,
+              body:
+                msg.firebase.not_ver_body0 +
+                user.fullname +
+                msg.firebase.liked_post,
+            },
+          };
+        } else {
+          data = {
+            type: "user_disliked",
+            postid: postString,
+            email: emailAction,
+            fullname: user.fullname,
+          };
+
+          message = {
+            data: data,
+            token: fcmToken,
+            notification: {
+              title: msg.firebase.dislike_title,
+              body:
+                msg.firebase.not_ver_body0 +
+                user.fullname +
+                msg.firebase.dislike_body,
+            },
+          };
+        }
 
         admin
           .messaging()

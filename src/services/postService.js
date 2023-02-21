@@ -56,7 +56,7 @@ const createNewPost = async (data, req) => {
     //Check if the user has done more than three posts current day.
     const counter = await Post.countPosts(postToInsert.email);
 
-    if (counter < 30) {
+    if (counter < 3) {
       //do it
       const newPost = await Post.createNewPost(postToInsert, msg);
       if (newPost !== false)
@@ -145,7 +145,7 @@ const interested = async (req) => {
             message: msg.noRide,
           };
         }
-        fun.toNotifyOwner(postForFunction.email, extra, row.postid);
+        fun.toNotifyOwner(postForFunction.email, extra, row.postid, true);
         // return the right results to the controller
 
         return {
@@ -164,6 +164,8 @@ const interested = async (req) => {
       if (deleted === false) {
         throw new Error("Something went wrong with canceling the interest");
       }
+
+      fun.toNotifyOwner(post.email, extra, post.postid, false);
 
       //check if there are a chat between those user
       const chat = await ConvUsers.checkIfExists(post.email, row.email);
@@ -1065,7 +1067,7 @@ const verInterested = async (req) => {
 
         //CREATION OF NEW CHAT
         let expiresIn = await determineExpirationDate(post);
-        console.log("New Chat expiration Date:", expiresIn);
+        // console.log("New Chat expiration Date:", expiresIn);
         const chatExists = await ConvUsers.checkIfExists(
           post.email,
           results.email
@@ -1247,6 +1249,8 @@ const verInterested = async (req) => {
             throw new Error("Error at destroying the possible review");
         }
 
+        fun.toNotifyTheUnverified(results.email, post.postid, post.email);
+
         //=================== DELETE THE CHAT CASE  ....
         let expiresIn = await determineExpirationDate(post);
         console.log("Date to check for the destruction of chat:", expiresIn);
@@ -1345,6 +1349,7 @@ const verInterested = async (req) => {
           });
         }
         console.log("TO DELETE", toDelete);
+
         if (toDelete) {
           const deletedChat = await ConvUsers.deleteIfExpiresEqual(
             chat,
