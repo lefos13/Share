@@ -24,8 +24,16 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASEE, TOKEN_KEY, GOOGLE_KEY } =
-  process.env;
+const {
+  EMAIL,
+  PASSEMAIL,
+  HOST,
+  USERR,
+  PASS,
+  DATABASEE,
+  TOKEN_KEY,
+  GOOGLE_KEY,
+} = process.env;
 // END OF SECTION (ENV VAR)
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
@@ -72,7 +80,7 @@ const createNewUser = async (req) => {
 
 const updateOneUser = async (req) => {
   try {
-    console.log("data for update!:", req.body.data);
+    // console.log("data for update!:", req.body.data);
     let msg = await determineLang(req);
     let photo = req.body.data.photo;
     let data = req.body.data;
