@@ -562,9 +562,11 @@ module.exports = {
             data: data,
             token: fcmToken,
             notification: {
-              title: msg.dislike_title,
+              title: msg.firebase.dislike_title,
               body:
-                msg.firebase.not_ver_body0 + user.fullname + msg.dislike_body,
+                msg.firebase.not_ver_body0 +
+                user.fullname +
+                msg.firebase.dislike_body,
             },
           };
         }
