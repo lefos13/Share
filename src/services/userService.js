@@ -86,13 +86,7 @@ const updateOneUser = async (req) => {
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
 
-      fs.writeFileSync("uploads/" + email + ".jpeg", buffer)
-        .catch((err) => {
-          throw err;
-        })
-        .finally((data) => {
-          console.log("file uploaded!");
-        });
+      fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
     }
 
     return { status: 200, message: msg.updateProfile };
