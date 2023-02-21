@@ -60,7 +60,7 @@ const createNewUser = async (req) => {
     if (final.status == 200) {
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
-      fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
+      fs.writeFile("uploads/" + data.email + ".jpeg", buffer);
     }
 
     return final;
