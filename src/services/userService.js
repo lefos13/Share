@@ -90,7 +90,7 @@ const updateOneUser = async (req) => {
       //     console.error(err);
       //   }
       // });
-      fs.writeFile("image.png", base64, { encoding: "base64" }, function (err) {
+      fs.writeFile("image.png", buffer, { encoding: "base64" }, function (err) {
         console.log("File created");
       });
     }
