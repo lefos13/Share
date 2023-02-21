@@ -253,7 +253,7 @@ app.use(
   })
 );
 
-const port = 3001;
+const port = 3000;
 
 let server = http.listen(port, () =>
   console.error("listening on http://0.0.0.0:3000/")
