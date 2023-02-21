@@ -110,13 +110,12 @@ const determineExpirationDate = async (post) => {
 
 const encryptMessages = async (messages) => {
   try {
-    
     for await (let val of messages) {
       const cipher = crypto.createCipheriv(algorithm, key, iv);
       val.text = cipher.update(val.text, "utf-8", "hex");
       val.text += cipher.final("hex");
     }
-    
+
     return messages;
   } catch (error) {
     console.error(error);
@@ -126,14 +125,12 @@ const encryptMessages = async (messages) => {
 
 const decryptMessages = async (messages) => {
   try {
-    
     for await (let val of messages) {
       const decipher = crypto.createDecipheriv(algorithm, key, iv);
       val.text = decipher.update(val.text, "hex", "utf-8");
       val.text += decipher.final("utf-8");
     }
 
-    
     return messages;
   } catch (error) {
     console.error(error);
@@ -324,7 +321,70 @@ const sendMessage = async (
   }
 };
 
+const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
+  try {
+    let postIdString = postid.toString();
+    const owner = await User.findOneLight(ownerEmail);
+    let fcmToken = await FcmToken.findOne({
+      where: {
+        email: unverifiedEmail,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    let toSend = false;
+    if (fcmToken != null) {
+      await verifyFCMToken(fcmToken.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
+    } else {
+      throw "User hasnt the app anymore!";
+    }
+
+    if (toSend !== false) {
+      const toNotifyUser = await User.findOneLight(unverifiedEmail);
+
+      const msg = await getLang(toNotifyUser.lastLang);
+
+      let message = {
+        data: {
+          type: "receiveDisapproval",
+          postid: postIdString,
+          email: owner.email, // owner email
+          fullname: owner.fullname, // owner email
+        },
+        token: fcmToken.fcmToken,
+        notification: {
+          title: msg.firebase.not_ver_title,
+          body:
+            msg.firebase.not_ver_body0 +
+            owner.fullname +
+            msg.firebase.unver_body,
+        },
+      };
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      fcmToken.destroy();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 module.exports = {
+  toNotifyTheUnverified,
   sendMessage,
   encryptMessages,
   decryptMessages,

@@ -56,7 +56,7 @@ const createNewPost = async (data, req) => {
     //Check if the user has done more than three posts current day.
     const counter = await Post.countPosts(postToInsert.email);
 
-    if (counter < 30) {
+    if (counter < 3) {
       //do it
       const newPost = await Post.createNewPost(postToInsert, msg);
       if (newPost !== false)
@@ -1065,7 +1065,7 @@ const verInterested = async (req) => {
 
         //CREATION OF NEW CHAT
         let expiresIn = await determineExpirationDate(post);
-        console.log("New Chat expiration Date:", expiresIn);
+        // console.log("New Chat expiration Date:", expiresIn);
         const chatExists = await ConvUsers.checkIfExists(
           post.email,
           results.email
