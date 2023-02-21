@@ -59,8 +59,8 @@ const createNewUser = async (req) => {
     const final = await User.register(data, msg);
     if (final.status == 200) {
       let base64 = photo;
-      const buffer = Buffer.from(base64, "base64");
-      fs.writeFile("uploads/" + data.email + ".jpeg", buffer);
+      // const buffer = Buffer.from(base64, "base64");
+      // fs.writeFile("uploads/" + data.email + ".jpeg", buffer);
     }
 
     return final;
