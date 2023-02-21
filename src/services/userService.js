@@ -72,6 +72,7 @@ const createNewUser = async (req) => {
 
 const updateOneUser = async (req) => {
   try {
+    console.log("data for update!:", req.body.data);
     let msg = await determineLang(req);
     let photo = req.body.data.photo;
     let data = req.body.data;
@@ -85,7 +86,13 @@ const updateOneUser = async (req) => {
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
 
-      fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
+      fs.writeFileSync("uploads/" + email + ".jpeg", buffer)
+        .catch((err) => {
+          throw err;
+        })
+        .finally((data) => {
+          console.log("file uploaded!");
+        });
     }
 
     return { status: 200, message: msg.updateProfile };

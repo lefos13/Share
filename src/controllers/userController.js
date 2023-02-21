@@ -38,6 +38,7 @@ const updateOneUser = async (req, res) => {
     }
     res.status(updatedUser.status).json({ message: updatedUser.message });
   } catch (error) {
+    // console.error(error);
     res.status(500).json({ message: error.errorMessage });
   }
 };
