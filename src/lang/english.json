@@ -62,7 +62,10 @@
   "firebase": {
     "not_ver_title": "Travel approval",
     "not_ver_body": " has approved you. You can travel together!",
+    "unver_title": "Travel disapproval",
     "unver_body": " has disapproved you for his/her ride!",
+    "dislike_title": "Interest cancelled",
+    "dislike_body": " has cancelled his/her interest for your ride!",
     "not_ver_body0": "",
     "not_owner_title": "Someone is interested!",
     "req_title": "A new Ride is posted!",

@@ -145,7 +145,7 @@ const interested = async (req) => {
             message: msg.noRide,
           };
         }
-        fun.toNotifyOwner(postForFunction.email, extra, row.postid);
+        fun.toNotifyOwner(postForFunction.email, extra, row.postid, true);
         // return the right results to the controller
 
         return {
@@ -164,6 +164,8 @@ const interested = async (req) => {
       if (deleted === false) {
         throw new Error("Something went wrong with canceling the interest");
       }
+
+      fun.toNotifyOwner(post.email, extra, post.postid, false);
 
       //check if there are a chat between those user
       const chat = await ConvUsers.checkIfExists(post.email, row.email);
