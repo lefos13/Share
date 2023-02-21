@@ -45,7 +45,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 // get the values from the .env file
-const { HOST, USERR, PASS, DATABASEE, TOKEN_KEY, GOOGLE_KEY } = process.env;
+const { HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } = process.env;
 
 Date.prototype.addHours = function (h) {
   this.setTime(this.getTime() + h * 60 * 60 * 1000);
@@ -56,7 +56,7 @@ Date.prototype.addHours = function (h) {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   dialectOptions: {
@@ -350,7 +350,9 @@ io.on("connection", (socket) => {
           console.log("call server Join!!!");
 
           const initiator = await User.findOneLight(action.data.email);
-          if (initiator == null) {break;}
+          if (initiator == null) {
+            break;
+          }
 
           let msg = await getLang(initiator.lastLang);
 
@@ -431,7 +433,7 @@ io.on("connection", (socket) => {
             if (u.messages !== null) {
               // order
               let toJson = IsJsonString(u.messages);
-              
+
               if (toJson) u.messages = JSON.parse(u.messages);
               u.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
@@ -471,10 +473,10 @@ io.on("connection", (socket) => {
               data.lastMessageTime = null;
               data.isLastMessageMine = false;
             }
-            
+
             conversations.push(data);
           }
-          
+
           //i use io emit to emit in all sockets connected
           //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
           socket.emit("action", { type: "conversations", data: conversations });

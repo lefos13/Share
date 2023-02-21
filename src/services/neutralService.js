@@ -30,13 +30,13 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASEE, TOKEN_KEY, GOOGLE_KEY } =
+const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
   process.env;
 // END OF SECTION (ENV VAR)
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,
@@ -67,12 +67,11 @@ const getTerms = async (req) => {
 
     let lang = req.headers["accept-language"];
 
-    if (lang == "EN") 
-      file = path.join(__dirname + "/../termsPolicies/terms_EN.html"); 
+    if (lang == "EN")
+      file = path.join(__dirname + "/../termsPolicies/terms_EN.html");
     else if (lang == "GR")
       file = path.join(__dirname + "/../termsPolicies/terms_GR.html");
-    else
-      file = path.join(__dirname + "/../termsPolicies/terms_GR.html");
+    else file = path.join(__dirname + "/../termsPolicies/terms_GR.html");
 
     return { status: 200, file: file };
   } catch (error) {

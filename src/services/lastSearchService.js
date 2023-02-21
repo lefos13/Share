@@ -18,13 +18,13 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // get the values from the .env file
-const { HOST, USERR, PASS, DATABASEE } = process.env;
+const { HOST, USERR, PASS, DATABASE } = process.env;
 // END OF SECTION (ENV VAR)
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
 const { last } = require("lodash");
-const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,
