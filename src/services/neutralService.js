@@ -25,27 +25,6 @@ const _ = require("lodash");
 const fun = require("../utils/functions");
 const path = require("path");
 
-//ENVIROMENTAL VAR
-const dotenv = require("dotenv");
-dotenv.config();
-
-// get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
-  process.env;
-// END OF SECTION (ENV VAR)
-// code for db
-const { Sequelize, DataTypes, fn } = require("sequelize");
-const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USERR, PASS, {
-  host: HOST,
-  dialect: "mysql",
-  logging: true,
-  dialectOptions: {
-    dateStrings: true,
-    typeCast: true,
-  },
-});
-
 const sendReport = async (req) => {
   try {
     let msg = await fun.determineLang(req);

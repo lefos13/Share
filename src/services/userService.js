@@ -24,14 +24,22 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
-  process.env;
+const {
+  EMAIL,
+  PASSEMAIL,
+  HOST,
+  USERR,
+  PASS,
+  DATABASEE,
+  TOKEN_KEY,
+  GOOGLE_KEY,
+} = process.env;
 // END OF SECTION (ENV VAR)
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
 const Users = require("../modules/user");
-const sequelize = new Sequelize(DATABASE, USERR, PASS, {
+const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,

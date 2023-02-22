@@ -1,27 +1,13 @@
 // inside src/database/Post.js
 
 //ENVIROMENTAL VAR
-const dotenv = require("dotenv");
 
-dotenv.config();
-// get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
-  process.env;
 // END OF SECTION (ENV VAR)
 
 const { pushNotifications } = require("../utils/functions");
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USERR, PASS, {
-  host: HOST,
-  dialect: "mysql",
-  logging: true,
-  dialectOptions: {
-    dateStrings: true,
-    typeCast: true,
-  },
-});
 
 const Users = require("../modules/user");
 const Posts = require("../modules/post");

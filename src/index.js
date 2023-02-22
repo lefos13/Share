@@ -45,7 +45,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 // get the values from the .env file
-const { HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } = process.env;
+const { HOST, USERR, PASS, DATABASEE, TOKEN_KEY, GOOGLE_KEY } = process.env;
 
 Date.prototype.addHours = function (h) {
   this.setTime(this.getTime() + h * 60 * 60 * 1000);
@@ -56,7 +56,7 @@ Date.prototype.addHours = function (h) {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USERR, PASS, {
+const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   dialectOptions: {
@@ -253,7 +253,7 @@ app.use(
   })
 );
 
-const port = 3000;
+const port = 3001;
 
 let server = http.listen(port, () =>
   console.error("listening on http://0.0.0.0:3000/")

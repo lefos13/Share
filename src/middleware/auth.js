@@ -2,8 +2,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 // get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
-  process.env;
+const { TOKEN_KEY } = process.env;
 // END OF SECTION (ENV VAR)
 //jwt
 const jwt = require("jsonwebtoken");
