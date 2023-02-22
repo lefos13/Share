@@ -13,27 +13,6 @@ const fun = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 
-//ENVIROMENTAL VAR
-const dotenv = require("dotenv");
-dotenv.config();
-
-// get the values from the .env file
-const { HOST, USERR, PASS, DATABASE } = process.env;
-// END OF SECTION (ENV VAR)
-// code for db
-const { Sequelize, DataTypes, fn } = require("sequelize");
-const { Op } = require("sequelize");
-const { last } = require("lodash");
-const sequelize = new Sequelize(DATABASE, USERR, PASS, {
-  host: HOST,
-  dialect: "mysql",
-  logging: true,
-  dialectOptions: {
-    dateStrings: true,
-    typeCast: true,
-  },
-});
-
 //CREATE A FAVOURITE SEARCH IF THERE IS LESS THAN 10 OF THEM ALREADY
 const addFavouriteSearch = async (req) => {
   try {

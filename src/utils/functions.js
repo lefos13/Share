@@ -8,7 +8,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
-  // databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
+  // databaseURL: "https://<DATABASEE_NAME>.firebaseio.com",
 });
 
 var _ = require("lodash");
@@ -17,7 +17,7 @@ const Review = require("../database/Review");
 const {
   EMAIL,
   PASSEMAIL,
-  DATABASE,
+  DATABASEE,
   USERR,
   PASS,
   HOST,
@@ -28,7 +28,7 @@ const {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASE, USERR, PASS, {
+const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,
@@ -724,38 +724,38 @@ module.exports = {
         });
       }
 
-      if (data.age != null) {
-        // afairese ta post twn xrhstwn pou einai panw apo data.age_end
+      // if (data.age != null) {
+      //   // afairese ta post twn xrhstwn pou einai panw apo data.age_end
 
-        array = _.filter(array, (obj) => {
-          let calcAge;
-          if (obj.user.age != null) {
-            let splitted = obj.user.age.split("/");
-            let ageDate = moment()
-              .set("year", parseInt(splitted[2]))
-              .set("month", parseInt(splitted[1]) - 1)
-              .set("date", parseInt(splitted[0]));
+      //   array = _.filter(array, (obj) => {
+      //     let calcAge;
+      //     if (obj.user.age != null) {
+      //       let splitted = obj.user.age.split("/");
+      //       let ageDate = moment()
+      //         .set("year", parseInt(splitted[2]))
+      //         .set("month", parseInt(splitted[1]) - 1)
+      //         .set("date", parseInt(splitted[0]));
 
-            calcAge = moment().diff(ageDate, "years");
-          }
+      //       calcAge = moment().diff(ageDate, "years");
+      //     }
 
-          return calcAge <= data.age_end;
-        });
-        // afairese ta post twn xrhstwn pou einai katw apo data.age
-        array = _.filter(array, (obj) => {
-          let calcAge;
-          if (obj.user.age != null) {
-            let splitted = obj.user.age.split("/");
-            let ageDate = moment()
-              .set("year", parseInt(splitted[2]))
-              .set("month", parseInt(splitted[1]) - 1)
-              .set("date", parseInt(splitted[0]));
+      //     return calcAge <= data.age_end;
+      //   });
+      //   // afairese ta post twn xrhstwn pou einai katw apo data.age
+      //   array = _.filter(array, (obj) => {
+      //     let calcAge;
+      //     if (obj.user.age != null) {
+      //       let splitted = obj.user.age.split("/");
+      //       let ageDate = moment()
+      //         .set("year", parseInt(splitted[2]))
+      //         .set("month", parseInt(splitted[1]) - 1)
+      //         .set("date", parseInt(splitted[0]));
 
-            calcAge = moment().diff(ageDate, "years");
-          }
-          return calcAge >= data.age;
-        });
-      }
+      //       calcAge = moment().diff(ageDate, "years");
+      //     }
+      //     return calcAge >= data.age;
+      //   });
+      // }
 
       if (data.car != null) {
         //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
