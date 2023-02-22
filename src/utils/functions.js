@@ -8,7 +8,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
-  // databaseURL: "https://<DATABASEE_NAME>.firebaseio.com",
+  // databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
 });
 
 var _ = require("lodash");
@@ -17,7 +17,7 @@ const Review = require("../database/Review");
 const {
   EMAIL,
   PASSEMAIL,
-  DATABASEE,
+  DATABASE,
   USERR,
   PASS,
   HOST,
@@ -28,7 +28,7 @@ const {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { nextTick } = require("process");
 const { Op } = require("sequelize");
-const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   logging: true,
