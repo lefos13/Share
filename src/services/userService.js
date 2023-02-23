@@ -55,7 +55,7 @@ const createNewUser = async (req) => {
     data["photo"] = 1;
     let salt = await bcrypt.genSalt(saltRounds);
     data.password = await bcrypt.hash(data.password, salt);
-
+    console.log("NEW USER FULLNAME: ", data.fullname);
     const final = await User.register(data, msg);
     if (final.status == 200) {
       let base64 = photo;
