@@ -68,7 +68,11 @@ const createNewUser = async (req) => {
     if (final.status == 200) {
       let base64 = photo;
       const buffer = Buffer.from(base64, "base64");
-      fs.writeFile("uploads/" + data.email + ".jpeg", buffer);
+      fs.writeFile("uploads/" + data.email + ".jpeg", buffer, (err) => {
+        if (err) {
+          console.error(err);
+        }
+      });
     }
 
     return final;
@@ -93,7 +97,11 @@ const updateOneUser = async (req) => {
     if (photo != null) {
       let base64 = photo;
       let buffer = Buffer.from(base64, "base64");
-      fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
+      fs.writeFile("uploads/" + data.email + ".jpeg", buffer, (err) => {
+        if (err) {
+          console.error(err);
+        }
+      });
       // fs.writeFile("image.png", buffer, { encoding: "base64" }, function (err) {
       //   console.log("File created");
       // });
