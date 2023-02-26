@@ -34,7 +34,14 @@ const corsOptions = {
 };
 
 //route to find a user
-router.post("/sendReport", [authenticateToken], neutralController.sendReport);
+router.post(
+  "/sendReport",
+  [authenticateToken],
+  cors({
+    origin: false,
+  }),
+  neutralController.sendReport
+);
 
 router.get(
   "/getTerms",
