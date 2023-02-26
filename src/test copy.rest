@@ -1,5 +1,5 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
-POST https://ouride.gr/users/createtoken
+POST https://ouride.gr/test/users/createtoken
 Content-Type: application/json
 Accept-Language: EN
 
