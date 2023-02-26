@@ -37,9 +37,7 @@ const corsOptions = {
 router.post(
   "/sendReport",
   [authenticateToken],
-  cors({
-    origin: false,
-  }),
+  cors(corsOptions),
   neutralController.sendReport
 );
 
