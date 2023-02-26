@@ -3,16 +3,17 @@ function sendReport() {
   axios
     .post(
       // `${BASE_URL}/test/users/createtoken`,
-      "https://ouride.gr/test/neutral/sendReport",
+      "https://ouride.gr/test/neutral/webSendReport",
       {
         text: "Test report from website!",
+        email: "lefos@gmail.com",
+        fullname: "Lefos Evan",
+        phoneNumber: "69756226262",
       },
       {
         headers: {
           "Content-Type": "application/json",
           "Accept-Language": "EN",
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDItMjZUMTg6NDM6NTkuNDA4WiIsImlhdCI6MTY3NzQzNzAzOSwiZXhwIjoxNjgyNjIxMDM5fQ.iBxM6J-eSdC5wZb7kXP1y4IfccRMWxj1bvisA2iipHo",
         },
       }
     )

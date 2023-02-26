@@ -23,7 +23,7 @@ const corsOptions = {
     "Accept",
   ],
   origin: function (origin, callback) {
-    console.log(origin);
+    // console.log(origin);
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -39,6 +39,13 @@ router.post(
   [authenticateToken],
   cors(corsOptions),
   neutralController.sendReport
+);
+
+router.post(
+  "/webSendReport",
+  [],
+  cors(corsOptions),
+  neutralController.webSendReport
 );
 
 router.get(

@@ -14,7 +14,7 @@ const authenticateToken = (req, res, next) => {
     const token = authHeader && authHeader.split(" ")[1];
 
     if (token == null) {
-      console.log("Unauthorized try to connect to an api");
+      // console.log("Unauthorized try to connect to an api");
       return res.sendStatus(401);
     }
 
