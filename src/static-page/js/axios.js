@@ -1,14 +1,19 @@
 function sendReport() {
   // const BASE_URL = "https://ouride.gr";
+  var fullname = document.getElementById("name");
+  var email = document.getElementById("email");
+  var phoneNumber = document.getElementById("phone");
+  var text = document.getElementById("message");
+  console.log(fullname, email, phoneNumber, text);
   axios
     .post(
       // `${BASE_URL}/test/users/createtoken`,
       "https://ouride.gr/test/neutral/webSendReport",
       {
-        text: "Test report from website!",
-        email: "lefos@gmail.com",
-        fullname: "Lefos Evan",
-        phoneNumber: "69756226262",
+        text: text,
+        email: email,
+        fullname: fullname,
+        phoneNumber: phoneNumber,
       },
       {
         headers: {

@@ -47,7 +47,7 @@ const webSendReport = async (req) => {
     let text = req.body.text;
     let fullname = req.body.fullname;
     let phoneNumber = req.body.phoneNumber;
-    let flag = fun.sendReport(text, extra, fullname, phoneNumber);
+    let flag = fun.webSendReport(text, extra, fullname, phoneNumber);
     // await sendReport(text, extra);
 
     return { status: 200, message: msg.feedbackSuc };
