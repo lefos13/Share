@@ -13,7 +13,10 @@ const authenticateToken = (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
 
-    if (token == null) return res.sendStatus(401);
+    if (token == null) {
+      console.log("Unauthorized try to connect to an api");
+      return res.sendStatus(401);
+    }
 
     jwt.verify(token, TOKEN_KEY, (err, email) => {
       if (err)

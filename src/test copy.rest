@@ -10,6 +10,13 @@ Accept-Language: EN
 }
 
 ###
+POST https://ouride.gr/test/neutral/sendReport
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDItMjZUMTg6NDU6MzIuNTYzWiIsImlhdCI6MTY3NzQzNzEzMiwiZXhwIjoxNjgyNjIxMTMyfQ.tXeZY2cp0mJ9h6pUW_aKSj-tAD7vDA0ovwLdWIRzWek
+Accept-Language: EN
+
+
+###
 
 #service pou kanei update to password you user sth vash
 POST http://157.230.18.246:3000/users/updateUserPass

@@ -12,7 +12,7 @@ function sendReport() {
       {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDItMjZUMTg6MDQ6MTguODM2WiIsImlhdCI6MTY3NzQzNDY1OCwiZXhwIjoxNjgyNjE4NjU4fQ.E3DqD3pIiOB3gEGzj25slQMg1NBj8u749kLHSDba22g",
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDItMjZUMTg6NDM6NTkuNDA4WiIsImlhdCI6MTY3NzQzNzAzOSwiZXhwIjoxNjgyNjIxMDM5fQ.iBxM6J-eSdC5wZb7kXP1y4IfccRMWxj1bvisA2iipHo",
         },
       }
     )
