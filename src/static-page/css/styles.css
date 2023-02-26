@@ -11796,7 +11796,7 @@ section.cta {
   background-position: center;
   background-size: cover;
   /* filter: blur(4px); */
-  padding: 250px;
+  /* padding: 250px; */
 }
 section.cta .cta-content {
   position: relative;
