@@ -40,6 +40,23 @@ const sendReport = async (req) => {
   }
 };
 
+const webSendReport = async (req) => {
+  try {
+    let msg = await fun.determineLang(req);
+    let extra = req.body.email;
+    let text = req.body.text;
+    let fullname = req.body.fullname;
+    let phoneNumber = req.body.phoneNumber;
+    let flag = fun.webSendReport(text, extra, fullname, phoneNumber);
+    // await sendReport(text, extra);
+
+    return { status: 200, message: msg.feedbackSuc };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 const getTerms = async (req) => {
   try {
     let file;
@@ -114,6 +131,7 @@ const moreMessages = async (req) => {
 };
 
 module.exports = {
+  webSendReport,
   moreMessages,
   sendReport,
   getTerms,

@@ -489,6 +489,40 @@ module.exports = {
       return false;
     }
   },
+  webSendReport: async (text, email, name, number) => {
+    try {
+      // create reusable transporter object using the default SMTP transport
+      let transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+          user: EMAIL,
+          pass: PASSEMAIL,
+        },
+      });
+
+      // send mail with defined transport object
+      info = await transporter.sendMail({
+        from: `Report`,
+        to: EMAIL, // list of receivers
+        subject: "Report from the App", // Subject line
+        text: "All data sent:",
+        html:
+          "<br>Comment: " +
+          text +
+          "<br>Email: " +
+          email +
+          "<br>Fullname: " +
+          name +
+          "<br>Phone number: " +
+          number, // plain text body
+      });
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  },
 
   toNotifyOwner: async (emailToNotify, emailAction, postid, liked) => {
     try {

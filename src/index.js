@@ -13,11 +13,16 @@ app.use(bodyParser.json({ limit: "5mb", type: "application/json" }));
 
 //helmet for security
 const helmet = require("helmet");
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 var _ = require("lodash");
 app.use("/images", express.static("uploads"));
 app.use("/termsPolicies", express.static("termsPolicies"));
+app.use("/web", express.static("static-page"));
 
 //cors of course
 const cors = require("cors");
