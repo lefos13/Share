@@ -61,6 +61,7 @@
               <a class="nav-link me-lg-3" href="#download">Download</a>
             </li>
           </ul>
+          <!-- Forma epikoinwnias -->
           <button
             class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0"
             data-bs-toggle="modal"
@@ -198,7 +199,7 @@
               "Μία εφαρμογή που καιρό τώρα ο κόσμος ζητάει στην Ελλάδα! Είναι
               επιτέλους κοντά μας!"
             </div>
-            <img src="assets/img/tnw-logo.jpg" alt="..." style="height: 3rem" />
+            <img src="assets/img/tnw-logo.png" alt="..." style="height: 3rem" />
           </div>
         </div>
       </div>
@@ -561,9 +562,9 @@
                 <button
                   class="btn btn-primary rounded-pill btn-lg disabled"
                   id="submitButton"
-                  type="submit"
+                  onclick="sendReport()"
                 >
-                  Submit
+                  Αποστολή
                 </button>
               </div>
             </form>
@@ -575,10 +576,14 @@
     <script src="js/bundle.min.js"></script>
     <!-- Core theme JS-->
     <script src="js/scripts.js"></script>
+    <!-- Extra scripts for functionality -->
+    <script src="scripts/axios.js"></script>
     <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
     <!-- * *                               SB Forms JS                               * *-->
     <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
     <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
     <script src="js/forms-latest.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    ;
   </body>
 </html>
