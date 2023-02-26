@@ -23,6 +23,7 @@ const authenticateToken = (req, res, next) => {
         });
       else {
         req.body["extra"] = email.email;
+        console.log("User", email.email, "Authenticated!");
       }
       next();
     });
