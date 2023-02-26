@@ -505,15 +505,15 @@ module.exports = {
         from: `Report`,
         to: EMAIL, // list of receivers
         subject: "Report from the App", // Subject line
-        text:
+        text: "All data sent:",
+        html:
+          "<br>Comment: " +
           text +
-          " by " +
+          "<br>Email: " +
           email +
-          "<br>" +
-          "Fullname: " +
+          "<br>Fullname: " +
           name +
-          "<br>" +
-          "Phone number: " +
+          "<br>Phone number: " +
           number, // plain text body
       });
 
