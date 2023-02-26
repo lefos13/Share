@@ -3672,8 +3672,8 @@ fieldset:disabled .btn {
   border-color: #f8f9fa;
 }
 .btn-outline-light:hover {
-  color: #ffffff;
-  background-color: #4c84bb;
+  color: #000000;
+  background-color: #f8f8f8;
   border-color: #010102;
 }
 .btn-check:focus + .btn-outline-light,
