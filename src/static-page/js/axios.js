@@ -1,9 +1,9 @@
 function sendReport() {
   // const BASE_URL = "https://ouride.gr";
-  var fullname = document.getElementById("name");
-  var email = document.getElementById("email");
-  var phoneNumber = document.getElementById("phone");
-  var text = document.getElementById("message");
+  var fullname = document.getElementById("name").value;
+  var email = document.getElementById("email").value;
+  var phoneNumber = document.getElementById("phone").value;
+  var text = document.getElementById("message").value;
   console.log(fullname, email, phoneNumber, text);
   axios
     .post(
