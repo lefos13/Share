@@ -19,6 +19,8 @@ app.use(
   })
 );
 
+const path = require('path');
+
 const { readFile, readFileSync } = require("fs");
 
 var _ = require("lodash");
@@ -29,8 +31,8 @@ app.get("/", (req, res)=> {
   try {
     const webPage = readFileSync(__dirname + "/static-page/index.html");
     // res.redirect("/web/index.html")
-    res.setHeader("Content-Type", "text/html");
-    res.send(webPage);
+    // res.setHeader("Content-Type", "text/html");
+    res.sendFile(path.join(__dirname, '/static-page/index.html'));
   } catch (error) {
     console.error(error);
   }
