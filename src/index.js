@@ -19,20 +19,18 @@ app.use(
   })
 );
 
+const { readFile, readFileSync } = require("fs");
+
 var _ = require("lodash");
 app.use("/images", express.static("uploads"));
 app.use("/termsPolicies", express.static("termsPolicies"));
 app.use("/web", express.static("static-page"));
 app.get("/", (req, res)=> {
   try {
-    res.redirect("/web/index.html")
-  } catch (error) {
-    console.error(error);
-  }
-})
-app.get("", (req, res)=> {
-  try {
-    res.redirect("/web/index.html")
+    const webPage = readFileSync(__dirname + "/static-page/index.html");
+    // res.redirect("/web/index.html")
+    res.setHeader("Content-Type", "text/html");
+    res.send(webPage);
   } catch (error) {
     console.error(error);
   }
@@ -290,6 +288,7 @@ const {
   getLang,
 } = require("./utils/functions");
 const { destroyPerArrayIds } = require("./database/PostInterested");
+
 
 app.locals["bg"] = {};
 
