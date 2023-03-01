@@ -31,7 +31,7 @@ app.get("/", (req, res)=> {
   try {
     const webPage = readFileSync(__dirname + "/static-page/index.html");
     // res.redirect("/web/index.html")
-    // res.setHeader("Content-Type", "text/html");
+    res.setHeader("Content-Type", "text/html");
     res.sendFile(path.join(__dirname, '/static-page/index.html'));
   } catch (error) {
     console.error(error);
