@@ -30,6 +30,13 @@ app.get("/", (req, res)=> {
     console.error(error);
   }
 })
+app.get("", (req, res)=> {
+  try {
+    res.redirect("/web/index.html")
+  } catch (error) {
+    console.error(error);
+  }
+})
 
 //cors of course
 const cors = require("cors");
