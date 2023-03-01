@@ -23,6 +23,13 @@ var _ = require("lodash");
 app.use("/images", express.static("uploads"));
 app.use("/termsPolicies", express.static("termsPolicies"));
 app.use("/web", express.static("static-page"));
+app.get("/", (req, res)=> {
+  try {
+    res.redirect("/web/index.html")
+  } catch (error) {
+    console.error(error);
+  }
+})
 
 //cors of course
 const cors = require("cors");
