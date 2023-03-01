@@ -4,9 +4,12 @@
   "description": "Back-end for Share the Ride app",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "compile-js": "cd static-page/js && babel axios.js -d compiled",
+    "minify-js": "cd static-page/js/compiled && uglifyjs axios.js -o ../minified/axios_min.js"
   },
   "dependencies": {
+    "uglify-js": "^3.13.2",
     "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
@@ -36,5 +39,13 @@
     "uuid": "^9.0.0"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-root-import": "^6.4.1",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "babel-plugin-transform-remove-strict-mode": "0.0.2",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1"
+  }
 }
