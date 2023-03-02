@@ -124,7 +124,7 @@ router.post(
   postController.feedScreen
 );
 
-router.get(
+router.post(
   "/feedAll",
   [authenticateToken],
   cors(corsOptions),
