@@ -124,4 +124,11 @@ router.post(
   postController.feedScreen
 );
 
+router.get(
+  "/feedAll",
+  [authenticateToken],
+  cors(corsOptions),
+  postController.feedAll
+);
+
 module.exports = router;
