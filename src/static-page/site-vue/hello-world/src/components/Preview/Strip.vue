@@ -8,7 +8,7 @@
             επιτέλους κοντά μας!"
           </div>
           <img
-            src="../assets/img/tnw-logo.png"
+            src="../../assets/img/tnw-logo.png"
             alt="..."
             style="height: 3rem"
           />

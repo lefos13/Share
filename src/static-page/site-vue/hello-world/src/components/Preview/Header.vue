@@ -16,7 +16,7 @@
                 href="https://play.google.com/store/apps/details?id=com.shareridenew"
                 ><img
                   class="app-badge"
-                  src="../assets/img/google-play-badge.svg"
+                  src="../../assets/img/google-play-badge.svg"
                   alt="..."
                 />
               </a>
@@ -91,7 +91,7 @@
                   <!-- * * Set the max width of your media to 100% and the height to-->
                   <!-- * * 100% like the demo example below.-->
                   <img
-                    src="../assets/img/demo-screen.png"
+                    src="../../assets/img/demo-screen.png"
                     style="max-width: 100%; height: 100%"
                   />
                   <!-- <video

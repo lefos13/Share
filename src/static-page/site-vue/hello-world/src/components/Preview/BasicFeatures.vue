@@ -20,7 +20,7 @@
           <div class="px-5 px-sm-0">
             <img
               class="img-fluid rounded-circle"
-              src="../assets/img/demo-screen2.png"
+              src="../../assets/img/demo-screen2.png"
               alt="..."
             />
           </div>
@@ -40,4 +40,6 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style scoped>
+
+</style>

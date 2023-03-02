@@ -12,7 +12,7 @@
           href="https://play.google.com/store/apps/details?id=com.shareridenew"
           ><img
             class="app-badge"
-            src="../assets/img/google-play-badge.svg"
+            src="../../assets/img/google-play-badge.svg"
             alt="..."
           />
         </a>

@@ -135,7 +135,7 @@
                       />
                     </video> -->
                   <img
-                    src="../assets/img/demo-screen1.png"
+                    src="../../assets/img/demo-screen1.png"
                     style="max-width: 100%; height: 100%"
                   />
                 </div>
