@@ -30,10 +30,10 @@ app.use("/web", express.static("static-page"));
 app.use("/web2", express.static("static-page/site-vue/hello-world/dist"));
 app.get("/", (req, res) => {
   try {
-    // const webPage = readFileSync(__dirname + "/static-page/index.html");
-    res.redirect("/web/index.html");
-    // res.setHeader("Content-Type", "text/html");
-    // res.sendFile(path.join(__dirname, '/static-page/index.html'));
+    // const webPage = readFileSync(__dirname + "/static-page/site-vue/hello-world/dist/index.html");
+    // res.redirect("/web/index.html");
+    res.setHeader("Content-Type", "text/html");
+    res.sendFile(path.join(__dirname, '/static-page/site-vue/hello-world/dist/index.html'));
   } catch (error) {
     console.error(error);
   }
