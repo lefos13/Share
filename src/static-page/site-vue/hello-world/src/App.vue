@@ -1,13 +1,13 @@
 <template>
-  <div >
-      <!-- Navigation-->
+  <div>
+    <!-- Navigation-->
     <NavBarUp msg="Welcome to Your Vue.js App" />
     <!-- Preview page-->
-    <Home v-if="showPreview"/>
+    <Home v-if="showPreview" />
     <!-- Footer-->
     <Footer />
   </div>
-  
+
   <div id="overlays">
     <ContactFormVue />
   </div>
@@ -25,13 +25,13 @@ export default {
     NavBarUp,
     Footer,
     ContactFormVue,
-    Home
+    Home,
   },
   computed: {
     showPreview() {
       return true;
-    }
-  }
+    },
+  },
 };
 </script>
 <style>

@@ -11671,6 +11671,14 @@ html {
 
 .bg-black {
   background-color: #000 !important;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: red;
+  color: white;
+  text-align: center;
+  z-index: 6;
 }
 
 .bg-gradient-primary-to-secondary {
@@ -11778,6 +11786,7 @@ section {
 
 .device[data-device="iPhoneX"][data-orientation="portrait"][data-color="black"]::after {
   content: "";
+  z-index: 6;
   background-image: url("../portrait_black.png");
 }
 

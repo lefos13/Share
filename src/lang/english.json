@@ -59,6 +59,7 @@
   "noUserThatliked": "User is not interested anymore in this ride!",
   "deleteUser": "You account has been deleted succesfully!",
   "noMessages": "No messages yet!",
+  "hasVerified": "You can't delete this ride! You have verified users!",
   "firebase": {
     "not_ver_title": "Travel approval",
     "not_ver_body": " has approved you. You can travel together!",

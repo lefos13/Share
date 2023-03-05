@@ -896,6 +896,14 @@ const deletePost = async (req) => {
     let data = req.body.data;
 
     let msg = await determineLang(req);
+
+    // check if there are any verified users on this Ride
+    const countVerified = await PostInterested.countVerified(data.postid);
+    if (countVerified == null)
+      throw new Error("Error at counting the verified!");
+    else if (countVerified >= 0) {
+      return { status: 406, message: msg.hasVerified };
+    }
     // delete the post
     let results = await Post.deleteOne(data.postid);
     if (results === null) {
