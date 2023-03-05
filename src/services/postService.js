@@ -902,7 +902,7 @@ const deletePost = async (req) => {
     const countVerified = await PostInterested.countVerified(data.postid);
     if (countVerified == null)
       throw new Error("Error at counting the verified!");
-    else if (countVerified >= 0) {
+    else if (countVerified > 0) {
       return { status: 406, message: msg.hasVerified };
     }
     // delete the post

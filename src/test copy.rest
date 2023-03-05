@@ -1,5 +1,5 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
-POST https://ouride.gr/test/users/createtoken
+POST https://ouride.gr/users/createtoken
 Content-Type: application/json
 Accept-Language: EN
 
@@ -557,7 +557,7 @@ Accept-Language: EN
 ###
 POST https://ouride.gr/posts/feedAll
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE1VDEzOjQ3OjM4LjEwM1oiLCJpYXQiOjE2NzExMTIwNTgsImV4cCI6MTY3NjI5NjA1OH0.CEbcQhtCWuuap7g2XCljelexze18A-hPRCJJnD3W0qQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
 Accept-Language: EN
 
 {
