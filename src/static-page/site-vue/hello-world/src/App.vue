@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Navigation-->
-    <NavBarUp msg="Welcome to Your Vue.js App" />
+    <NavBarUp msg="Welcome to Your Vue.js App" v-if="true" />
     <!-- Preview page-->
     <Home v-if="showPreview" />
     <!-- Footer-->
