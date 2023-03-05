@@ -11809,7 +11809,7 @@ section.cta {
 }
 section.cta .cta-content {
   position: relative;
-  z-index: 2;
+  /* z-index: 2; */
   border-radius: 100px;
   background-color: rgba(12, 56, 126, 0.6);
   padding: 20px;
