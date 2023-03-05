@@ -35,6 +35,7 @@ const sequelize = new Sequelize(DATABASE, USERR, PASS, {
     typeCast: true,
   },
 });
+
 const moment = require("moment-timezone");
 // const ConvUsers = require("../modules/convusers");
 moment.tz.setDefault("Europe/Athens");
@@ -896,6 +897,14 @@ const deletePost = async (req) => {
     let data = req.body.data;
 
     let msg = await determineLang(req);
+
+    // check if there are any verified users on this Ride
+    const countVerified = await PostInterested.countVerified(data.postid);
+    if (countVerified == null)
+      throw new Error("Error at counting the verified!");
+    else if (countVerified >= 0) {
+      return { status: 406, message: msg.hasVerified };
+    }
     // delete the post
     let results = await Post.deleteOne(data.postid);
     if (results === null) {
@@ -1595,6 +1604,114 @@ const feedScreen = async (req) => {
   }
 };
 
+const feedAll = async (req) => {
+  try {
+    let msg = await determineLang(req);
+    var data = req.body.data;
+    let email = req.body.extra;
+    let array = [];
+    let curDate = moment();
+    let query = {
+      where: {
+        email: { [Op.ne]: email },
+        [Op.or]: [
+          { startdate: { [Op.gte]: curDate } },
+          { enddate: { [Op.gte]: curDate } },
+        ],
+      },
+      order: [["date", "DESC"]],
+    };
+
+    // get all the rides based on the query above
+    let found = await Post.findAndCountAll(query);
+    if (found.count == 0) {
+      return { status: 404, message: msg.noRidesFound };
+    } else if (found === null) {
+      throw new Error("Something went wrong in searching the posts");
+    }
+
+    for await (fnd of found.rows) {
+      fnd.dataValues.isFavourite = false;
+      if (IsJsonString(fnd.moreplaces)) {
+        fnd.moreplaces = JSON.parse(fnd.moreplaces);
+      }
+      fnd = await fun.fixAllDates(fnd);
+      let userQuery = {
+        attributes: {
+          exclude: ["password", "verified", "facebook", "instagram", "mobile"],
+        },
+        where: {
+          email: fnd.email,
+        },
+      };
+
+      const user = await User.findOneUserQuery(userQuery);
+      if (user === false) {
+        throw new Error(
+          "Something went wrong with finding the user of each post"
+        );
+      }
+      var flag;
+      let isApproved = false;
+      // insert the review average and count inside the object of the user
+      let extraData = await insertAver(user);
+      user.dataValues = { ...user.dataValues, ...extraData };
+
+      // check if the user is interested in the specific post
+      let interested = await PostInterested.findOne(email, fnd.postid);
+
+      if (interested == null) {
+        flag = false;
+      } else {
+        flag = true;
+        if (interested.isVerified == true) isApproved = true;
+      }
+      let image = null;
+      if (user.photo !== null) {
+        image = "images/" + user.email + ".jpeg";
+      }
+      let results = {
+        user: user.toJSON(),
+        imagePath: image,
+        post: fnd,
+        interested: flag,
+        isApproved: isApproved,
+      };
+      array.push(results);
+    }
+
+    //PAGINATION
+    var skipcount = 0;
+    var takecount = 10;
+    if (data.page > 1) skipcount = data.page * 10 - 10;
+    var finalarr = _.take(_.drop(array, skipcount), takecount);
+
+    var mod = array.length % 10;
+
+    var totallength = 1;
+    mod == 0
+      ? (totallength = array.length / 10)
+      : (totallength = array.length / 10 - mod / 10 + 1);
+
+    // if the request asks for page that is over the limit
+    if (data.page > totallength) {
+      return {
+        status: 404,
+        message: msg.paginationLimit,
+      };
+    }
+    let results = {
+      postUser: finalarr,
+      totalPages: totallength,
+      pageLength: finalarr.length,
+    };
+    return { status: 200, body: results, message: msg.ridesFound };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
   createNewPost,
   interested,
@@ -1609,4 +1726,5 @@ module.exports = {
   handleFavourite,
   getFavourites,
   feedScreen,
+  feedAll,
 };

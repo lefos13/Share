@@ -19,7 +19,7 @@ app.use(
   })
 );
 
-const path = require('path');
+const path = require("path");
 
 const { readFile, readFileSync } = require("fs");
 
@@ -27,16 +27,17 @@ var _ = require("lodash");
 app.use("/images", express.static("uploads"));
 app.use("/termsPolicies", express.static("termsPolicies"));
 app.use("/web", express.static("static-page"));
-app.get("/", (req, res)=> {
+app.use("/web2", express.static("static-page/site-vue/hello-world/dist"));
+app.get("/", (req, res) => {
   try {
-    // const webPage = readFileSync(__dirname + "/static-page/index.html");
-    res.redirect("/web/index.html")
-    // res.setHeader("Content-Type", "text/html");
-    // res.sendFile(path.join(__dirname, '/static-page/index.html'));
+    // const webPage = readFileSync(__dirname + "/static-page/site-vue/hello-world/dist/index.html");
+    // res.redirect("/web/index.html");
+    res.setHeader("Content-Type", "text/html");
+    res.sendFile(path.join(__dirname, '/static-page/site-vue/hello-world/dist/index.html'));
   } catch (error) {
     console.error(error);
   }
-})
+});
 
 //cors of course
 const cors = require("cors");
@@ -290,7 +291,6 @@ const {
   getLang,
 } = require("./utils/functions");
 const { destroyPerArrayIds } = require("./database/PostInterested");
-
 
 app.locals["bg"] = {};
 

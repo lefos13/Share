@@ -11678,6 +11678,7 @@ html {
   background-color: red;
   color: white;
   text-align: center;
+  z-index: 6;
 }
 
 .bg-gradient-primary-to-secondary {
@@ -11785,7 +11786,8 @@ section {
 
 .device[data-device="iPhoneX"][data-orientation="portrait"][data-color="black"]::after {
   content: "";
-  background-image: url("../assets/img/portrait_black.png");
+  z-index: 6;
+  background-image: url("../portrait_black.png");
 }
 
 .device[data-device="iPhoneX"][data-orientation="portrait"][data-color="black"]
@@ -11799,7 +11801,7 @@ section {
 
 section.cta {
   position: relative;
-  background-image: url("../assets/background.jpg");
+  background-image: url("../background.jpg");
   background-position: center;
   background-size: cover;
   /* filter: blur(4px); */
@@ -11807,7 +11809,7 @@ section.cta {
 }
 section.cta .cta-content {
   position: relative;
-  z-index: 2;
+  /* z-index: 2; */
   border-radius: 100px;
   background-color: rgba(12, 56, 126, 0.6);
   padding: 20px;

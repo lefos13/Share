@@ -9,7 +9,6 @@
     "minify-js": "cd static-page/js/compiled && uglifyjs axios.js -o ../minified/axios_min.js"
   },
   "dependencies": {
-    "uglify-js": "^3.13.2",
     "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
@@ -21,7 +20,7 @@
     "helmet": "^4.6.0",
     "http": "0.0.1-security",
     "http-proxy-middleware": "^2.0.3",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "lodash.where": "^3.1.0",
     "moment": "^2.29.3",
@@ -32,10 +31,11 @@
     "node-schedule": "^2.1.0",
     "nodemailer": "^6.6.5",
     "nodemon": "^2.0.13",
-    "otp-generator": "^2.0.1",
+    "otp-generator": "^4.0.1",
     "path": "^0.12.7",
     "sequelize": "^6.7.0",
     "socket.io": "^4.5.4",
+    "uglify-js": "^3.13.2",
     "uuid": "^9.0.0"
   },
   "author": "",
