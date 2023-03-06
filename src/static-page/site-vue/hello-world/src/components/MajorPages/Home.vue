@@ -1,17 +1,17 @@
 <template>
-    <div class="preview-page">
-      <Header />
-      <!-- Quote/testimonial aside-->
-      <Strip />
-      <!-- App features section-->
-      <Features />
-      <!-- Basic features section-->
-      <BasicFeatures />
-      <!-- Call to action section-->
-      <Action />
-      <!-- App badge section-->
-      <AppBudge />
-    </div>
+  <div class="preview-page">
+    <Header />
+    <!-- Quote/testimonial aside-->
+    <Strip />
+    <!-- App features section-->
+    <Features />
+    <!-- Basic features section-->
+    <BasicFeatures />
+    <!-- Call to action section-->
+    <Action />
+    <!-- App badge section-->
+    <AppBudge />
+  </div>
 </template>
 
 <script>
@@ -30,11 +30,12 @@ export default {
     Features,
     BasicFeatures,
     Action,
-    AppBudge
+    AppBudge,
   },
   props: {
     msg: String,
   },
+  methods: {},
 };
 </script>
 

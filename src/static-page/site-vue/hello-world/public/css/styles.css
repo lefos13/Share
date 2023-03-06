@@ -2549,7 +2549,7 @@ textarea.form-control-lg {
   -moz-appearance: none;
   appearance: none;
   -webkit-print-color-adjust: exact;
-  color-adjust: exact;
+  print-color-adjust: exact;
 }
 .form-check-input[type="checkbox"] {
   border-radius: 0.25em;
@@ -11671,7 +11671,7 @@ html {
 
 .bg-black {
   background-color: #000 !important;
-  position: fixed;
+  /* position: fixed; */
   left: 0;
   bottom: 0;
   width: 100%;
@@ -11701,7 +11701,7 @@ html {
 aside,
 section {
   padding-top: 5rem;
-  padding-bottom: 10rem;
+  padding-bottom: 5rem;
 }
 
 .app-badge {
