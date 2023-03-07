@@ -758,38 +758,38 @@ module.exports = {
         });
       }
 
-      // if (data.age != null) {
-      //   // afairese ta post twn xrhstwn pou einai panw apo data.age_end
+      if (data.age != null) {
+        // afairese ta post twn xrhstwn pou einai panw apo data.age_end
 
-      //   array = _.filter(array, (obj) => {
-      //     let calcAge;
-      //     if (obj.user.age != null) {
-      //       let splitted = obj.user.age.split("/");
-      //       let ageDate = moment()
-      //         .set("year", parseInt(splitted[2]))
-      //         .set("month", parseInt(splitted[1]) - 1)
-      //         .set("date", parseInt(splitted[0]));
+        array = _.filter(array, (obj) => {
+          let calcAge;
+          if (obj.user.age != null) {
+            let splitted = obj.user.age.split("/");
+            let ageDate = moment()
+              .set("year", parseInt(splitted[2]))
+              .set("month", parseInt(splitted[1]) - 1)
+              .set("date", parseInt(splitted[0]));
 
-      //       calcAge = moment().diff(ageDate, "years");
-      //     }
+            calcAge = moment().diff(ageDate, "years");
+          }
 
-      //     return calcAge <= data.age_end;
-      //   });
-      //   // afairese ta post twn xrhstwn pou einai katw apo data.age
-      //   array = _.filter(array, (obj) => {
-      //     let calcAge;
-      //     if (obj.user.age != null) {
-      //       let splitted = obj.user.age.split("/");
-      //       let ageDate = moment()
-      //         .set("year", parseInt(splitted[2]))
-      //         .set("month", parseInt(splitted[1]) - 1)
-      //         .set("date", parseInt(splitted[0]));
+          return calcAge <= data.age_end;
+        });
+        // afairese ta post twn xrhstwn pou einai katw apo data.age
+        array = _.filter(array, (obj) => {
+          let calcAge;
+          if (obj.user.age != null) {
+            let splitted = obj.user.age.split("/");
+            let ageDate = moment()
+              .set("year", parseInt(splitted[2]))
+              .set("month", parseInt(splitted[1]) - 1)
+              .set("date", parseInt(splitted[0]));
 
-      //       calcAge = moment().diff(ageDate, "years");
-      //     }
-      //     return calcAge >= data.age;
-      //   });
-      // }
+            calcAge = moment().diff(ageDate, "years");
+          }
+          return calcAge >= data.age;
+        });
+      }
 
       if (data.car != null) {
         //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
