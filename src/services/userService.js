@@ -312,7 +312,7 @@ const login = async (req) => {
             status: 200,
             message: msg.loginSuc,
             user: rest,
-            forceUpdate: false,
+            forceUpdate: true,
           };
         } else {
           // CHECK IF THE PASS IS RIGHT
@@ -360,7 +360,7 @@ const loginThirdParty = async (req) => {
     let data = req.body.data;
     console.log("Data for google log in:", data);
     let userRegistered = false;
-    let forceUpdate = false;
+    let forceUpdate = true;
 
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;
