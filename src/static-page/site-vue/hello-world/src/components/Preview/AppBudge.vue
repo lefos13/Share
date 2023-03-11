@@ -10,6 +10,7 @@
         <a
           class="me-lg-3 mb-4 mb-lg-0"
           href="https://play.google.com/store/apps/details?id=com.shareridenew"
+          target="_blank"
           ><img
             class="app-badge"
             src="../../assets/img/google-play-badge.svg"
