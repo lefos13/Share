@@ -323,12 +323,13 @@ const sendMessage = async (
       let curTime = moment();
       //If there is other notification of this conv replace it with this one.
       if (true) {
+        const myJsonMessage = JSON.stringify(messageSent);
         const notificationToInsert = {
           imagePath: "images/" + senderEmail + ".jpeg",
           date: curTime,
           type: data.type,
           conversationId: data.conversationId,
-          convMessage: messageSent.toString(),
+          convMessage: myJsonMessage,
           postid: null,
           email: senderEmail,
           fullName: sender.fullname,
