@@ -25,6 +25,7 @@ const Notifications = sequelize.define(
       primaryKey: true,
       unique: true,
       allowNull: false,
+      autoIncrement: true,
     },
     imagePath: {
       type: DataTypes.STRING,
