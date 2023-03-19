@@ -346,15 +346,15 @@ const sendMessage = async (
             "Something went wrong with finding existing notification (message)"
           );
         else if (exists === null) {
-          Notification.createOne(notificationToInsert);
+          Notification.createOne(notificationToInsert).then((data) => {
+            console.log("Notification inserted: ", data);
+          });
         } else {
           await exists.destroy();
-          Notification.createOne(notificationToInsert);
+          Notification.createOne(notificationToInsert).then((data) => {
+            console.log("Notification inserted: ", data);
+          });
         }
-
-        Notification.createOne(notificationToInsert).then((data) => {
-          console.log("Notification inserted: ", data);
-        });
       }
 
       admin
