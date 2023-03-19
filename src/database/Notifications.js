@@ -32,7 +32,29 @@ const createOne = async (data) => {
     return false;
   }
 };
+const checkNotificationMessage = async (not) => {
+  try {
+    let exists = await Notifications.findOne({
+      where: {
+        ownerEmail: not.ownerEmail,
+        conversationId: not.conversationId,
+        isRead: false,
+      },
+    }).catch((err) => {
+      throw err;
+    });
 
+    if (exists != null) {
+      console.log("Found existing non-read notification of this conversation");
+      return exists;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 const deleteOne = async () => {
   try {
   } catch (error) {
@@ -50,6 +72,7 @@ const destroyAll = async () => {
 };
 
 module.exports = {
+  checkNotificationMessage,
   createOne,
   deleteOne,
   destroyAll,

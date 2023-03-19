@@ -320,6 +320,42 @@ const sendMessage = async (
             messageSent.text,
         },
       };
+      let curTime = moment();
+      //If there is other notification of this conv replace it with this one.
+      if (true) {
+        const notificationToInsert = {
+          imagePath: "images/" + postOwner + ".jpeg",
+          date: curTime,
+          type: data.type,
+          conversationId: data.conversationId,
+          convMessage: data.message,
+          postid: null,
+          email: senderEmail,
+          fullName: sender.fullname,
+          ownerEmail: receiverObj.email,
+          title: message.notification.title,
+          message: message.notification.body,
+          isRead: false,
+        };
+        //find if a similar notification exists
+        let exists = await Notification.checkNotificationMessage(
+          notificationToInsert
+        );
+        if (exists === false)
+          throw new Error(
+            "Something went wrong with finding existing notification (message)"
+          );
+        else if (exists === null) {
+          Notification.createOne(notificationToInsert);
+        } else {
+          await exists.destroy();
+          Notification.createOne(notificationToInsert);
+        }
+
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
+      }
 
       admin
         .messaging()
