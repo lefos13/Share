@@ -53,7 +53,7 @@
                   <i
                     class="bi-gift icon-feature text-gradient d-block mb-3"
                   ></i>
-                  <h3 class="font-alt">Δωρεάν</h3>
+                  <h3 class="font-alt">100% ΔΩΡΕΑΝ</h3>
                   <p class="text-muted mb-0">
                     Όλες οι υπηρεσίες της εφαρμογής είναι απολύτως δωρεάν.
                     Κατέβασε το Ouride και απόλαυσε τα πάντα στο 100%
