@@ -49,7 +49,52 @@ const moreMessages = async (req, res) => {
   }
 };
 
+const getNotifications = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const data = await neutralService.getNotifications(req);
+    if (data.status != 200) throw msg;
+    res.json({
+      messages: data.data.finalMessages,
+      messagesLeft: data.data.messagesLeft,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
+const readNotification = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const data = await neutralService.getNotifications(req);
+    if (data.status != 200) throw msg;
+    res.json({
+      messages: data.data.finalMessages,
+      messagesLeft: data.data.messagesLeft,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
+const deleteNotification = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const data = await neutralService.getNotifications(req);
+    if (data.status != 200) throw msg;
+    res.json({
+      messages: data.data.finalMessages,
+      messagesLeft: data.data.messagesLeft,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
 module.exports = {
+  deleteNotification,
+  readNotification,
+  getNotifications,
   webSendReport,
   moreMessages,
   sendReport,

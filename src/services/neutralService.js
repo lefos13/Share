@@ -130,7 +130,16 @@ const moreMessages = async (req) => {
   }
 };
 
+const getNotifications = async (req) => {
+  try {
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
+  getNotifications,
   webSendReport,
   moreMessages,
   sendReport,

@@ -14,6 +14,8 @@ admin.initializeApp({
 var _ = require("lodash");
 
 const Review = require("../database/Review");
+const Notification = require("../database/Notifications");
+
 const {
   EMAIL,
   PASSEMAIL,
@@ -383,81 +385,6 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
   }
 };
 
-const toNotifyOwner = async (emailToNotify, emailAction, postid) => {
-  try {
-    const user = await Users.findOne({
-      where: {
-        email: emailAction,
-      },
-    }).catch((err) => {
-      throw err;
-    });
-
-    const userToNotify = await User.findOneLight(emailToNotify);
-
-    let msg = await getLang(userToNotify.lastLang);
-
-    const fcmData = await FcmToken.findOne({
-      where: {
-        email: emailToNotify,
-      },
-    }).catch((err) => {
-      throw err;
-    });
-
-    let toSend = false;
-
-    if (fcmData != null) {
-      await verifyFCMToken(fcmData.fcmToken)
-        .then(() => {
-          toSend = true;
-        })
-        .catch(() => {
-          toSend = false;
-        });
-    } else {
-      throw "User hasnt the app anymore!";
-    }
-
-    if (toSend !== false) {
-      let postString = postid.toString();
-      let fcmToken = fcmData.fcmToken;
-      let data = {
-        type: "receiveInterest",
-        postid: postString,
-        email: emailAction,
-        fullname: user.fullname,
-      };
-
-      let message = {
-        data: data,
-        token: fcmToken,
-        notification: {
-          title: msg.firebase.not_owner_title,
-          body:
-            msg.firebase.not_ver_body0 +
-            user.fullname +
-            msg.firebase.liked_post,
-        },
-      };
-
-      admin
-        .messaging()
-        .send(message)
-        .then((response) => {
-          console.log("Success: ", response);
-        })
-        .catch((err) => {
-          throw err;
-        });
-    } else {
-      fcmData.destroy();
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 module.exports = {
   toNotifyTheUnverified,
   sendMessage,
@@ -604,7 +531,25 @@ module.exports = {
             },
           };
         }
+        // Insert notification to history
+        let curTime = moment();
+        const notificationToInsert = {
+          imagePath: "images/" + emailAction + ".jpeg",
+          date: curTime,
+          type: data.type,
+          postid: data.postid,
+          email: data.email,
+          fillName: data.fullname,
+          ownerEmail: emailToNotify,
+          title: message.notification.title,
+          message: message.notification.message,
+          isRead: false,
+        };
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
 
+        // Send notification through firebase
         admin
           .messaging()
           .send(message)
@@ -682,6 +627,24 @@ module.exports = {
               msg.firebase.not_ver_body,
           },
         };
+        // Insert notification to history
+        let curTime = moment();
+        const notificationToInsert = {
+          imagePath: "images/" + user.email + ".jpeg",
+          date: curTime,
+          type: message.data.type,
+          postid: message.data.postid,
+          email: message.data.email,
+          fillName: message.data.fullname,
+          ownerEmail: toNotifyUser.email,
+          title: message.notification.title,
+          message: message.notification.message,
+          isRead: false,
+        };
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
+
         admin
           .messaging()
           .send(message)
