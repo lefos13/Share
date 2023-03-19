@@ -39,6 +39,16 @@ const Notifications = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    conversationId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null,
+    },
+    convMessage: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: null,
+    },
     postid: {
       type: DataTypes.BIGINT,
       allowNull: true,
