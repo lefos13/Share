@@ -71,6 +71,7 @@ const Notifications = sequelize.define(
   },
   {
     freezeTableName: true,
+    timestamps: false,
   }
 );
 
