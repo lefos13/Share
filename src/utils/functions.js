@@ -539,10 +539,10 @@ module.exports = {
           type: data.type,
           postid: data.postid,
           email: data.email,
-          fillName: data.fullname,
+          fullName: data.fullname,
           ownerEmail: emailToNotify,
           title: message.notification.title,
-          message: message.notification.message,
+          message: message.notification.body,
           isRead: false,
         };
         Notification.createOne(notificationToInsert).then((data) => {
@@ -638,7 +638,7 @@ module.exports = {
           fillName: message.data.fullname,
           ownerEmail: toNotifyUser.email,
           title: message.notification.title,
-          message: message.notification.message,
+          message: message.notification.body,
           isRead: false,
         };
         Notification.createOne(notificationToInsert).then((data) => {
