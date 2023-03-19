@@ -328,7 +328,7 @@ const sendMessage = async (
           date: curTime,
           type: data.type,
           conversationId: data.conversationId,
-          convMessage: JSON.stringify(data.message),
+          convMessage: JSON.stringify(JSON.parse(data.message)),
           postid: null,
           email: senderEmail,
           fullName: sender.fullname,
