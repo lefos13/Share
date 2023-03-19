@@ -324,7 +324,7 @@ const sendMessage = async (
       //If there is other notification of this conv replace it with this one.
       if (true) {
         const notificationToInsert = {
-          imagePath: "images/" + postOwner + ".jpeg",
+          imagePath: "images/" + senderEmail + ".jpeg",
           date: curTime,
           type: data.type,
           conversationId: data.conversationId,
