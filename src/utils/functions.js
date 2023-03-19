@@ -230,6 +230,23 @@ const newRide = async (postid, emailArray, postOwner) => {
               msg.firebase.request_part2,
           },
         };
+        // Insert notification to history
+        let curTime = moment();
+        const notificationToInsert = {
+          imagePath: "images/" + postOwner + ".jpeg",
+          date: curTime,
+          type: message.data.type,
+          postid: message.data.postid,
+          email: message.data.email,
+          fullName: message.data.fullname,
+          ownerEmail: userToNotify.email,
+          title: message.notification.title,
+          message: message.notification.body,
+          isRead: false,
+        };
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
         allMessages.push(message);
         // allTokens.push(f.fcmToken);
       } else {
