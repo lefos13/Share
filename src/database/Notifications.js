@@ -91,6 +91,7 @@ const deleteOne = async (id) => {
 
 const readOne = async (id) => {
   try {
+    // console.log("Database reading:", id);
     await Notifications.update(
       {
         isRead: true,

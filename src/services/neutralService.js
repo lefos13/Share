@@ -168,13 +168,14 @@ const deleteNotification = async (req) => {
 const readNotification = async (req) => {
   try {
     let id = req.body.notificationId;
+    // console.log("reading", id);
     const msg = await determineLang(req);
 
     let data = await Notification.readOne(id);
-
+    // console.log("data of notification", data.toJSON());
     return {
       status: 200,
-      notifications: data,
+      preccess: data,
     };
   } catch (error) {
     console.error(error);
