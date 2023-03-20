@@ -65,7 +65,7 @@ const getNotifications = async (req, res) => {
 const readNotification = async (req, res) => {
   try {
     let msg = await determineLang(req);
-    const data = await neutralService.getNotifications(req);
+    const data = await neutralService.readNotification(req);
     if (data.status != 200) throw msg;
     res.json({
       messages: data.data.finalMessages,
