@@ -68,8 +68,7 @@ const readNotification = async (req, res) => {
     const data = await neutralService.readNotification(req);
     if (data.status != 200) throw msg;
     res.json({
-      messages: data.data.finalMessages,
-      messagesLeft: data.data.messagesLeft,
+      notification: data.data,
     });
   } catch (error) {
     res.status(500).json({ message: error.errorMessage });
