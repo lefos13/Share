@@ -79,11 +79,10 @@ const readNotification = async (req, res) => {
 const deleteNotification = async (req, res) => {
   try {
     let msg = await determineLang(req);
-    const data = await neutralService.getNotifications(req);
+    const data = await neutralService.deleteNotification(req);
     if (data.status != 200) throw msg;
     res.json({
-      messages: data.data.finalMessages,
-      messagesLeft: data.data.messagesLeft,
+      message: msg.notificationDeleted,
     });
   } catch (error) {
     res.status(500).json({ message: error.errorMessage });

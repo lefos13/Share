@@ -73,14 +73,42 @@ const checkNotificationMessage = async (not) => {
     return false;
   }
 };
-const deleteOne = async () => {
+const deleteOne = async (id) => {
   try {
+    await Notifications.destroy({
+      where: {
+        notificationId: id,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
   } catch (error) {
     console.error(error);
     return false;
   }
 };
 
+const readOne = async (id) => {
+  try {
+    await Notifications.update(
+      {
+        isRead: true,
+      },
+      {
+        where: {
+          notificationId: id,
+        },
+      }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 const destroyAll = async () => {
   try {
   } catch (error) {
@@ -94,5 +122,6 @@ module.exports = {
   checkNotificationMessage,
   createOne,
   deleteOne,
+  readOne,
   destroyAll,
 };
