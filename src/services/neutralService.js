@@ -7,6 +7,7 @@ const Request = require("../database/Request");
 const Post = require("../database/Post");
 const PostInt = require("../database/PostInterested");
 const ToReview = require("../database/ToReview");
+const Notification = require("../database/Notifications");
 const ConvUsers = require("../database/ConvUsers");
 
 const bcrypt = require("bcrypt");
@@ -132,6 +133,14 @@ const moreMessages = async (req) => {
 
 const getNotifications = async (req) => {
   try {
+    let email = req.body.extra;
+    const msg = await determineLang(req);
+
+    let allNotifications = await Notification.getAll(email);
+
+    return {
+      notifications: allNotifications,
+    };
   } catch (error) {
     console.error(error);
     return { status: 500 };

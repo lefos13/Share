@@ -21,6 +21,24 @@ const moment = require("moment");
 // *** ADD ***
 const {} = require("./utils");
 
+const getAll = async (email) => {
+  try {
+    const all = await Notifications.findAll({
+      where: {
+        ownerEmail: email,
+      },
+      order: [["date", "DESC"]],
+      limit: 15,
+    }).catch((err) => {
+      throw err;
+    });
+    return all;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 const createOne = async (data) => {
   try {
     await Notifications.create(data).catch((err) => {
@@ -72,6 +90,7 @@ const destroyAll = async () => {
 };
 
 module.exports = {
+  getAll,
   checkNotificationMessage,
   createOne,
   deleteOne,
