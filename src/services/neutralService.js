@@ -175,7 +175,7 @@ const readNotification = async (req) => {
     // console.log("data of notification", data.toJSON());
     return {
       status: 200,
-      preccess: data,
+      data: data,
     };
   } catch (error) {
     console.error(error);
