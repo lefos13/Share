@@ -167,14 +167,14 @@ const deleteNotification = async (req) => {
 
 const readNotification = async (req) => {
   try {
-    let email = req.body.extra;
+    let id = req.body.notificationId;
     const msg = await determineLang(req);
 
-    let allNotifications = await Notification.getAll(email);
+    let data = await Notification.readOne(id);
 
     return {
       status: 200,
-      notifications: allNotifications,
+      notifications: data,
     };
   } catch (error) {
     console.error(error);
