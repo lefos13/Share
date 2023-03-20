@@ -139,6 +139,7 @@ const getNotifications = async (req) => {
     let allNotifications = await Notification.getAll(email);
 
     return {
+      status: 200,
       notifications: allNotifications,
     };
   } catch (error) {

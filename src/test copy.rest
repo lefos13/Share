@@ -565,3 +565,9 @@ Accept-Language: EN
         "page": 1
     }
 }
+
+###
+GET https://ouride.gr/test/neutral/getNotifications
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
+Accept-Language: EN
