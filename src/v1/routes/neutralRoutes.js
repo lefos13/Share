@@ -69,14 +69,14 @@ router.get(
   neutralController.getNotifications
 );
 
-router.get(
+router.post(
   "/readNotification",
   [authenticateToken],
   cors(corsOptions),
   neutralController.getNotifications
 );
 
-router.get(
+router.post(
   "/deleteNotification",
   [authenticateToken],
   cors(corsOptions),
