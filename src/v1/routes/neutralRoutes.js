@@ -73,14 +73,14 @@ router.post(
   "/readNotification",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.getNotifications
+  neutralController.readNotification
 );
 
 router.post(
   "/deleteNotification",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.getNotifications
+  neutralController.deleteNotification
 );
 // router.get(
 //   "/",
