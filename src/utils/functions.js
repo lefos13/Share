@@ -232,8 +232,10 @@ const newRide = async (postid, emailArray, postOwner) => {
         };
         // Insert notification to history
         let curTime = moment();
+        let imagePath =
+          owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
         const notificationToInsert = {
-          imagePath: "images/" + postOwner + ".jpeg",
+          imagePath: imagePath,
           date: curTime,
           type: message.data.type,
           postid: message.data.postid,
@@ -323,9 +325,11 @@ const sendMessage = async (
       let curTime = moment();
       //If there is other notification of this conv replace it with this one.
       if (true) {
+        let imagePath =
+          sender.photo != null ? "images/" + sender.email + ".jpeg" : null;
         const myJsonMessage = JSON.stringify(messageSent);
         const notificationToInsert = {
-          imagePath: "images/" + senderEmail + ".jpeg",
+          imagePath: imagePath,
           date: curTime,
           type: data.type,
           conversationId: data.conversationId,
@@ -422,6 +426,24 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
             msg.firebase.unver_body,
         },
       };
+      let curTime = moment();
+      let imagePath =
+        owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
+      const notificationToInsert = {
+        imagePath: imagePath,
+        date: curTime,
+        type: message.data.type,
+        postid: message.data.postid,
+        email: message.data.email,
+        fullName: message.data.fullname,
+        ownerEmail: toNotifyUser.email,
+        title: message.notification.title,
+        message: message.notification.body,
+        isRead: false,
+      };
+      Notification.createOne(notificationToInsert).then((data) => {
+        console.log("Notification inserted: ", data);
+      });
       admin
         .messaging()
         .send(message)
@@ -587,8 +609,10 @@ module.exports = {
         }
         // Insert notification to history
         let curTime = moment();
+        let imagePath =
+          user.photo != null ? "images/" + user.email + ".jpeg" : null;
         const notificationToInsert = {
-          imagePath: "images/" + emailAction + ".jpeg",
+          imagePath: imagePath,
           date: curTime,
           type: data.type,
           postid: data.postid,
@@ -683,8 +707,10 @@ module.exports = {
         };
         // Insert notification to history
         let curTime = moment();
+        let imagePath =
+          user.photo != null ? "images/" + user.email + ".jpeg" : null;
         const notificationToInsert = {
-          imagePath: "images/" + user.email + ".jpeg",
+          imagePath: imagePath,
           date: curTime,
           type: message.data.type,
           postid: message.data.postid,

@@ -5,7 +5,7 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "ouridecommunity@gmail.com"
     }
 }
 
@@ -569,7 +569,7 @@ Accept-Language: EN
 ###
 GET https://ouride.gr/test/neutral/getNotifications
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im91cmlkZWNvbW11bml0eUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wMy0yMVQxNTozNTo1My4yMzhaIiwiaWF0IjoxNjc5NDEyOTUzLCJleHAiOjE2ODQ1OTY5NTN9.oFq-0ZGNY6fGTFJHwuxpglUa0mZHIyM3J-vBaz94Nmc
 Accept-Language: EN
 
 ###
