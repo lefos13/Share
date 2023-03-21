@@ -157,6 +157,7 @@ i {
 
 .title-nav {
   margin-top: 13px;
+  margin-left: 10px;
 }
 
 // Mobile version - hidden hamburger menu

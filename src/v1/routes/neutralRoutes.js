@@ -62,6 +62,26 @@ router.post(
   neutralController.moreMessages
 );
 
+router.get(
+  "/getNotifications",
+  [authenticateToken],
+  cors(corsOptions),
+  neutralController.getNotifications
+);
+
+router.post(
+  "/readNotification",
+  [authenticateToken],
+  cors(corsOptions),
+  neutralController.readNotification
+);
+
+router.post(
+  "/deleteNotification",
+  [authenticateToken],
+  cors(corsOptions),
+  neutralController.deleteNotification
+);
 // router.get(
 //   "/",
 //   [authenticateToken],

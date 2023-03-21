@@ -7,6 +7,7 @@ const Request = require("../database/Request");
 const Post = require("../database/Post");
 const PostInt = require("../database/PostInterested");
 const ToReview = require("../database/ToReview");
+const Notification = require("../database/Notifications");
 const ConvUsers = require("../database/ConvUsers");
 
 const bcrypt = require("bcrypt");
@@ -130,7 +131,62 @@ const moreMessages = async (req) => {
   }
 };
 
+const getNotifications = async (req) => {
+  try {
+    let email = req.body.extra;
+    const msg = await determineLang(req);
+
+    let allNotifications = await Notification.getAll(email);
+
+    return {
+      status: 200,
+      notifications: allNotifications,
+    };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
+const deleteNotification = async (req) => {
+  try {
+    let id = req.body.notificationId;
+    const msg = await determineLang(req);
+
+    let deleted = await Notification.deleteOne(id);
+
+    return {
+      status: 200,
+      process: deleted,
+    };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
+const readNotification = async (req) => {
+  try {
+    let id = req.body.notificationId;
+    // console.log("reading", id);
+    const msg = await determineLang(req);
+
+    let data = await Notification.readOne(id);
+    // console.log("data of notification", data.toJSON());
+    return {
+      status: 200,
+      data: data,
+    };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
+  getNotifications,
+  deleteNotification,
+  readNotification,
   webSendReport,
   moreMessages,
   sendReport,

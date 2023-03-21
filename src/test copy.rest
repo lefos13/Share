@@ -1,11 +1,11 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
-POST https://ouride.gr/users/createtoken
+POST https://ouride.gr/test/users/createtoken
 Content-Type: application/json
 Accept-Language: EN
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "ouridecommunity@gmail.com"
     }
 }
 
@@ -111,21 +111,21 @@ Accept-Language: EN
 ###
 
 #service pou ftiaxneis ena post
-POST http://157.230.18.246:3000/posts/createpost
+POST https://ouride.gr/test/posts/createpost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTEyVDE5OjQ4OjMwLjg3NVoiLCJpYXQiOjE2NzA4NzQ1MTAsImV4cCI6MTY3NjA1ODUxMH0.lZsv25J64lxVhOw8FtWionb5ZSJQl0bptPkV4Ww-Ifs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMTlUMTg6NTg6NTMuMjcxWiIsImlhdCI6MTY3OTI1MjMzMywiZXhwIjoxNjg0NDM2MzMzfQ.ysmx-1kTztJPcQ8mjZ7TIJlN8aN7uA_Zc8ZGupNpC1g
 Accept-Language: GR
 
 {
     "data": {
-        "email": "user1@gmail.com",
-        "date": "2022-06-26",
-        "startplace": "Αθήνα",
+        "email": "lefterisevagelinos1996@gmail.com",
+        "date": "2023-03-26",
+        "startplace": "Athens",
         "startcoord": "37.9838096,23.7275388",
-        "endplace": "Βόλος",
-        "endcoord": "39.366584,22.9506769",
+        "endplace": "Thessaloniki",
+        "endcoord": "40.6400629,22.9444191",
         "numseats": 2,
-        "startdate": "2023-01-22",
+        "startdate": "2023-03-26",
         "enddate": null,
         "returnStartDate": null,
         "returnEndDate": null,
@@ -564,4 +564,30 @@ Accept-Language: EN
     "data": {
         "page": 1
     }
+}
+
+###
+GET https://ouride.gr/test/neutral/getNotifications
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im91cmlkZWNvbW11bml0eUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wMy0yMVQxNTozNTo1My4yMzhaIiwiaWF0IjoxNjc5NDEyOTUzLCJleHAiOjE2ODQ1OTY5NTN9.oFq-0ZGNY6fGTFJHwuxpglUa0mZHIyM3J-vBaz94Nmc
+Accept-Language: EN
+
+###
+POST https://ouride.gr/test/neutral/deleteNotification
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
+Accept-Language: EN
+
+{
+    "notificationId": 26
+}
+
+###
+POST https://ouride.gr/test/neutral/readNotification
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
+Accept-Language: EN
+
+{
+    "notificationId": 25
 }

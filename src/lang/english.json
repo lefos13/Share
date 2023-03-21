@@ -76,5 +76,6 @@
     "new_message": "New message",
     "sent": " sent you: "
   },
-  "otpMessage": "Please copy the otp code that appears bellow and paste it on the app so you can confirm your identity: <br><h1><b>"
+  "otpMessage": "Please copy the otp code that appears bellow and paste it on the app so you can confirm your identity: <br><h1><b>",
+  "notificationDeleted": "Notifications has been deleted!"
 }

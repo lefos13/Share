@@ -14,6 +14,8 @@ admin.initializeApp({
 var _ = require("lodash");
 
 const Review = require("../database/Review");
+const Notification = require("../database/Notifications");
+
 const {
   EMAIL,
   PASSEMAIL,
@@ -228,6 +230,25 @@ const newRide = async (postid, emailArray, postOwner) => {
               msg.firebase.request_part2,
           },
         };
+        // Insert notification to history
+        let curTime = moment();
+        let imagePath =
+          owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
+        const notificationToInsert = {
+          imagePath: imagePath,
+          date: curTime,
+          type: message.data.type,
+          postid: message.data.postid,
+          email: message.data.email,
+          fullName: message.data.fullname,
+          ownerEmail: userToNotify.email,
+          title: message.notification.title,
+          message: message.notification.body,
+          isRead: false,
+        };
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
         allMessages.push(message);
         // allTokens.push(f.fcmToken);
       } else {
@@ -301,6 +322,45 @@ const sendMessage = async (
             messageSent.text,
         },
       };
+      let curTime = moment();
+      //If there is other notification of this conv replace it with this one.
+      if (true) {
+        let imagePath =
+          sender.photo != null ? "images/" + sender.email + ".jpeg" : null;
+        const myJsonMessage = JSON.stringify(messageSent);
+        const notificationToInsert = {
+          imagePath: imagePath,
+          date: curTime,
+          type: data.type,
+          conversationId: data.conversationId,
+          convMessage: myJsonMessage,
+          postid: null,
+          email: senderEmail,
+          fullName: sender.fullname,
+          ownerEmail: receiverObj.email,
+          title: message.notification.title,
+          message: message.notification.body,
+          isRead: false,
+        };
+        //find if a similar notification exists
+        let exists = await Notification.checkNotificationMessage(
+          notificationToInsert
+        );
+        if (exists === false)
+          throw new Error(
+            "Something went wrong with finding existing notification (message)"
+          );
+        else if (exists === null) {
+          Notification.createOne(notificationToInsert).then((data) => {
+            console.log("Notification inserted: ", data);
+          });
+        } else {
+          await exists.destroy();
+          Notification.createOne(notificationToInsert).then((data) => {
+            console.log("Notification inserted: ", data);
+          });
+        }
+      }
 
       admin
         .messaging()
@@ -366,6 +426,24 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
             msg.firebase.unver_body,
         },
       };
+      let curTime = moment();
+      let imagePath =
+        owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
+      const notificationToInsert = {
+        imagePath: imagePath,
+        date: curTime,
+        type: message.data.type,
+        postid: message.data.postid,
+        email: message.data.email,
+        fullName: message.data.fullname,
+        ownerEmail: toNotifyUser.email,
+        title: message.notification.title,
+        message: message.notification.body,
+        isRead: false,
+      };
+      Notification.createOne(notificationToInsert).then((data) => {
+        console.log("Notification inserted: ", data);
+      });
       admin
         .messaging()
         .send(message)
@@ -377,81 +455,6 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
         });
     } else {
       fcmToken.destroy();
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const toNotifyOwner = async (emailToNotify, emailAction, postid) => {
-  try {
-    const user = await Users.findOne({
-      where: {
-        email: emailAction,
-      },
-    }).catch((err) => {
-      throw err;
-    });
-
-    const userToNotify = await User.findOneLight(emailToNotify);
-
-    let msg = await getLang(userToNotify.lastLang);
-
-    const fcmData = await FcmToken.findOne({
-      where: {
-        email: emailToNotify,
-      },
-    }).catch((err) => {
-      throw err;
-    });
-
-    let toSend = false;
-
-    if (fcmData != null) {
-      await verifyFCMToken(fcmData.fcmToken)
-        .then(() => {
-          toSend = true;
-        })
-        .catch(() => {
-          toSend = false;
-        });
-    } else {
-      throw "User hasnt the app anymore!";
-    }
-
-    if (toSend !== false) {
-      let postString = postid.toString();
-      let fcmToken = fcmData.fcmToken;
-      let data = {
-        type: "receiveInterest",
-        postid: postString,
-        email: emailAction,
-        fullname: user.fullname,
-      };
-
-      let message = {
-        data: data,
-        token: fcmToken,
-        notification: {
-          title: msg.firebase.not_owner_title,
-          body:
-            msg.firebase.not_ver_body0 +
-            user.fullname +
-            msg.firebase.liked_post,
-        },
-      };
-
-      admin
-        .messaging()
-        .send(message)
-        .then((response) => {
-          console.log("Success: ", response);
-        })
-        .catch((err) => {
-          throw err;
-        });
-    } else {
-      fcmData.destroy();
     }
   } catch (error) {
     console.error(error);
@@ -604,7 +607,27 @@ module.exports = {
             },
           };
         }
+        // Insert notification to history
+        let curTime = moment();
+        let imagePath =
+          user.photo != null ? "images/" + user.email + ".jpeg" : null;
+        const notificationToInsert = {
+          imagePath: imagePath,
+          date: curTime,
+          type: data.type,
+          postid: data.postid,
+          email: data.email,
+          fullName: data.fullname,
+          ownerEmail: emailToNotify,
+          title: message.notification.title,
+          message: message.notification.body,
+          isRead: false,
+        };
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
 
+        // Send notification through firebase
         admin
           .messaging()
           .send(message)
@@ -682,6 +705,26 @@ module.exports = {
               msg.firebase.not_ver_body,
           },
         };
+        // Insert notification to history
+        let curTime = moment();
+        let imagePath =
+          user.photo != null ? "images/" + user.email + ".jpeg" : null;
+        const notificationToInsert = {
+          imagePath: imagePath,
+          date: curTime,
+          type: message.data.type,
+          postid: message.data.postid,
+          email: message.data.email,
+          fullName: message.data.fullname,
+          ownerEmail: toNotifyUser.email,
+          title: message.notification.title,
+          message: message.notification.body,
+          isRead: false,
+        };
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
+
         admin
           .messaging()
           .send(message)
@@ -758,38 +801,38 @@ module.exports = {
         });
       }
 
-      // if (data.age != null) {
-      //   // afairese ta post twn xrhstwn pou einai panw apo data.age_end
+      if (data.age != null) {
+        // afairese ta post twn xrhstwn pou einai panw apo data.age_end
 
-      //   array = _.filter(array, (obj) => {
-      //     let calcAge;
-      //     if (obj.user.age != null) {
-      //       let splitted = obj.user.age.split("/");
-      //       let ageDate = moment()
-      //         .set("year", parseInt(splitted[2]))
-      //         .set("month", parseInt(splitted[1]) - 1)
-      //         .set("date", parseInt(splitted[0]));
+        array = _.filter(array, (obj) => {
+          let calcAge;
+          if (obj.user.age != null) {
+            let splitted = obj.user.age.split("/");
+            let ageDate = moment()
+              .set("year", parseInt(splitted[2]))
+              .set("month", parseInt(splitted[1]) - 1)
+              .set("date", parseInt(splitted[0]));
 
-      //       calcAge = moment().diff(ageDate, "years");
-      //     }
+            calcAge = moment().diff(ageDate, "years");
+          }
 
-      //     return calcAge <= data.age_end;
-      //   });
-      //   // afairese ta post twn xrhstwn pou einai katw apo data.age
-      //   array = _.filter(array, (obj) => {
-      //     let calcAge;
-      //     if (obj.user.age != null) {
-      //       let splitted = obj.user.age.split("/");
-      //       let ageDate = moment()
-      //         .set("year", parseInt(splitted[2]))
-      //         .set("month", parseInt(splitted[1]) - 1)
-      //         .set("date", parseInt(splitted[0]));
+          return calcAge <= data.age_end;
+        });
+        // afairese ta post twn xrhstwn pou einai katw apo data.age
+        array = _.filter(array, (obj) => {
+          let calcAge;
+          if (obj.user.age != null) {
+            let splitted = obj.user.age.split("/");
+            let ageDate = moment()
+              .set("year", parseInt(splitted[2]))
+              .set("month", parseInt(splitted[1]) - 1)
+              .set("date", parseInt(splitted[0]));
 
-      //       calcAge = moment().diff(ageDate, "years");
-      //     }
-      //     return calcAge >= data.age;
-      //   });
-      // }
+            calcAge = moment().diff(ageDate, "years");
+          }
+          return calcAge >= data.age;
+        });
+      }
 
       if (data.car != null) {
         //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
