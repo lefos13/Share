@@ -78,7 +78,14 @@ const backUpUser = async (data) => {
 
     var json = JSON.stringify(data);
 
-    fs.writeFile("../deleted/" + data.user.mail + ".json", json, "utf8");
+    fs.writeFile(
+      "../deleted/" + data.user.mail + ".json",
+      json,
+      "utf8",
+      (callback) => {
+        console.log("Wrote backup of deleted user");
+      }
+    );
   } catch (error) {
     console.log(error);
   }
