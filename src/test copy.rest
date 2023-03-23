@@ -548,14 +548,17 @@ Accept-Language: EN
     }
 }
 
-### delete one favourite search.
-POST http://157.230.18.246:3000/users/deleteUser
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDEtMDVUMTQ6MTM6NDAuNTY3WiIsImlhdCI6MTY3MjkyODAyMCwiZXhwIjoxNjc4MTEyMDIwfQ.vecQIJHzEsoFSqEcYWsT3l-FBopqlByRxWFLwQ901ww
-Accept-Language: EN
+
 
 ### delete one favourite search.
 POST https://www.ouride.gr/test/users/deleteUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMjNUMTY6NDk6MDAuNzY1WiIsImlhdCI6MTY3OTU5MDE0MCwiZXhwIjoxNjg0Nzc0MTQwfQ.15_7_KUigApJZ13oy_n2b0paeHrBuflCgZ_mgYPPKmY
+Accept-Language: EN
+
+
+### delete one favourite search.
+POST https://www.ouride.gr/test/users/deactivateUser
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMjNUMTY6NDk6MDAuNzY1WiIsImlhdCI6MTY3OTU5MDE0MCwiZXhwIjoxNjg0Nzc0MTQwfQ.15_7_KUigApJZ13oy_n2b0paeHrBuflCgZ_mgYPPKmY
 Accept-Language: EN
