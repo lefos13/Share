@@ -907,6 +907,8 @@ const permDeleteUser = async (req) => {
 
     dataToBackUp.notificationsOfUser = notifications;
 
+    notifications.destroy();
+
     //get all reviews for this user
 
     const allReviews = await Review.findAll(email);
@@ -922,61 +924,6 @@ const permDeleteUser = async (req) => {
     const potentialReviews = await ToReview.findAllPerUser(email);
 
     dataToBackUp.toReviewsOfUser = potentialReviews;
-    // //delete all interests of user from posts that are active
-    // for await (int of allInt) {
-    //   // for each interest
-    //   // check if the post is expired.
-    //   let expired = await Post.findExpired(int.postid, curDate);
-    //   if (expired === false) throw new Error("Error at finding certain post");
-    //   else if (expired != null) {
-    //     //delete interest
-    //     int.destroy();
-    //   }
-    // }
-
-    // //delete all chats of user
-    // const deletedChat = await ConvUsers.deleteAll(email);
-    // if (!deletedChat) throw new Error("Error at deleting the chats!");
-
-    // //get all active posts of user
-    // const allPosts = await Post.findAllActive(email, curDate);
-    // if (allPosts === false) {
-    //   throw new Error("error at finding acrive posts");
-    // }
-
-    // //delete all user's active posts and interests
-    // let postIds = [];
-    // _.forEach(allPosts, (val) => {
-    //   postIds.push(val.postid);
-    // });
-
-    // const deletedInts = await PostInterested.destroyPerArrayIds(postIds);
-    // if (deletedInts === false) {
-    //   throw new Error("error at deleting the interests");
-    // }
-
-    // const deletedPosts = await Post.destroyAllPerIds(postIds);
-    // if (deletedPosts === false) {
-    //   throw new Error("error at deleting active User's posts");
-    // }
-
-    // //delete all active potential reviews
-    // const deletedToReviews = await ToReview.deleteAllPerUser(email);
-    // if (deletedToReviews === false) {
-    //   throw new Error("error at deleting potential reviews");
-    // }
-
-    // //delete all requests of the user
-    // const deletedReq = await Request.deletePerUser(email);
-    // if (deletedReq === false) {
-    //   throw new Error("Error at deleting requests");
-    // }
-
-    // //update profile
-    // const deleted = await User.updateDeleted(email);
-    // if (deleted === false) {
-    //   throw new Error("Error at updating 'deleted' of user");
-    // }
 
     backUpUser(dataToBackUp);
 
