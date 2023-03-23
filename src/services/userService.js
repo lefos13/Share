@@ -879,23 +879,25 @@ const permDeleteUser = async (req) => {
 
     const user = await User.findOneUser(email);
     dataToBackUp.user = user;
+    user.destroy();
 
     // get all posts that user is interested, Find all that are active
     const allInt = await PostInterested.findAllperUser(email);
     if (allInt === false) {
       throw new Error("error at finding all the interests of user");
     }
-
     dataToBackUp.allInterestsOfUser = allInt;
+    _.invokeMap(allInt, "destroy");
 
     //get all posts of user
     const posts = await Post.findAllOfUser(email);
-
     dataToBackUp.postsOfUser = posts;
+    _.invokeMap(posts, "destroy");
 
     //get all chats of user
     const chats = await ConvUsers.findAll(email);
     dataToBackUp.chatsofUser = chats;
+    _.invokeMap(chats, "destroy");
 
     //get fcmToken
     const fcmToken = await FcmToken.findOne({
@@ -903,40 +905,40 @@ const permDeleteUser = async (req) => {
         email: email,
       },
     });
-
     dataToBackUp.fcmTokenOfUser = fcmToken;
+    _.invokeMap(fcmToken, "destroy");
 
     //get all searches of user
     const lastSearches = await LastSearch.getAll(email);
-
     dataToBackUp.lastSearchesOfUser = lastSearches;
+    _.invokeMap(lastSearches, "destroy");
 
     //get all notifications of user
     const notifications = await Notification.getAllofUser(email);
-
     dataToBackUp.notificationsOfUser = notifications;
-
     _.invokeMap(notifications, "destroy");
 
     //get all reviews for this user
-
     const allReviews = await Review.findAll(email);
-
     dataToBackUp.reviewsOfUser = allReviews;
+    _.invokeMap(allReviews, "destroy");
 
     //get all search posts request
-
     const searchPosts = await SearchPost.getAll(email);
-
     dataToBackUp.postsRequestOfUser = searchPosts;
+    _.invokeMap(searchPosts, "destroy");
 
+    //get all potential reviews of user
     const potentialReviews = await ToReview.findAllPerUser(email);
-
     dataToBackUp.toReviewsOfUser = potentialReviews;
+    _.invokeMap(potentialReviews, "destroy");
 
+    //delete photo
+    fs.unlink("uploads/" + dataToBackUp.user.email + ".jpeg");
+    //backup all data of deleted user
     backUpUser(dataToBackUp);
 
-    return { status: 200, response: { message: msg.deleteUser } };
+    return { status: 200, response: { message: msg.permDeleteUser } };
   } catch (error) {
     console.error(error);
     return { status: 500 };
