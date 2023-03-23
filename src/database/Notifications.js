@@ -122,14 +122,16 @@ const destroyAll = async () => {
 const getAllofUser = async (email) => {
   try {
     const all = await Notifications.findAll({
-      [Op.or]: [
-        {
-          email: email,
-        },
-        {
-          ownerEmail: email,
-        },
-      ],
+      where: {
+        [Op.or]: [
+          {
+            email: email,
+          },
+          {
+            ownerEmail: email,
+          },
+        ],
+      },
       order: [["date", "DESC"]],
     }).catch((err) => {
       throw err;
