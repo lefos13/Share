@@ -468,6 +468,8 @@ const sendOtp = async (req) => {
       specialChars: false,
     });
 
+    console.log("OTP GENERATED", otp);
+
     verification(otp, email);
 
     return {
