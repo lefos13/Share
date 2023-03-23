@@ -370,8 +370,8 @@ const sendMessage = async (
           throw err;
         });
     } else {
-      console.log("Deleted fcm token of", fcm.email);
-      fcm.destroy();
+      throw "User has uninstalled the app!";
+      // fcm.destroy();
     }
   } catch (error) {
     // console.error("aaaaaaaaaaaaaaaaaaaaaaa");
@@ -451,7 +451,8 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
           throw err;
         });
     } else {
-      fcmToken.destroy();
+      throw "User has uninstalled the app!";
+      // fcmToken.destroy();
     }
   } catch (error) {
     console.error(error);
@@ -634,7 +635,8 @@ module.exports = {
             throw err;
           });
       } else {
-        fcmData.destroy();
+        // fcmData.destroy();
+        throw "User has uninstalled the app!";
       }
     } catch (error) {
       console.error(error);
@@ -730,7 +732,8 @@ module.exports = {
             throw err;
           });
       } else {
-        fcmToken.destroy();
+        // fcmToken.destroy();
+        throw "User has uninstalled the app!";
       }
     } catch (error) {
       console.error(error);
