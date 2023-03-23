@@ -910,7 +910,9 @@ const permDeleteUser = async (req) => {
       },
     });
     dataToBackUp.fcmTokenOfUser = fcmToken;
-    fcmToken.destroy();
+    if (fcmToken != null) {
+      fcmToken.destroy();
+    }
 
     //get all searches of user
     const lastSearches = await LastSearch.getAll(email);
