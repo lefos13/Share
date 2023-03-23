@@ -365,6 +365,7 @@ const findAllPerUser = async (email) => {
     }).catch((err) => {
       throw err;
     });
+    return toReviews;
   } catch (error) {
     console.error(error);
     return false;
