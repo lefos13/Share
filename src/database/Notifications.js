@@ -32,6 +32,7 @@ const getAll = async (email) => {
     }).catch((err) => {
       throw err;
     });
+
     return all;
   } catch (error) {
     console.error(error);
