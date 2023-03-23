@@ -67,7 +67,7 @@ const backUpUser = async (data) => {
     var json = JSON.stringify(data);
 
     fs.writeFile(
-      "deleted/" + data.user.mail + ".json",
+      "deleted/" + data.user.email + ".json",
       json,
       "utf8",
       (callback) => {
