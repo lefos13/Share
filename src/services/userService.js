@@ -929,7 +929,7 @@ const permDeleteUser = async (req) => {
     //backup all data of deleted user
     backUpUser(dataToBackUp);
 
-    return { status: 200, response: { message: msg.permDeleteUser } };
+    return { status: 200, response: { message: msg.permDeleteAccount } };
   } catch (error) {
     console.error(error);
     return { status: 500 };
