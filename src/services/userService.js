@@ -912,11 +912,11 @@ const permDeleteUser = async (req) => {
     dataToBackUp.lastSearchesOfUser = lastSearches;
 
     //get all notifications of user
-    const notifications = await Notification.getAll(email);
+    const notifications = await Notification.getAllofUser(email);
 
     dataToBackUp.notificationsOfUser = notifications;
 
-    notifications.destroy();
+    _.invokeMap(notifications, "destroy");
 
     //get all reviews for this user
 

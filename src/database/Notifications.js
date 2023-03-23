@@ -119,6 +119,29 @@ const destroyAll = async () => {
   }
 };
 
+const getAllofUser = async (email) => {
+  try {
+    const all = await Notifications.findAll({
+      [Op.or]: [
+        {
+          email: email,
+        },
+        {
+          ownerEmail: email,
+        },
+      ],
+      order: [["date", "DESC"]],
+    }).catch((err) => {
+      throw err;
+    });
+
+    return all;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 module.exports = {
   getAll,
   checkNotificationMessage,
@@ -126,4 +149,5 @@ module.exports = {
   deleteOne,
   readOne,
   destroyAll,
+  getAllofUser,
 };
