@@ -454,8 +454,8 @@ const sendOtp = async (req) => {
 
     var otp = otpGenerator.generate(4, {
       digits: true,
-      upperCase: false,
-      alphabets: false,
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
       specialChars: false,
     });
 
