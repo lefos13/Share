@@ -881,7 +881,7 @@ const permDeleteUser = async (req) => {
     dataToBackUp.user = user;
 
     // get all posts that user is interested, Find all that are active
-    const allInt = await PostInterested.findAllPerUser(email);
+    const allInt = await PostInterested.findAllperUser(email);
     if (allInt === false) {
       throw new Error("error at finding all the interests of user");
     }

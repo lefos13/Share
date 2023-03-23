@@ -57,7 +57,7 @@
   "usersToReview": "We didn't find any users that you can review!",
   "userDeleted": "User deleted his account!",
   "noUserThatliked": "User is not interested anymore in this ride!",
-  "deleteUser": "You account has been deleted succesfully!",
+  "deleteUser": "You account has been deactivated succesfully!",
   "noMessages": "No messages yet!",
   "hasVerified": "You can't delete this ride! You have to dissaprove any interested users!",
   "firebase": {
