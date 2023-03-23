@@ -145,7 +145,7 @@ const deleteUser = async (req, res) => {
 const permDeleteUser = async (req, res) => {
   try {
     let msg = await determineLang(req);
-    const results = await userService.deleteUser(req);
+    const results = await userService.permDeleteUser(req);
     if (results.status == 500) throw msg;
     else res.status(results.status).json(results.response);
   } catch (error) {
