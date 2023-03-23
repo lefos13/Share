@@ -206,15 +206,6 @@ const newRide = async (postid, emailArray, postOwner) => {
     let postIdString = postid.toString();
 
     for await (f of fcmTokens) {
-      let toSend = false;
-
-      await verifyFCMToken(f.fcmToken)
-        .then(() => {
-          toSend = true;
-        })
-        .catch(() => {
-          toSend = false;
-        });
       if (toSend !== false) {
         const userToNotify = await Users.findOne({
           where: { email: f.email },
@@ -258,13 +249,12 @@ const newRide = async (postid, emailArray, postOwner) => {
         Notification.createOne(notificationToInsert).then((data) => {
           console.log("Notification inserted: ", data);
         });
-        allMessages.push(message);
-        // allTokens.push(f.fcmToken);
-      } else {
-        f.destroy();
+        await verifyFCMToken(f.fcmToken).then(() => {
+          allMessages.push(message);
+        });
       }
     }
-    if (allMessages.length > 0)
+    if (allMessages.length > 0) {
       admin
         .messaging()
         .sendAll(allMessages)
@@ -274,6 +264,7 @@ const newRide = async (postid, emailArray, postOwner) => {
         .catch((err) => {
           console.error("Error to send massive notifications: " + err);
         });
+    }
   } catch (error) {
     console.error("Inside Newride  ============= " + error);
   }
@@ -299,6 +290,62 @@ const sendMessage = async (
       throw err;
     });
 
+    let data = {
+      type: "chatReceivedMessage",
+      conversationId: conversationId,
+      message: messageSent.toString(),
+    };
+    let message = {
+      data: data,
+      token: fcm.fcmToken,
+      notification: {
+        title: msg.firebase.new_message,
+        body:
+          msg.firebase.not_ver_body0 +
+          sender.fullname +
+          msg.firebase.sent +
+          messageSent.text,
+      },
+    };
+    let curTime = moment();
+    //If there is other notification of this conv replace it with this one.
+    if (true) {
+      let imagePath =
+        sender.photo != null ? "images/" + sender.email + ".jpeg" : null;
+      const myJsonMessage = JSON.stringify(messageSent);
+      const notificationToInsert = {
+        imagePath: imagePath,
+        date: curTime,
+        type: data.type,
+        conversationId: data.conversationId,
+        convMessage: myJsonMessage,
+        postid: null,
+        email: senderEmail,
+        fullName: sender.fullname,
+        ownerEmail: receiverObj.email,
+        title: message.notification.title,
+        message: message.notification.body,
+        isRead: false,
+      };
+      //find if a similar notification exists
+      let exists = await Notification.checkNotificationMessage(
+        notificationToInsert
+      );
+      if (exists === false)
+        throw new Error(
+          "Something went wrong with finding existing notification (message)"
+        );
+      else if (exists === null) {
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
+      } else {
+        await exists.destroy();
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
+      }
+    }
     let toSend = false;
 
     if (fcm != null) {
@@ -312,65 +359,7 @@ const sendMessage = async (
     } else {
       throw "User hasnt the app anymore!";
     }
-
     if (toSend !== false) {
-      let data = {
-        type: "chatReceivedMessage",
-        conversationId: conversationId,
-        message: messageSent.toString(),
-      };
-      let message = {
-        data: data,
-        token: fcm.fcmToken,
-        notification: {
-          title: msg.firebase.new_message,
-          body:
-            msg.firebase.not_ver_body0 +
-            sender.fullname +
-            msg.firebase.sent +
-            messageSent.text,
-        },
-      };
-      let curTime = moment();
-      //If there is other notification of this conv replace it with this one.
-      if (true) {
-        let imagePath =
-          sender.photo != null ? "images/" + sender.email + ".jpeg" : null;
-        const myJsonMessage = JSON.stringify(messageSent);
-        const notificationToInsert = {
-          imagePath: imagePath,
-          date: curTime,
-          type: data.type,
-          conversationId: data.conversationId,
-          convMessage: myJsonMessage,
-          postid: null,
-          email: senderEmail,
-          fullName: sender.fullname,
-          ownerEmail: receiverObj.email,
-          title: message.notification.title,
-          message: message.notification.body,
-          isRead: false,
-        };
-        //find if a similar notification exists
-        let exists = await Notification.checkNotificationMessage(
-          notificationToInsert
-        );
-        if (exists === false)
-          throw new Error(
-            "Something went wrong with finding existing notification (message)"
-          );
-        else if (exists === null) {
-          Notification.createOne(notificationToInsert).then((data) => {
-            console.log("Notification inserted: ", data);
-          });
-        } else {
-          await exists.destroy();
-          Notification.createOne(notificationToInsert).then((data) => {
-            console.log("Notification inserted: ", data);
-          });
-        }
-      }
-
       admin
         .messaging()
         .send(message)
@@ -401,6 +390,44 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
     }).catch((err) => {
       throw err;
     });
+
+    const toNotifyUser = await User.findOneLight(unverifiedEmail);
+
+    const msg = await getLang(toNotifyUser.lastLang);
+
+    let message = {
+      data: {
+        type: "user_disapproved",
+        postid: postIdString,
+        email: owner.email, // owner email
+        fullname: owner.fullname, // owner email
+      },
+      token: fcmToken.fcmToken,
+      notification: {
+        title: msg.firebase.unver_title,
+        body:
+          msg.firebase.not_ver_body0 + owner.fullname + msg.firebase.unver_body,
+      },
+    };
+    let curTime = moment();
+    let imagePath =
+      owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
+    const notificationToInsert = {
+      imagePath: imagePath,
+      date: curTime,
+      type: message.data.type,
+      postid: message.data.postid,
+      email: message.data.email,
+      fullName: message.data.fullname,
+      ownerEmail: toNotifyUser.email,
+      title: message.notification.title,
+      message: message.notification.body,
+      isRead: false,
+    };
+    Notification.createOne(notificationToInsert).then((data) => {
+      console.log("Notification inserted: ", data);
+    });
+
     let toSend = false;
     if (fcmToken != null) {
       await verifyFCMToken(fcmToken.fcmToken)
@@ -413,46 +440,7 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
     } else {
       throw "User hasnt the app anymore!";
     }
-
     if (toSend !== false) {
-      const toNotifyUser = await User.findOneLight(unverifiedEmail);
-
-      const msg = await getLang(toNotifyUser.lastLang);
-
-      let message = {
-        data: {
-          type: "user_disapproved",
-          postid: postIdString,
-          email: owner.email, // owner email
-          fullname: owner.fullname, // owner email
-        },
-        token: fcmToken.fcmToken,
-        notification: {
-          title: msg.firebase.unver_title,
-          body:
-            msg.firebase.not_ver_body0 +
-            owner.fullname +
-            msg.firebase.unver_body,
-        },
-      };
-      let curTime = moment();
-      let imagePath =
-        owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
-      const notificationToInsert = {
-        imagePath: imagePath,
-        date: curTime,
-        type: message.data.type,
-        postid: message.data.postid,
-        email: message.data.email,
-        fullName: message.data.fullname,
-        ownerEmail: toNotifyUser.email,
-        title: message.notification.title,
-        message: message.notification.body,
-        isRead: false,
-      };
-      Notification.createOne(notificationToInsert).then((data) => {
-        console.log("Notification inserted: ", data);
-      });
       admin
         .messaging()
         .send(message)
@@ -557,6 +545,68 @@ module.exports = {
       }).catch((err) => {
         throw err;
       });
+      let postString = postid.toString();
+      let fcmToken = fcmData.fcmToken;
+      let data;
+      let message;
+      if (liked === true) {
+        data = {
+          type: "receiveInterest",
+          postid: postString,
+          email: emailAction,
+          fullname: user.fullname,
+        };
+
+        message = {
+          data: data,
+          token: fcmToken,
+          notification: {
+            title: msg.firebase.not_owner_title,
+            body:
+              msg.firebase.not_ver_body0 +
+              user.fullname +
+              msg.firebase.liked_post,
+          },
+        };
+      } else {
+        data = {
+          type: "user_disliked",
+          postid: postString,
+          email: emailAction,
+          fullname: user.fullname,
+        };
+
+        message = {
+          data: data,
+          token: fcmToken,
+          notification: {
+            title: msg.firebase.dislike_title,
+            body:
+              msg.firebase.not_ver_body0 +
+              user.fullname +
+              msg.firebase.dislike_body,
+          },
+        };
+      }
+      // Insert notification to history
+      let curTime = moment();
+      let imagePath =
+        user.photo != null ? "images/" + user.email + ".jpeg" : null;
+      const notificationToInsert = {
+        imagePath: imagePath,
+        date: curTime,
+        type: data.type,
+        postid: data.postid,
+        email: data.email,
+        fullName: data.fullname,
+        ownerEmail: emailToNotify,
+        title: message.notification.title,
+        message: message.notification.body,
+        isRead: false,
+      };
+      Notification.createOne(notificationToInsert).then((data) => {
+        console.log("Notification inserted: ", data);
+      });
 
       let toSend = false;
 
@@ -573,69 +623,6 @@ module.exports = {
       }
 
       if (toSend !== false) {
-        let postString = postid.toString();
-        let fcmToken = fcmData.fcmToken;
-        let data;
-        let message;
-        if (liked === true) {
-          data = {
-            type: "receiveInterest",
-            postid: postString,
-            email: emailAction,
-            fullname: user.fullname,
-          };
-
-          message = {
-            data: data,
-            token: fcmToken,
-            notification: {
-              title: msg.firebase.not_owner_title,
-              body:
-                msg.firebase.not_ver_body0 +
-                user.fullname +
-                msg.firebase.liked_post,
-            },
-          };
-        } else {
-          data = {
-            type: "user_disliked",
-            postid: postString,
-            email: emailAction,
-            fullname: user.fullname,
-          };
-
-          message = {
-            data: data,
-            token: fcmToken,
-            notification: {
-              title: msg.firebase.dislike_title,
-              body:
-                msg.firebase.not_ver_body0 +
-                user.fullname +
-                msg.firebase.dislike_body,
-            },
-          };
-        }
-        // Insert notification to history
-        let curTime = moment();
-        let imagePath =
-          user.photo != null ? "images/" + user.email + ".jpeg" : null;
-        const notificationToInsert = {
-          imagePath: imagePath,
-          date: curTime,
-          type: data.type,
-          postid: data.postid,
-          email: data.email,
-          fullName: data.fullname,
-          ownerEmail: emailToNotify,
-          title: message.notification.title,
-          message: message.notification.body,
-          isRead: false,
-        };
-        Notification.createOne(notificationToInsert).then((data) => {
-          console.log("Notification inserted: ", data);
-        });
-
         // Send notification through firebase
         admin
           .messaging()
@@ -672,6 +659,52 @@ module.exports = {
       }).catch((err) => {
         throw err;
       });
+      const toNotifyUser = await Users.findOne({
+        where: {
+          email: email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      const msg = await getLang(toNotifyUser.lastLang);
+
+      let message = {
+        data: {
+          type: "receiveApproval",
+          postid: postIdString,
+          email: user.email, // owner email
+          fullname: user.fullname, // owner email
+          conversationId: convId,
+        },
+        token: fcmToken.fcmToken,
+        notification: {
+          title: msg.firebase.not_ver_title,
+          body:
+            msg.firebase.not_ver_body0 +
+            user.fullname +
+            msg.firebase.not_ver_body,
+        },
+      };
+      // Insert notification to history
+      let curTime = moment();
+      let imagePath =
+        user.photo != null ? "images/" + user.email + ".jpeg" : null;
+      const notificationToInsert = {
+        imagePath: imagePath,
+        date: curTime,
+        type: message.data.type,
+        postid: message.data.postid,
+        email: message.data.email,
+        fullName: message.data.fullname,
+        ownerEmail: toNotifyUser.email,
+        title: message.notification.title,
+        message: message.notification.body,
+        isRead: false,
+      };
+      Notification.createOne(notificationToInsert).then((data) => {
+        console.log("Notification inserted: ", data);
+      });
 
       let toSend = false;
       if (fcmToken != null) {
@@ -687,53 +720,6 @@ module.exports = {
       }
 
       if (toSend !== false) {
-        const toNotifyUser = await Users.findOne({
-          where: {
-            email: email,
-          },
-        }).catch((err) => {
-          throw err;
-        });
-
-        const msg = await getLang(toNotifyUser.lastLang);
-
-        let message = {
-          data: {
-            type: "receiveApproval",
-            postid: postIdString,
-            email: user.email, // owner email
-            fullname: user.fullname, // owner email
-            conversationId: convId,
-          },
-          token: fcmToken.fcmToken,
-          notification: {
-            title: msg.firebase.not_ver_title,
-            body:
-              msg.firebase.not_ver_body0 +
-              user.fullname +
-              msg.firebase.not_ver_body,
-          },
-        };
-        // Insert notification to history
-        let curTime = moment();
-        let imagePath =
-          user.photo != null ? "images/" + user.email + ".jpeg" : null;
-        const notificationToInsert = {
-          imagePath: imagePath,
-          date: curTime,
-          type: message.data.type,
-          postid: message.data.postid,
-          email: message.data.email,
-          fullName: message.data.fullname,
-          ownerEmail: toNotifyUser.email,
-          title: message.notification.title,
-          message: message.notification.body,
-          isRead: false,
-        };
-        Notification.createOne(notificationToInsert).then((data) => {
-          console.log("Notification inserted: ", data);
-        });
-
         admin
           .messaging()
           .send(message)
