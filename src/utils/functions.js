@@ -62,6 +62,27 @@ const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
 
+const backUpUser = async (data) => {
+  try {
+    data = {
+      table: [],
+      user: {
+        mail: "lefterisevagelinos1996@gmail.com",
+      },
+    };
+
+    data.table.push({
+      id: "1",
+      data: "tsifsa",
+    });
+
+    var json = JSON.stringify(data);
+
+    fs.writeFile("../deleted/" + data.user.mail + ".json", json, "utf8");
+  } catch (error) {
+    console.log(error);
+  }
+};
 const verifyFCMToken = async (fcmToken) => {
   try {
     return admin.messaging().send(
@@ -1038,4 +1059,5 @@ module.exports = {
   determineLang,
   getLang,
   determineExpirationDate,
+  backUpUser,
 };

@@ -15,7 +15,7 @@ const saltRounds = 10;
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { verification, checkPass, saveFcm } = require("../database/utils");
-const { insertAver, determineLang } = require("../utils/functions");
+const { insertAver, determineLang, backUpUser } = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 
@@ -866,7 +866,84 @@ const deleteUser = async (req) => {
   }
 };
 
+const permDeleteUser = async (req) => {
+  try {
+    let msg = await determineLang(req);
+    let email = req.body.extra;
+    let curDate = moment();
+
+    backUpUser({});
+    //get all posts that user is interested, Find all that are active
+    // const allInt = await PostInterested.findAllperUser(email);
+    // if (allInt === false) {
+    //   throw new Error("error at finding all the interests of user");
+    // }
+
+    // //delete all interests of user from posts that are active
+    // for await (int of allInt) {
+    //   // for each interest
+    //   // check if the post is expired.
+    //   let expired = await Post.findExpired(int.postid, curDate);
+    //   if (expired === false) throw new Error("Error at finding certain post");
+    //   else if (expired != null) {
+    //     //delete interest
+    //     int.destroy();
+    //   }
+    // }
+
+    // //delete all chats of user
+    // const deletedChat = await ConvUsers.deleteAll(email);
+    // if (!deletedChat) throw new Error("Error at deleting the chats!");
+
+    // //get all active posts of user
+    // const allPosts = await Post.findAllActive(email, curDate);
+    // if (allPosts === false) {
+    //   throw new Error("error at finding acrive posts");
+    // }
+
+    // //delete all user's active posts and interests
+    // let postIds = [];
+    // _.forEach(allPosts, (val) => {
+    //   postIds.push(val.postid);
+    // });
+
+    // const deletedInts = await PostInterested.destroyPerArrayIds(postIds);
+    // if (deletedInts === false) {
+    //   throw new Error("error at deleting the interests");
+    // }
+
+    // const deletedPosts = await Post.destroyAllPerIds(postIds);
+    // if (deletedPosts === false) {
+    //   throw new Error("error at deleting active User's posts");
+    // }
+
+    // //delete all active potential reviews
+    // const deletedToReviews = await ToReview.deleteAllPerUser(email);
+    // if (deletedToReviews === false) {
+    //   throw new Error("error at deleting potential reviews");
+    // }
+
+    // //delete all requests of the user
+    // const deletedReq = await Request.deletePerUser(email);
+    // if (deletedReq === false) {
+    //   throw new Error("Error at deleting requests");
+    // }
+
+    // //update profile
+    // const deleted = await User.updateDeleted(email);
+    // if (deleted === false) {
+    //   throw new Error("Error at updating 'deleted' of user");
+    // }
+
+    return { status: 200, response: { message: msg.deleteUser } };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
+  permDeleteUser,
   deleteUser,
   createNewUser,
   updateOneUser,

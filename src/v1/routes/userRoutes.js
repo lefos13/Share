@@ -91,10 +91,17 @@ router.post(
 );
 
 router.post(
-  "/deleteUser",
+  "/deactivateUser",
   [authenticateToken],
   cors(corsOptions),
   userController.deleteUser
+);
+
+router.post(
+  "/deleteUser",
+  [authenticateToken],
+  cors(corsOptions),
+  userController.permDeleteUser
 );
 
 router.get("/1", [], cors(corsOptions), (req, res) => {
