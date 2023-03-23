@@ -463,8 +463,10 @@ const sendOtp = async (req) => {
 
     var otp = otpGenerator.generate(4, {
       digits: true,
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false, //test
+      lowerCaseAlphabets: false, //test
+      alphabets: false, //production
+      upperCase: false, //production
       specialChars: false,
     });
 
