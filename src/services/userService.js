@@ -9,6 +9,9 @@ const PostInt = require("../database/PostInterested");
 const ToReview = require("../database/ToReview");
 const PostInterested = require("../database/PostInterested");
 const ConvUsers = require("../database/ConvUsers");
+const LastSearch = require("../database/LastSearch");
+const Notification = require("../database/Notifications");
+const SearchPost = require("../database/Request");
 const bcrypt = require("bcrypt");
 var otpGenerator = require("otp-generator");
 const saltRounds = 10;
@@ -39,6 +42,7 @@ const {
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
 const Users = require("../modules/user");
+const FcmToken = require("../modules/fcmtoken");
 const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
@@ -871,14 +875,62 @@ const permDeleteUser = async (req) => {
     let msg = await determineLang(req);
     let email = req.body.extra;
     let curDate = moment();
+    let dataToBackUp = {};
 
-    backUpUser({});
-    //get all posts that user is interested, Find all that are active
-    // const allInt = await PostInterested.findAllperUser(email);
-    // if (allInt === false) {
-    //   throw new Error("error at finding all the interests of user");
-    // }
+    const user = await User.findOneUser(email);
+    dataToBackUp.user = user;
 
+    // get all posts that user is interested, Find all that are active
+    const allInt = await PostInterested.findAllPerUser(email);
+    if (allInt === false) {
+      throw new Error("error at finding all the interests of user");
+    }
+
+    dataToBackUp.allInterestsOfUser = allInt;
+
+    //get all posts of user
+    const posts = await Post.findAllOfUser(email);
+
+    dataToBackUp.postsOfUser = posts;
+
+    //get all chats of user
+    const chats = await ConvUsers.findAll(email);
+    dataToBackUp.chatsofUser = chats;
+
+    //get fcmToken
+    const fcmToken = await FcmToken.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    dataToBackUp.fcmTokenOfUser = fcmToken;
+
+    //get all searches of user
+    const lastSearches = await LastSearch.getAll(email);
+
+    dataToBackUp.lastSearchesOfUser = lastSearches;
+
+    //get all notifications of user
+    const notifications = await Notification.getAll(email);
+
+    dataToBackUp.notificationsOfUser = notifications;
+
+    //get all reviews for this user
+
+    const allReviews = await Review.findAll(email);
+
+    dataToBackUp.reviewsOfUser = allReviews;
+
+    //get all search posts request
+
+    const searchPosts = await SearchPost.getAll(email);
+
+    dataToBackUp.postsRequestOfUser = searchPosts;
+
+    const potentialReviews = await ToReview.findAllPerUser(email);
+
+    dataToBackUp.toReviewsOfUser = potentialReviews;
     // //delete all interests of user from posts that are active
     // for await (int of allInt) {
     //   // for each interest
@@ -934,6 +986,8 @@ const permDeleteUser = async (req) => {
     // if (deleted === false) {
     //   throw new Error("Error at updating 'deleted' of user");
     // }
+
+    backUpUser(dataToBackUp);
 
     return { status: 200, response: { message: msg.deleteUser } };
   } catch (error) {

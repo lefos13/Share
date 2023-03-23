@@ -12,6 +12,7 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
+const { Op } = require("sequelize");
 // import "moment/locale/gr";
 // moment.locale("gr");
 // ==== code for db
@@ -81,9 +82,30 @@ const updateReview = async (review, data) => {
   }
 };
 
+const findAll = async (email) => {
+  try {
+    const reviews = await Reviews.findAll({
+      where: {
+        [Op.or]: [
+          {
+            email: email,
+          },
+          {
+            emailReviewer: email,
+          },
+        ],
+      },
+    });
+    return reviews;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
 module.exports = {
   findAndCountAll,
   findOne,
   saveReview,
   updateReview,
+  findAll,
 };

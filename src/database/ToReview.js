@@ -348,6 +348,28 @@ const deleteAllPerUser = async (email) => {
     return false;
   }
 };
+
+const findAllPerUser = async (email) => {
+  try {
+    const toReviews = await ToReview.findAll({
+      where: {
+        [Op.or]: [
+          {
+            driverEmail: email,
+          },
+          {
+            passengerEmail: email,
+          },
+        ],
+      },
+    }).catch((err) => {
+      throw err;
+    });
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 module.exports = {
   denyReview,
   newReviewAndReverse,
@@ -364,4 +386,5 @@ module.exports = {
   updateInVer,
   deleteOne,
   findAllMyFinished,
+  findAllPerUser,
 };

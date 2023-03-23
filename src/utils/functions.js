@@ -64,18 +64,6 @@ const iv = Buffer.from(IVHEX, "hex");
 
 const backUpUser = async (data) => {
   try {
-    data = {
-      table: [],
-      user: {
-        mail: "lefterisevagelinos1996@gmail.com",
-      },
-    };
-
-    data.table.push({
-      id: "1",
-      data: "tsifsa",
-    });
-
     var json = JSON.stringify(data);
 
     fs.writeFile(
