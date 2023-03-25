@@ -1,11 +1,11 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
-POST https://ouride.gr/test/users/createtoken
+POST https://ouride.gr/users/createtoken
 Content-Type: application/json
 Accept-Language: EN
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "slodevolos@hotmail.com"
     }
 }
 
@@ -551,9 +551,9 @@ Accept-Language: EN
 
 
 ### delete one favourite search.
-POST https://www.ouride.gr/test/users/deleteUser
+POST https://www.ouride.gr/users/deleteUser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMjNUMTY6NDk6MDAuNzY1WiIsImlhdCI6MTY3OTU5MDE0MCwiZXhwIjoxNjg0Nzc0MTQwfQ.15_7_KUigApJZ13oy_n2b0paeHrBuflCgZ_mgYPPKmY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wMy0yNVQxMTozOToxOS4zNzdaIiwiaWF0IjoxNjc5NzQ0MzU5LCJleHAiOjE2ODQ5MjgzNTl9.0cbPcolXmttGNkYXA2qnBytIaKyfwk9OtJrd_lBQnvM
 Accept-Language: EN
 
 
