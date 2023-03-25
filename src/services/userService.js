@@ -34,6 +34,7 @@ const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
 const { Sequelize, DataTypes, fn } = require("sequelize");
 const { Op } = require("sequelize");
 const Users = require("../modules/user");
+const FcmToken = require("../modules/fcmtoken");
 const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
