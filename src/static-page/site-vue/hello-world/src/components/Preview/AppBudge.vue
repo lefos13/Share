@@ -17,13 +17,16 @@
             alt="..."
           />
         </a>
-        <!-- <a href="#!">
-            <img
-              class="app-badge"
-              src="assets/img/app-store-badge.svg"
-              alt="..."
-            />
-          </a> -->
+        <a
+          href="https://apps.apple.com/gr/app/ouride/id6446164725"
+          target="_blank"
+        >
+          <img
+            class="app-badge"
+            src="../../assets/img/app-store-badge.svg"
+            alt="..."
+          />
+        </a>
       </div>
     </div>
   </section>
