@@ -142,7 +142,7 @@ const deleteOldPosts = schedule.scheduleJob("45 0 * * *", async function () {
         postIds.push(post.postid);
 
         var json = JSON.stringify(post);
-        fs.writeFileSync("deleted/"+curDate+".json", json, "UTF-8");
+        fs.writeFileSync("deleted/"+curDate+"_"+post.postid+".json", json, "UTF-8");
 
         post.destroy();
       }
