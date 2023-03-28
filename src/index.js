@@ -110,6 +110,7 @@ const v1RequestRouter = require("./v1/routes/requestRoutes");
 const v1ReviewRouter = require("./v1/routes/reviewsRoutes");
 const v1NeutralRouter = require("./v1/routes/neutralRoutes");
 const v1LastSearchesRouter = require("./v1/routes/lastSearchRoutes");
+const fs = require("fs");
 
 app.use("/reviews", v1ReviewRouter);
 app.use("/requests", v1RequestRouter);
@@ -139,6 +140,10 @@ const deleteOldPosts = schedule.scheduleJob("45 0 * * *", async function () {
       let postIds = [];
       if (months >= 3) {
         postIds.push(post.postid);
+
+        var json = JSON.stringify(post);
+        fs.writeFileSync("deleted/"+curDate+".json", json, "UTF-8");
+
         post.destroy();
       }
 
