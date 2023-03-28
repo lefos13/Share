@@ -27,16 +27,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // get the values from the .env file
-const {
-  EMAIL,
-  PASSEMAIL,
-  HOST,
-  USERR,
-  PASS,
-  DATABASEE,
-  TOKEN_KEY,
-  GOOGLE_KEY,
-} = process.env;
+const { EMAIL, TOKEN_CRYPTO_KEY, HOST, USERR, PASS, DATABASEE, TOKEN_KEY, GOOGLE_KEY } =
+  process.env;
 // END OF SECTION (ENV VAR)
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
@@ -52,6 +44,10 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
     typeCast: true,
   },
 });
+
+//REACT NATIVE DECRYPT
+var AES = require("react-native-crypto-js").AES;
+var CryptoJS = require("react-native-crypto-js");
 
 // create User service
 const createNewUser = async (req) => {
@@ -110,6 +106,8 @@ const updateOneUser = async (req) => {
 const createToken = async (data) => {
   try {
     let email = data.body.data.email;
+    const decryptedData = AES.decrypt(email, TOKEN_CRYPTO_KEY);
+    email = decryptedData.toString(CryptoJS.enc.Utf8);
     let msg = await determineLang(data);
     const user = await User.findOneUser(email);
     if (user === false) {
