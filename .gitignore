@@ -106,3 +106,9 @@ dist
 
 #images
 uploads/
+
+#videos
+src\static-page\site-vue\hello-world\src\assets\video
+
+#videos
+*.mp4

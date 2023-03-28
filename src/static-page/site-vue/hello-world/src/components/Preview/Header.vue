@@ -21,13 +21,14 @@
                   alt="..."
                 />
               </a>
-              <!-- <a href="#!"
-                  ><img
-                    class="app-badge"
-                    src="assets/img/app-store-badge.svg"
-                    alt="..."
-                  />
-                </a> -->
+              <a
+                href="https://apps.apple.com/gr/app/ouride/id6446164725"
+                target="_blank"
+                ><img
+                  class="app-badge"
+                  src="../../assets/img/app-store-badge.svg"
+                />
+              </a>
             </div>
           </div>
         </div>
@@ -96,16 +97,16 @@
                     style="max-width: 100%; height: 100%"
                   />
                   <!-- <video
-                      muted="muted"
-                      autoplay=""
-                      loop=""
-                      style="max-width: 100%; height: 100%"
-                    >
-                      <source
-                        src="../assets/img/demo-screen.mp4"
-                        type="video/mp4"
-                      />
-                    </video> -->
+                    muted="muted"
+                    autoplay=""
+                    loop=""
+                    style="max-width: 100%; height: 100%"
+                  >
+                    <source
+                      src="../../assets/video/story_video.mp4"
+                      type="video/mp4"
+                    />
+                  </video> -->
                 </div>
               </div>
             </div>
