@@ -5,7 +5,8 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "U2FsdGVkX1/pbb7jtFn6tNb7hvlZdnpz9Ch3t3CwekGVGrEd8v1+RRhUHvFXLp3f",
+        "hasEncryption": true
     }
 }
 
