@@ -27,8 +27,16 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // get the values from the .env file
-const { EMAIL, TOKEN_CRYPTO_KEY, HOST, USERR, PASS, DATABASEE, TOKEN_KEY, GOOGLE_KEY } =
-  process.env;
+const {
+  EMAIL,
+  TOKEN_CRYPTO_KEY,
+  HOST,
+  USERR,
+  PASS,
+  DATABASEE,
+  TOKEN_KEY,
+  GOOGLE_KEY,
+} = process.env;
 // END OF SECTION (ENV VAR)
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
@@ -106,8 +114,10 @@ const updateOneUser = async (req) => {
 const createToken = async (data) => {
   try {
     let email = data.body.data.email;
-    const decryptedData = AES.decrypt(email, TOKEN_CRYPTO_KEY);
-    email = decryptedData.toString(CryptoJS.enc.Utf8);
+    if (data.body.data.hasEncryption === true) {
+      const decryptedData = AES.decrypt(email, TOKEN_CRYPTO_KEY);
+      email = decryptedData.toString(CryptoJS.enc.Utf8);
+    }
     let msg = await determineLang(data);
     const user = await User.findOneUser(email);
     if (user === false) {
@@ -314,7 +324,7 @@ const login = async (req) => {
             status: 200,
             message: msg.loginSuc,
             user: rest,
-            forceUpdate: true,
+            forceUpdate: false,
           };
         } else {
           // CHECK IF THE PASS IS RIGHT
@@ -362,7 +372,7 @@ const loginThirdParty = async (req) => {
     let data = req.body.data;
     console.log("Data for google log in:", data);
     let userRegistered = false;
-    let forceUpdate = true;
+    let forceUpdate = false;
 
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;
