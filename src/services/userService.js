@@ -27,8 +27,16 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // get the values from the .env file
-const { EMAIL, PASSEMAIL, HOST, USERR, PASS, DATABASE, TOKEN_KEY, GOOGLE_KEY } =
-  process.env;
+const {
+  EMAIL,
+  TOKEN_CRYPTO_KEY,
+  HOST,
+  USERR,
+  PASS,
+  DATABASE,
+  TOKEN_KEY,
+  GOOGLE_KEY,
+} = process.env;
 // END OF SECTION (ENV VAR)
 // code for db
 const { Sequelize, DataTypes, fn } = require("sequelize");
@@ -44,6 +52,10 @@ const sequelize = new Sequelize(DATABASE, USERR, PASS, {
     typeCast: true,
   },
 });
+
+//REACT NATIVE DECRYPT
+var AES = require("react-native-crypto-js").AES;
+var CryptoJS = require("react-native-crypto-js");
 
 // create User service
 const createNewUser = async (req) => {
@@ -102,6 +114,10 @@ const updateOneUser = async (req) => {
 const createToken = async (data) => {
   try {
     let email = data.body.data.email;
+    if (data.body.data.hasEncryption === true) {
+      const decryptedData = AES.decrypt(email, TOKEN_CRYPTO_KEY);
+      email = decryptedData.toString(CryptoJS.enc.Utf8);
+    }
     let msg = await determineLang(data);
     const user = await User.findOneUser(email);
     if (user === false) {
@@ -308,7 +324,7 @@ const login = async (req) => {
             status: 200,
             message: msg.loginSuc,
             user: rest,
-            forceUpdate: true,
+            forceUpdate: false,
           };
         } else {
           // CHECK IF THE PASS IS RIGHT
@@ -356,7 +372,7 @@ const loginThirdParty = async (req) => {
     let data = req.body.data;
     console.log("Data for google log in:", data);
     let userRegistered = false;
-    let forceUpdate = true;
+    let forceUpdate = false;
 
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;
