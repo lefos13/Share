@@ -159,7 +159,7 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
   try {
     let convid = false;
     if (convObj != null)
-      if (moment(convObj.expiresIn).isSame(expiresIn)) {
+      if (moment(convObj.expiresIn).isSame(expiresIn, "day")) {
         console.log("Dates for chat destruction are same! Deletetion is moving on...");
         convid = convObj.convid;
         await convObj.destroy().catch((err) => {
