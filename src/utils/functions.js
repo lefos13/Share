@@ -295,7 +295,7 @@ const sendMessage = async (
       conversationId: conversationId,
       message: messageSent.toString(),
     };
-    let fcmTok = fcm.fcmToken!=null?fcm.fcmToken:null;
+    let fcmTok = fcm!=null?fcm.fcmToken:null;
     let message = {
       data: data,
       token: fcmTok,
@@ -395,7 +395,7 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
     const toNotifyUser = await User.findOneLight(unverifiedEmail);
 
     const msg = await getLang(toNotifyUser.lastLang);
-    let fcmTok = fcmToken.fcmToken!=null?fcmToken.fcmToken:null;
+    let fcmTok = fcmToken!=null?fcmToken.fcmToken:null;
     let message = {
       data: {
         type: "user_disapproved",
@@ -551,7 +551,7 @@ module.exports = {
       let postString = postid.toString();
       let data;
       let message;
-      let fcmToken = fcmData.fcmToken!=null?fcmData.fcmToken:null;
+      let fcmToken = fcmData!=null?fcmData.fcmToken:null;
       if (liked === true) {
         data = {
           type: "receiveInterest",
@@ -672,7 +672,7 @@ module.exports = {
       });
 
       const msg = await getLang(toNotifyUser.lastLang);
-      let fcmTok = fcmToken.fcmToken!=null?fcmToken.fcmToken:null;
+      let fcmTok = fcmToken!=null?fcmToken.fcmToken:null;
       let message = {
         data: {
           type: "receiveApproval",
