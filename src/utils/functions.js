@@ -213,7 +213,7 @@ const newRide = async (postid, emailArray, postOwner) => {
           throw err;
         });
         let msg = await getLang(userToNotify.lastLang);
-
+        
         let message = {
           data: {
             type: "newRide",
@@ -295,9 +295,10 @@ const sendMessage = async (
       conversationId: conversationId,
       message: messageSent.toString(),
     };
+    let fcmTok = fcm.fcmToken!=null?fcm.fcmToken:null;
     let message = {
       data: data,
-      token: fcm.fcmToken,
+      token: fcmTok,
       notification: {
         title: msg.firebase.new_message,
         body:
@@ -394,7 +395,7 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
     const toNotifyUser = await User.findOneLight(unverifiedEmail);
 
     const msg = await getLang(toNotifyUser.lastLang);
-
+    let fcmTok = fcmToken.fcmToken!=null?fcmToken.fcmToken:null;
     let message = {
       data: {
         type: "user_disapproved",
@@ -402,13 +403,14 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
         email: owner.email, // owner email
         fullname: owner.fullname, // owner email
       },
-      token: fcmToken.fcmToken,
+      token: fcmTok,
       notification: {
         title: msg.firebase.unver_title,
         body:
           msg.firebase.not_ver_body0 + owner.fullname + msg.firebase.unver_body,
       },
     };
+
     let curTime = moment();
     let imagePath =
       owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
@@ -547,9 +549,9 @@ module.exports = {
         throw err;
       });
       let postString = postid.toString();
-      let fcmToken = fcmData.fcmToken;
       let data;
       let message;
+      let fcmToken = fcmData.fcmToken!=null?fcmData.fcmToken:null;
       if (liked === true) {
         data = {
           type: "receiveInterest",
@@ -670,7 +672,7 @@ module.exports = {
       });
 
       const msg = await getLang(toNotifyUser.lastLang);
-
+      let fcmTok = fcmToken.fcmToken!=null?fcmToken.fcmToken:null;
       let message = {
         data: {
           type: "receiveApproval",
@@ -679,7 +681,7 @@ module.exports = {
           fullname: user.fullname, // owner email
           conversationId: convId,
         },
-        token: fcmToken.fcmToken,
+        token: fcmTok,
         notification: {
           title: msg.firebase.not_ver_title,
           body:
