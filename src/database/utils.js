@@ -92,7 +92,7 @@ const checkPass = async (result, user, fcmToken, email, msg) => {
 
       let { password, mobile, ...rest } = data;
 
-      if (await checkImagePath(data.email)) {
+      if (fs.existsSync("./uploads/" + data.email + ".jpeg")) {
         rest.photo = "images/" + data.email + ".jpeg";
       } else rest.photo = null;
       return {
