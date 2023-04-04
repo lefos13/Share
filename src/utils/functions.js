@@ -206,7 +206,6 @@ const newRide = async (postid, emailArray, postOwner) => {
     // ========= New functionality for the new ride notifications
     let allMessages = [];
     let postIdString = postid.toString();
-    let msg = await getLang(userToNotify.lastLang);
 
     // Loop through the array of users
     for await (let email of emailArray) {
@@ -216,6 +215,8 @@ const newRide = async (postid, emailArray, postOwner) => {
       }).catch((err) => {
         throw err;
       });
+
+      let msg = await getLang(userToNotify.lastLang);
 
       //get the fcm token if it exists
       let fcmToken = await FcmToken.findOne({ where: { email: email } }).catch(
