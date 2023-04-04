@@ -79,6 +79,11 @@ const Users = sequelize.define(
       defaultValue: null,
       allowNull: true,
     },
+    OS: {
+      type: DataTypes.STRING,
+      defaultValue: null,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,

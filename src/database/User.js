@@ -290,7 +290,23 @@ const findPerSocket = async (socketId) => {
   }
 };
 
+const updateOS = async (email, OS) => {
+  try {
+    const user = await Users.update(
+      { OS: OS },
+      { where: { email: email } }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 module.exports = {
+  updateOS,
   removeSocketId,
   addSocketId,
   activateAccount,

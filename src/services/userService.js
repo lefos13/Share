@@ -67,6 +67,7 @@ const createNewUser = async (req) => {
   try {
     let msg = await determineLang(req);
     var data = req.body.data;
+    console.log(data);
     let photo = data.photo;
     //Calculate age
 
@@ -267,6 +268,13 @@ const login = async (req) => {
     var pass = req.body.data.pass;
     let autoLogin = req.body.data.autoLogin;
 
+    //get current os of user
+    let OS = data.OS;
+    //update os of the user
+    await User.updateOS(email, OS).catch((err) => {
+      throw err;
+    });
+
     let fcmToken = req.body.data.fcmToken;
 
     let msg = await determineLang(req);
@@ -409,6 +417,13 @@ const loginThirdParty = async (req) => {
       if (fcmDone === false) {
         throw new Error("Error at creating/updating the fcmToken");
       }
+
+      //get OS of the user
+      let OS = data.OS;
+      //update os of the user
+      await User.updateOS(data.email, OS).catch((err) => {
+        throw err;
+      });
       //
       return {
         status: 200,
@@ -453,7 +468,12 @@ const loginThirdParty = async (req) => {
       if (updatedLang === false) {
         throw new Error("Error at updating the last lang");
       }
-
+      //get OS of the user
+      let OS = data.OS;
+      //update os of the user
+      await User.updateOS(data.email, OS).catch((err) => {
+        throw err;
+      });
       //activate account if user was deleted
       if (user.deleted == true) {
         User.activateAccount(user.email);
