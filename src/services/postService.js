@@ -15,6 +15,7 @@ const {
   IsJsonString,
   determineLang,
   determineExpirationDate,
+  checkImagePath,
 } = require("../utils/functions");
 const _ = require("lodash");
 // enviroment variables
@@ -448,7 +449,7 @@ const searchPosts = async (req) => {
         if (interested.isVerified == true) isApproved = true;
       }
       let imagePath = null;
-      if (user.photo !== null) {
+      if (await checkImagePath(fnd.email)) {
         imagePath = "images/" + fnd.email + ".jpeg";
       }
       results = {
@@ -569,7 +570,7 @@ const getPostsUser = async (req) => {
       }
 
       let image = null;
-      if (user.photo !== null) {
+      if (await checkImagePath(user.email)) {
         image = "images/" + user.email + ".jpeg";
       }
 
@@ -662,7 +663,7 @@ const getPostPerId = async (req) => {
     user.cardate = parseInt(user.cardate, 10);
 
     let image = null;
-    if (user.photo !== null) {
+    if (await checkImagePath(user.email)) {
       image = "images/" + user.email + ".jpeg";
     }
 
@@ -755,7 +756,7 @@ const getInterestedPerUser = async (req) => {
 
         // CHECK IF THERE IS AN IMAGE SO DEFINE IT
         let image = null;
-        if (user.photo !== null) {
+        if (await checkImagePath(user.email)) {
           image = "images/" + user.email + ".jpeg";
         }
 
@@ -820,7 +821,7 @@ const getIntPost = async (req) => {
 
         if (user != null) {
           let image = null;
-          if (user.photo !== null) {
+          if (await checkImagePath(user.email)) {
             image = "images/" + user.email + ".jpeg";
           }
           user.dataValues.imagePath = image;
@@ -850,7 +851,10 @@ const getIntPost = async (req) => {
         fullpost = { ...posts.dataValues };
       }
     }
-    let image = "images/" + posts.email + ".jpeg";
+    let image = null;
+    if (await checkImagePath(posts.email)) {
+      image = "images/" + posts.email + ".jpeg";
+    }
 
     if (isAny > 0) {
       message = msg.foundLikers;
@@ -1466,7 +1470,7 @@ const getFavourites = async (req) => {
       }
       post = await fun.fixAllDates(post);
       let image = null;
-      if (user.photo !== null) {
+      if (await checkImagePath(user.email)) {
         image = "images/" + user.email + ".jpeg";
       }
       allResults.push({
@@ -1558,7 +1562,7 @@ const feedScreen = async (req) => {
         if (interested.isVerified == true) isApproved = true;
       }
       let image = null;
-      if (user.photo !== null) {
+      if (await checkImagePath(user.email)) {
         image = "images/" + user.email + ".jpeg";
       }
       let results = {
@@ -1666,7 +1670,7 @@ const feedAll = async (req) => {
         if (interested.isVerified == true) isApproved = true;
       }
       let image = null;
-      if (user.photo !== null) {
+      if (await checkImagePath(user.email)) {
         image = "images/" + user.email + ".jpeg";
       }
       let results = {

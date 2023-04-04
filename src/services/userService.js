@@ -18,7 +18,12 @@ const saltRounds = 10;
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { verification, checkPass, saveFcm } = require("../database/utils");
-const { insertAver, determineLang, backUpUser } = require("../utils/functions");
+const {
+  insertAver,
+  determineLang,
+  backUpUser,
+  checkImagePath,
+} = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 
@@ -296,10 +301,8 @@ const login = async (req) => {
 
           let userData = user.toJSON();
           let { password, mobile, photo, ...rest } = userData;
-          //TEMP CODE FOR PHOTO
-          const photoPath = "./uploads/" + data.email + ".jpeg";
           //check if the photo exists and insert the property
-          if (fs.existsSync(photoPath)) {
+          if (await checkImagePath(data.email)) {
             rest.photo = "images/" + data.email + ".jpeg";
           } else {
             rest.photo = null;
@@ -421,9 +424,8 @@ const loginThirdParty = async (req) => {
       let userData = user.toJSON();
       let { password, mobile, photo, ...rest } = userData;
       //TEMP CODE FOR PHOTO
-      const photoPath = "./uploads/" + data.email + ".jpeg";
       //check if the photo exists and insert the property
-      if (fs.existsSync(photoPath)) {
+      if (await checkImagePath(data.email)) {
         rest.photo = "images/" + data.email + ".jpeg";
       } else {
         rest.photo = null;
@@ -643,7 +645,9 @@ const searchUser = async (req) => {
     }
 
     let imagePath = null;
-    if (found.photo !== null) imagePath = "images/" + found.email + ".jpeg";
+    if (await checkImagePath(found.email)) {
+      imagePath = "images/" + found.email + ".jpeg";
+    }
 
     let peopleDriven = 0;
     let ridesTaken = 0;
@@ -753,7 +757,7 @@ const notifyMe = async (req) => {
         }
 
         user.dataValues.toEdit = toEdit;
-        if (user.photo !== null)
+        if (await checkImagePath(user.email))
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
         else user.dataValues.imagePath = null;
         let res = await insertAver(user);
@@ -777,7 +781,7 @@ const notifyMe = async (req) => {
         }
 
         user.dataValues.toEdit = toEdit;
-        if (user.photo !== null)
+        if (await checkImagePath(user.email))
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
         else user.dataValues.imagePath = null;
         let res = await insertAver(user);

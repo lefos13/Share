@@ -22,6 +22,7 @@ const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
 // ==== code for db
+const { checkImagePath } = require("../utils/functions");
 
 const getLang = async (lang) => {
   let msg;
@@ -90,8 +91,8 @@ const checkPass = async (result, user, fcmToken, email, msg) => {
       }
 
       let { password, mobile, ...rest } = data;
-      const photoPath = "./uploads/" + data.email + ".jpeg";
-      if (fs.existsSync(photoPath)) {
+
+      if (await checkImagePath(data.email)) {
         rest.photo = "images/" + data.email + ".jpeg";
       } else rest.photo = null;
       return {
