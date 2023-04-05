@@ -448,7 +448,7 @@ io.on("connection", (socket) => {
             data.conversationId = u.convid;
             data.socketId = socket.id;
             data.username = us.fullname;
-            if (await checkImagePath(u.email))
+            if (await checkImagePath(u.mail))
               data.photo = "images/" + u.mail + ".jpeg";
             else data.photo = null;
             data.email = u.mail;
