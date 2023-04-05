@@ -18,7 +18,7 @@ const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   },
 });
 
-const { determineLang } = require("../utils/functions");
+const { determineLang, checkImagePath } = require("../utils/functions");
 
 const moment = require("moment");
 const Review = require("../database/Review");
@@ -83,8 +83,8 @@ const getReviews = async (req) => {
         r.dataValues.imagepath = null;
       } else {
         r.dataValues["fullname"] = user.fullname;
-        if (user.photo !== null)
-          r.dataValues.imagepath = "images/" + r.emailreviewer + ".jpeg";
+        if (await checkImagePath(user.email))
+          r.dataValues.imagepath = "images/" + user.email + ".jpeg";
         else r.dataValues.imagepath = null;
       }
     }

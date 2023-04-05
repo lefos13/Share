@@ -18,7 +18,12 @@ const saltRounds = 10;
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { verification, checkPass, saveFcm } = require("../database/utils");
-const { insertAver, determineLang, backUpUser } = require("../utils/functions");
+const {
+  insertAver,
+  determineLang,
+  backUpUser,
+  checkImagePath,
+} = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 
@@ -62,6 +67,7 @@ const createNewUser = async (req) => {
   try {
     let msg = await determineLang(req);
     var data = req.body.data;
+    console.log(data);
     let photo = data.photo;
     //Calculate age
 
@@ -262,6 +268,13 @@ const login = async (req) => {
     var pass = req.body.data.pass;
     let autoLogin = req.body.data.autoLogin;
 
+    //get current os of user
+    let OS = data.OS;
+    //update os of the user
+    await User.updateOS(email, OS).catch((err) => {
+      throw err;
+    });
+
     let fcmToken = req.body.data.fcmToken;
 
     let msg = await determineLang(req);
@@ -296,10 +309,8 @@ const login = async (req) => {
 
           let userData = user.toJSON();
           let { password, mobile, photo, ...rest } = userData;
-          //TEMP CODE FOR PHOTO
-          const photoPath = "./uploads/" + data.email + ".jpeg";
           //check if the photo exists and insert the property
-          if (fs.existsSync(photoPath)) {
+          if (await checkImagePath(data.email)) {
             rest.photo = "images/" + data.email + ".jpeg";
           } else {
             rest.photo = null;
@@ -406,6 +417,13 @@ const loginThirdParty = async (req) => {
       if (fcmDone === false) {
         throw new Error("Error at creating/updating the fcmToken");
       }
+
+      //get OS of the user
+      let OS = data.OS;
+      //update os of the user
+      await User.updateOS(data.email, OS).catch((err) => {
+        throw err;
+      });
       //
       return {
         status: 200,
@@ -421,9 +439,8 @@ const loginThirdParty = async (req) => {
       let userData = user.toJSON();
       let { password, mobile, photo, ...rest } = userData;
       //TEMP CODE FOR PHOTO
-      const photoPath = "./uploads/" + data.email + ".jpeg";
       //check if the photo exists and insert the property
-      if (fs.existsSync(photoPath)) {
+      if (await checkImagePath(data.email)) {
         rest.photo = "images/" + data.email + ".jpeg";
       } else {
         rest.photo = null;
@@ -451,7 +468,12 @@ const loginThirdParty = async (req) => {
       if (updatedLang === false) {
         throw new Error("Error at updating the last lang");
       }
-
+      //get OS of the user
+      let OS = data.OS;
+      //update os of the user
+      await User.updateOS(data.email, OS).catch((err) => {
+        throw err;
+      });
       //activate account if user was deleted
       if (user.deleted == true) {
         User.activateAccount(user.email);
@@ -643,7 +665,9 @@ const searchUser = async (req) => {
     }
 
     let imagePath = null;
-    if (found.photo !== null) imagePath = "images/" + found.email + ".jpeg";
+    if (await checkImagePath(found.email)) {
+      imagePath = "images/" + found.email + ".jpeg";
+    }
 
     let peopleDriven = 0;
     let ridesTaken = 0;
@@ -753,7 +777,7 @@ const notifyMe = async (req) => {
         }
 
         user.dataValues.toEdit = toEdit;
-        if (user.photo !== null)
+        if (await checkImagePath(user.email))
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
         else user.dataValues.imagePath = null;
         let res = await insertAver(user);
@@ -777,7 +801,7 @@ const notifyMe = async (req) => {
         }
 
         user.dataValues.toEdit = toEdit;
-        if (user.photo !== null)
+        if (await checkImagePath(user.email))
           user.dataValues.imagePath = "images/" + user.email + ".jpeg";
         else user.dataValues.imagePath = null;
         let res = await insertAver(user);

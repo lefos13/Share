@@ -33,7 +33,9 @@ app.get("/", (req, res) => {
     // const webPage = readFileSync(__dirname + "/static-page/site-vue/hello-world/dist/index.html");
     // res.redirect("/web/index.html");
     res.setHeader("Content-Type", "text/html");
-    res.sendFile(path.join(__dirname, '/static-page/site-vue/hello-world/dist/index.html'));
+    res.sendFile(
+      path.join(__dirname, "/static-page/site-vue/hello-world/dist/index.html")
+    );
   } catch (error) {
     console.error(error);
   }
@@ -142,7 +144,11 @@ const deleteOldPosts = schedule.scheduleJob("45 0 * * *", async function () {
         postIds.push(post.postid);
 
         var json = JSON.stringify(post);
-        fs.writeFileSync("deleted/"+curDate+"_"+post.postid+".json", json, "UTF-8");
+        fs.writeFileSync(
+          "deleted/" + curDate + "_" + post.postid + ".json",
+          json,
+          "UTF-8"
+        );
 
         post.destroy();
       }
@@ -294,6 +300,7 @@ const {
   decryptMessages,
   sendMessage,
   getLang,
+  checkImagePath,
 } = require("./utils/functions");
 const { destroyPerArrayIds } = require("./database/PostInterested");
 
@@ -441,7 +448,8 @@ io.on("connection", (socket) => {
             data.conversationId = u.convid;
             data.socketId = socket.id;
             data.username = us.fullname;
-            if (us.photo != null) data.photo = "images/" + u.mail + ".jpeg";
+            if (await checkImagePath(u.email))
+              data.photo = "images/" + u.mail + ".jpeg";
             else data.photo = null;
             data.email = u.mail;
 
@@ -818,10 +826,12 @@ io.on("connection", (socket) => {
             if (val.id == userApproving.socketId) userOnline = true;
           });
 
-          let photoApproving =
-            userApproving.photo != null
-              ? "images/" + userApproving.email + ".jpeg"
-              : null;
+          let photoApproving;
+          if (await checkImagePath(userApproving.email)) {
+            photoApproving = "images/" + userApproving.email + ".jpeg";
+          } else {
+            photoApproving = null;
+          }
           const dataForApprooved = {
             conversationId: conv.convid,
             socketId: userApproving.socketId,
@@ -843,10 +853,12 @@ io.on("connection", (socket) => {
             if (val.id == userApproved.socketId) user2Online = true;
           });
 
-          let photoApproved =
-            userApproved.photo != null
-              ? "images/" + userApproved.email + ".jpeg"
-              : null;
+          let photoApproved;
+          if (await checkImagePath(userApproved.email)) {
+            photoApproved = "images/" + userApproved.email + ".jpeg";
+          } else {
+            photoApproved = null;
+          }
           const dataForApprooving = {
             conversationId: conv.convid,
             socketId: userApproved.socketId,

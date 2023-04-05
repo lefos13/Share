@@ -62,6 +62,18 @@ const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
 
+const checkImagePath = async (email) => {
+  try {
+    if (fs.existsSync("./uploads/" + email + ".jpeg")) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+};
+
 const backUpUser = async (data) => {
   try {
     var json = JSON.stringify(data);
@@ -191,69 +203,77 @@ const newRide = async (postid, emailArray, postOwner) => {
       throw err;
     });
 
-    let fcmTokens = await FcmToken.findAll({
-      where: {
-        email: {
-          [Op.or]: emailArray,
-        },
-      },
-    }).catch((err) => {
-      throw err;
-    });
-
-    // let allTokens = [];
+    // ========= New functionality for the new ride notifications
     let allMessages = [];
     let postIdString = postid.toString();
 
-    for await (f of fcmTokens) {
-      if (toSend !== false) {
-        const userToNotify = await Users.findOne({
-          where: { email: f.email },
-        }).catch((err) => {
+    // Loop through the array of users
+    for await (let email of emailArray) {
+      //get the user to notify
+      const userToNotify = await Users.findOne({
+        where: { email: email },
+      }).catch((err) => {
+        throw err;
+      });
+
+      let msg = await getLang(userToNotify.lastLang);
+
+      //get the fcm token if it exists
+      let fcmToken = await FcmToken.findOne({ where: { email: email } }).catch(
+        (err) => {
           throw err;
-        });
-        let msg = await getLang(userToNotify.lastLang);
-        
-        let message = {
-          data: {
-            type: "newRide",
-            postid: postIdString,
-            email: owner.email, // owner email
-            fullname: owner.fullname, // owner email
-          },
-          token: f.fcmToken,
-          notification: {
-            title: msg.firebase.req_title,
-            body:
-              msg.firebase.not_ver_body0 +
-              owner.fullname +
-              msg.firebase.request_part2,
-          },
-        };
-        // Insert notification to history
-        let curTime = moment();
-        let imagePath =
-          owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
-        const notificationToInsert = {
-          imagePath: imagePath,
-          date: curTime,
-          type: message.data.type,
-          postid: message.data.postid,
-          email: message.data.email,
-          fullName: message.data.fullname,
-          ownerEmail: userToNotify.email,
-          title: message.notification.title,
-          message: message.notification.body,
-          isRead: false,
-        };
-        Notification.createOne(notificationToInsert).then((data) => {
-          console.log("Notification inserted: ", data);
-        });
+        }
+      );
+      //determine if the token exists
+      let fcmTok = fcmToken != null ? fcmToken.fcmToken : null;
+      let message = {
+        data: {
+          type: "newRide",
+          postid: postIdString,
+          email: owner.email, // owner email
+          fullname: owner.fullname, // owner email
+        },
+        token: fcmTok,
+        notification: {
+          title: msg.firebase.req_title,
+          body:
+            msg.firebase.not_ver_body0 +
+            owner.fullname +
+            msg.firebase.request_part2,
+        },
+      };
+      // Insert notification to history
+      let curTime = moment();
+      let imagePath = null;
+      if (await checkImagePath(owner.email)) {
+        imagePath = "images/" + owner.email + ".jpeg";
+      }
+      const notificationToInsert = {
+        imagePath: imagePath,
+        date: curTime,
+        type: message.data.type,
+        postid: message.data.postid,
+        email: message.data.email,
+        fullName: message.data.fullname,
+        ownerEmail: userToNotify.email,
+        title: message.notification.title,
+        message: message.notification.body,
+        isRead: false,
+      };
+
+      Notification.createOne(notificationToInsert).then((data) => {
+        console.log("Notification inserted: ", data);
+      });
+      // add the notification to the array to send to the firebase
+      if (fcmToken != null) {
         await verifyFCMToken(f.fcmToken).then(() => {
           allMessages.push(message);
         });
       }
     }
+
+    // end of functionality
+
     if (allMessages.length > 0) {
       admin
         .messaging()
@@ -295,7 +315,7 @@ const sendMessage = async (
       conversationId: conversationId,
       message: messageSent.toString(),
     };
-    let fcmTok = fcm!=null?fcm.fcmToken:null;
+    let fcmTok = fcm != null ? fcm.fcmToken : null;
     let message = {
       data: data,
       token: fcmTok,
@@ -311,8 +331,9 @@ const sendMessage = async (
     let curTime = moment();
     //If there is other notification of this conv replace it with this one.
     if (true) {
-      let imagePath =
-        sender.photo != null ? "images/" + sender.email + ".jpeg" : null;
+      let imagePath = null;
+      if (await checkImagePath(sender.email))
+        imagePath = "images/" + sender.email + ".jpeg";
       const myJsonMessage = JSON.stringify(messageSent);
       const notificationToInsert = {
         imagePath: imagePath,
@@ -395,7 +416,7 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
     const toNotifyUser = await User.findOneLight(unverifiedEmail);
 
     const msg = await getLang(toNotifyUser.lastLang);
-    let fcmTok = fcmToken!=null?fcmToken.fcmToken:null;
+    let fcmTok = fcmToken != null ? fcmToken.fcmToken : null;
     let message = {
       data: {
         type: "user_disapproved",
@@ -412,8 +433,10 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
     };
 
     let curTime = moment();
-    let imagePath =
-      owner.photo != null ? "images/" + owner.email + ".jpeg" : null;
+    let imagePath = null;
+    if (await checkImagePath(owner.email)) {
+      imagePath = "images/" + owner.email + ".jpeg";
+    }
     const notificationToInsert = {
       imagePath: imagePath,
       date: curTime,
@@ -551,7 +574,7 @@ module.exports = {
       let postString = postid.toString();
       let data;
       let message;
-      let fcmToken = fcmData!=null?fcmData.fcmToken:null;
+      let fcmToken = fcmData != null ? fcmData.fcmToken : null;
       if (liked === true) {
         data = {
           type: "receiveInterest",
@@ -593,8 +616,10 @@ module.exports = {
       }
       // Insert notification to history
       let curTime = moment();
-      let imagePath =
-        user.photo != null ? "images/" + user.email + ".jpeg" : null;
+      let imagePath = null;
+      if (await checkImagePath(user.email)) {
+        imagePath = "images/" + user.email + ".jpeg";
+      }
       const notificationToInsert = {
         imagePath: imagePath,
         date: curTime,
@@ -672,7 +697,7 @@ module.exports = {
       });
 
       const msg = await getLang(toNotifyUser.lastLang);
-      let fcmTok = fcmToken!=null?fcmToken.fcmToken:null;
+      let fcmTok = fcmToken != null ? fcmToken.fcmToken : null;
       let message = {
         data: {
           type: "receiveApproval",
@@ -692,8 +717,10 @@ module.exports = {
       };
       // Insert notification to history
       let curTime = moment();
-      let imagePath =
-        user.photo != null ? "images/" + user.email + ".jpeg" : null;
+      let imagePath = null;
+      if (await checkImagePath(user.email)) {
+        imagePath = "images/" + user.email + ".jpeg";
+      }
       const notificationToInsert = {
         imagePath: imagePath,
         date: curTime,
@@ -1039,4 +1066,5 @@ module.exports = {
   getLang,
   determineExpirationDate,
   backUpUser,
+  checkImagePath,
 };
