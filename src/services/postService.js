@@ -304,6 +304,12 @@ const interested = async (req) => {
       }
     }
   } catch (error) {
+    if (error === 1) {
+      return {
+        status: 405,
+        message: msg.cantLikeOwnPost,
+      };
+    }
     console.error(error);
     return { status: 500 };
   }
@@ -326,7 +332,7 @@ const searchPosts = async (req) => {
     let query = {
       where: {
         // email different than one that do the search
-        email: { [Op.ne]: data.email },
+        // email: { [Op.ne]: data.email },
         [Op.and]: [
           // arxikos proorismos h syntetagmenes
           {
@@ -1496,7 +1502,7 @@ const feedScreen = async (req) => {
     let curDate = moment();
     let query = {
       where: {
-        email: { [Op.ne]: email },
+        // email: { [Op.ne]: email },
         [Op.and]: [
           {
             [Op.or]: [
@@ -1616,7 +1622,7 @@ const feedAll = async (req) => {
     let curDate = moment();
     let query = {
       where: {
-        email: { [Op.ne]: email },
+        // email: { [Op.ne]: email },
         [Op.or]: [
           { startdate: { [Op.gte]: curDate } },
           { enddate: { [Op.gte]: curDate } },

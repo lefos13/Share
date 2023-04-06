@@ -78,5 +78,6 @@
   },
   "otpMessage": "Please copy the otp code that appears bellow and paste it on the app so you can confirm your identity: <br><h1><b>",
   "notificationDeleted": "Notifications has been deleted!",
-  "permDeleteAccount": "Your account has been deleted succesfully!"
+  "permDeleteAccount": "Your account has been deleted succesfully!",
+  "cantLikeOwnPost": "You can't be interested in your own ride!"
 }
