@@ -266,12 +266,12 @@ const newRide = async (postid, emailArray, postOwner) => {
       });
       // add the notification to the array to send to the firebase
       if (fcmToken != null) {
-        await verifyFCMToken(f.fcmToken).then(() => {
+        await verifyFCMToken(fcmToken.fcmToken).then(() => {
           allMessages.push(message);
         });
       }
     }
-
+    console.log("All notifications to send count: ", allMessages.length);
     // end of functionality
 
     if (allMessages.length > 0) {
