@@ -304,6 +304,7 @@ const interested = async (req) => {
       }
     }
   } catch (error) {
+    console.error("Error log", error);
     if (error == false) {
       return {
         status: 405,
