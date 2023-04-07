@@ -111,7 +111,10 @@ const interested = async (req) => {
     const isPostOwner = await Post.isPostOwner(row);
     if (isPostOwner === false) throw new Error("Db error");
     else if (isPostOwner > 0) {
-      throw false; //abstract case
+      throw {
+        status: 405,
+        message: msg.cantLikeOwnPost,
+      }; //abstract case
     }
 
     const interest = await PostInterested.findOne(row.email, row.postid);
@@ -305,11 +308,8 @@ const interested = async (req) => {
       }
     }
   } catch (error) {
-    if (error == false) {
-      return {
-        status: 405,
-        message: msg.cantLikeOwnPost,
-      };
+    if (error.status == 405) {
+      return error;
     }
     console.error(error);
     return { status: 500 };
