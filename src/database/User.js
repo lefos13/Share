@@ -305,7 +305,36 @@ const updateOS = async (email, OS) => {
   }
 };
 
+//get all users by searching based on fullname
+const findUsersByFullname = async (fullname) => {
+  try {
+    const user = await Users.findAll({
+      where: {
+        fullname: {
+          [Op.like]: `%${fullname}%`,
+        },
+      },
+      //exclude
+      exclude: [
+        "password",
+        "verified",
+        "facebook",
+        "instagram",
+        "mobile",
+        "OS",
+      ],
+    }).catch((err) => {
+      throw err;
+    });
+    return user;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 module.exports = {
+  findUsersByFullname,
   updateOS,
   removeSocketId,
   addSocketId,

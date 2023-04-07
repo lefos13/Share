@@ -984,7 +984,37 @@ const permDeleteUser = async (req) => {
   }
 };
 
+//Service that do integration of the controller searchUsers
+const searchUsers = async (req) => {
+  try {
+    let msg = await determineLang(req);
+    let email = req.body.extra;
+    let curDate = moment();
+    let data = req.body.data;
+
+    //get all users based on the fullname that client sent inside data
+    const allUsers = await User.findUsersByFullname(data);
+    if (allUsers === false) {
+      throw new Error("error at finding all the users");
+    }
+
+    //for each user insert average rating data
+    for await (let user of allUsers) {
+      let res = await insertAver(user);
+      user.dataValues.average = res.average;
+      user.dataValues.count = res.count;
+    }
+
+    //return the list of the users
+    return { status: 200, data: { users: allUsers } };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
+  searchUsers,
   permDeleteUser,
   deleteUser,
   createNewUser,

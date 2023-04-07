@@ -152,7 +152,20 @@ const permDeleteUser = async (req, res) => {
     res.status(500).json({ message: error.errorMessage });
   }
 };
+
+// constroller of "searchUsers" service
+const searchUsers = async (req, res) => {
+  try {
+    const msg = await determineLang(req);
+    const results = await userService.searchUsers(req);
+    if (results.status == 500) throw msg;
+    else res.status(results.status).json(results.data);
+  } catch (error) {
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
 module.exports = {
+  searchUsers,
   permDeleteUser,
   deleteUser,
   createNewUser,

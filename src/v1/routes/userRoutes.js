@@ -104,6 +104,14 @@ router.post(
   userController.permDeleteUser
 );
 
+// route post method that returns users as an autocomplete suggestions
+router.post(
+  "/searchUsers",
+  [authenticateToken],
+  cors(corsOptions),
+  userController.autocomplete
+);
+
 router.get("/1", [], cors(corsOptions), (req, res) => {
   res.json({ message: 1 });
 });
