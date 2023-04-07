@@ -307,7 +307,7 @@ const interested = async (req) => {
       }
     }
   } catch (error) {
-    if (error === false) {
+    if (error.status == 405) {
       return error;
     }
     console.error(error);
