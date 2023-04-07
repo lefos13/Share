@@ -34,7 +34,6 @@ const interested = async (req, res) => {
     let msg = await determineLang(req);
 
     const data = await postService.interested(req);
-    console.log(data);
     if (data.status == 500) {
       throw msg;
     } else if (data.status == 200) {
