@@ -993,7 +993,7 @@ const searchUsers = async (req) => {
     let data = req.body.data;
 
     //get all users based on the fullname that client sent inside data
-    const allUsers = await User.findUsersByFullname(data);
+    const allUsers = await User.findUsersByFullname(data.fullName);
     if (allUsers === false) {
       throw new Error("error at finding all the users");
     }
