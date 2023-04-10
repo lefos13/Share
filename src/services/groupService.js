@@ -22,7 +22,7 @@ const createGroup = async (req) => {
     let extra = req.body.extra;
     let data = req.body.data;
     let admin = extra;
-    let pendingMembers = data.Users;
+    let pendingMembers = data.users;
     let groupName = data.groupName;
 
     for await (let member of pendingMembers) {

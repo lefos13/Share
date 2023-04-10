@@ -5,8 +5,7 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "U2FsdGVkX1/pbb7jtFn6tNb7hvlZdnpz9Ch3t3CwekGVGrEd8v1+RRhUHvFXLp3f",
-        "hasEncryption": true
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -611,4 +610,25 @@ Accept-Language: EN
 {
     "fullName": "giann",
     "page": 1
+}
+
+###
+POST https://ouride.gr/test/groups/createGroup
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Accept-Language: EN
+
+{
+    "groupName": "Lefos Group",
+    "users": [
+        {
+            "email": "giannisfragoulis21@gmail.com",
+        },
+        {
+            "email": "slodevolos@hotmail.com",
+        },
+        {
+            "email": "panagiotafragoulh@gmail.com",
+        }
+    ]
 }
