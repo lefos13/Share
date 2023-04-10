@@ -64,9 +64,77 @@ const getAll = async (email) => {
   }
 };
 
-// *** ADD ***
+const getAsAdmin = async (email) => {
+  try {
+    const groups = await Groups.findAll({
+      where: {
+        admin: email,
+      },
+    });
+    return groups;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const getAsGuest = async (email) => {
+  try {
+    const groups = await Groups.findAll({
+      where: {
+        [Op.or]: [
+          sequelize.literal(
+            `JSON_CONTAINS(JSON_EXTRACT(members, "$[*].email"), '"` +
+              email +
+              `"')`
+          ),
+        ],
+      },
+    });
+    return groups;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const getAllInvitedTo = async (email) => {
+  try {
+    const groups = await Groups.findAll({
+      where: {
+        [Op.or]: [
+          sequelize.literal(
+            `JSON_CONTAINS(JSON_EXTRACT(members, "$[*].email"), '"` +
+              email +
+              `"')`
+          ),
+        ],
+      },
+    });
+
+    let pendingInvites = [];
+    // for each group
+    for await (let group of groups) {
+      // loop through all the members of the group
+      for await (let member of group.members) {
+        // if the member is the current user
+        if (member.email === email && member.pending === true) {
+          // return the group
+          pendingInvites.push(group);
+        }
+      }
+    }
+    return pendingInvites;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
 module.exports = {
+  getAllInvitedTo,
+  getAsGuest,
+  getAsAdmin,
   create,
   getAll,
 };

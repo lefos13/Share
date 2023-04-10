@@ -40,10 +40,6 @@ const Groups = sequelize.define(
       type: DataTypes.JSON,
       allowNull: true,
     },
-    pendingMembers: {
-      type: DataTypes.JSON,
-      allowNull: true,
-    },
     groupName: {
       type: DataTypes.STRING,
       allowNull: true,

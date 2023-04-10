@@ -327,7 +327,25 @@ const findUsersByFullname = async (fullname) => {
   }
 };
 
+const findUserMinimal = async (email) => {
+  try {
+    const user = await Users.findOne({
+      attributes: ["email", "fullname"],
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return user;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 module.exports = {
+  findUserMinimal,
   findUsersByFullname,
   updateOS,
   removeSocketId,
