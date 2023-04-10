@@ -151,10 +151,19 @@ const getActiveRequestsOfUser = async (email) => {
       if (adminUser === false) {
         throw new Error("Admin not found");
       }
+      let imagePath = null;
+      if (await checkImagePath(adminUser.email)) {
+        imagePath = "images/" + adminUser.email + ".jpeg";
+      }
+      let ratingData = await insertAver(adminUser);
+
       let dataToPush = {
         admin: {
           email: adminUser.email,
           fullname: adminUser.fullname,
+          imagePath: imagePath,
+          average: ratingData.average,
+          count: ratingData.count,
         },
         groupName: invitation.groupName,
         groupId: invitation.groupId,
