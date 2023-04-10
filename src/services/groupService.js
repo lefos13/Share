@@ -152,7 +152,7 @@ const getActiveRequestsOfUser = async (email) => {
         throw new Error("Admin not found");
       }
       let imagePath = null;
-      if (await checkImagePath(adminUser.email)) {
+      if (await fun.checkImagePath(adminUser.email)) {
         imagePath = "images/" + adminUser.email + ".jpeg";
       }
       let ratingData = await insertAver(adminUser);
