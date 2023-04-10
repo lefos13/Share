@@ -1032,7 +1032,15 @@ const searchUsers = async (req) => {
           message: msg.paginationLimit,
         };
       }
-      return { status: 200, data: { users: finalarr } };
+      return {
+        status: 200,
+        data: {
+          users: finalarr,
+          totalPages: totallength,
+          totalLength: count,
+          pageLength: finalarr.length,
+        },
+      };
     }
   } catch (error) {
     console.error(error);
