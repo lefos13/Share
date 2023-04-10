@@ -1011,6 +1011,7 @@ const searchUsers = async (req) => {
 
     //return the list of the users
     //if allUsers is empty return 404
+    let count = allUsers.length;
     if (allUsers.length === 0) {
       return { status: 404, message: msg.noUsers };
     } else {
@@ -1019,7 +1020,7 @@ const searchUsers = async (req) => {
       let takecount = 10;
       if (data.page > 1) skipcount = data.page * 10 - 10;
       let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
-      let mod = allUsers.length % 10;
+      let mod = count % 10;
       let totallength = 1;
       mod == 0
         ? (totallength = count / 10)
