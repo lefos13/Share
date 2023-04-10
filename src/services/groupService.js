@@ -43,6 +43,9 @@ const createGroup = async (req) => {
     }
     //get all groups of the user
     let allGroups = await Group.getAll(admin);
+    if (allGroups === false) {
+      throw new Error("Getting groups Failed");
+    }
     console.log("Groups found for user", allGroups);
     // for each group
     for await (let group of allGroups) {

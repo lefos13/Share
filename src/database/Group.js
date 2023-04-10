@@ -48,17 +48,20 @@ const getAll = async (email) => {
     const groups = await Groups.findAll({
       where: {
         [Op.or]: [
-          { email: email },
           sequelize.literal(
             `JSON_CONTAINS(JSON_EXTRACT(members, "$[*].email"), '"` +
               email +
               `"')`
           ),
+          { admin: email },
         ],
       },
     });
     return groups;
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };
 
 // *** ADD ***
