@@ -20,7 +20,7 @@ const createGroup = async (req) => {
     let msg = await fun.determineLang(req);
     //data for group creation
     let extra = req.body.extra;
-    let data = req.body.data;
+    let data = req.body;
     let admin = extra;
     let pendingMembers = data.users;
     let groupName = data.groupName;
