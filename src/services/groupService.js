@@ -28,6 +28,7 @@ const createGroup = async (req) => {
     for await (let member of pendingMembers) {
       //do stuff for each member
     }
+    // get data of the admin
 
     let finalData = {
       admin: admin,
@@ -41,14 +42,39 @@ const createGroup = async (req) => {
     if (response === false) {
       throw new Error("Group Creation Failed");
     }
+    // SECTION 2 - GET GROUPS
+
     //get all groups of the user
     let allGroups = await Group.getAll(admin);
     if (allGroups === false) {
       throw new Error("Getting groups Failed");
     }
     console.log("Groups found for user", allGroups);
+
     // for each group
     for await (let group of allGroups) {
+      //UPDATE DATA OF ADMIN
+      let adminUser = await User.findOneLight(group.admin);
+      if (adminUser === false) {
+        throw new Error("Admin not found");
+      }
+      let ratingDataAdmin = await insertAver(adminUser);
+
+      if (await fun.checkImagePath(adminUser.email)) {
+        adminUser.imagePath = "images/" + adminUser.email + ".jpeg";
+      } else {
+        adminUser.imagePath = null;
+      }
+
+      let adminObject = {
+        email: adminUser.email,
+        fullname: adminUser.fullname,
+        average: ratingDataAdmin.average,
+        count: ratingDataAdmin.count,
+        imagePath: adminUser.imagePath,
+      };
+      group.admin = adminObject;
+
       if (fun.IsJsonString(group.members) && group.members != null) {
         group.members = JSON.parse(group.members);
         //if members is not null
