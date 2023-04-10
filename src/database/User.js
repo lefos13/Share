@@ -316,16 +316,7 @@ const findUsersByFullname = async (fullname) => {
         deleted: false,
       },
       //exclude
-      attributes: {
-        exclude: [
-          "password",
-          "verified",
-          "facebook",
-          "instagram",
-          "mobile",
-          "OS",
-        ],
-      },
+      attributes: ["email", "fullname"],
     }).catch((err) => {
       throw err;
     });
