@@ -1,0 +1,72 @@
+// inside src/database/PostInterested.js
+
+//ENVIROMENTAL VAR
+
+// END OF SECTION (ENV VAR)
+
+// code for db
+const { Op } = require("sequelize");
+
+const Users = require("../modules/user");
+const Posts = require("../modules/post");
+const PostInterested = require("../modules/postinterested");
+const Reviews = require("../modules/review");
+const SearchPost = require("../modules/searchPost");
+const ToReview = require("../modules/toreview");
+const FcmToken = require("../modules/fcmtoken");
+const Groups = require("../modules/group");
+// ==== code for db
+
+//
+const { HOST, USERR, PASS, DATABASEE } = process.env;
+const { Op } = require("sequelize");
+const { Sequelize, DataTypes, fn } = require("sequelize");
+const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
+  host: HOST,
+  dialect: "mysql",
+  logging: true,
+  dialectOptions: {
+    dateStrings: true,
+    typeCast: true,
+  },
+});
+
+//function that count posts for a user the current day
+const create = async (data) => {
+  try {
+    await Groups.create(data).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error("Inside findOne of postinterested:", error);
+    return false;
+  }
+  // code to count posts of a user the current day
+};
+
+//get all groups of a user
+const getAll = async (email) => {
+  try {
+    const groups = await Groups.findAll({
+      where: {
+        [Op.or]: [
+          { email: email },
+          sequelize.literal(
+            `JSON_CONTAINS(JSON_EXTRACT(members, "$[*].email"), '"` +
+              email +
+              `"')`
+          ),
+        ],
+      },
+    });
+    return groups;
+  } catch (error) {}
+};
+
+// *** ADD ***
+
+module.exports = {
+  create,
+  getAll,
+};
