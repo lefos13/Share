@@ -18,6 +18,7 @@ const Groups = require("../modules/group");
 const { HOST, USERR, PASS, DATABASEE } = process.env;
 const { Op } = require("sequelize");
 const { Sequelize, DataTypes, fn } = require("sequelize");
+const { IsJsonString } = require("../utils/functions");
 const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
@@ -111,14 +112,19 @@ const getAllInvitedTo = async (email) => {
         ],
       },
     });
-
+    console.log("Found groups i am invited:", groups.length);
     let pendingInvites = [];
     // for each group
     for await (let group of groups) {
       // loop through all the members of the group
+
+      group.members = JSON.parse(group.members);
+
       for await (let member of group.members) {
+        console.log("User Checking: ", member);
         // if the member is the current user
         if (member.email === email && member.pending === true) {
+          console.log("Found user in members list with pending invite");
           // return the group
           pendingInvites.push(group);
         }
