@@ -991,6 +991,10 @@ const searchUsers = async (req) => {
     let email = req.body.extra;
     let curDate = moment();
     let data = req.body;
+    console.log(data);
+    console.log(data.data);
+    console.log(req.body);
+    console.log(req);
 
     //get all users based on the fullname that client sent inside data
     const allUsers = await User.findUsersByFullname(data.fullName);
