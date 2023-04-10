@@ -42,7 +42,7 @@ const createGroup = async (req) => {
       throw new Error("Group Creation Failed");
     }
     //get all groups of the user
-    let allGroups = await Group.getAll(email);
+    let allGroups = await Group.getAll(admin);
     console.log("Groups found for user", allGroups);
     // for each group
     for await (let group of allGroups) {
