@@ -1005,8 +1005,8 @@ const searchUsers = async (req) => {
     //for each user insert average rating data
     for await (let user of allUsers) {
       // let res = await insertAver(user);
-      user.dataValues.average = res.average;
-      user.dataValues.count = res.count;
+      // user.dataValues.average = res.average;
+      // user.dataValues.count = res.count;
     }
 
     //return the list of the users
