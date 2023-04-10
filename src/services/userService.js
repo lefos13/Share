@@ -1004,9 +1004,15 @@ const searchUsers = async (req) => {
 
     //for each user insert average rating data
     for await (let user of allUsers) {
-      // let res = await insertAver(user);
-      // user.dataValues.average = res.average;
-      // user.dataValues.count = res.count;
+      let res = await insertAver(user);
+      user.dataValues.average = res.average;
+      user.dataValues.count = res.count;
+      // check if image of user exists
+      if (await checkImagePath(user.email)) {
+        user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+      } else {
+        user.dataValues.imagePath = null;
+      }
     }
 
     //return the list of the users
