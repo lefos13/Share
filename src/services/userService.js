@@ -991,10 +991,10 @@ const searchUsers = async (req) => {
     let email = req.body.extra;
     let curDate = moment();
     let data = req.body;
-    console.log(data);
-    console.log(data.data);
-    console.log(req.body);
-    console.log(req);
+    // console.log(data);
+    // console.log(data.data);
+    // console.log(req.body);
+    // console.log(req);
 
     //get all users based on the fullname that client sent inside data
     const allUsers = await User.findUsersByFullname(data.fullName);
@@ -1019,7 +1019,7 @@ const searchUsers = async (req) => {
       let takecount = 10;
       if (data.page > 1) skipcount = data.page * 10 - 10;
       let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
-      let mod = count % 10;
+      let mod = allUsers.length % 10;
       let totallength = 1;
       mod == 0
         ? (totallength = count / 10)
