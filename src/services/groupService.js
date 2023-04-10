@@ -129,6 +129,95 @@ const createGroup = async (req) => {
   }
 };
 
+const getGroups = async (req) => {
+  try {
+    let extra = req.body.extra;
+    let msg = await fun.determineLang(req);
+    let allGroups = await Group.getAll(extra);
+    if (allGroups === false) {
+      throw new Error("Getting groups Failed");
+    } else if (allGroups.length === 0) {
+      return { status: 404, message: msg.noGroups };
+    }
+    console.log("Groups found for user", allGroups);
+    // for each group
+    for await (let group of allGroups) {
+      //UPDATE DATA OF ADMIN
+      let adminUser = await User.findOneLight(group.admin);
+      if (adminUser === false) {
+        throw new Error("Admin not found");
+      }
+      let ratingDataAdmin = await insertAver(adminUser);
+
+      if (await fun.checkImagePath(adminUser.email)) {
+        adminUser.imagePath = "images/" + adminUser.email + ".jpeg";
+      } else {
+        adminUser.imagePath = null;
+      }
+
+      let adminObject = {
+        email: adminUser.email,
+        fullname: adminUser.fullname,
+        average: ratingDataAdmin.average,
+        count: ratingDataAdmin.count,
+        imagePath: adminUser.imagePath,
+      };
+      group.admin = adminObject;
+
+      if (fun.IsJsonString(group.members) && group.members != null) {
+        group.members = JSON.parse(group.members);
+        //if members is not null
+        if (group.members.length !== 0) {
+          for await (let member of group.members) {
+            let memberFullname = await User.findOneLight(member.email);
+            member.fullname = memberFullname.fullname;
+            //get average rating for each member
+
+            let ratingData = await insertAver(member);
+            member.average = ratingData.average;
+            member.count = ratingData.count;
+            //insert imagePath into member object
+            if (await fun.checkImagePath(member.email)) {
+              member.imagePath = "images/" + member.email + ".jpeg";
+            } else {
+              member.imagePath = null;
+            }
+          }
+        }
+      }
+      //scan pending members list
+      if (
+        fun.IsJsonString(group.pendingMembers) &&
+        group.pendingMembers != null
+      ) {
+        group.pendingMembers = JSON.parse(group.pendingMembers);
+        //if members is not null
+        if (group.pendingMembers.length !== 0) {
+          for await (let member of group.pendingMembers) {
+            let memberFullname = await User.findOneLight(member.email);
+            member.fullname = memberFullname.fullname;
+            //get average rating for each member
+            let ratingData = await insertAver(member);
+            member.average = ratingData.average;
+            member.count = ratingData.count;
+            //insert imagePath into member object
+            if (await fun.checkImagePath(member.email)) {
+              member.imagePath = "images/" + member.email + ".jpeg";
+            } else {
+              member.imagePath = null;
+            }
+          }
+        }
+      }
+    }
+    return { status: 200, message: msg.groupsFound, data: allGroups };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
   createGroup,
+  getGroups,
 };

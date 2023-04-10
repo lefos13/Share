@@ -41,4 +41,11 @@ router.post(
   groupController.createGroup
 );
 
+router.get(
+  "/getGroups",
+  [authenticateToken],
+  cors(corsOptions),
+  groupController.getGroups
+);
+
 module.exports = router;

@@ -81,5 +81,7 @@
   "permDeleteAccount": "Your account has been deleted succesfully!",
   "cantLikeOwnPost": "You can't be interested in your own ride!",
   "noUsers": "We didn't find any users!",
-  "groupCreated": "Group has been created succesfully!"
+  "groupCreated": "Group has been created succesfully!",
+  "groupsFound": "We found your groups!",
+  "noGroups": "We didn't find any groups!"
 }
