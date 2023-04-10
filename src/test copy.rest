@@ -622,13 +622,13 @@ Accept-Language: EN
     "groupName": "Lefos Group",
     "users": [
         {
-            "email": "giannisfragoulis21@gmail.com",
+            "email": "giannisfragoulis21@gmail.com"
         },
         {
-            "email": "slodevolos@hotmail.com",
+            "email": "slodevolos@hotmail.com"
         },
         {
-            "email": "panagiotafragoulh@gmail.com",
+            "email": "panagiotafragoulh@gmail.com"
         }
     ]
 }
