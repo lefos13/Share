@@ -1000,13 +1000,35 @@ const searchUsers = async (req) => {
 
     //for each user insert average rating data
     for await (let user of allUsers) {
-      let res = await insertAver(user);
+      // let res = await insertAver(user);
       user.dataValues.average = res.average;
       user.dataValues.count = res.count;
     }
 
     //return the list of the users
-    return { status: 200, data: { users: allUsers } };
+    //if allUsers is empty return 404
+    if (allUsers.length === 0) {
+      return { status: 404, message: msg.noUsers };
+    } else {
+      //paginate the list of users
+      let skipcount = 0;
+      let takecount = 10;
+      if (data.page > 1) skipcount = data.page * 10 - 10;
+      let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
+      let mod = count % 10;
+      let totallength = 1;
+      mod == 0
+        ? (totallength = count / 10)
+        : (totallength = count / 10 - mod / 10 + 1);
+
+      if (data.page > totallength) {
+        return {
+          status: 404,
+          message: msg.paginationLimit,
+        };
+      }
+      return { status: 200, data: { users: finalarr } };
+    }
   } catch (error) {
     console.error(error);
     return { status: 500 };

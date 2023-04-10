@@ -308,11 +308,12 @@ const updateOS = async (email, OS) => {
 //get all users by searching based on fullname
 const findUsersByFullname = async (fullname) => {
   try {
-    const user = await Users.findAll({
+    const users = await Users.findAll({
       where: {
         fullname: {
           [Op.like]: `%${fullname}%`,
         },
+        deleted: false,
       },
       //exclude
       exclude: [
@@ -326,7 +327,7 @@ const findUsersByFullname = async (fullname) => {
     }).catch((err) => {
       throw err;
     });
-    return user;
+    return users;
   } catch (error) {
     console.error(error);
     return false;
