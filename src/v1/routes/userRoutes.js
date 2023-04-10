@@ -109,7 +109,7 @@ router.post(
   "/searchUsers",
   [authenticateToken],
   cors(corsOptions),
-  userController.autocomplete
+  userController.searchUsers
 );
 
 router.get("/1", [], cors(corsOptions), (req, res) => {
