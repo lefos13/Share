@@ -80,7 +80,10 @@ const createGroup = async (req) => {
         //if members is not null
         if (group.members.length !== 0) {
           for await (let member of group.members) {
+            let memberFullname = await User.findOneLight(member.email);
+            member.fullname = memberFullname.fullname;
             //get average rating for each member
+
             let ratingData = await insertAver(member);
             member.average = ratingData.average;
             member.count = ratingData.count;
@@ -102,6 +105,8 @@ const createGroup = async (req) => {
         //if members is not null
         if (group.pendingMembers.length !== 0) {
           for await (let member of group.pendingMembers) {
+            let memberFullname = await User.findOneLight(member.email);
+            member.fullname = memberFullname.fullname;
             //get average rating for each member
             let ratingData = await insertAver(member);
             member.average = ratingData.average;
