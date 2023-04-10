@@ -4,9 +4,6 @@
 
 // END OF SECTION (ENV VAR)
 
-// code for db
-const { Op } = require("sequelize");
-
 const Users = require("../modules/user");
 const Posts = require("../modules/post");
 const PostInterested = require("../modules/postinterested");
