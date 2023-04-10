@@ -51,19 +51,19 @@ const createGroup = async (req) => {
     for await (let group of allGroups) {
       if (fun.IsJsonString(group.members)) {
         group.members = JSON.parse(group.members);
-      }
-      //if members is not null
-      if (group.members.length !== 0) {
-        for await (let member of group.members) {
-          //get average rating for each member
-          let ratingData = await insertAver(member);
-          member.average = ratingData.average;
-          member.count = ratingData.count;
-          //insert imagePath into member object
-          if (await fun.checkImagePath(member.email)) {
-            member.imagePath = "images/" + member.email + ".jpeg";
-          } else {
-            member.imagePath = null;
+        //if members is not null
+        if (group.members.length !== 0) {
+          for await (let member of group.members) {
+            //get average rating for each member
+            let ratingData = await insertAver(member);
+            member.average = ratingData.average;
+            member.count = ratingData.count;
+            //insert imagePath into member object
+            if (await fun.checkImagePath(member.email)) {
+              member.imagePath = "images/" + member.email + ".jpeg";
+            } else {
+              member.imagePath = null;
+            }
           }
         }
       }
