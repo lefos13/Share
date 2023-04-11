@@ -673,11 +673,11 @@ Accept-Language: EN
 ###
 POST https://ouride.gr/test/groups/acceptInvitation
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQxMDoxOToxNC4xOTNaIiwiaWF0IjoxNjgxMjA4MzU0LCJleHAiOjE2ODYzOTIzNTR9.MtApZa3nOBVssAhdbrJGrJCYENMfyHpCcl8JIVRD55M
 Accept-Language: EN
 
 {
-    "groupId": 26
+    "groupId": 17
 }
 
 ###

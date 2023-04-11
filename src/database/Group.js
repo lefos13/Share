@@ -210,7 +210,7 @@ const leaveGroup = async (groupId, email) => {
 };
 
 //make pending=false of a member of a group. function name = acceptInvitation
-const acceptInvitation = async (email, groupId) => {
+const acceptInvitation = async (groupId, email) => {
   try {
     //get the group based on the groupId
     const group = await Groups.findOne({
@@ -243,7 +243,7 @@ const acceptInvitation = async (email, groupId) => {
 };
 
 //remove member of a group. Funtion name = declineInvitation
-const declineInvitation = async (email, groupId) => {
+const declineInvitation = async (groupId, email) => {
   try {
     //get the group based on the groupId
     const group = await Groups.findOne({
