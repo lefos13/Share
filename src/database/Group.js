@@ -197,7 +197,7 @@ const leaveGroup = async (groupId, email) => {
 
     await group
       .update({
-        members: JSON.stringify(group.members),
+        members: group.members,
       })
       .catch((err) => {
         throw err;
@@ -208,7 +208,72 @@ const leaveGroup = async (groupId, email) => {
     return false;
   }
 };
+
+//make pending=false of a member of a group. function name = acceptInvitation
+const acceptInvitation = async (email, groupId) => {
+  try {
+    //get the group based on the groupId
+    const group = await Groups.findOne({
+      where: {
+        groupId: groupId,
+      },
+    });
+    //get the members of the group
+    group.members = JSON.parse(group.members);
+    //loop through all the members of the group
+    for await (let member of group.members) {
+      // if the member is the current user
+      if (member.email === email) {
+        // set the pending to false
+        member.pending = false;
+      }
+    }
+    await group
+      .update({
+        members: group.members,
+      })
+      .catch((err) => {
+        throw err;
+      });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+//remove member of a group. Funtion name = declineInvitation
+const declineInvitation = async (email, groupId) => {
+  try {
+    //get the group based on the groupId
+    const group = await Groups.findOne({
+      where: {
+        groupId: groupId,
+      },
+    });
+    //get the members of the group
+    group.members = JSON.parse(group.members);
+
+    //remove member form the list of members of the group
+    group.members = group.members.filter((member) => member.email !== email);
+
+    await group
+      .update({
+        members: group.members,
+      })
+      .catch((err) => {
+        throw err;
+      });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 module.exports = {
+  declineInvitation,
+  acceptInvitation,
   leaveGroup,
   changeGroupName,
   destroy,

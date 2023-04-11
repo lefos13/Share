@@ -71,4 +71,20 @@ router.post(
   groupController.leaveGroup
 );
 
+//accept invitation route (GUEST)
+router.post(
+  "/acceptInvitation",
+  [authenticateToken],
+  cors(corsOptions),
+  groupController.acceptInvitation
+);
+
+//decline invitation route (GUEST)
+router.post(
+  "/declineInvitation",
+  [authenticateToken],
+  cors(corsOptions),
+  groupController.declineInvitation
+);
+
 module.exports = router;

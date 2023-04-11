@@ -254,7 +254,59 @@ const leaveGroup = async (req) => {
   }
 };
 
+//accept invitation service
+const acceptInvitation = async (req) => {
+  try {
+    let invitedEmail = req.body.extra;
+    let msg = await fun.determineLang(req);
+    let groupId = req.body.groupId;
+    // accept invitation
+    let response = await Group.acceptInvitation(groupId, invitedEmail);
+    if (response === false) {
+      throw new Error("Invitation Acceptance Failed");
+    }
+
+    // get all the groups and requests of the user that is invited
+    let results = await getGroupsOfUser(invitedEmail);
+    let requests = await getActiveRequestsOfUser(invitedEmail);
+
+    let getGroupsData = {
+      asAdminGroups: results.allGroupsAsAdmin,
+      asGuestGroups: results.allGroupsAsGuest,
+      activeRequests: requests,
+    };
+    return {
+      status: 200,
+      message: msg.invitationAccepted,
+      data: getGroupsData,
+    };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
+//decline invitation service
+const declineInvitation = async (req) => {
+  try {
+    let invitedEmail = req.body.extra;
+    let msg = await fun.determineLang(req);
+    let groupId = req.body.groupId;
+    // decline invitation
+    let response = await Group.declineInvitation(groupId, invitedEmail);
+    if (response === false) {
+      throw new Error("Invitation Declination Failed");
+    }
+    return { status: 200, message: msg.invitationDeclined };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
+  declineInvitation,
+  acceptInvitation,
   leaveGroup,
   changeName,
   deleteGroup,

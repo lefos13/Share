@@ -59,7 +59,33 @@ const leaveGroup = async (req, res) => {
   }
 };
 
+//accept invitation controller
+const acceptInvitation = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const data = await groupService.acceptInvitation(req);
+    if (data.status != 200) throw msg;
+    res.status(200).json({ message: data.message, data: data.data });
+  } catch (error) {
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
+//decline invitation controller
+const declineInvitation = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const data = await groupService.declineInvitation(req);
+    if (data.status != 200) throw msg;
+    res.status(200).json({ message: data.message });
+  } catch (error) {
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
 module.exports = {
+  declineInvitation,
+  acceptInvitation,
   leaveGroup,
   changeName,
   deleteGroup,

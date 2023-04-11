@@ -615,14 +615,14 @@ Accept-Language: EN
 ###
 POST https://ouride.gr/test/groups/createGroup
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQwODowNjoxNy42MTZaIiwiaWF0IjoxNjgxMjAwMzc3LCJleHAiOjE2ODYzODQzNzd9.0YZmC9b8mx6iAiylujnRZjwZyat2d_tIdtkXZVvdta0
 Accept-Language: EN
 
 {
     "groupName": "Lefos Group",
     "users": [
         {
-            "email": "slodevolos@hotmail.com"
+            "email": "lefterisevagelinos1996@gmail.com"
         },
         {
             "email": "ouridecommunity@gmail.com"
@@ -642,11 +642,11 @@ Accept-Language: EN
 ###
 POST https://ouride.gr/test/groups/deleteGroup
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQwODowNjoxNy42MTZaIiwiaWF0IjoxNjgxMjAwMzc3LCJleHAiOjE2ODYzODQzNzd9.0YZmC9b8mx6iAiylujnRZjwZyat2d_tIdtkXZVvdta0
 Accept-Language: EN
 
 {
-    "groupId": 9
+    "groupId": 15
 }
 
 ###
@@ -667,5 +667,25 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 Accept-Language: EN
 
 {
-    "groupId": 15
+    "groupId": 26
+}
+
+###
+POST https://ouride.gr/test/groups/acceptInvitation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Accept-Language: EN
+
+{
+    "groupId": 26
+}
+
+###
+POST https://ouride.gr/test/groups/declineInvitation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Accept-Language: EN
+
+{
+    "groupId": 26
 }
