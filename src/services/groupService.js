@@ -181,84 +181,73 @@ const getGroups = async (req) => {
   try {
     let extra = req.body.extra;
     let msg = await fun.determineLang(req);
-    let allGroups = await Group.getAll(extra);
-    if (allGroups === false) {
-      throw new Error("Getting groups Failed");
-    } else if (allGroups.length === 0) {
-      return { status: 404, message: msg.noGroups };
+
+    let results = await getGroupsOfUser(extra);
+    let requests = await getActiveRequestsOfUser(extra);
+
+    let getGroupsData = {
+      asAdminGroups: results.allGroupsAsAdmin,
+      asGuestGroups: results.allGroupsAsGuest,
+      activeRequests: requests,
+    };
+    return { status: 200, message: msg.groupsFound, data: getGroupsData };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
+//service for deleting a group
+const deleteGroup = async (req) => {
+  try {
+    let extra = req.body.extra;
+    let msg = await fun.determineLang(req);
+    let groupId = req.body.groupId;
+    let admin = extra;
+    // delete a group
+    let response = await Group.destroy(admin, groupId);
+    if (response === false) {
+      throw new Error("Group Deletion Failed");
     }
-    console.log("Groups found for user", allGroups);
-    // for each group
-    for await (let group of allGroups) {
-      //UPDATE DATA OF ADMIN
-      let adminUser = await User.findOneLight(group.admin);
-      if (adminUser === false) {
-        throw new Error("Admin not found");
-      }
-      let ratingDataAdmin = await insertAver(adminUser);
+    return { status: 200, message: msg.groupDeleted };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
 
-      if (await fun.checkImagePath(adminUser.email)) {
-        adminUser.imagePath = "images/" + adminUser.email + ".jpeg";
-      } else {
-        adminUser.imagePath = null;
-      }
-
-      let adminObject = {
-        email: adminUser.email,
-        fullname: adminUser.fullname,
-        average: ratingDataAdmin.average,
-        count: ratingDataAdmin.count,
-        imagePath: adminUser.imagePath,
-      };
-      group.admin = adminObject;
-
-      if (fun.IsJsonString(group.members) && group.members != null) {
-        group.members = JSON.parse(group.members);
-        //if members is not null
-        if (group.members.length !== 0) {
-          for await (let member of group.members) {
-            let memberFullname = await User.findOneLight(member.email);
-            member.fullname = memberFullname.fullname;
-            //get average rating for each member
-
-            let ratingData = await insertAver(member);
-            member.average = ratingData.average;
-            member.count = ratingData.count;
-            //insert imagePath into member object
-            if (await fun.checkImagePath(member.email)) {
-              member.imagePath = "images/" + member.email + ".jpeg";
-            } else {
-              member.imagePath = null;
-            }
-          }
-        }
-      }
-      //scan pending members list
-      if (
-        fun.IsJsonString(group.pendingMembers) &&
-        group.pendingMembers != null
-      ) {
-        group.pendingMembers = JSON.parse(group.pendingMembers);
-        //if members is not null
-        if (group.pendingMembers.length !== 0) {
-          for await (let member of group.pendingMembers) {
-            let memberFullname = await User.findOneLight(member.email);
-            member.fullname = memberFullname.fullname;
-            //get average rating for each member
-            let ratingData = await insertAver(member);
-            member.average = ratingData.average;
-            member.count = ratingData.count;
-            //insert imagePath into member object
-            if (await fun.checkImagePath(member.email)) {
-              member.imagePath = "images/" + member.email + ".jpeg";
-            } else {
-              member.imagePath = null;
-            }
-          }
-        }
-      }
+//change name of a group
+const changeName = async (req) => {
+  try {
+    let extra = req.body.extra;
+    let msg = await fun.determineLang(req);
+    let groupId = req.body.groupId;
+    let newGroupName = req.body.name;
+    let admin = extra;
+    // change name of a group
+    let response = await Group.changeGroupName(admin, groupId, newGroupName);
+    if (response === false) {
+      throw new Error("Group Name Change Failed");
     }
-    return { status: 200, message: msg.groupsFound, data: allGroups };
+    return { status: 200, message: msg.groupNameChanged };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
+//function that removes a member from a group
+const leaveGroup = async (req) => {
+  try {
+    let extra = req.body.extra;
+    let msg = await fun.determineLang(req);
+    let groupId = req.body.groupId;
+    // remove a member from a group
+    let response = await Group.leaveGroup(groupId, extra);
+    if (response === false) {
+      throw new Error("Group Member Deletion Failed");
+    }
+    return { status: 200, message: msg.memberRemoved };
   } catch (error) {
     console.error(error);
     return { status: 500 };
@@ -266,6 +255,9 @@ const getGroups = async (req) => {
 };
 
 module.exports = {
+  leaveGroup,
+  changeName,
+  deleteGroup,
   createGroup,
   getGroups,
 };

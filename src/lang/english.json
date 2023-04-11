@@ -83,5 +83,7 @@
   "noUsers": "We didn't find any users!",
   "groupCreated": "Group has been created succesfully!",
   "groupsFound": "We found your groups!",
-  "noGroups": "We didn't find any groups!"
+  "noGroups": "We didn't find any groups!",
+  "groupDeleted": "Group has been deleted succesfully!",
+  "groupNameChanged": "Group name has been changed succesfully!"
 }

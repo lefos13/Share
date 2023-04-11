@@ -29,6 +29,8 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   },
 });
 
+const fun = require("../utils/functions");
+
 //function that count posts for a user the current day
 const create = async (data) => {
   try {
@@ -137,7 +139,85 @@ const getAllInvitedTo = async (email) => {
   }
 };
 
+//delete a group
+const destroy = async (email, groupId) => {
+  try {
+    await Groups.destroy({
+      where: {
+        groupId: groupId,
+        admin: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+//change name of a group - function name = changeGroupName
+const changeGroupName = async (email, groupId, groupName) => {
+  try {
+    await Groups.update(
+      {
+        groupName: groupName,
+      },
+      {
+        where: {
+          groupId: groupId,
+          admin: email,
+        },
+      }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+//leaveGroup a member from a group
+const leaveGroup = async (groupId, email) => {
+  try {
+    // get the group based on the groupId
+    const group = await Groups.findOne({
+      where: {
+        groupId: groupId,
+      },
+    });
+    // get the members of the group
+    group.members = JSON.parse(group.members);
+
+    // remove the member from the group
+    group.members = group.members.filter((member) => member.email !== email);
+
+    await Groups.update(
+      {
+        members: JSON.stringify(group.members),
+      },
+      {
+        where: {
+          groupId: groupId,
+          admin: email,
+        },
+      }
+    ).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 module.exports = {
+  leaveGroup,
+  changeGroupName,
+  destroy,
   getAllInvitedTo,
   getAsGuest,
   getAsAdmin,

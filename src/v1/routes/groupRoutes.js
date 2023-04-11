@@ -48,4 +48,27 @@ router.get(
   groupController.getGroups
 );
 
+router.post(
+  "/deleteGroup",
+  [authenticateToken],
+  cors(corsOptions),
+  groupController.deleteGroup
+);
+
+//change group name route
+router.post(
+  "/changeName",
+  [authenticateToken],
+  cors(corsOptions),
+  groupController.changeName
+);
+
+//remove member route (GUEST)
+router.post(
+  "/leaveGroup",
+  [authenticateToken],
+  cors(corsOptions),
+  groupController.leaveGroup
+);
+
 module.exports = router;
