@@ -85,5 +85,6 @@
   "groupsFound": "We found your groups!",
   "noGroups": "We didn't find any groups!",
   "groupDeleted": "Group has been deleted succesfully!",
-  "groupNameChanged": "Group name has been changed succesfully!"
+  "groupNameChanged": "Group name has been changed succesfully!",
+  "leftGroup": "You have left the group!"
 }

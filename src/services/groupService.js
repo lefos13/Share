@@ -247,7 +247,7 @@ const leaveGroup = async (req) => {
     if (response === false) {
       throw new Error("Group Member Deletion Failed");
     }
-    return { status: 200, message: msg.memberRemoved };
+    return { status: 200, message: msg.leftGroup };
   } catch (error) {
     console.error(error);
     return { status: 500 };
