@@ -8,10 +8,21 @@ moment.tz.setDefault("Europe/Athens");
 let allowCrypto = true;
 
 //limit the size of request
+/* The above code is configuring the Express app to use the `body-parser` middleware to parse incoming
+JSON data. The `limit` option sets the maximum size of the JSON payload to 5 megabytes, and the
+`type` option specifies that the middleware should only parse requests with a content type of
+`application/json`. */
 var bodyParser = require("body-parser");
 app.use(bodyParser.json({ limit: "5mb", type: "application/json" }));
 
 //helmet for security
+/* The above code is configuring the use of the Helmet middleware in a Node.js application. Helmet is a
+security middleware that helps protect the application from common web vulnerabilities by setting
+various HTTP headers. In this case, the `contentSecurityPolicy` option is set to `false`, which
+disables the default content security policy that Helmet sets. The content security policy is a
+security feature that helps prevent cross-site scripting (XSS) attacks by specifying which sources
+of content are allowed to be loaded on a web page. Disabling it may make the application more
+vulnerable to XSS attacks. */
 const helmet = require("helmet");
 app.use(
   helmet({
@@ -21,9 +32,11 @@ app.use(
 
 const path = require("path");
 
-const { readFile, readFileSync } = require("fs");
-
 var _ = require("lodash");
+/* The above code is setting up routes for serving static files using Express.js. It is serving files
+from the "uploads" directory under the "/images" route, from the "termsPolicies" directory under the
+"/termsPolicies" route, from the "static-page" directory under the "/web" route, and from the
+"static-page/site-vue/hello-world/dist" directory under the "/web2" route. */
 app.use("/images", express.static("uploads"));
 app.use("/termsPolicies", express.static("termsPolicies"));
 app.use("/web", express.static("static-page"));
@@ -102,10 +115,18 @@ const Conv = require("./database/ConvUsers");
 const User = require("./database/User");
 const Post = require("./database/Post");
 
+/* The above code is importing the `authenticateToken` function from a file located in the
+`./middleware/auth` directory. This function is likely used as middleware in a web application to
+authenticate user tokens before allowing access to certain routes or resources. */
 const { authenticateToken } = require("./middleware/auth");
 //ROUTES IMPORT
 
 // *** ADD ***
+/* The above code is importing and using various routers for different endpoints in a Node.js
+application. Specifically, it is using routers for handling requests related to posts, users,
+requests, reviews, neutral items, last searches, and groups. These routers are defined in separate
+files and are being imported into the main application file using the `require` function. The
+`app.use` function is then used to mount these routers on their respective endpoints. */
 const v1PostRouter = require("./v1/routes/postRoutes");
 const v1UserRouter = require("./v1/routes/userRoutes");
 const v1RequestRouter = require("./v1/routes/requestRoutes");
@@ -128,6 +149,11 @@ checkconnection();
 const schedule = require("node-schedule");
 
 //run once a time to delete old posts from the database 45 0 * * *
+/* The above code is scheduling a job to run at 12:45 AM every day to delete all posts that are expired
+for more than 3 months. It first finds all the expired posts, then checks if any post is expired for
+more than 3 months. If it is, it deletes the post along with all those who were interested in it. It
+also writes the deleted post's data to a JSON file in the "deleted" folder. Finally, it destroys all
+the interested posts that were deleted along with the expired post. */
 const deleteOldPosts = schedule.scheduleJob("45 0 * * *", async function () {
   // const deleteOldPosts = schedule.scheduleJob("*/1 * * * * *", async function () {
   try {
@@ -167,6 +193,10 @@ const deleteOldPosts = schedule.scheduleJob("45 0 * * *", async function () {
 // */1 * * * * Every minute
 // */5 * * * * * Every 5 seconds
 // 30 0 * * * Every 12:30 after midnight
+/* The above code is scheduling a job to run every day at 12:30 AM. The job checks for expired
+conversations and deletes them from the database if any are found. It uses the Moment.js library to
+get the current time and date, and the Lodash library to iterate over the expired conversations and
+delete them. */
 const deleteConversations = schedule.scheduleJob(
   "30 0 * * *", //every 12:30 after midnight
   async function () {
@@ -189,6 +219,11 @@ const deleteConversations = schedule.scheduleJob(
 );
 
 //cors configuration
+/* The above code is setting up CORS (Cross-Origin Resource Sharing) options for a server. It allows
+requests from any origin (as specified by the `whitelist` array), with credentials, and with certain
+HTTP methods (GET, PUT, POST, DELETE, OPTIONS). It also allows certain headers to be included in the
+request. The `origin` function checks if the origin is in the whitelist and either allows the
+request or throws an error. In this case, it is allowing all requests regardless of origin. */
 const whitelist = ["*"];
 const corsOptions = {
   credentials: true,
@@ -215,6 +250,10 @@ const corsOptions = {
 };
 
 //check connection with the database
+/**
+ * The function checks if there is a successful connection to a database using Sequelize and logs a
+ * message accordingly.
+ */
 async function checkconnection() {
   try {
     await sequelize.authenticate();
@@ -229,6 +268,13 @@ const API_SERVICE_URL = `https://maps.googleapis.com/maps/api/place/`;
 const API_SERVICE_URL2 = `https://maps.googleapis.com/maps/api/`;
 
 //google proxy for autocomplete
+/* The above code is configuring a middleware for an Express.js application. The middleware is
+responsible for handling requests to the "/autocomplete/json" endpoint. It first authenticates the
+request using a token, then applies CORS settings using the cors middleware. Finally, it creates a
+proxy to forward the request to a target API service URL, with some modifications to the request
+path using pathRewrite. Specifically, it adds a language header to the request, and appends some
+query parameters to the path to restrict the autocomplete results to cities in Greece and use a
+Google API key. */
 app.use(
   "/autocomplete/json",
   [authenticateToken],
@@ -251,6 +297,13 @@ app.use(
 );
 
 //google proxy for place details
+/* The above code is configuring a middleware function for an Express.js application. The middleware
+function is using the createProxyMiddleware function from the http-proxy-middleware library to proxy
+requests to an external API service. The middleware function is also using the cors middleware to
+enable Cross-Origin Resource Sharing (CORS) for the proxied requests. The middleware function is
+also using an authentication middleware function to authenticate the requests before they are
+proxied. The pathRewrite function is modifying the path of the proxied request to add a query
+parameter for the Google Maps API key and to specify the fields to be returned in the */
 app.use(
   "/details/json",
   [authenticateToken],
@@ -271,6 +324,12 @@ app.use(
 );
 
 //google proxy for place details
+/* The above code is configuring a middleware for an Express.js application. The middleware is using
+the `createProxyMiddleware` function to proxy requests to a geocoding API service located at
+`API_SERVICE_URL2`. The middleware is also using the `cors` middleware with custom options specified
+in `corsOptions`. Additionally, the middleware is using the `authenticateToken` middleware to ensure
+that requests are authenticated before being proxied. Finally, the middleware is modifying the
+request path by adding query parameters for language, result type, and a Google API key. */
 app.use(
   "/geocode/json",
   [authenticateToken],
@@ -314,6 +373,11 @@ io.on("connection", (socket) => {
     data: {},
   });
 
+  /* The above code is a JavaScript event listener that listens for a "disconnect" event on a socket
+  connection. When the event is triggered, it retrieves the user associated with the socket and
+  finds all conversations that the user is a part of. For each conversation, it sets the user's
+  online status to false and deletes any states associated with the user's conversations. Finally,
+  it removes the user from the app's local storage. */
   socket.on("disconnect", async (data) => {
     try {
       console.log("Disconnect reason: ", data);
@@ -379,6 +443,14 @@ io.on("connection", (socket) => {
         //of all the conversations(user got approval from others or gave aprroval)
         //also when i initialize a chat conversation i need a unique id so i emit
         //the self_user to the client so i can initialize the chat with this id
+
+        /* The above code is a case statement for handling the "server/join" event in a chat
+        application. It first logs all data of the user and then retrieves the user's information
+        from the database. It then adds the user's socket ID to the database and retrieves all
+        active conversations for the user. For each conversation, it retrieves the other user's
+        information and emits a message to inform the other user that the current user is online. It
+        then retrieves the conversation messages, sorts them by date, and paginates them to send the
+        last 20 messages. If encryption is allowed, it decrypts */
         case "server/join":
           //log all data of the user
           console.log("call server Join!!!");
@@ -521,6 +593,13 @@ io.on("connection", (socket) => {
           });
           break;
 
+        /* The above code is handling a private message event on a server in a chat application. It
+        receives the conversation ID, sender email, and message data from the client. It then
+        retrieves the recipient's email from the conversation ID and checks if the recipient is
+        online or in the background. If the recipient is online, it emits the message to the
+        recipient's socket. If the recipient is offline or in the background, it sends a
+        notification to the recipient. The message is also added to the conversation history in the
+        database. */
         case "server/private_message": {
           const conversationId = action.data.conversationId; // this is the receipient id
           const fromEmail = action.data.senderEmail; //this is my id
@@ -610,6 +689,10 @@ io.on("connection", (socket) => {
           break;
         }
 
+        /* The above code is handling the "server/personalChatOpened" event. It is setting up a
+        personal chat between two users and updating the conversation status. It is also informing
+        the other user (if online) that the message has been seen and marking the last message as
+        read. */
         case "server/personalChatOpened": {
           console.log("personalChatOpened data: ", action.data.senderId);
           let conversationId = action.data.conversationId;
@@ -667,12 +750,21 @@ io.on("connection", (socket) => {
           break;
         }
 
+        /* The above code is a case statement in a JavaScript switch statement. It is checking if the
+        action type is "server/personalChatClosed". If it is, it logs the senderId from the action
+        data to the console, deletes the senderId property from the app.locals object, and breaks
+        out of the switch statement. This code is likely part of a larger application that handles
+        personal chat sessions and cleans up resources when a session is closed. */
         case "server/personalChatClosed": {
           console.log("personalChatClosed data: ", action.data.senderId);
           delete app.locals[action.data.senderId];
           break;
         }
 
+        /* The above code is handling the "AppInBackground" action. It sets the background status of
+        the user to true and sends notifications to the other user(s) in the conversation if the
+        user is in the background. It retrieves all conversations involving the user and sets the
+        "isUserOnline" status to false for the other user(s) in each conversation. */
         case "server/AppInBackground": {
           console.log("AppInBackground data: ", action.data.senderEmail);
           let sender = action.data.senderEmail;
@@ -696,6 +788,11 @@ io.on("connection", (socket) => {
           break;
         }
 
+        /* The above code is a case statement in a JavaScript function that handles the
+        "server/AppInForeground" action. It logs the sender's email to the console, deletes the
+        sender's email from a local background object, retrieves all conversations involving the
+        sender from the database, and sends a socket.io message to each conversation's other user to
+        set their online status to true. */
         case "server/AppInForeground": {
           console.log("AppInForeground data: ", action.data.senderEmail);
           let sender = action.data.senderEmail;
@@ -718,6 +815,10 @@ io.on("connection", (socket) => {
           break;
         }
 
+        /* The above code is a case statement in a JavaScript program that handles the
+        "server/ActiveConversationInBackground" action. It logs the data of the action to the
+        console, finds the user associated with the current socket, and deletes the user's email
+        from the app's local storage. */
         case "server/ActiveConversationInBackground": {
           console.log("ActiveConversationInBackground data: ", action.data);
           const user = await User.findPerSocket(socket.id);
@@ -725,6 +826,11 @@ io.on("connection", (socket) => {
           break;
         }
 
+        /* The above code is handling a socket event "ActiveConversationInForeground". It is retrieving
+        the conversation ID and the user associated with the socket. It is then marking the last
+        message in the conversation as read and seen. It is also updating the conversation to
+        indicate that it has been read by the user. Finally, it is updating the last message in the
+        conversation with the user's email. */
         case "server/ActiveConversationInForeground": {
           console.log("ActiveConversationInForeground data: ", action.data);
           const conversationId = action.data.conversationId;
@@ -768,6 +874,11 @@ io.on("connection", (socket) => {
           break;
         }
 
+        /* The above code is a case statement in a JavaScript function that handles a specific action
+        type "server/updateExpirationDate". It retrieves information about two users and a
+        conversation from a database, and then sends a message to both users' sockets using
+        Socket.IO. The message contains the conversation ID and the new expiration date for the
+        conversation. */
         case "server/updateExpirationDate": {
           let userApproving = await User.findOneLight(
             action.data.userApproving
@@ -806,6 +917,10 @@ io.on("connection", (socket) => {
           break;
         }
 
+        /* The above code is a case statement that handles the "server/handShakeEstablished" event. It
+        creates a new conversation between two users and sends the conversation data to both users.
+        It checks if the users are online and retrieves their profile photos if available. Finally,
+        it emits the "onConversationAdded" event to both users with the conversation data. */
         case "server/handShakeEstablished": {
           let userOnline = false;
           let userApproving = await User.findOneLight(
@@ -898,5 +1013,9 @@ io.on("connection", (socket) => {
   });
 });
 
+/* The above code is exporting an object named `io` from a JavaScript module. The `io` object is
+assigned to the `ioObject` constant and then exported using the `module.exports` syntax. This code
+is likely part of a larger project that uses the `io` object for some purpose, such as creating a
+WebSocket server or handling real-time communication between clients and a server. */
 const ioObject = io;
 module.exports.io = ioObject;

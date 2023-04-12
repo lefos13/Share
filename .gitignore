@@ -107,6 +107,9 @@ dist
 #images
 uploads/
 
+#other
+.vscode
+
 #videos
 src\static-page\site-vue\hello-world\src\assets\video
 

@@ -2,6 +2,14 @@
 const groupService = require("../services/groupService");
 const { determineLang } = require("../utils/functions");
 
+/**
+ * These are controllers for a group service that handle creating, getting, deleting, changing name,
+ * leaving, accepting, and declining invitations for groups.
+ * @param req - The request object containing information about the HTTP request made by the client.
+ * @param res - `res` is the response object that is used to send the HTTP response back to the client.
+ * It contains methods like `status()` to set the HTTP status code, `json()` to send a JSON response,
+ * and `send()` to send a plain text response.
+ */
 const createGroup = async (req, res) => {
   try {
     let msg = await determineLang(req);

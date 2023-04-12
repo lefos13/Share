@@ -80,6 +80,15 @@ const createNewPost = async (data, req) => {
   }
 };
 
+/**
+ * This is an async function that handles a user's interest in a post, including creating or deleting
+ * the interest, checking if the user is the owner of the post, and determining if a chat between the
+ * user and the post owner should be deleted or updated.
+ * @param req - The "req" parameter is likely an HTTP request object, which contains information about
+ * the incoming request such as headers, query parameters, and request body.
+ * @returns an object with various properties depending on the execution path of the function. The
+ * properties include `status`, `message`, `body`, and `convDeleted`.
+ */
 const interested = async (req) => {
   try {
     const io = socket.io;
@@ -315,6 +324,15 @@ const interested = async (req) => {
   }
 };
 
+/**
+ * This function searches for posts based on user input and applies filters to the results before
+ * returning them.
+ * @param req - The request object containing information about the HTTP request made to the server. It
+ * includes properties such as the request method, headers, body, and query parameters.
+ * @returns an object with properties "status", "body", and "message". The "status" property indicates
+ * the status code of the response, the "body" property contains the data returned by the function, and
+ * the "message" property contains a message related to the response.
+ */
 const searchPosts = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -954,6 +972,14 @@ const deleteInterested = async (req) => {
   }
 };
 
+/**
+ * This function verifies or unverifies a user's interest in a post and performs various actions based
+ * on the verification status.
+ * @param req - The "req" parameter is an object that represents the HTTP request made to the server.
+ * It contains information such as the request method, headers, and body.
+ * @returns an object with various properties depending on the execution of the function. The
+ * properties include status, message, chatCreated, conversationId, convDeleted.
+ */
 const verInterested = async (req) => {
   try {
     var data = req.body.data;
@@ -1493,6 +1519,15 @@ const getFavourites = async (req) => {
   }
 };
 
+/**
+ * The function fetches and paginates a list of posts based on certain criteria and returns them along
+ * with user information and other details.
+ * @param req - The request object containing information about the HTTP request made to the server. It
+ * includes data such as the request headers, request body, and request method.
+ * @returns an object with properties `status`, `body`, and `message`. The `status` property indicates
+ * the status code of the response, the `body` property contains the data returned by the function, and
+ * the `message` property contains a message related to the response.
+ */
 const feedScreen = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -1500,6 +1535,12 @@ const feedScreen = async (req) => {
     let email = req.body.extra;
     let array = [];
     let curDate = moment();
+    /* The above code is defining a query object with a where clause that filters records based on
+    certain conditions. The conditions include checking if the startplace or startcoord properties
+    of the record match certain values, and if the startdate or enddate properties are greater than
+    or equal to the current date. The query also includes an order clause that sorts the results in
+    descending order based on the date property. The code uses the Sequelize library's Op object to
+    define the operators used in the query. */
     let query = {
       where: {
         // email: { [Op.ne]: email },
@@ -1582,6 +1623,12 @@ const feedScreen = async (req) => {
     }
 
     //PAGINATION
+    /* The above code is implementing pagination logic for an array of data. It calculates the number
+    of items to skip and take based on the requested page number and the number of items per page.
+    It then uses the Lodash library to extract the desired subset of data from the array. It also
+    calculates the total number of pages based on the length of the array and the number of items
+    per page. If the requested page number is greater than the total number of pages, it returns an
+    error message indicating that the pagination limit has been exceeded. */
     var skipcount = 0;
     var takecount = 10;
     if (data.page > 1) skipcount = data.page * 10 - 10;
@@ -1613,6 +1660,14 @@ const feedScreen = async (req) => {
   }
 };
 
+/**
+ * The function "feedAll" retrieves and paginates a list of posts from the database, along with
+ * associated user and interested status information.
+ * @param req - The request object containing information about the HTTP request made to the server.
+ * @returns an object with properties `status`, `body`, and `message`. The `status` property indicates
+ * the status code of the response, the `body` property contains the data returned by the function, and
+ * the `message` property contains a message related to the response.
+ */
 const feedAll = async (req) => {
   try {
     let msg = await determineLang(req);

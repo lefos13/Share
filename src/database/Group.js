@@ -31,7 +31,17 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
 
 const fun = require("../utils/functions");
 
-//function that count posts for a user the current day
+/**
+ * This function creates a new group and returns true if successful, otherwise it returns false and
+ * logs an error.
+ * @param data - The `data` parameter is an object that contains the information needed to create a new
+ * group. It likely includes properties such as the group name, description, and members. The `Groups`
+ * object is likely a model or schema for a database that stores information about groups. The `create`
+ * method is
+ * @returns The `create` function is returning a boolean value. If the `Groups.create` operation is
+ * successful, it returns `true`. If there is an error, it catches the error and logs it to the
+ * console, then returns `false`.
+ */
 const create = async (data) => {
   try {
     await Groups.create(data).catch((err) => {
@@ -45,7 +55,13 @@ const create = async (data) => {
   // code to count posts of a user the current day
 };
 
-//get all groups of a user
+/**
+ * The function retrieves all groups where the given email is either an admin or a member.
+ * @param email - The email parameter is a string that represents the email address of a user. This
+ * function uses the email parameter to find all the groups where the user is a member or an admin.
+ * @returns The function `getAll` is returning a Promise that resolves to an array of `Groups` objects
+ * that match the specified criteria. If there is an error, it returns `false`.
+ */
 const getAll = async (email) => {
   try {
     const groups = await Groups.findAll({
@@ -67,6 +83,14 @@ const getAll = async (email) => {
   }
 };
 
+/**
+ * This function retrieves all groups where the specified email is the admin.
+ * @param email - The email parameter is a string that represents the email address of the admin user.
+ * This function uses the email parameter to query the database for all groups where the admin is the
+ * user with the specified email address.
+ * @returns The function `getAsAdmin` returns a promise that resolves to an array of `Groups` where the
+ * `admin` property matches the `email` parameter. If there is an error, it returns `false`.
+ */
 const getAsAdmin = async (email) => {
   try {
     const groups = await Groups.findAll({
@@ -81,6 +105,12 @@ const getAsAdmin = async (email) => {
   }
 };
 
+/**
+ * The function retrieves groups where a given email is a member and not pending.
+ * @param email - The email of the user for whom we want to retrieve the groups they belong to.
+ * @returns The function `getAsGuest` returns an array of groups that the guest with the given email is
+ * a member of and has been approved to join.
+ */
 const getAsGuest = async (email) => {
   try {
     //   [Op.or]: [
@@ -126,6 +156,13 @@ const getAsGuest = async (email) => {
   }
 };
 
+/**
+ * This function retrieves all groups that a user is invited to and have pending invites.
+ * @param email - The email of the user for whom we want to retrieve all the groups they are invited
+ * to.
+ * @returns an array of groups that the user with the given email is invited to and has a pending
+ * invitation.
+ */
 const getAllInvitedTo = async (email) => {
   try {
     const groups = await Groups.findAll({
@@ -164,7 +201,14 @@ const getAllInvitedTo = async (email) => {
   }
 };
 
-//delete a group
+/**
+ * This is an asynchronous function that attempts to delete a group with a specific ID and admin email,
+ * returning true if successful and false if there was an error.
+ * @param email - The email of the admin who is trying to destroy the group.
+ * @param groupId - The ID of the group that needs to be destroyed.
+ * @returns a boolean value. If the `Groups.destroy` operation is successful, it will return `true`. If
+ * there is an error, it will log the error to the console and return `false`.
+ */
 const destroy = async (email, groupId) => {
   try {
     await Groups.destroy({
@@ -182,7 +226,15 @@ const destroy = async (email, groupId) => {
   }
 };
 
-//change name of a group - function name = changeGroupName
+/**
+ * This function updates the name of a group if the email provided is the admin of the group.
+ * @param email - The email of the user who is the admin of the group and wants to change the group
+ * name.
+ * @param groupId - The ID of the group that needs to be updated.
+ * @param groupName - The new name for the group that needs to be updated.
+ * @returns a boolean value - `true` if the update operation was successful and `false` if there was an
+ * error.
+ */
 const changeGroupName = async (email, groupId, groupName) => {
   try {
     await Groups.update(
@@ -205,7 +257,13 @@ const changeGroupName = async (email, groupId, groupName) => {
   }
 };
 
-//leaveGroup a member from a group
+/**
+ * The function removes a member from a group and deletes the group if there are no members left.
+ * @param groupId - The ID of the group that the member wants to leave.
+ * @param email - The email of the member who wants to leave the group.
+ * @returns a boolean value - `true` if the member was successfully removed from the group, and `false`
+ * if there was an error.
+ */
 const leaveGroup = async (groupId, email) => {
   try {
     // get the group based on the groupId
@@ -246,7 +304,13 @@ const leaveGroup = async (groupId, email) => {
   }
 };
 
-//make pending=false of a member of a group. function name = acceptInvitation
+/**
+ * This function accepts an invitation to join a group by updating the group's member list to mark the
+ * user as no longer pending.
+ * @param groupId - The ID of the group that the invitation is for.
+ * @param email - The email of the member whose invitation is being accepted.
+ * @returns a boolean value - `true` if the update is successful and `false` if there is an error.
+ */
 const acceptInvitation = async (groupId, email) => {
   try {
     //get the group based on the groupId
@@ -280,6 +344,13 @@ const acceptInvitation = async (groupId, email) => {
 };
 
 //remove member of a group. Funtion name = declineInvitation
+/**
+ * This function removes a member from a group's list of members based on their email address.
+ * @param groupId - The ID of the group from which the invitation is being declined.
+ * @param email - The email of the member who is declining the invitation to the group.
+ * @returns a boolean value - `true` if the member was successfully removed from the group, and `false`
+ * if there was an error.
+ */
 const declineInvitation = async (groupId, email) => {
   try {
     //get the group based on the groupId
