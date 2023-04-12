@@ -95,18 +95,18 @@ const getAsGuest = async (email) => {
       },
     });
     //loop through members of all groups
-    groups.forEach((group, key) => {
-      group.members = JSON.parse(group.members);
-      //remove group from the list of groups if email isnt in the group's members
-      group.members.forEach((member) => {
-        //remove group from groups if email is member of the group but pending = true
-        if (member.email === email && member.pending === true) {
-          console.log("Found user in members list with pending invite");
-          // return the group
-          groups.splice(key, 1);
-        }
-      });
-    });
+    // groups.forEach((group, key) => {
+    //   group.members = JSON.parse(group.members);
+    //   //remove group from the list of groups if email isnt in the group's members
+    //   group.members.forEach((member) => {
+    //     //remove group from groups if email is member of the group but pending = true
+    //     if (member.email === email && member.pending === true) {
+    //       console.log("Found user in members list with pending invite");
+    //       // return the group
+    //       groups.splice(key, 1);
+    //     }
+    //   });
+    // });
 
     //   [Op.or]: [
     //     Sequelize.fn('JSON_CONTAINS',
