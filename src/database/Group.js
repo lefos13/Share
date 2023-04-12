@@ -91,7 +91,7 @@ const getAsGuest = async (email) => {
     //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
     //         '"business"')
     // ]
-    const groups = await Groups.findAll({
+    let groups = await Groups.findAll({
       where: {
         [Op.or]: [
           sequelize.literal(
@@ -102,8 +102,8 @@ const getAsGuest = async (email) => {
         ],
       },
     });
-    let finalGroups = groups.toJSON();
 
+    let finalGroups = groups;
     //loop through groups knowing the index of array
     for await (let [index, group] of finalGroups.entries()) {
       // loop through members of the group
