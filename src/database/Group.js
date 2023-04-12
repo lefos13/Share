@@ -89,13 +89,25 @@ const getAsGuest = async (email) => {
           sequelize.literal(
             `JSON_CONTAINS(JSON_EXTRACT(members, "$[*].email"), '"` +
               email +
-              `"') AND JSON_CONTAINS(JSON_EXTRACT(members, "$[*].pending"), '"` +
-              false +
               `"')`
           ),
         ],
       },
     });
+    //loop through members of all groups
+    groups.forEach((group, key) => {
+      group.members = JSON.parse(group.members);
+      //remove group from the list of groups if email isnt in the group's members
+      group.members.forEach((member) => {
+        //remove group from groups if email is member of the group but pending = true
+        if (member.email === email && member.pending === true) {
+          console.log("Found user in members list with pending invite");
+          // return the group
+          groups.splice(key, 1);
+        }
+      });
+    });
+
     //   [Op.or]: [
     //     Sequelize.fn('JSON_CONTAINS',
     //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
