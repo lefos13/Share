@@ -103,9 +103,9 @@ const getAsGuest = async (email) => {
       },
     });
 
-    let finalGroups = groups;
+    let finalGroups = [];
     //loop through groups knowing the index of array
-    for await (let [index, group] of finalGroups.entries()) {
+    for await (let group of groups) {
       // loop through members of the group
       if (IsJsonString(group.members)) {
         group.members = JSON.parse(group.members);
@@ -114,13 +114,11 @@ const getAsGuest = async (email) => {
       for await (let member of group.members) {
         // if the member is the current user
         if (member.email === email && member.pending === false) {
-          console.log("Found user in members list with accepted invite");
-          // remove the group
-          delete finalGroups[index];
+          finalGroups.push(group);
         }
       }
     }
-    console.log("After loop cleaning: ", finalGroups);
+
     return finalGroups;
   } catch (error) {
     console.error(error);
