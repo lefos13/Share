@@ -116,7 +116,7 @@ const getAsGuest = async (email) => {
         if (member.email === email && member.pending === false) {
           console.log("Found user in members list with accepted invite");
           // remove the group
-          finalGroups.splice(index, 1);
+          delete finalGroups[index];
         }
       }
     }
