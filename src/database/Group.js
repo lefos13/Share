@@ -205,13 +205,25 @@ const leaveGroup = async (groupId, email) => {
     // remove the member from the group
     group.members = group.members.filter((member) => member.email !== email);
 
-    await group
-      .update({
-        members: group.members,
-      })
-      .catch((err) => {
+    //if group.members is not empty
+    if (group.members.length > 0) {
+      await group
+        .update({
+          members: group.members,
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      //destroy the group
+      await Groups.destroy({
+        where: {
+          groupId: groupId,
+        },
+      }).catch((err) => {
         throw err;
       });
+    }
     return true;
   } catch (error) {
     console.error(error);
