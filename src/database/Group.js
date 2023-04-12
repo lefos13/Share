@@ -89,11 +89,21 @@ const getAsGuest = async (email) => {
           sequelize.literal(
             `JSON_CONTAINS(JSON_EXTRACT(members, "$[*].email"), '"` +
               email +
+              `"') AND JSON_CONTAINS(JSON_EXTRACT(members, "$[*].pending"), '"` +
+              false +
               `"')`
           ),
         ],
       },
     });
+    //   [Op.or]: [
+    //     Sequelize.fn('JSON_CONTAINS',
+    //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
+    //         '"user"'),
+    //     Sequelize.fn('JSON_CONTAINS',
+    //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
+    //         '"business"')
+    // ]
     return groups;
   } catch (error) {
     console.error(error);

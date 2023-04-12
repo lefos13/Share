@@ -306,10 +306,12 @@ const updateOS = async (email, OS) => {
 };
 
 //get all users by searching based on fullname
-const findUsersByFullname = async (fullname) => {
+const findUsersByFullname = async (fullname, email) => {
   try {
     const users = await Users.findAll({
       where: {
+        //email not equal to email
+        email: { [Op.ne]: email },
         fullname: {
           [Op.like]: `%${fullname}%`,
         },

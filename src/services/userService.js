@@ -997,7 +997,7 @@ const searchUsers = async (req) => {
     // console.log(req);
 
     //get all users based on the fullname that client sent inside data
-    const allUsers = await User.findUsersByFullname(data.fullName);
+    const allUsers = await User.findUsersByFullname(data.fullName, email);
     if (allUsers === false) {
       throw new Error("error at finding all the users");
     }
