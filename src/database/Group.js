@@ -111,7 +111,7 @@ const getAsGuest = async (email) => {
     //loop through groups knowing the index of array
     for await (let [group, index] of groups.entries()) {
       // loop through members of the group
-      group.members = JSON.parse(group.members);
+      // group.members = JSON.parse(group.members);
       //check equality of emails and if pending = false
       for await (let member of group.members) {
         // if the member is the current user
