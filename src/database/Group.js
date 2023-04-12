@@ -109,21 +109,23 @@ const getAsGuest = async (email) => {
     // });
 
     //loop through groups knowing the index of array
-    for await (let [group, index] of groups.entries()) {
+    for await (let [index, group] of groups.entries()) {
       // loop through members of the group
-      // group.members = JSON.parse(group.members);
+      if (IsJsonString(group.members)) {
+        group.members = JSON.parse(group.members);
+      }
       //check equality of emails and if pending = false
-      console.log("group", group);
-      console.log("index", index);
-      // for await (let member of group.members) {
-      //   // if the member is the current user
-      //   if (member.email === email && member.pending === false) {
-      //     console.log("Found user in members list with accepted invite");
-      //     // remove the group
-      //     groups.splice(index, 1);
-      //     break;
-      //   }
-      // }
+      // console.log("group", group);
+      // console.log("index", index);
+      for await (let member of group.members) {
+        // if the member is the current user
+        if (member.email === email && member.pending === false) {
+          console.log("Found user in members list with accepted invite");
+          // remove the group
+          groups.splice(index, 1);
+          break;
+        }
+      }
     }
 
     //   [Op.or]: [
