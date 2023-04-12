@@ -83,6 +83,14 @@ const getAsAdmin = async (email) => {
 
 const getAsGuest = async (email) => {
   try {
+    //   [Op.or]: [
+    //     Sequelize.fn('JSON_CONTAINS',
+    //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
+    //         '"user"'),
+    //     Sequelize.fn('JSON_CONTAINS',
+    //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
+    //         '"business"')
+    // ]
     const groups = await Groups.findAll({
       where: {
         [Op.or]: [
@@ -94,49 +102,26 @@ const getAsGuest = async (email) => {
         ],
       },
     });
-    //loop through members of all groups
-    // groups.forEach((group, key) => {
-    //   group.members = JSON.parse(group.members);
-    //   //remove group from the list of groups if email isnt in the group's members
-    //   group.members.forEach((member) => {
-    //     //remove group from groups if email is member of the group but pending = true
-    //     if (member.email === email && member.pending === true) {
-    //       console.log("Found user in members list with pending invite");
-    //       // return the group
-    //       groups.splice(key, 1);
-    //     }
-    //   });
-    // });
+    let finalGroups = groups.toJSON();
 
     //loop through groups knowing the index of array
-    for await (let [index, group] of groups.entries()) {
+    for await (let [index, group] of finalGroups.entries()) {
       // loop through members of the group
       if (IsJsonString(group.members)) {
         group.members = JSON.parse(group.members);
       }
       //check equality of emails and if pending = false
-      // console.log("group", group);
-      // console.log("index", index);
       for await (let member of group.members) {
         // if the member is the current user
         if (member.email === email && member.pending === false) {
           console.log("Found user in members list with accepted invite");
           // remove the group
-          groups.splice(index, 1);
-          break;
+          finalGroups.splice(index, 1);
         }
       }
     }
-
-    //   [Op.or]: [
-    //     Sequelize.fn('JSON_CONTAINS',
-    //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
-    //         '"user"'),
-    //     Sequelize.fn('JSON_CONTAINS',
-    //         Sequelize.fn('JSON_EXTRACT', Sequelize.col('roles'), Sequelize.literal('"$[*].role"')),
-    //         '"business"')
-    // ]
-    return groups;
+    console.log("After loop cleaning: ", finalGroups);
+    return finalGroups;
   } catch (error) {
     console.error(error);
     return false;
@@ -156,7 +141,7 @@ const getAllInvitedTo = async (email) => {
         ],
       },
     });
-    console.log("Found groups i am invited:", groups.length);
+    // console.log("Found groups i am invited:", groups.length);
     let pendingInvites = [];
     // for each group
     for await (let group of groups) {
@@ -168,7 +153,7 @@ const getAllInvitedTo = async (email) => {
         console.log("User Checking: ", member);
         // if the member is the current user
         if (member.email === email && member.pending === true) {
-          console.log("Found user in members list with pending invite");
+          // console.log("Found user in members list with pending invite");
           // return the group
           pendingInvites.push(group);
         }
