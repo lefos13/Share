@@ -14,6 +14,8 @@ const Reviews = require("../modules/review");
 const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
+const Groups = require("./Group");
+const { IsJsonString } = require("../utils/functions");
 // ==== code for db
 
 // *** ADD ***
@@ -220,6 +222,43 @@ const countVerified = async (postid) => {
   }
 };
 
+// count verified for specific postid
+const countVerifiedEnchanced = async (postid) => {
+  try {
+    //find all interests of this postid
+    const allIntersted = await PostInterested.findAll({
+      where: {
+        postid: postid,
+        isVerified: true,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    let countOfUsers = 0;
+    for await (const interested of allIntersted) {
+      //CHECK IF THE INTEREST IS OF A GROUP
+      if (interested.groupId != null) {
+        //get data of the group
+        let groupData = await Groups.findOne(interested.groupId);
+        if (groupData === false) {
+          throw new Error("Group not found");
+        }
+        //count members of the group
+        if (IsJsonString(groupData.members)) {
+          groupData.members = JSON.parse(groupData.members);
+        }
+        countOfUsers += groupData.members.length;
+      } else {
+        countOfUsers++;
+      }
+    }
+    return countOfUsers;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 const updateVerify = async (postInt) => {
   try {
     await postInt.update({ isVerified: true }).catch((err) => {
@@ -357,6 +396,7 @@ const destroyPerArrayIds = async (postids) => {
 // *** ADD ***
 
 module.exports = {
+  countVerifiedEnchanced,
   findAllVerifedPerPost,
   destroyPerArrayIds,
   findAllperUser,

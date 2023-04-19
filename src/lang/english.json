@@ -88,5 +88,6 @@
   "groupNameChanged": "Group name has been changed succesfully!",
   "leftGroup": "You have left the group!",
   "invitationAccepted": "Invitation has been accepted!",
-  "invitationDeclined": "Invitation has been declined!"
+  "invitationDeclined": "Invitation has been declined!",
+  "groupHasPendingUsers": "Group has pending users!"
 }

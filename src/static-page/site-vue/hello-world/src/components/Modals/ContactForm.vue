@@ -129,6 +129,12 @@ export default {
     msg: String,
   },
   methods: {
+    // `sendReport()` is a method that sends a report using Axios to a specific API endpoint. It
+    // retrieves the values of the input fields for name, email, phone number, and message, and sends
+    // them as data in the Axios POST request. The API endpoint is
+    // "https://ouride.gr/test/neutral/webSendReport". The method also logs the response from the API
+    // and any errors that may occur. Finally, it logs a message to the console indicating that the
+    // report has been sent.
     sendReport() {
       // const BASE_URL = "https://ouride.gr";
       var fullname = document.getElementById("name").value;

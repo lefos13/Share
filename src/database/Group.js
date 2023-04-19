@@ -379,7 +379,46 @@ const declineInvitation = async (groupId, email) => {
   }
 };
 
+const getPendingUsers = async (groupId) => {
+  try {
+    const users = Groups.findOne({
+      where: {
+        groupId: groupId,
+      },
+    }).catch(err=> {
+      throw err;
+    });
+    //loop through all the members of the group
+    for await (let member of users.members) {
+      // if the member is the current user
+      if (member.pending === true) {
+        // return the group
+        return true;
+      }
+    }
+    return "ok";
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const findOne = async (groupId) => {
+  try {
+    const group = await Groups.findOne({
+      where: {
+        groupId: groupId,
+      },
+    });
+    return group;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
 module.exports = {
+  findOne,
+  getPendingUsers,
   declineInvitation,
   acceptInvitation,
   leaveGroup,

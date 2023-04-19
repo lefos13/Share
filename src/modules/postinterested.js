@@ -61,6 +61,11 @@ const PostInterested = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    groupId: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null
+    }
   },
   {
     freezeTableName: true,

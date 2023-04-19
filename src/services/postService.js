@@ -8,6 +8,7 @@ const Review = require("../database/Review");
 const ToReview = require("../database/ToReview");
 const LastSearch = require("../database/LastSearch");
 const ConvUsers = require("../database/ConvUsers");
+const Groups = require("../database/Groups");
 const fun = require("../utils/functions");
 const {
   insertAver,
@@ -105,8 +106,23 @@ const interested = async (req) => {
 
     let dateOfInterest = moment();
 
+    //check if there is a property groupId in the data of body
+    if (data.groupId != null) {
+      //check if the group has any pending users
+      const pendingUsers = await Groups.getPendingUsers(data.groupId);
+      if (pendingUsers === true) {
+        return {
+          status: 405,
+          message: msg.groupHasPendingUsers,
+        };
+      } else if (pendingUsers === false) {
+        throw new Error("Something went wrong with finding the pending users");
+      }
+    } else data.groupId = null;
+    //prepare the data to be inserted into the database
     var row = {
       email: data.email,
+      groupId: data.groupId,
       postid: data.postid,
       date: dateOfInterest,
       note: data.note,
@@ -125,6 +141,10 @@ const interested = async (req) => {
       }; //abstract case
     }
 
+    /* The above code is using the `findOne` method of the `PostInterested` model to find a specific
+    interest record based on the email and postid provided in the `row` object. It then checks if
+    the returned value is `false`, and if so, throws an error indicating that something went wrong
+    with finding the interest. */
     const interest = await PostInterested.findOne(row.email, row.postid);
     if (interest === false) {
       throw new Error("Something went wrong with finding the interested");
@@ -145,6 +165,12 @@ const interested = async (req) => {
           message: msg.tenInterest,
         };
       } else {
+        /* The above code is creating an interest for a post and sending a notification to the owner of
+        the post using Firebase. It first creates the interest using the
+        `PostInterested.createInterest()` function and throws an error if the creation fails. It
+        then retrieves the post using the `Post.findOne()` function and sends a notification to the
+        owner using the `fun.toNotifyOwner()` function. Finally, it returns a response object with a
+        status code, body, and message to the controller. */
         //CASE THAT INTEREST IS TO BE CREATED
         const inter = await PostInterested.createInterest(row);
 
@@ -466,11 +492,15 @@ const searchPosts = async (req) => {
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(data.email, fnd.postid);
 
+      let isGroupInterested = false;
       if (interested == null) {
         flag = false;
       } else {
         flag = true;
         if (interested.isVerified == true) isApproved = true;
+        interested.groupId != null
+          ? (isGroupInterested = true)
+          : (isGroupInterested = false);
       }
       let imagePath = null;
       if (await checkImagePath(fnd.email)) {
@@ -481,6 +511,7 @@ const searchPosts = async (req) => {
         imagePath: imagePath,
         post: fnd,
         interested: flag,
+        isGroupInterested: isGroupInterested,
         isApproved: isApproved,
       };
       array.push(results);
@@ -645,6 +676,15 @@ const getPostsUser = async (req) => {
   }
 };
 
+/**
+ * This function retrieves a post and its associated user information, including reviews and images,
+ * based on a given post ID and user email.
+ * @param req - The "req" parameter is an object that contains information about the HTTP request being
+ * made, including the request body and query parameters.
+ * @returns an object with a `status` property and a `data` property. The `status` property indicates
+ * the status of the response (200 for success, 404 for not found, 500 for error), and the `data`
+ * property contains an object with properties `imagePath`, `interested`, `post`, and `user`.
+ */
 const getPostPerId = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -673,6 +713,14 @@ const getPostPerId = async (req) => {
     // if the searcher is interested then true
     postInt == null ? (interested = false) : (interested = true);
 
+    let isGroupInterested = false;
+    //check if the insterest is by a group
+    if (postInt != null) {
+      postInt.groupId != null
+        ? (isGroupInterested = true)
+        : (isGroupInterested = false);
+    }
+
     // find creator of post
     const user = await User.findOneLight(post.email);
     if (user === false) {
@@ -699,6 +747,7 @@ const getPostPerId = async (req) => {
     const response = {
       imagePath: image,
       interested: interested,
+      isGroupInterested: isGroupInterested,
       post: post,
       user: user,
     };
@@ -784,11 +833,16 @@ const getInterestedPerUser = async (req) => {
           image = "images/" + user.email + ".jpeg";
         }
 
+        let isGroupInterested = false;
+        if (postI.groupId != null) {
+          isGroupInterested = true;
+        }
         // SUM UP THE RESULTS AND PUSH THEM INTO AN ARRAY
         let results = {
           user: user,
           imagePath: image,
           post: tempPost,
+          isGroupInterested: isGroupInterested,
           interested: true,
           isApproved: postI.isVerified,
         };
@@ -995,7 +1049,9 @@ const verInterested = async (req) => {
       return { status: 404, message: msg.noUserThatliked };
 
     //GETTING THE SUM OF THE VERIFIED
-    const allIntersted = await PostInterested.countVerified(data.postid);
+    const allIntersted = await PostInterested.countVerifiedEnchanced(
+      data.postid
+    );
     if (allIntersted === null) {
       throw new Error("Error at getting the count of the verified");
     }
@@ -1010,7 +1066,9 @@ const verInterested = async (req) => {
     const post = await Post.findOne(data.postid);
     if (post === false) throw new Error("Error at finding the post");
 
+    //IF THE OCCUPIED POSITIONS ARE LESS THAN THE NUMBER OF Seats OR THE USER IS VERIFIED
     if (allIntersted < post.numseats || results.isVerified == true) {
+      //IF THE USER IS NOT VERIFIED
       if (results.isVerified === false) {
         const updated = await PostInterested.updateVerify(results);
         if (!updated) throw new Error("Error at update verify flag");
@@ -1602,11 +1660,15 @@ const feedScreen = async (req) => {
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(email, fnd.postid);
 
+      let isGroupInterested = false;
       if (interested == null) {
         flag = false;
       } else {
         flag = true;
         if (interested.isVerified == true) isApproved = true;
+        interested.groupId != null
+          ? (isGroupInterested = true)
+          : (isGroupInterested = false);
       }
       let image = null;
       if (await checkImagePath(user.email)) {
@@ -1617,6 +1679,7 @@ const feedScreen = async (req) => {
         imagePath: image,
         post: fnd,
         interested: flag,
+        isGroupInterested: isGroupInterested,
         isApproved: isApproved,
       };
       array.push(results);
@@ -1724,11 +1787,15 @@ const feedAll = async (req) => {
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(email, fnd.postid);
 
+      let isGroupInterested = false;
       if (interested == null) {
         flag = false;
       } else {
         flag = true;
         if (interested.isVerified == true) isApproved = true;
+        interested.groupId != null
+          ? (isGroupInterested = true)
+          : (isGroupInterested = false);
       }
       let image = null;
       if (await checkImagePath(user.email)) {
@@ -1739,6 +1806,7 @@ const feedAll = async (req) => {
         imagePath: image,
         post: fnd,
         interested: flag,
+        isGroupInterested: isGroupInterested,
         isApproved: isApproved,
       };
       array.push(results);
