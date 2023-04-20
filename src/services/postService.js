@@ -8,7 +8,7 @@ const Review = require("../database/Review");
 const ToReview = require("../database/ToReview");
 const LastSearch = require("../database/LastSearch");
 const ConvUsers = require("../database/ConvUsers");
-const Groups = require("../database/Groups");
+const Groups = require("../database/Group");
 const fun = require("../utils/functions");
 const {
   insertAver,
