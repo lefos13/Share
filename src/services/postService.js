@@ -109,6 +109,16 @@ const interested = async (req) => {
 
     //check if there is a property groupId in the data of body
     if (data.groupId != null) {
+      //check if a member of the group is the owner of the post
+      const isGroupMember = await Groups.isGroupMember(data.postid, groupId);
+      if (isGroupMember instanceof Error) throw isGroupMember;
+      else if (isGroupMember === true) {
+        throw {
+          status: 405,
+          message: msg.ownerPartOfGroup,
+        }; //abstract case
+      }
+
       //check if the group has any pending users
       const pendingUsers = await Groups.getPendingUsers(data.groupId);
       if (pendingUsers === true) {

@@ -406,6 +406,7 @@ const globalAllExpired = async () => {
     return false;
   }
 };
+
 module.exports = {
   globalAllExpired,
   destroyAllPerIds,

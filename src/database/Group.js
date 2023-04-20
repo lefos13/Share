@@ -419,7 +419,41 @@ const findOne = async (groupId) => {
     return false;
   }
 };
+
+const isGroupMember = async (postid, groupId) => {
+  try {
+    //get post of postid
+    const post = await Posts.findOne({
+      where: {
+        postid: postid,
+      },
+    });
+    //get group of groupId
+    const group = await Groups.findOne({
+      where: {
+        groupId: groupId,
+      },
+    });
+    const postOwner = post.email;
+    //Parse the group members
+    if (IsJsonString(group.members)) {
+      group.members = JSON.parse(group.members);
+    }
+    //loop through all the members of the group
+    for await (let member of group.members) {
+      // if the member is the current user
+      if (member.email === postOwner) {
+        return true;
+      }
+    }
+    return false;
+  } catch (err) {
+    console.error(err);
+    return new Error(err);
+  }
+};
 module.exports = {
+  isGroupMember,
   findOne,
   getPendingUsers,
   declineInvitation,

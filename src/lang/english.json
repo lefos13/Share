@@ -89,5 +89,6 @@
   "leftGroup": "You have left the group!",
   "invitationAccepted": "Invitation has been accepted!",
   "invitationDeclined": "Invitation has been declined!",
-  "groupHasPendingUsers": "Group has pending users!"
+  "groupHasPendingUsers": "Group has pending users!",
+  "ownerPartOfGroup": "The driver is part of your group!"
 }
