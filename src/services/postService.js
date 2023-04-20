@@ -110,7 +110,10 @@ const interested = async (req) => {
     //check if there is a property groupId in the data of body
     if (data.groupId != null) {
       //check if a member of the group is the owner of the post
-      const isGroupMember = await Groups.isGroupMember(data.postid, groupId);
+      const isGroupMember = await Groups.isGroupMember(
+        data.postid,
+        data.groupId
+      );
       if (isGroupMember instanceof Error) throw isGroupMember;
       else if (isGroupMember === true) {
         throw {
