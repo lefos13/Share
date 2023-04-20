@@ -381,7 +381,7 @@ const declineInvitation = async (groupId, email) => {
 
 const getPendingUsers = async (groupId) => {
   try {
-    const users = Groups.findOne({
+    const users = await Groups.findOne({
       where: {
         groupId: groupId,
       },
