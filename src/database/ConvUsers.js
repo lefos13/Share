@@ -182,7 +182,7 @@ const updateDate = async (convid, date, isGroup) => {
     const updated = await ConvUsers.update(
       {
         expiresIn: date,
-        isGroup: isGroup,
+        groupId: isGroup,
       },
       {
         where: {

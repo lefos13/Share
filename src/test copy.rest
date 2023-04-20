@@ -273,14 +273,14 @@ language: EN
 
 ###
 #service epistrefei lista me endiaferomenous gia ena post
-POST http://157.230.18.246:3000/posts/getIntPost
+POST https://ouride.gr/test/posts/getIntPost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0yMFQxMjozMTo0Ny41MTBaIiwiaWF0IjoxNjgxOTkzOTA3LCJleHAiOjE2ODcxNzc5MDd9.6Jhr9wCexRsClNgvfgj0eNB5UvG9nCJGohk-z-NFIFY
 Accept-Language: EN
 
 {
     "data": {
-        "postid": 1849,
+        "postid": 1999,
         "page": 1
     }
 }

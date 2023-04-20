@@ -271,7 +271,7 @@ const interested = async (req) => {
                 expirationDates.push(expires);
                 allDates.push({
                   date: expires,
-                  isGroup: val.groupId != null ? true : false,
+                  groupId: val.groupId != null ? val.groupId : null,
                 });
               }
             }
@@ -287,7 +287,7 @@ const interested = async (req) => {
                 expirationDates.push(expires);
                 allDates.push({
                   date: expires,
-                  isGroup: val.groupId != null ? true : false,
+                  groupId: val.groupId != null ? val.groupId : null,
                 });
               }
             }
@@ -301,11 +301,11 @@ const interested = async (req) => {
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
-          let isGroup = false;
+          let groupId = false;
           //loop through allDates and define isGroup if the date is equal to the maximum date
           _.forEach(allDates, (d) => {
             if (moment(d.date).isSame(maxDate)) {
-              isGroup = d.isGroup;
+              groupId = d.groupId;
             }
           });
           //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
@@ -313,7 +313,7 @@ const interested = async (req) => {
           let updated = await ConvUsers.updateDate(
             chat.convid,
             maxDate,
-            isGroup
+            groupId
           );
           if (updated === false)
             throw new Error("Didnt update the conv expiration date");
@@ -323,7 +323,7 @@ const interested = async (req) => {
             type: "setExpirationDate",
             data: {
               conversationId: chat.convid,
-              isGroup: isGroup,
+              groupId: groupId,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
           });
@@ -333,7 +333,7 @@ const interested = async (req) => {
             type: "setExpirationDate",
             data: {
               conversationId: chat.convid,
-              isGroup: isGroup,
+              groupId: groupId,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
           });
@@ -943,6 +943,16 @@ const getIntPost = async (req) => {
           user.dataValues.isVerified = one.isVerified;
           user.dataValues.piid = one.piid;
           user.dataValues.note = one.note;
+          if (one.groupId != null) {
+            user.dataValues.isGroupInterested = true;
+            let groupData = await Groups.findOne(one.groupId);
+            //Check if members is Json and parse it
+            if (IsJsonString(groupData.members)) {
+              user.dataValues.members = JSON.parse(groupData.members);
+            } else {
+              user.dataValues.members = groupData.members;
+            }
+          }
 
           allUsers.push(user);
         } else {
@@ -1214,7 +1224,7 @@ const verInterested = async (req) => {
           throw new Error("Error at finding if chat Exists");
 
         if (chatExists != null) {
-          let isGroup = results.groupId != null ? true : false;
+          let isGroup = results.groupId != null ? results.groupId : null;
           //chat exists from older post so the expireDate is to be updated if it is older than current expire date
 
           const updated = await ConvUsers.updateExpireDate(
@@ -1233,7 +1243,7 @@ const verInterested = async (req) => {
             convid: post.email + " " + results.email,
             expiresIn: expiresIn,
             messages: null,
-            isGroup: results.groupId != null ? true : false,
+            groupId: results.groupId != null ? results.groupId : null,
           });
           if (chatMade === false)
             throw new Error("Error at creating new chat between the users");
@@ -1465,7 +1475,7 @@ const verInterested = async (req) => {
                 expirationDates.push(expires);
                 allDates.push({
                   date: expires,
-                  isGroup: val.groupId != null ? true : false,
+                  groupId: val.groupId != null ? val.groupId : null,
                 });
               }
             }
@@ -1480,7 +1490,7 @@ const verInterested = async (req) => {
                 expirationDates.push(expires);
                 allDates.push({
                   date: expires,
-                  isGroup: val.groupId != null ? true : false,
+                  groupId: val.groupId != null ? val.groupId : null,
                 });
               }
             }
@@ -1494,11 +1504,11 @@ const verInterested = async (req) => {
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
-          let isGroup = false;
+          let groupId = false;
           //loop through allDates and define isGroup if the date is equal to the maximum date
           _.forEach(allDates, (d) => {
             if (moment(d.date).isSame(maxDate)) {
-              isGroup = d.isGroup;
+              groupId = d.groupId;
             }
           });
 
@@ -1506,7 +1516,7 @@ const verInterested = async (req) => {
           let updated = await ConvUsers.updateDate(
             chat.convid,
             maxDate,
-            isGroup
+            groupId
           );
           if (updated === false)
             throw new Error("Didnt update the conv expiration date");
@@ -1515,7 +1525,7 @@ const verInterested = async (req) => {
           io.to(driver.socketId).emit("action", {
             type: "setExpirationDate",
             data: {
-              isGroup: isGroup,
+              isGroup: groupId,
               conversationId: chat.convid,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
@@ -1525,7 +1535,7 @@ const verInterested = async (req) => {
           io.to(passenger.socketId).emit("action", {
             type: "setExpirationDate",
             data: {
-              isGroup: isGroup,
+              isGroup: groupId,
               conversationId: chat.convid,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },

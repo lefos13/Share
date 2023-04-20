@@ -41,10 +41,10 @@ const ConvUsers = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
-    isGroup: {
-      type: DataTypes.BOOLEAN,
+    groupId: {
+      type: DataTypes.BIGINT,
       allowNull: true,
-      defaultValue: false,
+      defaultValue: null,
     },
   },
   {
