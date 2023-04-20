@@ -952,6 +952,8 @@ const getIntPost = async (req) => {
             } else {
               user.dataValues.members = groupData.members;
             }
+          } else {
+            user.dataValues.isGroupInterested = false;
           }
 
           allUsers.push(user);
