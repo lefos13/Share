@@ -137,15 +137,17 @@ const checkIfExists = async (email1, email2) => {
   }
 };
 
-const updateExpireDate = async (convObj, expiresIn) => {
+const updateExpireDate = async (convObj, expiresIn, isGroup) => {
   try {
     let tesDate = moment(convObj.expiresIn);
     if (tesDate > expiresIn) {
       return "0";
     } else {
-      await convObj.update({ expiresIn: expiresIn }).catch((err) => {
-        throw err;
-      });
+      await convObj
+        .update({ expiresIn: expiresIn, isGroup: isGroup })
+        .catch((err) => {
+          throw err;
+        });
     }
 
     return true;
@@ -160,7 +162,9 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
     let convid = false;
     if (convObj != null)
       if (moment(convObj.expiresIn).isSame(expiresIn, "day")) {
-        console.log("Dates for chat destruction are same! Deletetion is moving on...");
+        console.log(
+          "Dates for chat destruction are same! Deletetion is moving on..."
+        );
         convid = convObj.convid;
         await convObj.destroy().catch((err) => {
           throw err;
@@ -173,11 +177,12 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
   }
 };
 
-const updateDate = async (convid, date) => {
+const updateDate = async (convid, date, isGroup) => {
   try {
     const updated = await ConvUsers.update(
       {
         expiresIn: date,
+        isGroup: isGroup,
       },
       {
         where: {

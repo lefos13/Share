@@ -260,6 +260,7 @@ const interested = async (req) => {
             postListPassenger
           );
 
+        let allDates = [];
         let expirationDates = [];
         if (allVerPassenger.length > 0) {
           // get the expiration dates
@@ -268,6 +269,10 @@ const interested = async (req) => {
               if (val.postid == postv.postid) {
                 let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
+                allDates.push({
+                  date: expires,
+                  isGroup: val.groupId != null ? true : false,
+                });
               }
             }
           }
@@ -280,6 +285,10 @@ const interested = async (req) => {
               if (val.postid == postv.postid) {
                 let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
+                allDates.push({
+                  date: expires,
+                  isGroup: val.groupId != null ? true : false,
+                });
               }
             }
           }
@@ -292,10 +301,20 @@ const interested = async (req) => {
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
-
+          let isGroup = false;
+          //loop through allDates and define isGroup if the date is equal to the maximum date
+          _.forEach(allDates, (d) => {
+            if (moment(d.date).isSame(maxDate)) {
+              isGroup = d.isGroup;
+            }
+          });
           //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
 
-          let updated = await ConvUsers.updateDate(chat.convid, maxDate);
+          let updated = await ConvUsers.updateDate(
+            chat.convid,
+            maxDate,
+            isGroup
+          );
           if (updated === false)
             throw new Error("Didnt update the conv expiration date");
           //EMIT THE EXPIRATION DATE CHANGE
@@ -304,6 +323,7 @@ const interested = async (req) => {
             type: "setExpirationDate",
             data: {
               conversationId: chat.convid,
+              isGroup: isGroup,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
           });
@@ -313,6 +333,7 @@ const interested = async (req) => {
             type: "setExpirationDate",
             data: {
               conversationId: chat.convid,
+              isGroup: isGroup,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
           });
@@ -1193,11 +1214,13 @@ const verInterested = async (req) => {
           throw new Error("Error at finding if chat Exists");
 
         if (chatExists != null) {
-          //chat exists from older post so the expireDate is to be updates if it is older than current expire date
+          let isGroup = results.groupId != null ? true : false;
+          //chat exists from older post so the expireDate is to be updated if it is older than current expire date
 
           const updated = await ConvUsers.updateExpireDate(
             chatExists,
-            expiresIn
+            expiresIn,
+            isGroup
           );
           if (updated === false) {
             throw new Error("Error at updating the existing chat");
@@ -1206,11 +1229,11 @@ const verInterested = async (req) => {
           }
         } else {
           //chat doesn't exist at all so a new one is created
-
           const chatMade = await ConvUsers.saveOne({
             convid: post.email + " " + results.email,
             expiresIn: expiresIn,
             messages: null,
+            isGroup: results.groupId != null ? true : false,
           });
           if (chatMade === false)
             throw new Error("Error at creating new chat between the users");
@@ -1248,14 +1271,17 @@ const verInterested = async (req) => {
           throw new Error("Error at finding the toreview");
 
         // if driver is owner check all older posts and decide if you need to update the flags or deny review
+        /* The code is checking if a review exists for a specific driver email and if there are any
+        active posts for that driver. If there are active posts, it retrieves all the verified posts
+        for a specific passenger email and checks the end dates of those posts to get the oldest
+        one. It then creates a new review object with the oldest post's end date and the
+        corresponding post interested ID. */
         if (toReviewExists.driverEmail === post.email) {
-          // const denied = await ToReview.denyReview(toReviewExists);
-          // if (denied)
-          //   throw new Error("Error at denieing review for both users!");
           const allActiveDriver = await Post.findAllActive(
             toReviewExists.driverEmail,
             moment()
           );
+
           if (allActiveDriver.length > 0) {
             let allPostIds = [];
             _.forEach(allActiveDriver, (val) => {
@@ -1271,13 +1297,26 @@ const verInterested = async (req) => {
               for await (let val of allVerified) {
                 let tempPost = await Post.findOne(val.postid);
                 tempPost.enddate != null
-                  ? dates.push({ d: tempPost.enddate, p: val.piid })
-                  : dates.push({ d: tempPost.startdate, p: val.piid });
+                  ? dates.push({
+                      d: tempPost.enddate,
+                      p: val.piid,
+                    })
+                  : dates.push({
+                      d: tempPost.startdate,
+                      p: val.piid,
+                    });
               }
 
+              /* The code is using the Moment.js library to perform date manipulation. It first maps an
+              array of objects containing dates to an array of Moment.js date objects. It then finds
+              the minimum date from this array using the `moment.min()` method. It then iterates
+              through the original array of objects to find the object that corresponds to the
+              minimum date and assigns its `p` property to the `piid` variable. Finally, it sets the
+              `dateToCompare` variable to the minimum date. */
               let newdates = dates.map((d) => moment(d.d));
               let minDate = moment.min(newdates);
               let piid;
+
               _.forEach(dates, (d) => {
                 if (moment(d.d).isSame(minDate)) {
                   piid = d.p;
@@ -1304,6 +1343,13 @@ const verInterested = async (req) => {
         );
 
         let passengerPostsIds = [];
+        /* The above code is checking if there are any active passenger posts and if there are, it
+        retrieves all the verified interested passengers for those posts. It then checks if the
+        minimum date of those verified interested passengers is greater than or equal to a given
+        date to compare. If it is, it creates a new review object and updates the existing toReview
+        object with the new review. If the minimum date is not greater than or equal to the given
+        date to compare, it denies the review. If there are no active passenger posts, it also
+        denies the review. */
         if (activePassengerPosts.length > 0) {
           _.forEach(activePassengerPosts, (val) => {
             passengerPostsIds.push(val.postid);
@@ -1409,6 +1455,7 @@ const verInterested = async (req) => {
           );
 
         let expirationDates = [];
+        let allDates = [];
         if (allVerPassenger.length > 0) {
           // get the expiration dates
           for await (let val of allVerPassenger) {
@@ -1416,6 +1463,10 @@ const verInterested = async (req) => {
               if (val.postid == postv.postid) {
                 let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
+                allDates.push({
+                  date: expires,
+                  isGroup: val.groupId != null ? true : false,
+                });
               }
             }
           }
@@ -1427,6 +1478,10 @@ const verInterested = async (req) => {
               if (val.postid == postv.postid) {
                 let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
+                allDates.push({
+                  date: expires,
+                  isGroup: val.groupId != null ? true : false,
+                });
               }
             }
           }
@@ -1439,10 +1494,20 @@ const verInterested = async (req) => {
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
+          let isGroup = false;
+          //loop through allDates and define isGroup if the date is equal to the maximum date
+          _.forEach(allDates, (d) => {
+            if (moment(d.date).isSame(maxDate)) {
+              isGroup = d.isGroup;
+            }
+          });
 
-          //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
-
-          let updated = await ConvUsers.updateDate(chat.convid, maxDate);
+          //CHANGE THE EXPIRATION DATE AND ISGROUP FLAG TO THE OLDER ONE AND DO NOT DELETE THE CHAT
+          let updated = await ConvUsers.updateDate(
+            chat.convid,
+            maxDate,
+            isGroup
+          );
           if (updated === false)
             throw new Error("Didnt update the conv expiration date");
           //EMIT THE EXPIRATION DATE CHANGE
@@ -1450,6 +1515,7 @@ const verInterested = async (req) => {
           io.to(driver.socketId).emit("action", {
             type: "setExpirationDate",
             data: {
+              isGroup: isGroup,
               conversationId: chat.convid,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
@@ -1459,6 +1525,7 @@ const verInterested = async (req) => {
           io.to(passenger.socketId).emit("action", {
             type: "setExpirationDate",
             data: {
+              isGroup: isGroup,
               conversationId: chat.convid,
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },

@@ -41,6 +41,11 @@ const ConvUsers = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    isGroup: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+    },
   },
   {
     freezeTableName: true,
