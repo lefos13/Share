@@ -96,6 +96,7 @@ const interested = async (req) => {
     let extra = req.body.extra;
 
     let data = req.body.data;
+    console.log("Log for groupId: ", data);
 
     let msg = await determineLang(req);
     if (data.email == null) {

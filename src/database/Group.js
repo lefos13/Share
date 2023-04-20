@@ -385,9 +385,12 @@ const getPendingUsers = async (groupId) => {
       where: {
         groupId: groupId,
       },
-    }).catch(err=> {
+    }).catch((err) => {
       throw err;
     });
+    if (IsJsonString(users.members)) {
+      users.members = JSON.parse(users.members);
+    }
     //loop through all the members of the group
     for await (let member of users.members) {
       // if the member is the current user
@@ -415,7 +418,7 @@ const findOne = async (groupId) => {
     console.error(error);
     return false;
   }
-}
+};
 module.exports = {
   findOne,
   getPendingUsers,
