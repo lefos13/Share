@@ -947,6 +947,7 @@ const getIntPost = async (req) => {
             user.dataValues.isGroupInterested = true;
             let groupData = await Groups.findOne(one.groupId);
             groupData = await fun.insertDataToMembers(groupData);
+            user.dataValues.members = groupData.members;
           } else {
             user.dataValues.isGroupInterested = false;
           }
