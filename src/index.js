@@ -962,6 +962,16 @@ io.on("connection", (socket) => {
           } else {
             photoApproving = null;
           }
+
+          let members = [];
+          let isGroupInterest = false;
+          if (conv.groupId != null) {
+            groupData = await findOne(conv.groupId);
+            groupData = await insertDataToMembers(groupData);
+            members = groupData.members;
+            isGroupInterest = true;
+          }
+
           const dataForApprooved = {
             conversationId: conv.convid,
             socketId: userApproving.socketId,
@@ -975,6 +985,8 @@ io.on("connection", (socket) => {
             lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
+            isGroupInterest: isGroupInterest,
+            members: members,
           };
 
           let user2Online = false;
@@ -1002,6 +1014,8 @@ io.on("connection", (socket) => {
             lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
+            isGroupInterest: isGroupInterest,
+            members: members,
           };
 
           io.to(userApproved.socketId).emit("action", {
