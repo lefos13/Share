@@ -97,6 +97,8 @@ const getAsAdmin = async (email) => {
       where: {
         admin: email,
       },
+      //order by isCreated
+      order: [["isCreated", "DESC"]],
     });
     return groups;
   } catch (error) {
@@ -131,6 +133,7 @@ const getAsGuest = async (email) => {
           ),
         ],
       },
+      order: [["isCreated", "DESC"]],
     });
 
     let finalGroups = [];

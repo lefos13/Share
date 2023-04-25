@@ -364,6 +364,8 @@ const {
   checkImagePath,
 } = require("./utils/functions");
 const { destroyPerArrayIds } = require("./database/PostInterested");
+const { findOne } = require("./database/Group");
+const { insertDataToMembers } = require("./utils/functions");
 
 app.locals["bg"] = {};
 
@@ -491,6 +493,7 @@ io.on("connection", (socket) => {
                 expiresIn: value.expiresIn,
                 messages: value.messages,
                 convid: convid,
+                groupId: value.groupId,
               });
             } else if (mails[1] != action.data.email) {
               otherUsers.push({
@@ -498,6 +501,7 @@ io.on("connection", (socket) => {
                 expiresIn: value.expiresIn,
                 messages: value.messages,
                 convid: convid,
+                groupId: value.groupId,
               });
             }
           }
@@ -526,6 +530,15 @@ io.on("connection", (socket) => {
               data.photo = "images/" + u.mail + ".jpeg";
             else data.photo = null;
             data.email = u.mail;
+
+            //import members of group if the conversation was initiated by a group interest
+            if (u.groupId != null) {
+              data.isGroupInterest = true;
+              //get group based on groupId
+              let group = await findOne(groupId);
+              group = await insertDataToMembers(group);
+              data.members = group.members;
+            }
 
             data.isUserOnline = false;
             let socketList = await io.fetchSockets();

@@ -62,6 +62,25 @@ const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
 
+const insertDataToMembers = async (group) => {
+  if (IsJsonString(group.members)) group.members = JSON.parse(group.members);
+
+  for await (let member of group.members) {
+    let memberFullname = await User.findOneLight(member.email);
+    member.fullname = memberFullname.fullname;
+    //get average rating for each member
+    let ratingData = await insertAver(member);
+    member.average = ratingData.average;
+    member.count = ratingData.count;
+    //insert imagePath into member object
+    if (await checkImagePath(member.email)) {
+      member.imagePath = "images/" + member.email + ".jpeg";
+    } else {
+      member.imagePath = null;
+    }
+  }
+  return group;
+};
 /**
  * The function checks if an image file exists in a specific directory based on the email parameter.
  * @param email - The email parameter is a string that represents the email address of a user. It is
@@ -1219,4 +1238,5 @@ module.exports = {
   determineExpirationDate,
   backUpUser,
   checkImagePath,
+  insertDataToMembers,
 };

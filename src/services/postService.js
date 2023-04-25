@@ -946,12 +946,7 @@ const getIntPost = async (req) => {
           if (one.groupId != null) {
             user.dataValues.isGroupInterested = true;
             let groupData = await Groups.findOne(one.groupId);
-            //Check if members is Json and parse it
-            if (IsJsonString(groupData.members)) {
-              user.dataValues.members = JSON.parse(groupData.members);
-            } else {
-              user.dataValues.members = groupData.members;
-            }
+            groupData = await fun.insertDataToMembers(groupData);
           } else {
             user.dataValues.isGroupInterested = false;
           }

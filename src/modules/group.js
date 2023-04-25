@@ -44,6 +44,9 @@ const Groups = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    isCreated: {
+      type: DataTypes.DATE,
+    },
   },
   {
     freezeTableName: true,
