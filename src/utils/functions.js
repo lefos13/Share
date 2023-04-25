@@ -610,6 +610,47 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
   }
 };
 
+const insertAver = async (user) => {
+  try {
+    //define the query for the db call
+    let query = {
+      attributes:
+        // [sequelize.fn("count", sequelize.col("rating")), "counter"],
+        [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
+      where: {
+        email: user.email,
+      },
+    };
+    let results = await Review.findAndCountAll(query);
+
+    if (results.count != 0) {
+      let rows = results.rows;
+      let total = null;
+      for await (r of rows) {
+        total = r.toJSON().total;
+      }
+      let average = total / results.count;
+      let rounded = average.toFixed(1);
+      rounded = parseFloat(rounded);
+      let count = results.count;
+      return {
+        average: rounded,
+        count: count,
+      };
+    } else {
+      let average = 0;
+      let count = 0;
+      return {
+        average: average,
+        count: count,
+      };
+    }
+  } catch (err) {
+    console.error("inside InsertAver()" + err);
+    return false;
+  }
+};
+
 module.exports = {
   toNotifyTheUnverified,
   sendMessage,
@@ -926,46 +967,7 @@ module.exports = {
   match the email of the user object. It then calculates the average rating of all the matching
   records and returns an object with the average rating and the count of matching records. If there
   are no matching records, it returns an object with an average rating of 0 and a count of 0. */
-  insertAver: async (user) => {
-    try {
-      //define the query for the db call
-      let query = {
-        attributes:
-          // [sequelize.fn("count", sequelize.col("rating")), "counter"],
-          [[sequelize.fn("sum", sequelize.col("rating")), "total"]],
-        where: {
-          email: user.email,
-        },
-      };
-      let results = await Review.findAndCountAll(query);
-
-      if (results.count != 0) {
-        let rows = results.rows;
-        let total = null;
-        for await (r of rows) {
-          total = r.toJSON().total;
-        }
-        let average = total / results.count;
-        let rounded = average.toFixed(1);
-        rounded = parseFloat(rounded);
-        let count = results.count;
-        return {
-          average: rounded,
-          count: count,
-        };
-      } else {
-        let average = 0;
-        let count = 0;
-        return {
-          average: average,
-          count: count,
-        };
-      }
-    } catch (err) {
-      console.error("inside InsertAver()" + err);
-      return false;
-    }
-  },
+  insertAver,
 
   /* The above code is a function called `applyFilters` that takes in two parameters: `data` and
  `array`. It applies various filters to the `array` based on the values of `data` and returns the
