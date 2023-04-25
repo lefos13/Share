@@ -535,7 +535,7 @@ io.on("connection", (socket) => {
             if (u.groupId != null) {
               data.isGroupInterest = true;
               //get group based on groupId
-              let group = await findOne(groupId);
+              let group = await findOne(u.groupId);
               group = await insertDataToMembers(group);
               data.members = group.members;
             }

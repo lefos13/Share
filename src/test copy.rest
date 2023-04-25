@@ -302,14 +302,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 ###
 // verify an insterested user to a post
-POST http://157.230.18.246:3000/posts/verInterested
+POST https://ouride.gr/test/posts/verInterested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE5VDE1OjQ1OjE3LjU5OFoiLCJpYXQiOjE2NzE0NjQ3MTcsImV4cCI6MTY3NjY0ODcxN30.WBx6Yobse5TbkOypQ2w95x6_U1O5Ej_ch9jzGieCo08
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0yNVQwOTozMToyNy45OTBaIiwiaWF0IjoxNjgyNDE1MDg3LCJleHAiOjE2ODc1OTkwODd9.iBlDLTCxfojU3yhTz987uizpQblZPRd8W2vcHpeoPTc
 
 {
     "data": {
-        "postid": 1832,
-        "piid": 464
+        "postid": 1999,
+        "piid": 985
     }
 }
 
