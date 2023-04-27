@@ -17,48 +17,44 @@ const path = require("path");
 
 // API /createGroup
 /**
- * This function creates a group and returns all groups associated with the user.
- * @param req - The `req` parameter is an object that contains information about the HTTP request made
- * to the server, including the request body, headers, and query parameters. It is likely that this
- * function is part of an Express.js or similar web framework application.
- * @returns An object with a status code and message, and data related to the groups created and the
- * user's groups and requests. If there is an error, only a status code is returned.
+ * This function creates a group with specified members and returns all groups associated with the
+ * admin.
+ * @param req - The `req` parameter is an object that contains the request information sent by the
+ * client to the server. It typically includes information such as the HTTP method, headers, and body
+ * of the request.
+ * @returns An object with a status code and a message, and possibly some data. If there is an error,
+ * only a status code is returned.
  */
 const createGroup = async (req) => {
   try {
-    let msg = await fun.determineLang(req);
-    //data for group creation
-    let extra = req.body.extra;
-    let data = req.body;
-    let admin = extra;
-    let members = data.users;
-    //insert pending=false into each member
-    for await (let member of members) {
-      member.pending = true;
+    const msg = await fun.determineLang(req);
+
+    // Extract data for group creation
+    const { extra, users, groupName } = req.body;
+    const admin = extra;
+    const members = users.map((user) => ({ ...user, pending: true }));
+
+    // Logic for creating group
+    const response = await Group.create({
+      admin,
+      members,
+      groupName,
+    });
+
+    if (!response) {
+      throw new Error("Group creation failed");
     }
-    let groupName = data.groupName;
 
-    let finalData = {
-      admin: admin,
-      members: members,
-      groupName: groupName,
-    };
-
-    //logic for creating group
-    let response = await Group.create(finalData);
-    if (response === false) {
-      throw new Error("Group Creation Failed");
-    }
-    // SECTION 2 - GET GROUPS
-    let results = await getGroupsOfUser(extra);
-    let requests = await getActiveRequestsOfUser(extra);
-
-    let getGroupsData = {
+    // Get all groups
+    const results = await getGroupsOfUser(extra);
+    const requests = await getActiveRequestsOfUser(extra);
+    const getGroupsData = {
       asAdminGroups: results.allGroupsAsAdmin,
       asGuestGroups: results.allGroupsAsGuest,
       activeRequests: requests,
     };
-    //return all groups
+
+    // Return all groups
     return { status: 200, message: msg.groupCreated, data: getGroupsData };
   } catch (error) {
     console.error(error);
@@ -77,34 +73,36 @@ const createGroup = async (req) => {
  */
 const getGroupsOfUser = async (admin) => {
   try {
-    //get all groups of the user that is admin
-    let allGroupsAsAdmin = await Group.getAsAdmin(admin);
-    if (allGroupsAsAdmin === false) {
-      throw new Error("Getting groups Failed");
+    // Get all groups of the user that is admin
+    const allGroupsAsAdmin = await Group.getAsAdmin(admin);
+    if (!allGroupsAsAdmin) {
+      throw new Error("Failed to get groups");
     }
 
-    //get all groups of the user that is guest
-    let allGroupsAsGuest = await Group.getAsGuest(admin);
-    if (allGroupsAsGuest === false) {
-      throw new Error("Getting groups Failed");
+    // Get all groups of the user that is guest
+    const allGroupsAsGuest = await Group.getAsGuest(admin);
+    if (!allGroupsAsGuest) {
+      throw new Error("Failed to get groups");
     }
 
-    //for await for each group that the he is an admin
-    for await (let group of allGroupsAsAdmin) {
-      // update data of group
-      group = await updateDataOfGroup(group);
-    }
+    // Update data of each group that the user is an admin of
+    const updatedGroupsAsAdmin = await Promise.all(
+      allGroupsAsAdmin.map(updateDataOfGroup)
+    );
 
-    //for await for each group that the he is a guest
-    for await (let group of allGroupsAsGuest) {
-      //UPDATE DATA OF group
-      group = await updateDataOfGroup(group);
-    }
+    // Update data of each group that the user is a guest of
+    const updatedGroupsAsGuest = await Promise.all(
+      allGroupsAsGuest.map(updateDataOfGroup)
+    );
+
     return {
-      allGroupsAsAdmin: allGroupsAsAdmin,
-      allGroupsAsGuest: allGroupsAsGuest,
+      allGroupsAsAdmin: updatedGroupsAsAdmin,
+      allGroupsAsGuest: updatedGroupsAsGuest,
     };
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
 };
 
 /**
