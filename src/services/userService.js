@@ -65,24 +65,27 @@ var CryptoJS = require("react-native-crypto-js");
 // create User service
 const createNewUser = async (req) => {
   try {
-    let msg = await determineLang(req);
-    var data = req.body.data;
+    const msg = await determineLang(req);
+    const data = req.body.data;
     console.log(data);
-    let photo = data.photo;
-    //Calculate age
 
-    //===========
+    // Extract photo from data and remove it from the object
+    const { photo, ...userData } = data;
 
-    data["verified"] = true;
-    data["photo"] = 1;
-    let salt = await bcrypt.genSalt(saltRounds);
-    data.password = await bcrypt.hash(data.password, salt);
-    console.log("NEW USER FULLNAME: ", data.fullname);
-    const final = await User.register(data, msg);
-    if (final.status == 200) {
-      let base64 = photo;
+    // Hash the user's password
+    const salt = await bcrypt.genSalt(saltRounds);
+    userData.password = await bcrypt.hash(userData.password, salt);
+
+    console.log("NEW USER FULLNAME: ", userData.fullname);
+
+    // Register the user
+    const final = await User.register(userData, msg);
+
+    if (final.status === 200) {
+      // Save the user's photo
+      const base64 = photo;
       const buffer = Buffer.from(base64, "base64");
-      fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
+      fs.writeFileSync("uploads/" + userData.email + ".jpeg", buffer);
     }
 
     return final;
@@ -94,25 +97,24 @@ const createNewUser = async (req) => {
 
 const updateOneUser = async (req) => {
   try {
-    // console.log("data for update!:", req.body.data);
-    let msg = await determineLang(req);
-    let photo = req.body.data.photo;
-    let data = req.body.data;
-    let email = req.body.extra;
+    const msg = await determineLang(req);
+    const { photo, ...userData } = req.body.data;
+    const email = req.body.extra;
 
-    const res = await User.updateUser(data, email);
-    if (res === false) {
-      throw new Error("Error at updating profile");
+    const res = await User.updateUser(userData, email);
+    if (!res) {
+      throw new Error("Failed to update profile");
     }
-    if (photo != null) {
-      let base64 = photo;
-      let buffer = Buffer.from(base64, "base64");
-      fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
+
+    if (photo) {
+      const base64 = photo;
+      const buffer = Buffer.from(base64, "base64");
+      fs.writeFileSync(`uploads/${email}.jpeg`, buffer);
     }
 
     return { status: 200, message: msg.updateProfile };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return { status: 500 };
   }
 };

@@ -1127,44 +1127,41 @@ const verInterested = async (req) => {
 
         //If there is no possible review, create a new one
         if (toReviewExists == null) {
-          if (post.enddate == null) {
-            const reviewMade = await ToReview.createOne(
-              post.email,
-              results.email,
-              post.startdate,
-              results.piid
-            );
-            if (reviewMade === false)
-              throw new Error("Error at creating possible review");
-          } else {
-            const reviewMade = await ToReview.createOne(
-              post.email,
-              results.email,
-              post.enddate,
-              results.piid
-            );
-            if (reviewMade === false)
-              throw new Error("Error at creating possible review");
+          const enddate =
+            post.enddate == null
+              ? moment(post.startdate)
+              : moment(post.enddate);
+          const reviewMade = await ToReview.createOne(
+            post.email,
+            results.email,
+            enddate,
+            results.piid
+          );
+          if (reviewMade === false) {
+            throw new Error("Error creating possible review");
           }
         } else {
           //if a review is done already check if the driver and the passenger have the right emails.
 
           //if the possibleReview has the post owner as the passenger, change the row so that the owner become the driver
           // and the interested user become the passenger.
+          const enddate =
+            post.enddate == null
+              ? moment(post.startdate)
+              : moment(post.enddate);
+          const objEndDate = moment(toReviewExists.endDate);
+          const crDate = moment();
+          const forceChange = objEndDate.isBefore(crDate);
+          /* The above code is checking if a review already exists for a driver's email address and if
+          it does, it checks if the end date of the review is before or the same as a given end
+          date. If it is, it either reverses the review and updates it with new information or
+          creates a new review with the given end date and information. If a review does not exist
+          for the driver's email address, it creates a new review with the given end date and
+          information. */
           if (
             toReviewExists.driverEmail != post.email &&
             toReviewExists.driverEmail == results.email
           ) {
-            let enddate;
-            post.enddate == null
-              ? (enddate = moment(post.startdate))
-              : (enddate = moment(post.enddate));
-
-            let objEndDate = moment(toReviewExists.endDate);
-
-            let crDate = moment();
-            let forceChange = objEndDate.isBefore(crDate);
-
             if (enddate.isSameOrBefore(objEndDate) || forceChange) {
               const reversed = await ToReview.reverseUsers(
                 toReviewExists,
@@ -1173,28 +1170,20 @@ const verInterested = async (req) => {
                 results.piid,
                 enddate
               );
-              if (reversed === false)
-                throw new Error("error at reversing and updating to review");
+              if (reversed === false) {
+                throw new Error("Error reversing and updating to review");
+              }
             }
           } else {
-            let enddate;
-            post.enddate == null
-              ? (enddate = moment(post.startdate))
-              : (enddate = moment(post.enddate));
-
-            let objEndDate = moment(toReviewExists.endDate);
-
-            let crDate = moment();
-            let forceChange = objEndDate.isBefore(crDate);
-
             if (enddate.isSameOrBefore(objEndDate) || forceChange) {
               const reversed = await ToReview.newReview(
                 toReviewExists,
                 enddate,
                 data.piid
               );
-              if (reversed === false)
-                throw new Error("error at reversing and updating to review");
+              if (reversed === false) {
+                throw new Error("Error reversing and updating to review");
+              }
             }
           }
 
@@ -1206,7 +1195,9 @@ const verInterested = async (req) => {
               data.piid,
               post.enddate
             );
-            if (!updated) throw new Error("Error at resseting the flags");
+            if (!updated) {
+              throw new Error("Error resetting the flags");
+            }
           }
         }
 
@@ -1291,45 +1282,27 @@ const verInterested = async (req) => {
           );
 
           if (allActiveDriver.length > 0) {
-            let allPostIds = [];
-            _.forEach(allActiveDriver, (val) => {
-              allPostIds.push(val.postid);
-            });
+            const allPostIds = allActiveDriver.map((val) => val.postid);
             const allVerified = await PostInterested.findAllVerifedPerPost(
               toReviewExists.passengerEmail,
               allPostIds
             );
             if (allVerified.length > 0) {
               //Check the enddates of active verifed posts and get the oldest
-              let dates = [];
-              for await (let val of allVerified) {
-                let tempPost = await Post.findOne(val.postid);
-                tempPost.enddate != null
-                  ? dates.push({
-                      d: tempPost.enddate,
-                      p: val.piid,
-                    })
-                  : dates.push({
-                      d: tempPost.startdate,
-                      p: val.piid,
-                    });
-              }
+              const dates = await Promise.all(
+                allVerified.map(async (val) => {
+                  const tempPost = await Post.findOne(val.postid);
+                  const date =
+                    tempPost.enddate != null
+                      ? tempPost.enddate
+                      : tempPost.startdate;
+                  return { d: date, p: val.piid };
+                })
+              );
 
-              /* The code is using the Moment.js library to perform date manipulation. It first maps an
-              array of objects containing dates to an array of Moment.js date objects. It then finds
-              the minimum date from this array using the `moment.min()` method. It then iterates
-              through the original array of objects to find the object that corresponds to the
-              minimum date and assigns its `p` property to the `piid` variable. Finally, it sets the
-              `dateToCompare` variable to the minimum date. */
               let newdates = dates.map((d) => moment(d.d));
               let minDate = moment.min(newdates);
-              let piid;
-
-              _.forEach(dates, (d) => {
-                if (moment(d.d).isSame(minDate)) {
-                  piid = d.p;
-                }
-              });
+              const { piid } = dates.find((d) => moment(d.d).isSame(minDate));
               dateToCompare = minDate;
 
               const newToReview = await ToReview.newReview(
@@ -1350,7 +1323,6 @@ const verInterested = async (req) => {
           moment()
         );
 
-        let passengerPostsIds = [];
         /* The above code is checking if there are any active passenger posts and if there are, it
         retrieves all the verified interested passengers for those posts. It then checks if the
         minimum date of those verified interested passengers is greater than or equal to a given
@@ -1358,11 +1330,8 @@ const verInterested = async (req) => {
         object with the new review. If the minimum date is not greater than or equal to the given
         date to compare, it denies the review. If there are no active passenger posts, it also
         denies the review. */
+        let passengerPostsIds = activePassengerPosts.map((val) => val.postid);
         if (activePassengerPosts.length > 0) {
-          _.forEach(activePassengerPosts, (val) => {
-            passengerPostsIds.push(val.postid);
-          });
-
           const allVerifiedOfDriver =
             await PostInterested.findAllVerifedPerPost(
               post.email,
@@ -1370,34 +1339,31 @@ const verInterested = async (req) => {
             );
 
           if (allVerifiedOfDriver.length > 0) {
-            let dates = [];
-            for await (let val of allVerifiedOfDriver) {
-              let tempPost = await Post.findOne(val.postid);
-              tempPost.enddate != null
-                ? dates.push({ d: tempPost.enddate, p: val.piid })
-                : dates.push({ d: tempPost.startdate, p: val.piid });
-            }
+            let dates = await Promise.all(
+              allVerifiedOfDriver.map(async (val) => {
+                let tempPost = await Post.findOne(val.postid);
+                let date = tempPost.enddate ?? tempPost.startdate;
+                return { d: date, p: val.piid };
+              })
+            );
 
             let newDates = dates.map((d) => moment(d.d));
             let minDate = moment.min(newDates);
-            let greater = false;
-            if (dateToCompare !== null) {
-              greater = minDate.isSameOrAfter(dateToCompare);
-            }
-            if (!greater) {
+
+            if (!dateToCompare || minDate.isBefore(dateToCompare)) {
               let piid;
               _.forEach(dates, (d) => {
                 if (moment(d.d).isSame(minDate)) {
                   piid = d.p;
                 }
               });
+
               let passenger = await PostInterested.findOneById(piid);
               let driver =
                 passenger.email == toReviewExists.passengerEmail
                   ? toReviewExists.driverEmail
                   : toReviewExists.passengerEmail;
 
-              // minDate = minDate.format("YYYY-MM-DD")
               const newToReview = await ToReview.newReviewAndReverse(
                 toReviewExists,
                 driver,
@@ -1405,8 +1371,10 @@ const verInterested = async (req) => {
                 minDate,
                 piid
               );
-              if (!newToReview)
-                throw new Error("error at updating the toreview object");
+
+              if (!newToReview) {
+                throw new Error("Error at updating the toreview object");
+              }
             }
           } else if (dateToCompare == null) {
             const destroyed = await ToReview.denyReview(toReviewExists);
@@ -1429,38 +1397,28 @@ const verInterested = async (req) => {
         if (chat === false) throw new Error("error at finding existing chat");
 
         //CHECK IF THERE IS ANY OLDER VERIFICATION OF THE USERS
-        let curDate = moment();
-        //find all active posts of passenger
-        let allActivePassenger = await Post.findAllActive(
-          results.email,
-          curDate
-        );
-        //find all active posts of driver
-        let allActiveDriver = await Post.findAllActive(post.email, curDate);
-        let postListPassenger = [];
-        let postListDriver = [];
-        //get all the ids of passenger
-        _.forEach(allActivePassenger, (val) => {
-          postListPassenger.push(val.postid);
-        });
-        //get all the ids of driver
-        _.forEach(allActiveDriver, (val) => {
-          postListDriver.push(val.postid);
-        });
-        // find if the passenger is interested and verified to any of the posts of driver
-        let allVerPassenger = [];
-        if (postListDriver.length > 0)
-          allVerPassenger = await PostInterested.findAllVerifedPerPost(
-            results.email,
-            postListDriver
-          );
-        // find if the driver is interested and verified to any of the posts of passenger
-        let allVerDriver = [];
-        if (postListPassenger.length > 0)
-          allVerDriver = await PostInterested.findAllVerifedPerPost(
-            post.email,
-            postListPassenger
-          );
+        const curDate = moment();
+        const [allActivePassenger, allActiveDriver] = await Promise.all([
+          Post.findAllActive(results.email, curDate),
+          Post.findAllActive(post.email, curDate),
+        ]);
+        const postListPassenger = allActivePassenger.map((val) => val.postid);
+        const postListDriver = allActiveDriver.map((val) => val.postid);
+
+        const allVerPassenger =
+          postListDriver.length > 0
+            ? await PostInterested.findAllVerifedPerPost(
+                results.email,
+                postListDriver
+              )
+            : [];
+        const allVerDriver =
+          postListPassenger.length > 0
+            ? await PostInterested.findAllVerifedPerPost(
+                post.email,
+                postListPassenger
+              )
+            : [];
 
         let expirationDates = [];
         let allDates = [];
