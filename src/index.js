@@ -558,7 +558,7 @@ io.on("connection", (socket) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
               });
               //if those messages are the last 20 return false
-              data.messagesLeft = messages.length > 20;
+              data.messagesLeft = u.messages.length > 20;
               //Paginate the messages and send the last 20 of them
               const finalMessages = _.take(
                 _.drop(u.messages, 0),
