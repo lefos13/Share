@@ -62,24 +62,39 @@ const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
 
+/**
+ * The function inserts data to a group's members, including their full name, average rating, count,
+ * and image path.
+ * @param group - an object containing information about a group, including an array of members.
+ * @returns The function `insertDataToMembers` returns an object with the updated `group` data, where
+ * the `members` array has been updated with additional properties such as `fullname`, `average`,
+ * `count`, and `imagePath` for each member.
+ */
 const insertDataToMembers = async (group) => {
-  if (IsJsonString(group.members)) group.members = JSON.parse(group.members);
-
-  for await (let member of group.members) {
-    let memberFullname = await User.findOneLight(member.email);
-    member.fullname = memberFullname.fullname;
-    //get average rating for each member
-    let ratingData = await insertAver(member);
-    member.average = ratingData.average;
-    member.count = ratingData.count;
-    //insert imagePath into member object
-    if (await checkImagePath(member.email)) {
-      member.imagePath = "images/" + member.email + ".jpeg";
-    } else {
-      member.imagePath = null;
-    }
+  if (IsJsonString(group.members)) {
+    group.members = JSON.parse(group.members);
   }
-  return group;
+
+  const updatedMembers = await Promise.all(
+    group.members.map(async (member) => {
+      const memberFullname = await User.findOneLight(member.email);
+      const ratingData = await insertAver(member);
+      const hasImagePath = await checkImagePath(member.email);
+      const imagePath = hasImagePath ? `images/${member.email}.jpeg` : null;
+
+      return {
+        ...member,
+        fullname: memberFullname.fullname,
+        average: ratingData.average,
+        count: ratingData.count,
+        imagePath,
+      };
+    })
+  );
+  return {
+    ...group,
+    members: updatedMembers,
+  };
 };
 /**
  * The function checks if an image file exists in a specific directory based on the email parameter.

@@ -474,7 +474,6 @@ io.on("connection", (socket) => {
           let conversations = [];
           const otherUsers = [];
 
-          //Find all user's active chats and part2: extract the other user
           const dbConvs = await ConvUsers.findAll({
             where: {
               convid: { [Op.substring]: action.data.email },
@@ -483,32 +482,21 @@ io.on("connection", (socket) => {
             throw err;
           });
 
-          // part2
-          for await (value of dbConvs) {
-            let convid = value.convid;
-            const mails = value.convid.split(" ");
-            if (mails[0] != action.data.email) {
-              otherUsers.push({
-                mail: mails[0],
-                expiresIn: value.expiresIn,
-                messages: value.messages,
-                convid: convid,
-                groupId: value.groupId,
-              });
-            } else if (mails[1] != action.data.email) {
-              otherUsers.push({
-                mail: mails[1],
-                expiresIn: value.expiresIn,
-                messages: value.messages,
-                convid: convid,
-                groupId: value.groupId,
-              });
-            }
+          for (const value of dbConvs) {
+            const [mail1, mail2] = value.convid.split(" ");
+            const otherMail = mail1 === action.data.email ? mail2 : mail1;
+            const otherUser = {
+              mail: otherMail,
+              expiresIn: value.expiresIn,
+              messages: value.messages,
+              convid: value.convid,
+              groupId: value.groupId,
+            };
+            otherUsers.push(otherUser);
           }
 
           //import into convs list all the data that are required for the emition
           for await (u of otherUsers) {
-            let data = {};
             const us = await Users.findOne({ where: { email: u.mail } }).catch(
               (err) => {
                 throw err;
@@ -523,33 +511,44 @@ io.on("connection", (socket) => {
               },
             });
 
-            data.conversationId = u.convid;
-            data.socketId = socket.id;
-            data.username = us.fullname;
-            if (await checkImagePath(u.mail))
-              data.photo = "images/" + u.mail + ".jpeg";
-            else data.photo = null;
-            data.email = u.mail;
+            const data = {
+              conversationId: u.convid,
+              socketId: socket.id,
+              username: us.fullname,
+              photo: (await checkImagePath(u.mail))
+                ? `images/${u.mail}.jpeg`
+                : null,
+              email: u.mail,
+              isGroupInterest: false,
+              members: [],
+              isUserOnline: false,
+              expiresIn: u.expiresIn,
+              messages: [],
+              isRead: true,
+              lastMessage: null,
+              lastMessageTime: null,
+              isLastMessageMine: false,
+              messagesLeft: false,
+            };
 
             //import members of group if the conversation was initiated by a group interest
             if (u.groupId != null) {
               data.isGroupInterest = true;
-              //get group based on groupId
-              let group = await findOne(u.groupId);
-              group = await insertDataToMembers(group);
-              data.members = group.members;
+              const group = await findOne(u.groupId);
+              data.members = (await insertDataToMembers(group)).members;
             }
 
-            data.isUserOnline = false;
             let socketList = await io.fetchSockets();
 
-            _.forEach(socketList, (val) => {
-              if (val.id == us.socketId) data.isUserOnline = true;
-            });
+            for (const val of socketList) {
+              if (val.id == us.socketId) {
+                data.isUserOnline = true;
+                break;
+              }
+            }
 
             if (app.locals.bg[us.email] != null) data.isUserOnline = false;
 
-            data.expiresIn = u.expiresIn;
             if (u.messages !== null) {
               // order
               let toJson = IsJsonString(u.messages);
@@ -558,22 +557,23 @@ io.on("connection", (socket) => {
               u.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
               });
-              data.messagesLeft = u.messages.length > 20 ? true : false; //if those messages are the last 20 return false
+              //if those messages are the last 20 return false
+              data.messagesLeft = messages.length > 20;
               //Paginate the messages and send the last 20 of them
-              var skipcount = 0;
-              var takecount = u.messages.length > 20 ? 20 : u.messages.length;
-              var finalMessages = _.take(
-                _.drop(u.messages, skipcount),
-                takecount
+              const finalMessages = _.take(
+                _.drop(u.messages, 0),
+                data.messagesLeft ? 20 : u.messages.length
               );
 
-              if (allowCrypto)
-                finalMessages = await decryptMessages(finalMessages);
+              if (allowCrypto) {
+                data.messages = await decryptMessages(finalMessages);
+              } else {
+                data.messages = finalMessages;
+              }
 
-              data.messages = finalMessages;
               data.lastMessage = finalMessages[0].text;
               data.isLastMessageMine =
-                finalMessages[0].user._id == action.data.email ? true : false;
+                data.messages[0].user._id == action.data.email;
               data.lastMessageTime = moment(finalMessages[0].createdAt).format(
                 "DD-MM-YYYY HH:mm"
               ); //need to change
@@ -585,13 +585,6 @@ io.on("connection", (socket) => {
                 // check if the user has read it in the past
                 data.isRead = finalMessages[0].isRead;
               }
-            } else {
-              data.messages = [];
-              data.isRead = true;
-              // console.log("LAST MESSAGE:", msg.noMessages);
-              data.lastMessage = null;
-              data.lastMessageTime = null;
-              data.isLastMessageMine = false;
             }
 
             conversations.push(data);
@@ -935,38 +928,45 @@ io.on("connection", (socket) => {
         It checks if the users are online and retrieves their profile photos if available. Finally,
         it emits the "onConversationAdded" event to both users with the conversation data. */
         case "server/handShakeEstablished": {
-          let userOnline = false;
-          let userApproving = await User.findOneLight(
-            action.data.userApproving
-          );
-          let msgUserApproving = await getLang(userApproving.lastLang);
-          let userApproved = await User.findOneLight(action.data.userApproved);
+          const [userApproving, userApproved] = await Promise.all([
+            User.findOneLight(action.data.userApproving),
+            User.findOneLight(action.data.userApproved),
+          ]);
+
+          const [msgUserApproving, msgUserApproved] = await Promise.all([
+            getLang(userApproving.lastLang),
+            getLang(userApproved.lastLang),
+          ]);
+
           const conv = await Conv.checkIfExists(
             userApproved.email,
             userApproving.email
           );
-          let msgUserApproved = await getLang(userApproved.lastLang);
 
           // send new conversation to both users.
           // send the new expiration date for the right conversation id
           // PREPARE DATA TO SEND TO BOTH USERS
           let socketList = await io.fetchSockets();
 
-          _.forEach(socketList, (val) => {
-            if (val.id == userApproving.socketId) userOnline = true;
-          });
-
-          let photoApproving;
-          if (await checkImagePath(userApproving.email)) {
-            photoApproving = "images/" + userApproving.email + ".jpeg";
-          } else {
-            photoApproving = null;
-          }
+          let userOnline = false;
+          let user2Online = false;
+          const [photoApproving, photoApproved] = await Promise.all([
+            checkImagePath(userApproving.email)
+              ? `images/${userApproving.email}.jpeg`
+              : null,
+            checkImagePath(userApproved.email)
+              ? `images/${userApproved.email}.jpeg`
+              : null,
+            socketList.forEach((val) => {
+              if (val.id == userApproving.socketId) userOnline = true;
+              if (val.id == userApproved.socketId) user2Online = true;
+            }),
+          ]);
 
           let members = [];
           let isGroupInterest = false;
           if (conv.groupId != null) {
-            groupData = await findOne(conv.groupId);
+            let groupData = await findOne(conv.groupId);
             groupData = await insertDataToMembers(groupData);
             members = groupData.members;
             isGroupInterest = true;
@@ -989,18 +989,6 @@ io.on("connection", (socket) => {
             members: members,
           };
 
-          let user2Online = false;
-
-          _.forEach(socketList, (val) => {
-            if (val.id == userApproved.socketId) user2Online = true;
-          });
-
-          let photoApproved;
-          if (await checkImagePath(userApproved.email)) {
-            photoApproved = "images/" + userApproved.email + ".jpeg";
-          } else {
-            photoApproved = null;
-          }
           const dataForApprooving = {
             conversationId: conv.convid,
             socketId: userApproved.socketId,
