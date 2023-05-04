@@ -177,12 +177,12 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
   }
 };
 
-const updateDate = async (convid, date, isGroup) => {
+const updateDate = async (convid, date, newGroupId) => {
   try {
     const updated = await ConvUsers.update(
       {
         expiresIn: date,
-        groupId: isGroup,
+        groupId: newGroupId,
       },
       {
         where: {

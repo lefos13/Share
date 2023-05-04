@@ -535,7 +535,14 @@ io.on("connection", (socket) => {
             if (u.groupId != null) {
               data.isGroupInterest = true;
               const group = await findOne(u.groupId);
-              data.members = (await insertDataToMembers(group)).members;
+              //Check if the user is the admin of the group
+              if (group.admin !== action.data.email) {
+                data.isGroupInterest = true;
+                data.members = (await insertDataToMembers(group)).members;
+              } else {
+                //do not include members in data
+                data.isGroupInterest = true;
+              }
             }
 
             let socketList = await io.fetchSockets();
@@ -963,15 +970,6 @@ io.on("connection", (socket) => {
             }),
           ]);
 
-          let members = [];
-          let isGroupInterest = false;
-          if (conv.groupId != null) {
-            let groupData = await findOne(conv.groupId);
-            groupData = await insertDataToMembers(groupData);
-            members = groupData.members;
-            isGroupInterest = true;
-          }
-
           const dataForApprooved = {
             conversationId: conv.convid,
             socketId: userApproving.socketId,
@@ -985,8 +983,8 @@ io.on("connection", (socket) => {
             lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
-            isGroupInterest: isGroupInterest,
-            members: members,
+            isGroupInterest: false,
+            members: [],
           };
 
           const dataForApprooving = {
@@ -1002,9 +1000,19 @@ io.on("connection", (socket) => {
             lastMessage: null,
             lastMessageTime: null,
             isLastMessageMine: false,
-            isGroupInterest: isGroupInterest,
-            members: members,
+            isGroupInterest: false,
+            members: [],
           };
+
+          if (conv.groupId != null) {
+            let group = await findOne(conv.groupId);
+            dataForApprooving.members = (
+              await insertDataToMembers(group)
+            ).members;
+
+            dataForApprooved.isGroupInterest = true;
+            dataForApprooving.isGroupInterest = true;
+          }
 
           io.to(userApproved.socketId).emit("action", {
             type: "onConversationAdded",
