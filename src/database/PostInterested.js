@@ -15,11 +15,24 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const Groups = require("./Group");
+const Post = require("./Post");
 const { IsJsonString } = require("../utils/functions");
+const moment = require("moment");
 // ==== code for db
 
 // *** ADD ***
-
+const checkIfInterestExists = async (groupId) => {
+  try {
+    const found = await PostInterested.findAll({ where: { groupId } });
+    const interest = found.find(async (interest) => {
+      const post = await Post.findExpired(interest.postid, moment());
+      return post !== null;
+    });
+    return interest ? interest.postid : null;
+  } catch (error) {
+    return new Error(error);
+  }
+};
 //function that count posts for a user the current day
 const findOne = async (email, postid) => {
   try {
@@ -417,4 +430,5 @@ module.exports = {
   updateVerify,
   resetFlags,
   getInterestedIfVerified,
+  checkIfInterestExists,
 };

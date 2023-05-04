@@ -40,7 +40,9 @@ const deleteGroup = async (req, res) => {
   try {
     let msg = await determineLang(req);
     const data = await groupService.deleteGroup(req);
-    if (data.status != 200) throw msg;
+    if (data.status === 405) {
+      res.status(405).json({ message: data.message, postid: data.postid });
+    } else if (data.status === 500) throw msg;
     res.status(200).json({ message: data.message });
   } catch (error) {
     res.status(500).json({ message: error.errorMessage });
@@ -64,7 +66,9 @@ const leaveGroup = async (req, res) => {
   try {
     let msg = await determineLang(req);
     const data = await groupService.leaveGroup(req);
-    if (data.status != 200) throw msg;
+    if (data.status === 405) {
+      res.status(405).json({ message: data.message, postid: data.postid });
+    } else if (data.status === 500) throw msg;
     res.status(200).json({ message: data.message });
   } catch (error) {
     res.status(500).json({ message: error.errorMessage });

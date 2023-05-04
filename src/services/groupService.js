@@ -251,6 +251,17 @@ const deleteGroup = async (req) => {
     let msg = await fun.determineLang(req);
     let groupId = req.body.groupId;
     let admin = extra;
+    // check if there is an interest with this group of users
+    let interested = await PostInt.checkIfInterestExists(groupId);
+    if (interested instanceof Error) {
+      throw interested;
+    } else if (interested != null) {
+      return {
+        status: 405,
+        message: msg.notAllowedToDelete,
+        postid: interested,
+      };
+    }
     // delete a group
     let response = await Group.destroy(admin, groupId);
     if (response === false) {
@@ -308,6 +319,16 @@ const leaveGroup = async (req) => {
     let extra = req.body.extra;
     let msg = await fun.determineLang(req);
     let groupId = req.body.groupId;
+    let interestData = await PostInt.checkIfInterestExists(groupId);
+    if (interestData instanceof Error) {
+      throw interestData;
+    } else if (interestData != null) {
+      return {
+        status: 405,
+        message: msg.notAllowedToLeave,
+        postid: interestData,
+      };
+    }
     // remove a member from a group
     let response = await Group.leaveGroup(groupId, extra);
     if (response === false) {
