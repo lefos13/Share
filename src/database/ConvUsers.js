@@ -137,14 +137,14 @@ const checkIfExists = async (email1, email2) => {
   }
 };
 
-const updateExpireDate = async (convObj, expiresIn, isGroup) => {
+const updateExpireDate = async (convObj, expiresIn, groupId) => {
   try {
     let tesDate = moment(convObj.expiresIn);
     if (tesDate > expiresIn) {
       return "0";
     } else {
       await convObj
-        .update({ expiresIn: expiresIn, isGroup: isGroup })
+        .update({ expiresIn: expiresIn, groupId: groupId })
         .catch((err) => {
           throw err;
         });
