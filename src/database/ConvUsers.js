@@ -137,19 +137,29 @@ const checkIfExists = async (email1, email2) => {
   }
 };
 
-const updateExpireDate = async (convObj, expiresIn, groupId) => {
+const updateExpireDate = async (convObj, expiresIn) => {
   try {
     let tesDate = moment(convObj.expiresIn);
     if (tesDate > expiresIn) {
       return "0";
     } else {
-      await convObj
-        .update({ expiresIn: expiresIn, groupId: groupId })
-        .catch((err) => {
-          throw err;
-        });
+      await convObj.update({ expiresIn: expiresIn }).catch((err) => {
+        throw err;
+      });
     }
 
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const updateGroupId = async (convObj, newGroupId) => {
+  try {
+    await convObj.update({ groupId: newGroupId }).catch((err) => {
+      throw err;
+    });
     return true;
   } catch (error) {
     console.error(error);
@@ -244,4 +254,5 @@ module.exports = {
   saveOne,
   findOne,
   updateLastMessage,
+  updateGroupId,
 };

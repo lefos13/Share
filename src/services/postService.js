@@ -1336,17 +1336,28 @@ const verInterested = async (req) => {
           throw new Error("Error at finding if chat Exists");
 
         if (chatExists != null) {
+          console.log("Updating the existing chat");
           let groupId = results.groupId != null ? results.groupId : null;
           //chat exists from older post so the expireDate is to be updated if it is older than current expire date
-
+          console.log("Group Id:", groupId);
           const updated = await ConvUsers.updateExpireDate(
             chatExists,
-            expiresIn,
-            groupId
+            expiresIn
           );
+
+          //update chat to group if the group id is not null
+          if (groupId != null) {
+            const groupUpdate = await ConvUsers.updateGroupId(
+              chatExists,
+              groupId
+            );
+          }
+
+          console.log("Chat update response:", updated);
           if (updated === false) {
             throw new Error("Error at updating the existing chat");
           } else if (updated === "0") {
+            console.log("Chat wasnt updated");
             chatCreated = null;
           }
         } else {
