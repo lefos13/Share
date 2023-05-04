@@ -520,7 +520,7 @@ io.on("connection", (socket) => {
                 : null,
               email: u.mail,
               isGroupInterest: false,
-              members: [],
+              members: null,
               isUserOnline: false,
               expiresIn: u.expiresIn,
               messages: [],
@@ -984,7 +984,7 @@ io.on("connection", (socket) => {
             lastMessageTime: null,
             isLastMessageMine: false,
             isGroupInterest: false,
-            members: [],
+            members: null,
           };
 
           const dataForApprooving = {
@@ -1001,7 +1001,7 @@ io.on("connection", (socket) => {
             lastMessageTime: null,
             isLastMessageMine: false,
             isGroupInterest: false,
-            members: [],
+            members: null,
           };
 
           if (conv.groupId != null) {
