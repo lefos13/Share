@@ -1403,7 +1403,7 @@ const verInterested = async (req) => {
 
         //CHECK IF CHAT HAS A GROUPID
         let groupId = chat.groupId !== null ? chat.groupId : null;
-        let makeGroupId = results.groupId === groupId ? null : results.groupId;
+        let makeGroupId = results.groupId === groupId ? null : groupId;
 
         if (chat === false) throw new Error("error at finding existing chat");
 
