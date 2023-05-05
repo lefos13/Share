@@ -1340,26 +1340,48 @@ const verInterested = async (req) => {
           let groupId = results.groupId != null ? results.groupId : null;
           //chat exists from older post so the expireDate is to be updated if it is older than current expire date
           console.log("Group Id:", groupId);
-          const updated = await ConvUsers.updateExpireDate(
+          const newDate = await ConvUsers.updateExpireDate(
             chatExists,
             expiresIn
           );
-
+          console.log("Chat expiration date update response:", newDate);
+          if (!newDate) {
+            throw new Error("Error at updating the existing chat");
+          } else if (moment(newDate).isSame(expiresIn, "day")) {
+            console.log("Chat expiration date wasnt updated");
+            chatCreated = null;
+          }
+          const [driver, passenger] = await Promise.all([
+            User.findOneLight(post.email),
+            User.findOneLight(results.email),
+          ]);
           //update chat to group if the group id is not null
           if (groupId != null) {
             const groupUpdate = await ConvUsers.updateGroupId(
               chatExists,
               groupId
             );
+            const newChatData = await ConvUsers.checkIfExists(
+              post.email,
+              results.email
+            );
+            sendEventsForBecomingGroup(
+              groupId,
+              newChatData,
+              passenger,
+              driver,
+              io
+            );
           }
 
-          console.log("Chat update response:", updated);
-          if (updated === false) {
-            throw new Error("Error at updating the existing chat");
-          } else if (updated === "0") {
-            console.log("Chat wasnt updated");
-            chatCreated = null;
-          }
+          //CHANGE THE EXPIRATION DATE AND ISGROUP FLAG TO THE OLDER ONE AND DO NOT DELETE THE CHAT
+          await updateExpirationDates(
+            chatExists,
+            moment(newDate),
+            io,
+            driver,
+            passenger
+          );
         } else {
           //chat doesn't exist at all so a new one is created
           const chatMade = await ConvUsers.saveOne({
@@ -1408,212 +1430,41 @@ const verInterested = async (req) => {
         if (chat === false) throw new Error("error at finding existing chat");
 
         //CHECK IF THERE IS ANY OLDER VERIFICATION OF THE USERS
-        const curDate = moment();
-        const [allActivePassenger, allActiveDriver] = await Promise.all([
-          Post.findAllActive(results.email, curDate),
-          Post.findAllActive(post.email, curDate),
-        ]);
-        const postListPassenger = allActivePassenger.map((val) => val.postid);
-        const postListDriver = allActiveDriver.map((val) => val.postid);
-
-        const allVerPassenger =
-          postListDriver.length > 0
-            ? await PostInterested.findAllVerifedPerPost(
-                results.email,
-                postListDriver
-              )
-            : [];
-        const allVerDriver =
-          postListPassenger.length > 0
-            ? await PostInterested.findAllVerifedPerPost(
-                post.email,
-                postListPassenger
-              )
-            : [];
-
-        let expirationDates = [];
-        // let allDates = [];
-        if (allVerPassenger.length > 0) {
-          // get the expiration dates
-          for await (let val of allVerPassenger) {
-            for await (let postv of allActiveDriver) {
-              if (val.postid == postv.postid) {
-                let expires = await determineExpirationDate(postv);
-                expirationDates.push(expires);
-                // allDates.push({
-                //   date: expires,
-                //   groupId: val.groupId != null ? val.groupId : null,
-                // });
-              }
-            }
-          }
-        }
-        if (allVerDriver.length > 0) {
-          // get the expiration dates
-          for await (let val of allVerDriver) {
-            for await (let postv of allActivePassenger) {
-              if (val.postid == postv.postid) {
-                let expires = await determineExpirationDate(postv);
-                expirationDates.push(expires);
-                // allDates.push({
-                //   date: expires,
-                //   groupId: val.groupId != null ? val.groupId : null,
-                // });
-              }
-            }
-          }
-        }
+        let expirationDates = await getExpirationsDates(results, post);
 
         let toDelete = true;
         if (expirationDates.length > 0) {
           toDelete = false;
 
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
-          expirationDates = expirationDates.map((d) => moment(d));
+          const expirationDatesParsed = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
-          // let groupId = false;
-          //loop through allDates and define isGroup if the date is equal to the maximum date
-          // _.forEach(allDates, (d) => {
-          //   if (moment(d.date).isSame(maxDate)) {
-          //     groupId = d.groupId;
-          //   }
-          // });
+          // Update conversation expiration date and retrieve driver and passenger
+          const [updated, driver, passenger] = await Promise.all([
+            ConvUsers.updateDate(
+              chat.convid,
+              moment.max(expirationDatesParsed),
+              makeGroupId
+            ),
+            User.findOneLight(post.email),
+            User.findOneLight(results.email),
+          ]);
+          if (!updated) {
+            throw new Error("Failed to update conversation expiration date");
+          }
 
           //CHANGE THE EXPIRATION DATE AND ISGROUP FLAG TO THE OLDER ONE AND DO NOT DELETE THE CHAT
-          let updated = await ConvUsers.updateDate(
-            chat.convid,
-            maxDate,
-            makeGroupId
-          );
-          if (updated === false)
-            throw new Error("Didnt update the conv expiration date");
-          //EMIT THE EXPIRATION DATE CHANGE
-          let driver = await User.findOneLight(post.email);
-          io.to(driver.socketId).emit("action", {
-            type: "setExpirationDate",
-            data: {
-              conversationId: chat.convid,
-              expiresIn: maxDate.format("YYYY-MM-DD"),
-            },
-          });
-
-          let passenger = await User.findOneLight(results.email);
-          io.to(passenger.socketId).emit("action", {
-            type: "setExpirationDate",
-            data: {
-              conversationId: chat.convid,
-              expiresIn: maxDate.format("YYYY-MM-DD"),
-            },
-          });
+          updateExpirationDates(chat, maxDate, io, driver, passenger);
 
           //Update chats if chat becomes personal
-          if (groupId !== null && makeGroupId === null) {
-            console.log("CHAT BECOMES PERSONAL");
-            //gather data for the conversation
-            const dataForPassenger = {
-              conversationId: chat.convid,
-              socketId: passenger.socketId,
-              username: driver.fullname,
-              photo: (await checkImagePath(driver.mail))
-                ? `images/${driver.mail}.jpeg`
-                : null,
-              email: driver.mail,
-              isGroupInterest: false,
-              members: null,
-              isUserOnline: false,
-              expiresIn: chat.expiresIn,
-              messages: [],
-              isRead: true,
-              lastMessage: null,
-              lastMessageTime: null,
-              isLastMessageMine: false,
-              messagesLeft: false,
-            };
-
-            const dataForDriver = {
-              conversationId: chat.convid,
-              socketId: driver.socketId,
-              username: passenger.fullname,
-              photo: (await checkImagePath(passenger.mail))
-                ? `images/${passenger.mail}.jpeg`
-                : null,
-              email: passenger.mail,
-              isGroupInterest: false,
-              members: null,
-              isUserOnline: false,
-              expiresIn: chat.expiresIn,
-              messages: [],
-              isRead: true,
-              lastMessage: null,
-              lastMessageTime: null,
-              isLastMessageMine: false,
-              messagesLeft: false,
-            };
-
-            let socketList = await io.fetchSockets();
-
-            const passengerSocket = socketList.find(
-              (val) => val.id === passenger.socketId
-            );
-            const driverSocket = socketList.find(
-              (val) => val.id === driver.socketId
-            );
-
-            if (passengerSocket) {
-              dataForDriver.isUserOnline = true;
-            }
-
-            if (driverSocket) {
-              dataForPassenger.isUserOnline = true;
-            }
-
-            if (chat.messages !== null) {
-              if (IsJsonString(chat.messages)) {
-                chat.messages = JSON.parse(chat.messages);
-              }
-              chat.messages.sort((a, b) => {
-                return new Date(b.createdAt) - new Date(a.createdAt);
-              });
-              const messagesLeft = chat.messages.length > 20;
-              //Paginate the messages and send the last 20 of them
-              const finalMessages = _.take(
-                _.drop(chat.messages, 0),
-                messagesLeft ? 20 : chat.messages.length
-              );
-              const decryptedMessages = await fun.decryptMessages(
-                finalMessages
-              );
-
-              dataForPassenger.messagesLeft = messagesLeft;
-              dataForPassenger.messages = decryptedMessages;
-              dataForPassenger.lastMessage = finalMessages[0].text;
-              dataForPassenger.isLastMessageMine =
-                finalMessages[0].user._id === passenger.email;
-              dataForPassenger.isRead = dataForPassenger.isLastMessageMine
-                ? true
-                : finalMessages[0].isRead;
-
-              dataForDriver.messagesLeft = messagesLeft;
-              dataForDriver.messages = decryptedMessages;
-              dataForDriver.lastMessage = finalMessages[0].text;
-              dataForDriver.isLastMessageMine =
-                finalMessages[0].user._id === driver.mail;
-              dataForDriver.isRead = dataForDriver.isLastMessageMine
-                ? true
-                : finalMessages[0].isRead;
-            }
-
-            //send the data to the user
-            io.to(driver.socketId).emit("action", {
-              type: "onConversationUpdated",
-              conversation: dataForDriver,
-            });
-            //send the data to the user
-            io.to(passenger.socketId).emit("action", {
-              type: "onConversationUpdated",
-              conversation: dataForPassenger,
-            });
-          }
+          sendEventsForUpdates(
+            groupId,
+            makeGroupId,
+            chat,
+            passenger,
+            driver,
+            io
+          );
         }
         console.log("TO DELETE", toDelete);
 
@@ -1663,6 +1514,310 @@ const verInterested = async (req) => {
   } catch (error) {
     console.error(error);
     return { status: 500 };
+  }
+
+  async function getExpirationsDates(results, post) {
+    const curDate = moment();
+    const [allActivePassenger, allActiveDriver] = await Promise.all([
+      Post.findAllActive(results.email, curDate),
+      Post.findAllActive(post.email, curDate),
+    ]);
+    const postListPassenger = allActivePassenger.map((val) => val.postid);
+    const postListDriver = allActiveDriver.map((val) => val.postid);
+
+    const allVerPassenger =
+      postListDriver.length > 0
+        ? await PostInterested.findAllVerifedPerPost(
+            results.email,
+            postListDriver
+          )
+        : [];
+    const allVerDriver =
+      postListPassenger.length > 0
+        ? await PostInterested.findAllVerifedPerPost(
+            post.email,
+            postListPassenger
+          )
+        : [];
+
+    let expirationDates = [];
+    // let allDates = [];
+    if (allVerPassenger.length > 0) {
+      // get the expiration dates
+      for await (let val of allVerPassenger) {
+        for await (let postv of allActiveDriver) {
+          if (val.postid == postv.postid) {
+            let expires = await determineExpirationDate(postv);
+            expirationDates.push(expires);
+            // allDates.push({
+            //   date: expires,
+            //   groupId: val.groupId != null ? val.groupId : null,
+            // });
+          }
+        }
+      }
+    }
+    if (allVerDriver.length > 0) {
+      // get the expiration dates
+      for await (let val of allVerDriver) {
+        for await (let postv of allActivePassenger) {
+          if (val.postid == postv.postid) {
+            let expires = await determineExpirationDate(postv);
+            expirationDates.push(expires);
+            // allDates.push({
+            //   date: expires,
+            //   groupId: val.groupId != null ? val.groupId : null,
+            // });
+          }
+        }
+      }
+    }
+    return expirationDates;
+  }
+
+  async function updateExpirationDates(chat, maxDate, io, driver, passenger) {
+    //EMIT THE EXPIRATION DATE CHANGE
+    io.to(driver.socketId).emit("action", {
+      type: "setExpirationDate",
+      data: {
+        conversationId: chat.convid,
+        expiresIn: maxDate.format("YYYY-MM-DD"),
+      },
+    });
+
+    io.to(passenger.socketId).emit("action", {
+      type: "setExpirationDate",
+      data: {
+        conversationId: chat.convid,
+        expiresIn: maxDate.format("YYYY-MM-DD"),
+      },
+    });
+  }
+
+  async function sendEventsForUpdates(
+    groupId,
+    makeGroupId,
+    chat,
+    passenger,
+    driver,
+    io
+  ) {
+    if (groupId !== null && makeGroupId === null) {
+      console.log("CHAT BECOMES PERSONAL");
+      //gather data for the conversation
+      const dataForPassenger = {
+        conversationId: chat.convid,
+        socketId: passenger.socketId,
+        username: driver.fullname,
+        photo: (await checkImagePath(driver.mail))
+          ? `images/${driver.mail}.jpeg`
+          : null,
+        email: driver.mail,
+        isGroupInterest: false,
+        members: null,
+        isUserOnline: false,
+        expiresIn: chat.expiresIn,
+        messages: [],
+        isRead: true,
+        lastMessage: null,
+        lastMessageTime: null,
+        isLastMessageMine: false,
+        messagesLeft: false,
+      };
+
+      const dataForDriver = {
+        conversationId: chat.convid,
+        socketId: driver.socketId,
+        username: passenger.fullname,
+        photo: (await checkImagePath(passenger.mail))
+          ? `images/${passenger.mail}.jpeg`
+          : null,
+        email: passenger.mail,
+        isGroupInterest: false,
+        members: null,
+        isUserOnline: false,
+        expiresIn: chat.expiresIn,
+        messages: [],
+        isRead: true,
+        lastMessage: null,
+        lastMessageTime: null,
+        isLastMessageMine: false,
+        messagesLeft: false,
+      };
+
+      let socketList = await io.fetchSockets();
+
+      const passengerSocket = socketList.find(
+        (val) => val.id === passenger.socketId
+      );
+      const driverSocket = socketList.find((val) => val.id === driver.socketId);
+
+      if (passengerSocket) {
+        dataForDriver.isUserOnline = true;
+      }
+
+      if (driverSocket) {
+        dataForPassenger.isUserOnline = true;
+      }
+
+      if (chat.messages !== null) {
+        if (IsJsonString(chat.messages)) {
+          chat.messages = JSON.parse(chat.messages);
+        }
+        chat.messages.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        const messagesLeft = chat.messages.length > 20;
+        //Paginate the messages and send the last 20 of them
+        const finalMessages = _.take(
+          _.drop(chat.messages, 0),
+          messagesLeft ? 20 : chat.messages.length
+        );
+        const decryptedMessages = await fun.decryptMessages(finalMessages);
+
+        dataForPassenger.messagesLeft = messagesLeft;
+        dataForPassenger.messages = decryptedMessages;
+        dataForPassenger.lastMessage = finalMessages[0].text;
+        dataForPassenger.isLastMessageMine =
+          finalMessages[0].user._id === passenger.email;
+        dataForPassenger.isRead = dataForPassenger.isLastMessageMine
+          ? true
+          : finalMessages[0].isRead;
+
+        dataForDriver.messagesLeft = messagesLeft;
+        dataForDriver.messages = decryptedMessages;
+        dataForDriver.lastMessage = finalMessages[0].text;
+        dataForDriver.isLastMessageMine =
+          finalMessages[0].user._id === driver.mail;
+        dataForDriver.isRead = dataForDriver.isLastMessageMine
+          ? true
+          : finalMessages[0].isRead;
+      }
+
+      //send the data to the user
+      io.to(driver.socketId).emit("action", {
+        type: "onConversationUpdated",
+        conversation: dataForDriver,
+      });
+      //send the data to the user
+      io.to(passenger.socketId).emit("action", {
+        type: "onConversationUpdated",
+        conversation: dataForPassenger,
+      });
+    }
+  }
+
+  async function sendEventsForBecomingGroup(
+    groupId,
+    chat,
+    passenger,
+    driver,
+    io
+  ) {
+    console.log("CHAT BECOMES GROUP");
+    //gather data for the conversation
+    const dataForPassenger = {
+      conversationId: chat.convid,
+      socketId: passenger.socketId,
+      username: driver.fullname,
+      photo: (await checkImagePath(driver.mail))
+        ? `images/${driver.mail}.jpeg`
+        : null,
+      email: driver.mail,
+      isGroupInterest: true,
+      members: null,
+      isUserOnline: false,
+      expiresIn: chat.expiresIn,
+      messages: [],
+      isRead: true,
+      lastMessage: null,
+      lastMessageTime: null,
+      isLastMessageMine: false,
+      messagesLeft: false,
+    };
+
+    const dataForDriver = {
+      conversationId: chat.convid,
+      socketId: driver.socketId,
+      username: passenger.fullname,
+      photo: (await checkImagePath(passenger.mail))
+        ? `images/${passenger.mail}.jpeg`
+        : null,
+      email: passenger.mail,
+      isGroupInterest: true,
+      members: null,
+      isUserOnline: false,
+      expiresIn: chat.expiresIn,
+      messages: [],
+      isRead: true,
+      lastMessage: null,
+      lastMessageTime: null,
+      isLastMessageMine: false,
+      messagesLeft: false,
+    };
+
+    let socketList = await io.fetchSockets();
+
+    const passengerSocket = socketList.find(
+      (val) => val.id === passenger.socketId
+    );
+    const driverSocket = socketList.find((val) => val.id === driver.socketId);
+
+    if (passengerSocket) {
+      dataForDriver.isUserOnline = true;
+    }
+
+    if (driverSocket) {
+      dataForPassenger.isUserOnline = true;
+    }
+
+    if (chat.messages !== null) {
+      if (IsJsonString(chat.messages)) {
+        chat.messages = JSON.parse(chat.messages);
+      }
+      chat.messages.sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+      const messagesLeft = chat.messages.length > 20;
+      //Paginate the messages and send the last 20 of them
+      const finalMessages = _.take(
+        _.drop(chat.messages, 0),
+        messagesLeft ? 20 : chat.messages.length
+      );
+      const decryptedMessages = await fun.decryptMessages(finalMessages);
+
+      dataForPassenger.messagesLeft = messagesLeft;
+      dataForPassenger.messages = decryptedMessages;
+      dataForPassenger.lastMessage = finalMessages[0].text;
+      dataForPassenger.isLastMessageMine =
+        finalMessages[0].user._id === passenger.email;
+      dataForPassenger.isRead = dataForPassenger.isLastMessageMine
+        ? true
+        : finalMessages[0].isRead;
+
+      dataForDriver.messagesLeft = messagesLeft;
+      dataForDriver.messages = decryptedMessages;
+      dataForDriver.lastMessage = finalMessages[0].text;
+      dataForDriver.isLastMessageMine =
+        finalMessages[0].user._id === driver.mail;
+      dataForDriver.isRead = dataForDriver.isLastMessageMine
+        ? true
+        : finalMessages[0].isRead;
+    }
+
+    const groupData = await Groups.findOne(groupId);
+    dataForDriver.members = (await fun.insertDataToMembers(groupData)).members;
+
+    //send the data to the user
+    io.to(driver.socketId).emit("action", {
+      type: "onConversationUpdated",
+      conversation: dataForDriver,
+    });
+    //send the data to the user
+    io.to(passenger.socketId).emit("action", {
+      type: "onConversationUpdated",
+      conversation: dataForPassenger,
+    });
   }
 
   async function handleToReviews(post, results, dateToCompare) {

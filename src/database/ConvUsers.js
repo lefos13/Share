@@ -141,14 +141,13 @@ const updateExpireDate = async (convObj, expiresIn) => {
   try {
     let tesDate = moment(convObj.expiresIn);
     if (tesDate > expiresIn) {
-      return "0";
+      return tesDate;
     } else {
       await convObj.update({ expiresIn: expiresIn }).catch((err) => {
         throw err;
       });
+      return expiresIn;
     }
-
-    return true;
   } catch (error) {
     console.error(error);
     return false;
