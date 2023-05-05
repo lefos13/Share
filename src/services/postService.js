@@ -350,10 +350,10 @@ const interested = async (req) => {
               conversationId: chat.convid,
               socketId: passenger.socketId,
               username: driver.fullname,
-              photo: (await checkImagePath(driver.mail))
-                ? `images/${driver.mail}.jpeg`
+              photo: (await checkImagePath(driver.email))
+                ? `images/${driver.email}.jpeg`
                 : null,
-              email: driver.mail,
+              email: driver.email,
               isGroupInterest: false,
               members: null,
               isUserOnline: false,
@@ -370,10 +370,10 @@ const interested = async (req) => {
               conversationId: chat.convid,
               socketId: driver.socketId,
               username: passenger.fullname,
-              photo: (await checkImagePath(passenger.mail))
-                ? `images/${passenger.mail}.jpeg`
+              photo: (await checkImagePath(passenger.email))
+                ? `images/${passenger.email}.jpeg`
                 : null,
-              email: passenger.mail,
+              email: passenger.email,
               isGroupInterest: false,
               members: null,
               isUserOnline: false,
@@ -1609,10 +1609,10 @@ const verInterested = async (req) => {
         conversationId: chat.convid,
         socketId: passenger.socketId,
         username: driver.fullname,
-        photo: (await checkImagePath(driver.mail))
-          ? `images/${driver.mail}.jpeg`
+        photo: (await checkImagePath(driver.email))
+          ? `images/${driver.email}.jpeg`
           : null,
-        email: driver.mail,
+        email: driver.email,
         isGroupInterest: false,
         members: null,
         isUserOnline: false,
@@ -1629,10 +1629,10 @@ const verInterested = async (req) => {
         conversationId: chat.convid,
         socketId: driver.socketId,
         username: passenger.fullname,
-        photo: (await checkImagePath(passenger.mail))
-          ? `images/${passenger.mail}.jpeg`
+        photo: (await checkImagePath(passenger.email))
+          ? `images/${passenger.email}.jpeg`
           : null,
-        email: passenger.mail,
+        email: passenger.email,
         isGroupInterest: false,
         members: null,
         isUserOnline: false,
@@ -1720,10 +1720,10 @@ const verInterested = async (req) => {
       conversationId: chat.convid,
       socketId: passenger.socketId,
       username: driver.fullname,
-      photo: (await checkImagePath(driver.mail))
-        ? `images/${driver.mail}.jpeg`
+      photo: (await checkImagePath(driver.email))
+        ? `images/${driver.email}.jpeg`
         : null,
-      email: driver.mail,
+      email: driver.email,
       isGroupInterest: true,
       members: null,
       isUserOnline: false,
@@ -1740,10 +1740,10 @@ const verInterested = async (req) => {
       conversationId: chat.convid,
       socketId: driver.socketId,
       username: passenger.fullname,
-      photo: (await checkImagePath(passenger.mail))
-        ? `images/${passenger.mail}.jpeg`
+      photo: (await checkImagePath(passenger.email))
+        ? `images/${passenger.email}.jpeg`
         : null,
-      email: passenger.mail,
+      email: passenger.email,
       isGroupInterest: true,
       members: null,
       isUserOnline: false,
