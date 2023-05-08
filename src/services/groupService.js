@@ -28,9 +28,9 @@ const socket = require("../index");
  * only a status code is returned.
  */
 const createGroup = async (req) => {
+  const io = socket.io;
   try {
     const msg = await fun.determineLang(req);
-    const io = socket.io;
     // Extract data for group creation
     const { extra, users, groupName } = req.body;
     const admin = extra;
@@ -71,7 +71,7 @@ const createGroup = async (req) => {
     }
 
     //send events for new group
-    newGroupChat(admin, groupChat, io);
+    newGroupChat(admin, groupChat);
 
     // Get all groups
     const results = await getGroupsOfUser(extra);
@@ -89,18 +89,18 @@ const createGroup = async (req) => {
     return { status: 500 };
   }
 
-  function newGroupChat(admin, groupChat, io) {
+  function newGroupChat(admin, groupChat) {
     try {
-      let socketList = io.fetchSockets();
       let adminData = User.findOneLight(admin);
       if (!adminData) {
         throw new Error(
           "Failed to find admin inside newGroupChat(sending events)"
         );
       }
-      let socketUser = socketList.find(
-        (user) => user.id === adminData.socketId
-      );
+      let socketList = io.fetchSockets();
+      _.forEach(socketList, (val) => {
+        if (val.id == recUser.socketId) online = true;
+      });
       //add user to room
       socketUser.join(groupChat.convId);
       const ratingData = insertAver(adminData);
