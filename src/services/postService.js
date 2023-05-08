@@ -428,6 +428,9 @@ const interested = async (req) => {
               dataForPassenger.isRead = dataForPassenger.isLastMessageMine
                 ? true
                 : finalMessages[0].isRead;
+              dataForPassenger.lastMessageTime = moment(
+                finalMessages[0].createdAt
+              ).format("DD-MM-YYYY HH:mm");
 
               dataForDriver.messagesLeft = messagesLeft;
               dataForDriver.messages = decryptedMessages;
@@ -437,6 +440,9 @@ const interested = async (req) => {
               dataForDriver.isRead = dataForDriver.isLastMessageMine
                 ? true
                 : finalMessages[0].isRead;
+              dataForDriver.lastMessageTime = moment(
+                finalMessages[0].createdAt
+              ).format("DD-MM-YYYY HH:mm");
             }
 
             //send the data to the user

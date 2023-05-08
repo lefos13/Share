@@ -936,13 +936,13 @@ io.on("connection", (socket) => {
         it emits the "onConversationAdded" event to both users with the conversation data. */
         case "server/handShakeEstablished": {
           const [userApproving, userApproved] = await Promise.all([
-            User.findOneLight(action.data.userApproving),
-            User.findOneLight(action.data.userApproved),
+            await User.findOneLight(action.data.userApproving),
+            await User.findOneLight(action.data.userApproved),
           ]);
 
           const [msgUserApproving, msgUserApproved] = await Promise.all([
-            getLang(userApproving.lastLang),
-            getLang(userApproved.lastLang),
+            await getLang(userApproving.lastLang),
+            await getLang(userApproved.lastLang),
           ]);
 
           const conv = await Conv.checkIfExists(
@@ -958,10 +958,10 @@ io.on("connection", (socket) => {
           let userOnline = false;
           let user2Online = false;
           const [photoApproving, photoApproved] = await Promise.all([
-            checkImagePath(userApproving.email)
+            (await checkImagePath(userApproving.email))
               ? `images/${userApproving.email}.jpeg`
               : null,
-            checkImagePath(userApproved.email)
+            (await checkImagePath(userApproved.email))
               ? `images/${userApproved.email}.jpeg`
               : null,
             socketList.forEach((val) => {
