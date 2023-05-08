@@ -98,13 +98,12 @@ const createGroup = async (req) => {
         );
       }
       let socketList = await io.fetchSockets();
-      let socketUser = null;
-      _.forEach(socketList, (val) => {
-        if (val.id == adminData.socketId) socketUser = val;
-      });
-      console.log(socketUser !== null);
-      //add user to room
-      socketUser.join(groupChat.convId);
+      for (const socket of socketList) {
+        if (socket.id === adminData.socketId) {
+          socket.join(groupChat.convid);
+          break;
+        }
+      }
       const ratingData = await insertAver(adminData);
       //prepare data for group chat
       const data = {
