@@ -119,7 +119,7 @@ const createGroup = async (req) => {
         isGroupInterest: false,
         members: null,
         isUserOnline: false,
-        expiresIn: u.expiresIn,
+        expiresIn: null,
         messages: [],
         isRead: true,
         lastMessage: null,
@@ -132,9 +132,7 @@ const createGroup = async (req) => {
       console.log("EMITTING NEW GROUP CHAT TO ADMIN");
       io.to(adminData.socketId).emit({
         type: "onGroupConversationAdded",
-        data: {
-          conversation: data,
-        },
+        conversation: data,
       });
     } catch (error) {
       console.error(error);
