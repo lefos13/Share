@@ -1014,6 +1014,7 @@ io.on("connection", (socket) => {
             dataForApprooving.isGroupInterest = true;
           }
 
+          console.log("Data for approved before send:", dataForApprooved);
           io.to(userApproved.socketId).emit("action", {
             type: "onConversationAdded",
             data: {
@@ -1021,6 +1022,7 @@ io.on("connection", (socket) => {
             },
           });
 
+          console.log("Data for approving before send:", dataForApprooving);
           io.to(userApproving.socketId).emit("action", {
             type: "onConversationAdded",
             data: {
