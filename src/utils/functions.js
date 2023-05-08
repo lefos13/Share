@@ -75,7 +75,7 @@ const iv = Buffer.from(IVHEX, "hex");
 const extractConvid = async (group) => {
   try {
     let convId = group.admin;
-    const members = group.members;
+    let members = group.members;
     if (await IsJsonString(members)) {
       members = JSON.parse(members);
     }
