@@ -111,7 +111,7 @@ const createGroup = async (req) => {
         conversationId: groupChat.convid,
         socketId: adminData.socketId,
         username: adminData.fullname,
-        photo: checkImagePath(adminData.email)
+        photo: fun.checkImagePath(adminData.email)
           ? `images/${adminData.email}.jpeg`
           : null,
         email: adminData.email,
