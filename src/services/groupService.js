@@ -15,6 +15,7 @@ const moment = require("moment");
 const _ = require("lodash");
 const fun = require("../utils/functions");
 const path = require("path");
+const socket = require("../index");
 
 // API /createGroup
 /**
@@ -29,7 +30,7 @@ const path = require("path");
 const createGroup = async (req) => {
   try {
     const msg = await fun.determineLang(req);
-
+    const io = socket.io;
     // Extract data for group creation
     const { extra, users, groupName } = req.body;
     const admin = extra;
@@ -69,6 +70,9 @@ const createGroup = async (req) => {
       throw groupChat;
     }
 
+    //send events for new group
+    newGroupChat(admin, groupChat, io);
+
     // Get all groups
     const results = await getGroupsOfUser(extra);
     const requests = await getActiveRequestsOfUser(extra);
@@ -83,6 +87,56 @@ const createGroup = async (req) => {
   } catch (error) {
     console.error(error);
     return { status: 500 };
+  }
+
+  function newGroupChat(admin, groupChat, io) {
+    try {
+      let socketList = io.fetchSockets();
+      let adminData = User.findOneLight(admin);
+      if (!adminData) {
+        throw new Error(
+          "Failed to find admin inside newGroupChat(sending events)"
+        );
+      }
+      let socketUser = socketList.find(
+        (user) => user.id === adminData.socketId
+      );
+      //add user to room
+      socketUser.join(groupChat.convId);
+      const ratingData = insertAver(adminData);
+      //prepare data for group chat
+      const data = {
+        conversationId: groupChat.convid,
+        socketId: adminData.socketId,
+        username: adminData.fullname,
+        photo: checkImagePath(adminData.email)
+          ? `images/${adminData.email}.jpeg`
+          : null,
+        email: adminData.email,
+        average: ratingData.average,
+        count: ratingData.count,
+        isGroupInterest: false,
+        members: null,
+        isUserOnline: false,
+        expiresIn: u.expiresIn,
+        messages: [],
+        isRead: true,
+        lastMessage: null,
+        lastMessageTime: null,
+        isLastMessageMine: false,
+        messagesLeft: false,
+        pending: true,
+      };
+      //send user the chat data
+      console.log("EMITTING NEW GROUP CHAT TO ADMIN");
+      io.to(adminData.socketId).emit({
+        type: "onGroupConversationAdded",
+        data: data,
+      });
+    } catch (error) {
+      console.error(error);
+      return new Error("Failed to send events for new Chat");
+    }
   }
 };
 
@@ -383,10 +437,40 @@ const acceptInvitation = async (req) => {
     let invitedEmail = req.body.extra;
     let msg = await fun.determineLang(req);
     let groupId = req.body.groupId;
+    const io = socket.io;
+
+    let userInvited = await User.findOneLight(invitedEmail);
+    if (userInvited === false) {
+      throw new Error("Error at finding initiatior of service " + invitedEmail);
+    }
+
     // accept invitation
-    let response = await Group.acceptInvitation(groupId, invitedEmail);
-    if (response === false) {
+    const group = await Group.acceptInvitation(groupId, invitedEmail);
+    if (group === false) {
       throw new Error("Invitation Acceptance Failed");
+    }
+
+    let members = group.members;
+    if (fun.IsJsonString(members)) members = JSON.parse(members);
+    let isChatStillPending = false;
+    members.forEach((member) => {
+      if (member.pending === true) {
+        isChatStillPending = true;
+      }
+    });
+
+    const groupChat = await ConvGroup.findOneByGroupId(group.groupId);
+
+    //EMIT EVENT OF GROUP CHAT TO MEMBER
+    const socketList = await io.fetchSockets();
+    const userSocket = socketList.find(
+      (val) => val.id === userInvited.socketId
+    );
+    userSocket.join(groupChat.convid);
+
+    if (!isChatStillPending) {
+      console.log("GROUP CHAT IS NOT PENDING ANYMORE");
+      //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE
     }
 
     // get all the groups and requests of the user that is invited
@@ -425,9 +509,22 @@ const declineInvitation = async (req) => {
     let msg = await fun.determineLang(req);
     let groupId = req.body.groupId;
     // decline invitation
-    let response = await Group.declineInvitation(groupId, invitedEmail);
-    if (response === false) {
+    let group = await Group.declineInvitation(groupId, invitedEmail);
+    if (group === false) {
       throw new Error("Invitation Declination Failed");
+    }
+    let members = group.members;
+    if (fun.IsJsonString(members)) members = JSON.parse(members);
+    let isChatStillPending = false;
+    members.forEach((member) => {
+      if (member.pending === true) {
+        isChatStillPending = true;
+      }
+    });
+
+    if (!isChatStillPending) {
+      console.log("GROUP CHAT IS NOT PENDING ANYMORE");
+      //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE
     }
     return { status: 200, message: msg.invitationDeclined };
   } catch (error) {

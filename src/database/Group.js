@@ -339,7 +339,7 @@ const acceptInvitation = async (groupId, email) => {
       .catch((err) => {
         throw err;
       });
-    return true;
+    return group;
   } catch (error) {
     console.error(error);
     return false;
@@ -375,7 +375,7 @@ const declineInvitation = async (groupId, email) => {
       .catch((err) => {
         throw err;
       });
-    return true;
+    return group;
   } catch (error) {
     console.error(error);
     return false;

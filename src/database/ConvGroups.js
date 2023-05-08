@@ -28,7 +28,36 @@ const saveOne = async (data) => {
     );
   }
 };
+/**
+ * This is an asynchronous function that finds a conversation from a MySQL database using the
+ * conversation ID.
+ * @param id - The parameter "id" is the identifier of the conversation that needs to be retrieved from
+ * the database.
+ * @returns The `findOne` function is returning the results of a database query to find a conversation
+ * with a specific `id`. If the query is successful, the function returns the results. If there is an
+ * error, the function returns a new `Error` object with a message indicating that there was an error
+ * in the function.
+ */
+const findOneByGroupId = async (id) => {
+  try {
+    //find a conversation from database (mysql)
+    let results = await ConvGroups.findOne({
+      where: {
+        groupId: id,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return results;
+  } catch (error) {
+    console.error(error);
+    return new Error(
+      "Error inside findOne function of ConvGroups database layer!"
+    );
+  }
+};
 
 module.exports = {
   saveOne,
+  findOneByGroupId,
 };
