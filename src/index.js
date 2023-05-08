@@ -1017,17 +1017,13 @@ io.on("connection", (socket) => {
           console.log("Data for approved before send:", dataForApprooved);
           io.to(userApproved.socketId).emit("action", {
             type: "onConversationAdded",
-            data: {
-              conversation: dataForApprooved,
-            },
+            conversation: dataForApprooved,
           });
 
           console.log("Data for approving before send:", dataForApprooving);
           io.to(userApproving.socketId).emit("action", {
             type: "onConversationAdded",
-            data: {
-              conversation: dataForApprooving,
-            },
+            conversation: dataForApprooving,
           });
           break;
         }
