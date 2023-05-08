@@ -76,12 +76,20 @@ const extractConvid = async (group) => {
   try {
     const convId = group.admin;
     const members = group.members;
-    members.forEach((element) => {
-      convId += " " + element.email;
+    if (await IsJsonString(members)) {
+      members = JSON.parse(members);
+    }
+    console.log(
+      "Members of group that was found to extract the conversation ID: ",
+      members
+    );
+    //loop through members with for each
+    members.forEach((member) => {
+      convId += " " + member.email;
     });
     return convId;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return new Error("Something went wrong at extracting the conversation ID");
   }
 };
