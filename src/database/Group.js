@@ -44,10 +44,10 @@ const fun = require("../utils/functions");
  */
 const create = async (data) => {
   try {
-    await Groups.create(data).catch((err) => {
+    const group = await Groups.create(data).catch((err) => {
       throw err;
     });
-    return true;
+    return group;
   } catch (error) {
     console.error("Inside findOne of postinterested:", error);
     return false;
@@ -409,6 +409,15 @@ const getPendingUsers = async (groupId) => {
   }
 };
 
+/**
+ * This is an asynchronous function that finds a group by its ID and returns it, or returns false if
+ * there is an error.
+ * @param groupId - The parameter `groupId` is a unique identifier for a group that is being searched
+ * for in the database. It is used in the `where` clause of the Sequelize query to find a specific
+ * group with the matching `groupId` value.
+ * @returns The `findOne` function is returning a Promise that resolves to either the `group` object if
+ * it is found in the database, or `false` if there is an error.
+ */
 const findOne = async (groupId) => {
   try {
     const group = await Groups.findOne({

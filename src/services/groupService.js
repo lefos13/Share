@@ -9,6 +9,7 @@ const ToReview = require("../database/ToReview");
 const Notification = require("../database/Notifications");
 const ConvUsers = require("../database/ConvUsers");
 const Group = require("../database/Group");
+const ConvGroup = require("../database/ConvGroups");
 const { insertAver } = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
@@ -34,15 +35,38 @@ const createGroup = async (req) => {
     const admin = extra;
     const members = users.map((user) => ({ ...user, pending: true }));
 
-    // Logic for creating group
-    const response = await Group.create({
+    // Create the group
+    const groupCreated = await Group.create({
       admin,
       members,
       groupName,
     });
-
-    if (!response) {
+    if (groupCreated === false) {
       throw new Error("Group creation failed");
+    }
+
+    console.log("GROUP THAT WAS CREATED", groupCreated);
+    //extract the converted id of the group
+    const extractedConvId = await fun.extractConvid(
+      await Group.findOne(groupCreated.groupId)
+    );
+    if (extractedConvId instanceof Error) {
+      throw extractedConvId;
+    }
+
+    console.log("EXTRACTED CONV ID", extractedConvId);
+    //prepare data for group chat
+    const data = {
+      convid: extractedConvId,
+      messages: null,
+      groupId: groupCreated.groupId,
+      pending: true,
+    };
+
+    //create Group chat
+    const groupChat = await ConvGroup.saveOne(data);
+    if (groupChat instanceof Error) {
+      throw groupChat;
     }
 
     // Get all groups

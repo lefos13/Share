@@ -63,6 +63,29 @@ const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
 
 /**
+ * The function extracts the conversation ID from a group object in JavaScript.
+ * @param group - The `group` parameter is an object that contains information about a group
+ * conversation. It has two properties: `admin`, which is a string representing the email address of
+ * the group admin, and `members`, which is an array of objects representing the group members. Each
+ * member object has an `email`
+ * @returns The function `extractConvid` returns a promise that resolves to a string representing the
+ * conversation ID. If an error occurs during the execution of the function, it returns a new Error
+ * object with a message indicating that something went wrong.
+ */
+const extractConvid = async (group) => {
+  try {
+    const convId = group.admin;
+    const members = group.members;
+    members.forEach((element) => {
+      convId += " " + element.email;
+    });
+    return convId;
+  } catch (error) {
+    console.log(error);
+    return new Error("Something went wrong at extracting the conversation ID");
+  }
+};
+/**
  * The function inserts data to a group's members, including their full name, average rating, count,
  * and image path.
  * @param group - an object containing information about a group, including an array of members.
@@ -1256,4 +1279,5 @@ module.exports = {
   backUpUser,
   checkImagePath,
   insertDataToMembers,
+  extractConvid,
 };
