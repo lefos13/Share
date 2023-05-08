@@ -89,22 +89,23 @@ const createGroup = async (req) => {
     return { status: 500 };
   }
 
-  function newGroupChat(admin, groupChat) {
+  async function newGroupChat(admin, groupChat) {
     try {
-      let adminData = User.findOneLight(admin);
+      let adminData = await User.findOneLight(admin);
       if (!adminData) {
         throw new Error(
           "Failed to find admin inside newGroupChat(sending events)"
         );
       }
-      let socketList = io.fetchSockets();
+      let socketList = await io.fetchSockets();
       let socketUser = null;
       _.forEach(socketList, (val) => {
         if (val.id == adminData.socketId) socketUser = val;
       });
+      console.log(socketUser !== null);
       //add user to room
       socketUser.join(groupChat.convId);
-      const ratingData = insertAver(adminData);
+      const ratingData = await insertAver(adminData);
       //prepare data for group chat
       const data = {
         conversationId: groupChat.convid,
