@@ -98,8 +98,9 @@ const createGroup = async (req) => {
         );
       }
       let socketList = io.fetchSockets();
+      let socketUser = null;
       _.forEach(socketList, (val) => {
-        if (val.id == recUser.socketId) online = true;
+        if (val.id == adminData.socketId) socketUser = val;
       });
       //add user to room
       socketUser.join(groupChat.convId);
