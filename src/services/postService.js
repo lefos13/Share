@@ -346,6 +346,10 @@ const interested = async (req) => {
           if (groupId !== null && makeGroupId === null) {
             console.log("CHAT BECOMES PERSONAL");
             //gather data for the conversation
+            const [ratingDataPassenger, ratingDataDriver] = await Promise.all([
+              insertAver(driver),
+              insertAver(passenger),
+            ]);
             const dataForPassenger = {
               conversationId: chat.convid,
               socketId: passenger.socketId,
@@ -354,6 +358,8 @@ const interested = async (req) => {
                 ? `images/${driver.email}.jpeg`
                 : null,
               email: driver.email,
+              average: ratingDataDriver.average,
+              count: ratingDataDriver.count,
               isGroupInterest: false,
               members: null,
               isUserOnline: false,
@@ -374,6 +380,8 @@ const interested = async (req) => {
                 ? `images/${passenger.email}.jpeg`
                 : null,
               email: passenger.email,
+              average: ratingDataPassenger.average,
+              count: ratingDataPassenger.count,
               isGroupInterest: false,
               members: null,
               isUserOnline: false,
@@ -1611,6 +1619,10 @@ const verInterested = async (req) => {
     if (groupId !== null && makeGroupId === null) {
       console.log("CHAT BECOMES PERSONAL");
       //gather data for the conversation
+      const [ratingDataForDriver, ratingDataForPassenger] = await Promise.all([
+        insertAver(driver),
+        insertAver(passenger),
+      ]);
       const dataForPassenger = {
         conversationId: chat.convid,
         socketId: passenger.socketId,
@@ -1619,6 +1631,8 @@ const verInterested = async (req) => {
           ? `images/${driver.email}.jpeg`
           : null,
         email: driver.email,
+        average: ratingDataForDriver.average,
+        count: ratingDataForDriver.count,
         isGroupInterest: false,
         members: null,
         isUserOnline: false,
@@ -1639,6 +1653,8 @@ const verInterested = async (req) => {
           ? `images/${passenger.email}.jpeg`
           : null,
         email: passenger.email,
+        average: ratingDataForPassenger.average,
+        count: ratingDataForPassenger.count,
         isGroupInterest: false,
         members: null,
         isUserOnline: false,
@@ -1722,6 +1738,10 @@ const verInterested = async (req) => {
   ) {
     console.log("CHAT BECOMES GROUP");
     //gather data for the conversation
+    const [ratingDataForDriver, ratingDataForPassenger] = await Promise.all([
+      insertAver(driver),
+      insertAver(passenger),
+    ]);
     const dataForPassenger = {
       conversationId: chat.convid,
       socketId: passenger.socketId,
@@ -1730,6 +1750,8 @@ const verInterested = async (req) => {
         ? `images/${driver.email}.jpeg`
         : null,
       email: driver.email,
+      average: ratingDataForDriver.average,
+      count: ratingDataForDriver.count,
       isGroupInterest: true,
       members: null,
       isUserOnline: false,
@@ -1750,6 +1772,8 @@ const verInterested = async (req) => {
         ? `images/${passenger.email}.jpeg`
         : null,
       email: passenger.email,
+      average: ratingDataForPassenger.average,
+      count: ratingDataForPassenger.count,
       isGroupInterest: true,
       members: null,
       isUserOnline: false,

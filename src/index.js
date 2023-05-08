@@ -362,6 +362,7 @@ const {
   sendMessage,
   getLang,
   checkImagePath,
+  insertAver,
 } = require("./utils/functions");
 const { destroyPerArrayIds } = require("./database/PostInterested");
 const { findOne } = require("./database/Group");
@@ -511,6 +512,7 @@ io.on("connection", (socket) => {
               },
             });
 
+            const ratingData = await insertAver(us);
             const data = {
               conversationId: u.convid,
               socketId: socket.id,
@@ -519,6 +521,8 @@ io.on("connection", (socket) => {
                 ? `images/${u.mail}.jpeg`
                 : null,
               email: u.mail,
+              average: ratingData.average,
+              count: ratingData.count,
               isGroupInterest: false,
               members: null,
               isUserOnline: false,
@@ -957,13 +961,20 @@ io.on("connection", (socket) => {
 
           let userOnline = false;
           let user2Online = false;
-          const [photoApproving, photoApproved] = await Promise.all([
+          const [
+            photoApproving,
+            photoApproved,
+            ratingDataApproving,
+            ratingDataApproved,
+          ] = await Promise.all([
             (await checkImagePath(userApproving.email))
               ? `images/${userApproving.email}.jpeg`
               : null,
             (await checkImagePath(userApproved.email))
               ? `images/${userApproved.email}.jpeg`
               : null,
+            await insertAver(userApproving),
+            await insertAver(userApproved),
             socketList.forEach((val) => {
               if (val.id == userApproving.socketId) userOnline = true;
               if (val.id == userApproved.socketId) user2Online = true;
@@ -976,6 +987,8 @@ io.on("connection", (socket) => {
             username: userApproving.fullname,
             photo: photoApproving,
             email: userApproving.email,
+            average: ratingDataApproving.average,
+            count: ratingDataApproving.count,
             isUserOnline: userOnline,
             expiresIn: conv.expiresIn,
             messages: [],
@@ -993,6 +1006,8 @@ io.on("connection", (socket) => {
             username: userApproved.fullname,
             photo: photoApproved,
             email: userApproved.email,
+            average: ratingDataApproved.average,
+            count: ratingDataApproved.count,
             isUserOnline: user2Online,
             expiresIn: conv.expiresIn,
             messages: [],
