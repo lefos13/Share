@@ -133,7 +133,9 @@ const createGroup = async (req) => {
       console.log("EMITTING NEW GROUP CHAT TO ADMIN");
       io.to(adminData.socketId).emit({
         type: "onGroupConversationAdded",
-        data: data,
+        data: {
+          conversation: data,
+        },
       });
     } catch (error) {
       console.error(error);
