@@ -375,6 +375,9 @@ io.on("connection", (socket) => {
     type: "getUserEmail",
     data: {},
   });
+  socket.on("disconnecting", () => {
+    console.log("Socket rooms of user that was connected", socket.rooms); // the Set contains at least the socket ID
+  });
   /* The above code is a JavaScript event listener that listens for a "disconnect" event on a socket
   connection. When the event is triggered, it retrieves the user associated with the socket and
   finds all conversations that the user is a part of. For each conversation, it sets the user's
