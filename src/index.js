@@ -587,12 +587,15 @@ io.on("connection", (socket) => {
           console.log("Real Group Id: ", realGroupId);
           console.log("Real Conversation Id: ", realConversationId);
 
-          const userEmails = realConversationId.split(" ");
+          let userEmails = realConversationId.split(" ");
+          //exclude Sender Email
+          userEmails = userEmails.filter((val) => val != fromEmail);
+
           action.data.message.isRead = false;
           action.data.message.seen = false;
           let socketList = await io.fetchSockets(); //get all sockets
 
-          for (email of userEmails) {
+          for await (email of userEmails) {
             let userData = await User.findOneLight(email);
             if (app.locals[email] === conversationId && email !== fromEmail) {
               action.data.message.isRead = true;
@@ -616,7 +619,10 @@ io.on("connection", (socket) => {
 
             //send notification for offline or background user
             if (!online || inBackground) {
-              await sendMessageGroup(
+              console.log(
+                "User is offline or in background so NOTIFICATION IS TO BE SENT"
+              );
+              sendMessageGroup(
                 dataForNotification,
                 userEmails,
                 fromEmail,
@@ -630,7 +636,6 @@ io.on("connection", (socket) => {
             return new Error("Conversation finding error");
           }
 
-          //inform all users of group chat that i have seen the conversation
           socket.broadcast.to(action.data.conversationId).emit("action", {
             type: "private_message_groups",
             data: {

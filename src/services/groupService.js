@@ -97,6 +97,7 @@ const createGroup = async (req) => {
           "Failed to find admin inside newGroupChat(sending events)"
         );
       }
+      let group = await Group.findOne(groupChat.groupId);
       let socketList = await io.fetchSockets();
       for (const socket of socketList) {
         if (socket.id === adminData.socketId) {
@@ -113,7 +114,7 @@ const createGroup = async (req) => {
       const data = {
         conversationId: groupChat.groupId + "-" + groupChat.convid,
         socketId: adminData.socketId,
-        username: adminData.fullname,
+        username: group.groupName,
         photo: (await fun.checkImagePath(adminData.email))
           ? `images/${adminData.email}.jpeg`
           : null,
