@@ -1076,9 +1076,9 @@ io.on("connection", (socket) => {
             const ratingData = await insertAver(adminData);
             if (ratingData === false) throw new Error("Rating not found");
             const data = {
-              conversationId: conv.convid,
+              conversationId: group.groupId + "-" + conv.convid,
               socketId: adminData.socketId,
-              username: adminData.fullname,
+              username: group.groupName,
               photo: (await checkImagePath(adminData.email))
                 ? `images/${adminData.email}.jpeg`
                 : null,
@@ -1099,6 +1099,8 @@ io.on("connection", (socket) => {
             };
             return data;
           })
+
+          //logic for messages and flags
         );
 
         console.log(

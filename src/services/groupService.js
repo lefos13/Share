@@ -107,7 +107,7 @@ const createGroup = async (req) => {
       const ratingData = await insertAver(adminData);
       //prepare data for group chat
       const data = {
-        conversationId: groupChat.convid,
+        conversationId: groupChat.groupId + "-" + groupChat.convid,
         socketId: adminData.socketId,
         username: adminData.fullname,
         photo: (await fun.checkImagePath(adminData.email))
