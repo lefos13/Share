@@ -463,6 +463,8 @@ const sendMessageGroup = async (
   conversationId
 ) => {
   userEmails.filter((userEmail) => {
+    if (userEmail == senderEmail)
+      console.log("REMOVED SENDER FROM NOTIFICATION LIST OF USERS");
     return userEmail != senderEmail;
   });
   await Promise.all(
