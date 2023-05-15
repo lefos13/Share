@@ -100,6 +100,10 @@ const createGroup = async (req) => {
       let socketList = await io.fetchSockets();
       for (const socket of socketList) {
         if (socket.id === adminData.socketId) {
+          console.log(
+            "ADMIN FOUND ONLINE AND THE RIGHT SOCKET IS IN DB",
+            socket.id === adminData.socketId
+          );
           socket.join(groupChat.groupId + "-" + groupChat.convid);
           break;
         }
@@ -129,7 +133,7 @@ const createGroup = async (req) => {
         pending: true,
       };
       //send user the chat data
-      console.log("EMITTING NEW GROUP CHAT TO ADMIN");
+      console.log("EMITTING NEW GROUP CHAT TO ADMIN", adminData.socketId);
       io.to(adminData.socketId).emit({
         type: "onGroupConversationAdded",
         data: {
