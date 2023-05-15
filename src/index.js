@@ -1079,7 +1079,7 @@ io.on("connection", (socket) => {
               conversationId: conv.convid,
               socketId: adminData.socketId,
               username: adminData.fullname,
-              photo: (await fun.checkImagePath(adminData.email))
+              photo: (await checkImagePath(adminData.email))
                 ? `images/${adminData.email}.jpeg`
                 : null,
               email: adminData.email,
