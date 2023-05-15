@@ -260,7 +260,7 @@ const countVerifiedEnchanced = async (postid) => {
         if (IsJsonString(groupData.members)) {
           groupData.members = JSON.parse(groupData.members);
         }
-        countOfUsers += groupData.members.length;
+        countOfUsers += groupData.members.length + 1;
       } else {
         countOfUsers++;
       }

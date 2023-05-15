@@ -343,10 +343,16 @@ const deleteGroup = async (req) => {
         postid: interested,
       };
     }
+
     // delete a group
     let response = await Group.destroy(admin, groupId);
     if (response === false) {
       throw new Error("Group Deletion Failed");
+    }
+    //delete chat of group
+    let chatDeleted = await ConvGroup.deleteOneByGroupId(groupId);
+    if (chatDeleted === false) {
+      throw new Error("Chat Deletion Failed");
     }
     return { status: 200, message: msg.groupDeleted };
   } catch (error) {

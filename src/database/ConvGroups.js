@@ -57,7 +57,68 @@ const findOneByGroupId = async (id) => {
   }
 };
 
+/**
+ * This function deletes a conversation from a MySQL database based on its group ID.
+ * @param id - The parameter `id` is the unique identifier of the conversation group that needs to be
+ * deleted from the database.
+ * @returns The function `deleteOneByGroupId` returns the results of the deletion operation on the
+ * `ConvGroups` table in the database. If the operation is successful, it returns the number of rows
+ * deleted. If there is an error, it returns an error message.
+ */
+const deleteOneByGroupId = async (id) => {
+  try {
+    //delete a conversation from database (mysql)
+    let results = await ConvGroups.destroy({
+      where: {
+        groupId: id,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return results;
+  } catch (error) {
+    console.error(error);
+    return new Error(
+      "Error inside deleteOneByGroupId function of ConvGroups database layer!"
+    );
+  }
+};
+
+//find all by user email
+/**
+ * This function finds all conversations in a database that match a given email address.
+ * @param email - The email parameter is a string that is used to search for conversations in the
+ * ConvGroups table of a MySQL database. The function uses the Sequelize ORM to perform the search and
+ * returns the results as an array of objects.
+ * @returns The function `findAllByEmail` returns the results of a database query to find all
+ * conversation groups where the `convid` column contains the specified email address. If the query is
+ * successful, the function returns the results. If there is an error, the function returns an error
+ * message.
+ */
+const findAllByEmail = async (email) => {
+  try {
+    //find all conversations from database (mysql)
+    let results = await ConvGroups.findAll({
+      where: {
+        convid: {
+          [Op.like]: `%${email}%`,
+        },
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return results;
+  } catch (error) {
+    console.error(error);
+    return new Error(
+      "Error inside findAllByEmail function of ConvGroups database layer!"
+    );
+  }
+};
 module.exports = {
   saveOne,
   findOneByGroupId,
+  deleteOneByGroupId,
+  findAllByEmail,
 };

@@ -114,6 +114,8 @@ const ConvUsers = require("./modules/convusers");
 const Conv = require("./database/ConvUsers");
 const User = require("./database/User");
 const Post = require("./database/Post");
+const ConvGroup = require("./database/ConvGroups");
+const Group = require("./database/Group");
 
 /* The above code is importing the `authenticateToken` function from a file located in the
 `./middleware/auth` directory. This function is likely used as middleware in a web application to
@@ -474,142 +476,8 @@ io.on("connection", (socket) => {
           if (addedSocketId === false)
             throw new Error("Error at updating the socket id");
 
-          let conversations = [];
-          const otherUsers = [];
-
-          const dbConvs = await ConvUsers.findAll({
-            where: {
-              convid: { [Op.substring]: action.data.email },
-            },
-          }).catch((err) => {
-            throw err;
-          });
-
-          for (const value of dbConvs) {
-            const [mail1, mail2] = value.convid.split(" ");
-            const otherMail = mail1 === action.data.email ? mail2 : mail1;
-            const otherUser = {
-              mail: otherMail,
-              expiresIn: value.expiresIn,
-              messages: value.messages,
-              convid: value.convid,
-              groupId: value.groupId,
-            };
-            otherUsers.push(otherUser);
-          }
-
-          //import into convs list all the data that are required for the emition
-          for await (u of otherUsers) {
-            const us = await Users.findOne({ where: { email: u.mail } }).catch(
-              (err) => {
-                throw err;
-              }
-            );
-            //inform the current user of that conversation, that the user that just logged in is online
-            io.to(us.socketId).emit("action", {
-              type: "setIsConversationUserOnline",
-              data: {
-                conversationId: u.convid,
-                isUserOnline: true,
-              },
-            });
-
-            const ratingData = await insertAver(us);
-            const data = {
-              conversationId: u.convid,
-              socketId: socket.id,
-              username: us.fullname,
-              photo: (await checkImagePath(u.mail))
-                ? `images/${u.mail}.jpeg`
-                : null,
-              email: u.mail,
-              average: ratingData.average,
-              count: ratingData.count,
-              isGroupInterest: false,
-              members: null,
-              isUserOnline: false,
-              expiresIn: u.expiresIn,
-              messages: [],
-              isRead: true,
-              lastMessage: null,
-              lastMessageTime: null,
-              isLastMessageMine: false,
-              messagesLeft: false,
-            };
-
-            //import members of group if the conversation was initiated by a group interest
-            if (u.groupId != null) {
-              data.isGroupInterest = true;
-              const group = await findOne(u.groupId);
-              //Check if the user is the admin of the group
-              if (group.admin !== action.data.email) {
-                data.isGroupInterest = true;
-                data.members = (await insertDataToMembers(group)).members;
-              } else {
-                //do not include members in data
-                data.isGroupInterest = true;
-              }
-            }
-
-            let socketList = await io.fetchSockets();
-
-            for (const val of socketList) {
-              if (val.id == us.socketId) {
-                data.isUserOnline = true;
-                break;
-              }
-            }
-
-            if (app.locals.bg[us.email] != null) data.isUserOnline = false;
-
-            if (u.messages !== null) {
-              // order
-              let toJson = IsJsonString(u.messages);
-
-              if (toJson) u.messages = JSON.parse(u.messages);
-              u.messages.sort((a, b) => {
-                return new Date(b.createdAt) - new Date(a.createdAt);
-              });
-              //if those messages are the last 20 return false
-              data.messagesLeft = u.messages.length > 20;
-              //Paginate the messages and send the last 20 of them
-              const finalMessages = _.take(
-                _.drop(u.messages, 0),
-                data.messagesLeft ? 20 : u.messages.length
-              );
-
-              if (allowCrypto) {
-                data.messages = await decryptMessages(finalMessages);
-              } else {
-                data.messages = finalMessages;
-              }
-
-              data.lastMessage = finalMessages[0].text;
-              data.isLastMessageMine =
-                data.messages[0].user._id == action.data.email;
-              data.lastMessageTime = moment(finalMessages[0].createdAt).format(
-                "DD-MM-YYYY HH:mm"
-              ); //need to change
-
-              // if last message is mine then make isRead ==true
-              if (data.isLastMessageMine) {
-                data.isRead = true;
-              } else {
-                // check if the user has read it in the past
-                data.isRead = finalMessages[0].isRead;
-              }
-            }
-
-            conversations.push(data);
-          }
-
-          //i use io emit to emit in all sockets connected
-          //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
-          socket.emit("action", { type: "conversations", data: conversations });
-          socket.emit("action", {
-            type: "self_user",
-            data: { userId: action.data.email },
-          });
+          await privateConversations();
+          await groupConversations();
           break;
 
         /* The above code is handling a private message event on a server in a chat application. It
@@ -1047,6 +915,203 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       console.error(error);
+    }
+
+    async function privateConversations() {
+      let conversations = [];
+      const otherUsers = [];
+
+      const dbConvs = await ConvUsers.findAll({
+        where: {
+          convid: { [Op.substring]: action.data.email },
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      for (const value of dbConvs) {
+        const [mail1, mail2] = value.convid.split(" ");
+        const otherMail = mail1 === action.data.email ? mail2 : mail1;
+        const otherUser = {
+          mail: otherMail,
+          expiresIn: value.expiresIn,
+          messages: value.messages,
+          convid: value.convid,
+          groupId: value.groupId,
+        };
+        otherUsers.push(otherUser);
+      }
+
+      //import into convs list all the data that are required for the emition
+      for await (u of otherUsers) {
+        const us = await Users.findOne({ where: { email: u.mail } }).catch(
+          (err) => {
+            throw err;
+          }
+        );
+        //inform the current user of that conversation, that the user that just logged in is online
+        io.to(us.socketId).emit("action", {
+          type: "setIsConversationUserOnline",
+          data: {
+            conversationId: u.convid,
+            isUserOnline: true,
+          },
+        });
+
+        const ratingData = await insertAver(us);
+        const data = {
+          conversationId: u.convid,
+          socketId: socket.id,
+          username: us.fullname,
+          photo: (await checkImagePath(u.mail))
+            ? `images/${u.mail}.jpeg`
+            : null,
+          email: u.mail,
+          average: ratingData.average,
+          count: ratingData.count,
+          isGroupInterest: false,
+          members: null,
+          isUserOnline: false,
+          expiresIn: u.expiresIn,
+          messages: [],
+          isRead: true,
+          lastMessage: null,
+          lastMessageTime: null,
+          isLastMessageMine: false,
+          messagesLeft: false,
+        };
+
+        //import members of group if the conversation was initiated by a group interest
+        if (u.groupId != null) {
+          data.isGroupInterest = true;
+          const group = await findOne(u.groupId);
+          //Check if the user is the admin of the group
+          if (group.admin !== action.data.email) {
+            data.isGroupInterest = true;
+            data.members = (await insertDataToMembers(group)).members;
+          } else {
+            //do not include members in data
+            data.isGroupInterest = true;
+          }
+        }
+
+        let socketList = await io.fetchSockets();
+
+        for (const val of socketList) {
+          if (val.id == us.socketId) {
+            data.isUserOnline = true;
+            break;
+          }
+        }
+
+        if (app.locals.bg[us.email] != null) data.isUserOnline = false;
+
+        if (u.messages !== null) {
+          // order
+          let toJson = IsJsonString(u.messages);
+
+          if (toJson) u.messages = JSON.parse(u.messages);
+          u.messages.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+          //if those messages are the last 20 return false
+          data.messagesLeft = u.messages.length > 20;
+          //Paginate the messages and send the last 20 of them
+          const finalMessages = _.take(
+            _.drop(u.messages, 0),
+            data.messagesLeft ? 20 : u.messages.length
+          );
+
+          if (allowCrypto) {
+            data.messages = await decryptMessages(finalMessages);
+          } else {
+            data.messages = finalMessages;
+          }
+
+          data.lastMessage = finalMessages[0].text;
+          data.isLastMessageMine =
+            data.messages[0].user._id == action.data.email;
+          data.lastMessageTime = moment(finalMessages[0].createdAt).format(
+            "DD-MM-YYYY HH:mm"
+          ); //need to change
+
+          // if last message is mine then make isRead ==true
+          if (data.isLastMessageMine) {
+            data.isRead = true;
+          } else {
+            // check if the user has read it in the past
+            data.isRead = finalMessages[0].isRead;
+          }
+        }
+
+        conversations.push(data);
+      }
+
+      //i use io emit to emit in all sockets connected
+      //io.emit("action", { type: "users_online", data: createUsersOnline(action.data.email) })
+      socket.emit("action", { type: "conversations", data: conversations });
+      socket.emit("action", {
+        type: "self_user",
+        data: { userId: action.data.email },
+      });
+    }
+    async function groupConversations() {
+      try {
+        console.log("Getting all the group conversations");
+        const groupConvs = await ConvGroup.findAllByEmail(action.data.email);
+        let groupConversations = await Promise.all(
+          groupConvs.map(async (conv) => {
+            io.to(conv.convid).emit("setIsConversationUserOnlineGroups", {
+              data: {
+                conversationId: conv.convid,
+                isUserOnline: true,
+              },
+            });
+
+            const group = await Group.findOne(conv.groupId);
+            if (group === false) throw new Error("Group not found");
+
+            const adminData = await User.findOneLight(group.admin);
+            if (adminData === false) throw new Error("Admin not found");
+            const ratingData = await insertAver(adminData);
+            if (ratingData === false) throw new Error("Rating not found");
+            const data = {
+              conversationId: conv.convid,
+              socketId: adminData.socketId,
+              username: adminData.fullname,
+              photo: (await fun.checkImagePath(adminData.email))
+                ? `images/${adminData.email}.jpeg`
+                : null,
+              email: adminData.email,
+              average: ratingData.average,
+              count: ratingData.count,
+              isGroupInterest: false,
+              members: null,
+              isUserOnline: false,
+              expiresIn: null,
+              messages: [],
+              isRead: true,
+              lastMessage: null,
+              lastMessageTime: null,
+              isLastMessageMine: false,
+              messagesLeft: false,
+              pending: true,
+            };
+            return data;
+          })
+        );
+
+        console.log(
+          "Emitting all the group conversations, length:",
+          groupConversations.length
+        );
+        socket.emit("action", {
+          type: "conversationsGroups",
+          data: groupConversations,
+        });
+      } catch (error) {
+        console.error(error);
+      }
     }
   });
 });
