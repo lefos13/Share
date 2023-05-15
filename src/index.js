@@ -1152,8 +1152,10 @@ io.on("connection", (socket) => {
 
             const adminData = await User.findOneLight(group.admin);
             if (adminData === false) throw new Error("Admin not found");
+
             const ratingData = await insertAver(adminData);
             if (ratingData === false) throw new Error("Rating not found");
+
             const data = {
               conversationId: group.groupId + "-" + conv.convid,
               socketId: adminData.socketId,
@@ -1176,7 +1178,58 @@ io.on("connection", (socket) => {
               messagesLeft: false,
               pending: true,
             };
+            //join the room for conversation
             socket.join(data.conversationId);
+
+            let emails = conv.convid.split(" ");
+            emails = emails.filter((e) => e !== action.data.email);
+            let socketList = await io.fetchSockets();
+            //check if there is a user of the group online
+            await Promise.all(
+              emails.map(async (email) => {
+                let userData = await User.findOneLight(email);
+                for (const soc of socketList) {
+                  if (soc.id == userData.socketId) {
+                    data.isUserOnline = true;
+                    break;
+                  }
+                }
+              })
+            );
+
+            if (conv.messages !== null) {
+              if (IsJsonString(conv.messages))
+                conv.messages = JSON.parse(conv.messages);
+
+              conv.messages.sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+              });
+
+              data.messagesLeft = u.messages.length > 20;
+
+              const finalMessages = _.take(
+                _.drop(u.messages, 0),
+                data.messagesLeft ? 20 : u.messages.length
+              );
+
+              if (allowCrypto) {
+                data.messages = await decryptMessages(finalMessages);
+              } else {
+                data.messages = finalMessages;
+              }
+              data.lastMessage = finalMessages[0].text;
+              data.isLastMessageMine =
+                data.messages[0].user._id == action.data.email;
+              data.lastMessageTime = moment(finalMessages[0].createdAt).format(
+                "DD-MM-YYYY HH:mm"
+              );
+              if (data.isLastMessageMine) {
+                data.isRead = true;
+              } else {
+                // check if the user has read it in the past
+                data.isRead = finalMessages[0].isRead;
+              }
+            }
             return data;
           })
           //logic for messages and flags
