@@ -462,11 +462,7 @@ const sendMessageGroup = async (
   senderEmail,
   conversationId
 ) => {
-  userEmails.filter((userEmail) => {
-    if (userEmail == senderEmail)
-      console.log("REMOVED SENDER FROM NOTIFICATION LIST OF USERS");
-    return userEmail != senderEmail;
-  });
+  userEmails = userEmails.filter((userEmail) => userEmail !== senderEmail);
   await Promise.all(
     userEmails.map(async (userEmail) => {
       const receiverObj = await User.findOneLight(userEmail);
@@ -532,6 +528,7 @@ const sendMessageGroup = async (
     })
   );
 };
+
 const sendMessage = async (
   messageSent,
   receiverObj,
