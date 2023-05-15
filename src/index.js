@@ -646,7 +646,7 @@ io.on("connection", (socket) => {
           else messages.push(action.data.message);
           // let blabla = await decryptMessages(messages);
           const addedMessage = await ConvGroup.addMessage(
-            conversationId,
+            realConversationId,
             messages[0]
           );
           if (addedMessage == false) {
