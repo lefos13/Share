@@ -38,6 +38,7 @@ const ConvGroups = sequelize.define(
     },
     groupId: {
       type: DataTypes.BIGINT,
+      primaryKey: true,
       allowNull: true,
       defaultValue: null,
     },
