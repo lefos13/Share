@@ -100,7 +100,7 @@ const createGroup = async (req) => {
       let socketList = await io.fetchSockets();
       for (const socket of socketList) {
         if (socket.id === adminData.socketId) {
-          socket.join(groupChat.convid);
+          socket.join(groupChat.groupId + "-" + groupChat.convid);
           break;
         }
       }
@@ -327,6 +327,7 @@ const getGroups = async (req) => {
  * code is 200 and the message is "msg.groupDeleted". If there is an error, the status code is 500.
  */
 const deleteGroup = async (req) => {
+  const io = socket.io;
   try {
     let extra = req.body.extra;
     let msg = await fun.determineLang(req);
@@ -349,11 +350,20 @@ const deleteGroup = async (req) => {
     if (response === false) {
       throw new Error("Group Deletion Failed");
     }
+    //inform users that a group chat has been deleted
+    let groupChat = await ConvGroup.findOneByGroupId(groupId);
+    io.to(groupChat.groupId + "-" + groupChat.convid).emit({
+      type: "onGroupConversationRemoved",
+      data: {
+        conversation: groupChat.convid,
+      },
+    });
     //delete chat of group
     let chatDeleted = await ConvGroup.deleteOneByGroupId(groupId);
     if (chatDeleted === false) {
       throw new Error("Chat Deletion Failed");
     }
+
     return { status: 200, message: msg.groupDeleted };
   } catch (error) {
     console.error(error);

@@ -1097,12 +1097,11 @@ io.on("connection", (socket) => {
               messagesLeft: false,
               pending: true,
             };
+            socket.join(data.conversationId);
             return data;
           })
-
           //logic for messages and flags
         );
-
         console.log(
           "Emitting all the group conversations, length:",
           groupConversations.length
