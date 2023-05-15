@@ -6,6 +6,40 @@ const moment = require("moment");
 const ConvGroups = require("../modules/convgroups");
 
 /**
+ * This function adds a message to a conversation group and updates the database.
+ * @param convid - The ID of the conversation group where the message will be added.
+ * @param message - The message that needs to be added to the conversation with the given convid.
+ * @returns The function does not have an explicit return statement, but it may return `false` if an
+ * error is caught in the try-catch block.
+ */
+const addMessage = async (convid, message) => {
+  try {
+    let results = await ConvGroups.findOne({
+      where: {
+        convid: convid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    let messages = [];
+
+    if (results.messages != null) {
+      messages = JSON.parse(results.messages);
+    }
+
+    messages.push(message);
+
+    await results
+      .update({ messages: JSON.stringify(messages) })
+      .catch((err) => {
+        throw err;
+      });
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+/**
  * The saveOne function creates a new conversation in a MySQL database and returns the created object.
  * @param data - The `data` parameter is an object that contains the information to be saved to the
  * database. It is passed as an argument to the `saveOne` function.
@@ -121,4 +155,5 @@ module.exports = {
   findOneByGroupId,
   deleteOneByGroupId,
   findAllByEmail,
+  addMessage,
 };

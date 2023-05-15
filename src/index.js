@@ -576,6 +576,90 @@ io.on("connection", (socket) => {
           break;
         }
 
+        case "server/private_message_groups": {
+          const conversationId = action.data.conversationId; // this is the receipient id
+          const fromEmail = action.data.senderEmail; //this is my id
+          let dataForNotification = action.data.message;
+
+          const realGroupId = action.data.conversationId.split("-")[0];
+          const realConversationId = action.data.conversationId.split("-")[1];
+          console.log("Real Group Id: ", realGroupId);
+          console.log("Real Conversation Id: ", realConversationId);
+
+          const userEmails = realConversationId.split(" ");
+          action.data.message.isRead = false;
+          action.data.message.seen = false;
+          let socketList = await io.fetchSockets(); //get all sockets
+
+          for (email of userEmails) {
+            let userData = await User.findOneLight(email);
+            if (app.locals[email] === conversationId && email !== fromEmail) {
+              action.data.message.isRead = true;
+              action.data.message.seen = true;
+              socket.emit("action", {
+                type: "setGroupConversationSeen",
+                data: {
+                  conversationId: conversationId,
+                  seen: true,
+                },
+              });
+            }
+
+            //check if online or in background
+            let online = false;
+            _.forEach(socketList, (val) => {
+              if (val.id == userData.socketId) online = true;
+            });
+            let inBackground = false;
+            if (app.locals.bg[userData.email] != null) inBackground = true;
+
+            //send notification for offline or background user
+            if (!online || inBackground) {
+              console.log(
+                "User",
+                fromEmail,
+                " emiting notification to online user:",
+                recUser.email
+              );
+              await sendMessage(
+                dataForNotificaiton,
+                recUser,
+                fromEmail,
+                conversationId
+              );
+            }
+          }
+
+          const conversation = await ConvGroup.findOneByGroupId(realGroupId);
+          if (conversation === false) {
+            return new Error("Conversation finding error");
+          }
+
+          //inform all users of group chat that i have seen the conversation
+          socket.broadcast.to(action.data.conversationId).emit("action", {
+            type: "private_message_groups",
+            data: {
+              ...action.data,
+              conversationId: conversationId,
+              senderEmail: fromEmail,
+            },
+          });
+
+          let messages = [];
+          if (allowCrypto)
+            messages = await encryptMessages([action.data.message]);
+          else messages.push(action.data.message);
+          // let blabla = await decryptMessages(messages);
+          const addedMessage = await ConvGroup.addMessage(
+            conversationId,
+            messages[0]
+          );
+          if (addedMessage == false) {
+            console.log(new Error("Error at adding the message"));
+          }
+          break;
+        }
+
         /* The above code is handling the "server/personalChatOpened" event. It is setting up a
         personal chat between two users and updating the conversation status. It is also informing
         the other user (if online) that the message has been seen and marking the last message as
