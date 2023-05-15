@@ -455,6 +455,78 @@ const newRide = async (postid, emailArray, postOwner) => {
  * @param senderEmail - The email address of the user who is sending the message.
  * @param conversationId - The ID of the conversation between the sender and receiver of the message.
  */
+
+const sendMessageGroup = async (
+  messageSent,
+  userEmails,
+  senderEmail,
+  conversationId
+) => {
+  await Promise.all(
+    userEmails.map(async (userEmail) => {
+      const receiverObj = await User.findOneLight(userEmail);
+      let msg = await getLang(receiverObj.lastLang);
+      const sender = await User.findOneLight(senderEmail);
+      if (sender === false) throw new Error("Didnt find user");
+
+      const fcm = await FcmToken.findOne({
+        where: {
+          email: receiverObj.email,
+        },
+      }).catch((err) => {
+        throw err;
+      });
+
+      let data = {
+        type: "groupChatReceivedMessage",
+        conversationId: conversationId,
+        message: messageSent.toString(),
+      };
+      let fcmTok = fcm != null ? fcm.fcmToken : null;
+      let message = {
+        data: data,
+        token: fcmTok,
+        notification: {
+          title: msg.firebase.new_message,
+          body:
+            msg.firebase.not_ver_body0 +
+            sender.fullname +
+            msg.firebase.sent +
+            messageSent.text,
+        },
+      };
+      //If there is other notification of this conv replace it with this one.
+      //code to be written!
+      //
+      if (fcm != null) {
+        await verifyFCMToken(fcm.fcmToken)
+          .then(() => {
+            toSend = true;
+          })
+          .catch(() => {
+            toSend = false;
+          });
+      } else {
+        throw "User hasnt the app anymore!";
+      }
+
+      if (toSend !== false) {
+        admin
+          .messaging()
+          .send(message)
+          .then((response) => {
+            console.log("Success: ", response);
+          })
+          .catch((err) => {
+            throw err;
+          });
+      } else {
+        throw "User has uninstalled the app!";
+        // fcm.destroy();
+      }
+    })
+  );
+};
 const sendMessage = async (
   messageSent,
   receiverObj,
@@ -1288,4 +1360,5 @@ module.exports = {
   checkImagePath,
   insertDataToMembers,
   extractConvid,
+  sendMessageGroup,
 };

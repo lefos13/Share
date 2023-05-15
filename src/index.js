@@ -365,6 +365,7 @@ const {
   getLang,
   checkImagePath,
   insertAver,
+  sendMessageGroup,
 } = require("./utils/functions");
 const { destroyPerArrayIds } = require("./database/PostInterested");
 const { findOne } = require("./database/Group");
@@ -615,15 +616,9 @@ io.on("connection", (socket) => {
 
             //send notification for offline or background user
             if (!online || inBackground) {
-              console.log(
-                "User",
-                fromEmail,
-                " emiting notification to online user:",
-                recUser.email
-              );
-              await sendMessage(
-                dataForNotificaiton,
-                recUser,
+              await sendMessageGroup(
+                dataForNotification,
+                userEmails,
                 fromEmail,
                 conversationId
               );
