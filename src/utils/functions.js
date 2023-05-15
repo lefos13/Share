@@ -462,6 +462,9 @@ const sendMessageGroup = async (
   senderEmail,
   conversationId
 ) => {
+  userEmails.filter((userEmail) => {
+    return userEmail != senderEmail;
+  });
   await Promise.all(
     userEmails.map(async (userEmail) => {
       const receiverObj = await User.findOneLight(userEmail);
