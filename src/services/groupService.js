@@ -134,7 +134,7 @@ const createGroup = async (req) => {
       };
       //send user the chat data
       console.log("EMITTING NEW GROUP CHAT TO ADMIN", adminData.socketId);
-      io.to(adminData.socketId).emit({
+      io.to(adminData.socketId).emit("action", {
         type: "onGroupConversationAdded",
         data: {
           conversation: data,
@@ -356,7 +356,7 @@ const deleteGroup = async (req) => {
     }
     //inform users that a group chat has been deleted
     let groupChat = await ConvGroup.findOneByGroupId(groupId);
-    io.to(groupChat.groupId + "-" + groupChat.convid).emit({
+    io.to(groupChat.groupId + "-" + groupChat.convid).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
         conversation: groupChat.convid,
