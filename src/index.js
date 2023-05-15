@@ -1198,18 +1198,19 @@ io.on("connection", (socket) => {
             );
 
             if (conv.messages !== null) {
+              console.log("Messages", conv.messages !== null);
               if (IsJsonString(conv.messages))
                 conv.messages = JSON.parse(conv.messages);
-
+              console.log("Messages 1", conv.messages !== null);
               conv.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
               });
-
-              data.messagesLeft = u.messages.length > 20;
+              console.log("Messages 2", conv.messages !== null);
+              data.messagesLeft = conv.messages.length > 20;
 
               const finalMessages = _.take(
-                _.drop(u.messages, 0),
-                data.messagesLeft ? 20 : u.messages.length
+                _.drop(conv.messages, 0),
+                data.messagesLeft ? 20 : conv.messages.length
               );
 
               if (allowCrypto) {
