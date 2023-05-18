@@ -760,7 +760,7 @@ io.on("connection", (socket) => {
 
           //get conversation and mark the last message as read
           const conv = ConvGroup.updateLastMessage(
-            conversationId,
+            realConversationId,
             senderId,
             true
           );

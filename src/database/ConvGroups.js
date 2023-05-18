@@ -7,6 +7,7 @@ const ConvGroups = require("../modules/convgroups");
 
 const updateLastMessage = async (convid, email, seen) => {
   try {
+    console.log("UPDATING LAST MESSAGE AS SEEN AND READ");
     let results = await ConvGroups.findOne({
       where: {
         convid: convid,
@@ -16,7 +17,7 @@ const updateLastMessage = async (convid, email, seen) => {
     });
 
     let messages = [];
-    if (results != null)
+    if (results != null) {
       if (results.messages != null) {
         messages = JSON.parse(results.messages);
         messages.sort((a, b) => {
@@ -34,7 +35,9 @@ const updateLastMessage = async (convid, email, seen) => {
             });
         }
       }
-
+    } else {
+      console.log("GROUP CHAT NO LONGER EXISTS");
+    }
     return true;
   } catch (error) {
     console.error(error);
