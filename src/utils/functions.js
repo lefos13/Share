@@ -537,6 +537,33 @@ const sendMessageGroup = async (
         });
       }
     }
+    let toSend = false;
+
+    if (fcm != null) {
+      await verifyFCMToken(fcm.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
+    } else {
+      throw "User hasnt the app anymore!";
+    }
+    if (toSend !== false) {
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      throw "User has uninstalled the app!";
+      // fcm.destroy();
+    }
   } catch (error) {
     console.log(error);
   }
