@@ -435,7 +435,7 @@ io.on("connection", (socket) => {
       }
       const groupConvs = await ConvGroup.findAllByEmail(user.email);
       groupConvs.forEach((conv) => {
-        io.to(conv.groupId + "-" + conv.convid).emit("action", {
+        socket.broadcast.to(conv.groupId + "-" + conv.convid).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
             conversationId: conv.groupId + "-" + conv.convid,
@@ -825,13 +825,15 @@ io.on("connection", (socket) => {
           }
           const groupConvs = await ConvGroup.findAllByEmail(sender);
           groupConvs.forEach((conv) => {
-            io.to(conv.groupId + "-" + conv.convid).emit("action", {
-              type: "setIsConversationUserOnlineGroups",
-              data: {
-                conversationId: conv.groupId + "-" + conv.convid,
-                isUserOnline: false,
-              },
-            });
+            socket.broadcast
+              .to(conv.groupId + "-" + conv.convid)
+              .emit("action", {
+                type: "setIsConversationUserOnlineGroups",
+                data: {
+                  conversationId: conv.groupId + "-" + conv.convid,
+                  isUserOnline: false,
+                },
+              });
           });
 
           break;
@@ -863,13 +865,15 @@ io.on("connection", (socket) => {
           }
           const groupConvs = await ConvGroup.findAllByEmail(sender);
           groupConvs.forEach((conv) => {
-            io.to(conv.groupId + "-" + conv.convid).emit("action", {
-              type: "setIsConversationUserOnlineGroups",
-              data: {
-                conversationId: conv.groupId + "-" + conv.convid,
-                isUserOnline: true,
-              },
-            });
+            socket.broadcast
+              .to(conv.groupId + "-" + conv.convid)
+              .emit("action", {
+                type: "setIsConversationUserOnlineGroups",
+                data: {
+                  conversationId: conv.groupId + "-" + conv.convid,
+                  isUserOnline: true,
+                },
+              });
           });
           break;
         }
@@ -1293,7 +1297,7 @@ io.on("connection", (socket) => {
               pending: true,
             };
 
-            io.to(data.conversationId).emit("action", {
+            socket.broadcast.to(data.conversationId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
                 conversationId: data.conversationId,
