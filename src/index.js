@@ -606,6 +606,16 @@ io.on("connection", (socket) => {
           action.data.message.seen = false;
           let socketList = await io.fetchSockets(); //get all sockets
 
+          socket.broadcast.to(action.data.conversationId).emit("action", {
+            type: "private_message_groups",
+            data: {
+              ...action.data,
+              conversationId: conversationId,
+              senderEmail: fromEmail,
+            },
+          });
+
+          //send notification for offline or background user
           for await (email of userEmails) {
             let userData = await User.findOneLight(email);
             if (app.locals[email] === conversationId && email !== fromEmail) {
@@ -633,9 +643,9 @@ io.on("connection", (socket) => {
               console.log(
                 "User is offline or in background so NOTIFICATION IS TO BE SENT"
               );
-              sendMessageGroup(
+              await sendMessageGroup(
                 dataForNotification,
-                userEmails,
+                email,
                 fromEmail,
                 conversationId
               );
@@ -646,15 +656,6 @@ io.on("connection", (socket) => {
           if (conversation === false) {
             return new Error("Conversation finding error");
           }
-
-          socket.broadcast.to(action.data.conversationId).emit("action", {
-            type: "private_message_groups",
-            data: {
-              ...action.data,
-              conversationId: conversationId,
-              senderEmail: fromEmail,
-            },
-          });
 
           let messages = [];
           if (allowCrypto)

@@ -459,75 +459,87 @@ const newRide = async (postid, emailArray, postOwner) => {
 
 const sendMessageGroup = async (
   messageSent,
-  userEmails,
+  userEmail,
   senderEmail,
   conversationId
 ) => {
-  userEmails = userEmails.filter((userEmail) => userEmail !== senderEmail);
-  await Promise.all(
-    userEmails.map(async (userEmail) => {
-      const receiverObj = await User.findOneLight(userEmail);
-      let msg = await getLang(receiverObj.lastLang);
-      const sender = await User.findOneLight(senderEmail);
-      if (sender === false) throw new Error("Didnt find user");
+  try {
+    let receiverObj = await User.findOneLight(userEmail);
+    if (!receiverObj) {
+      throw new Error("Didnt find user");
+    }
+    let msg = await getLang(receiverObj.lastLang);
 
-      const fcm = await FcmToken.findOne({
-        where: {
-          email: receiverObj.email,
-        },
-      }).catch((err) => {
-        throw err;
-      });
+    const sender = await User.findOneLight(senderEmail);
+    if (sender === false) throw new Error("Didnt find user");
+    const fcm = await FcmToken.findOne({
+      where: {
+        email: receiverObj.email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
 
-      let data = {
-        type: "groupChatReceivedMessage",
-        conversationId: conversationId,
-        message: messageSent.toString(),
+    let data = {
+      type: "groupChatReceivedMessage",
+      conversationId: conversationId,
+      message: messageSent.toString(),
+    };
+    let fcmTok = fcm != null ? fcm.fcmToken : null;
+    let message = {
+      data: data,
+      token: fcmTok,
+      notification: {
+        title: msg.firebase.new_message,
+        body:
+          msg.firebase.not_ver_body0 +
+          sender.fullname +
+          msg.firebase.sent +
+          messageSent.text,
+      },
+    };
+    let curTime = moment();
+    if (true) {
+      let imagePath = null;
+      if (await checkImagePath(sender.email))
+        imagePath = "images/" + sender.email + ".jpeg";
+      const myJsonMessage = JSON.stringify(messageSent);
+      const notificationToInsert = {
+        imagePath: imagePath,
+        date: curTime,
+        type: data.type,
+        conversationId: data.conversationId,
+        convMessage: myJsonMessage,
+        postid: null,
+        email: senderEmail,
+        fullName: sender.fullname,
+        ownerEmail: receiverObj.email,
+        title: message.notification.title,
+        message: message.notification.body,
+        isRead: false,
       };
-      let fcmTok = fcm != null ? fcm.fcmToken : null;
-      let message = {
-        data: data,
-        token: fcmTok,
-        notification: {
-          title: msg.firebase.new_message,
-          body:
-            msg.firebase.not_ver_body0 +
-            sender.fullname +
-            msg.firebase.sent +
-            messageSent.text,
-        },
-      };
-      //If there is other notification of this conv replace it with this one.
-      //code to be written!
-      //
-      if (fcm != null) {
-        await verifyFCMToken(fcm.fcmToken)
-          .then(() => {
-            toSend = true;
-          })
-          .catch(() => {
-            toSend = false;
-          });
+      //find if a similar notification exists
+      let exists = await Notification.checkNotificationMessage(
+        notificationToInsert
+      );
+      if (exists === false)
+        throw new Error(
+          "Something went wrong with finding existing notification (message)"
+        );
+      else if (exists === null) {
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
       } else {
-        throw "User hasnt the app anymore!";
+        await exists.destroy();
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
       }
-
-      if (toSend !== false) {
-        admin
-          .messaging()
-          .send(message)
-          .then((response) => {
-            console.log("Success: ", response);
-          })
-          .catch((err) => {
-            throw err;
-          });
-      } else {
-        throw "User has uninstalled the app!";
-        // fcm.destroy();
-      }
-    })
-  );
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const sendMessage = async (
