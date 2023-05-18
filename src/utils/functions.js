@@ -102,6 +102,11 @@ const extractConvid = async (group) => {
  * `count`, and `imagePath` for each member.
  */
 const insertDataToMembers = async (group) => {
+  if (IsJsonString(group.members)) {
+    console.log("GROUP MEMBERS: ", group.members);
+    group.members = JSON.parse(group.members);
+  }
+
   const updatedMembers = await Promise.all(
     group.members.map(async (member) => {
       const memberFullname = await User.findOneLight(member.email);
@@ -769,9 +774,9 @@ const insertAver = async (user) => {
 
 const returnAllMembers = async (group) => {
   try {
-    group.members = IsJsonString(group.members)
-      ? JSON.parse(group.members)
-      : group.members;
+    // group.members = IsJsonString(group.members)
+    //   ? JSON.parse(group.members)
+    //   : group.members;
     const admin = await User.findOneLight(group.admin);
 
     let adminData = {
