@@ -728,7 +728,7 @@ io.on("connection", (socket) => {
           let senderId = action.data.senderId;
           //state that user has opened the chat
           app.locals[action.data.senderId] = conversationId;
-          let { groupId, realConversationId } = conversationId.split("-");
+          let realConversationId = conversationId.split("-")[1];
           //get all users email with sender too
           let usersEmail = realConversationId.split(" ");
           //exluce sender
