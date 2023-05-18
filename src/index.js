@@ -438,7 +438,7 @@ io.on("connection", (socket) => {
         io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
-            conversationId: conv.conversationId,
+            conversationId: conv.groupId + "-" + conv.conversationId,
             isUserOnline: false,
           },
         });
@@ -828,7 +828,7 @@ io.on("connection", (socket) => {
             io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
-                conversationId: conv.conversationId,
+                conversationId: conv.groupId + "-" + conv.conversationId,
                 isUserOnline: false,
               },
             });
@@ -866,7 +866,7 @@ io.on("connection", (socket) => {
             io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
-                conversationId: conv.conversationId,
+                conversationId: conv.groupId + "-" + conv.conversationId,
                 isUserOnline: true,
               },
             });
@@ -1296,7 +1296,7 @@ io.on("connection", (socket) => {
             io.to(data.conversationId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
-                conversationId: conv.conversationId,
+                conversationId: data.conversationId,
                 isUserOnline: true,
               },
             });
