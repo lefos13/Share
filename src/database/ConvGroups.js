@@ -5,6 +5,42 @@ const { Op } = require("sequelize");
 const moment = require("moment");
 const ConvGroups = require("../modules/convgroups");
 
+const updateLastMessage = async (convid, email, seen) => {
+  try {
+    let results = await ConvGroups.findOne({
+      where: {
+        convid: convid,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    let messages = [];
+    if (results != null)
+      if (results.messages != null) {
+        messages = JSON.parse(results.messages);
+        messages.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        // check if the last message is of the user that openned the chat
+        if (messages[0].user._id == email) {
+        } else {
+          messages[0].isRead = true;
+          messages[0].seen = true;
+          await results
+            .update({ messages: JSON.stringify(messages) })
+            .catch((err) => {
+              throw err;
+            });
+        }
+      }
+
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 /**
  * This function adds a message to a conversation group and updates the database.
  * @param convid - The ID of the conversation group where the message will be added.
@@ -156,4 +192,5 @@ module.exports = {
   deleteOneByGroupId,
   findAllByEmail,
   addMessage,
+  updateLastMessage,
 };

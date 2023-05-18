@@ -722,6 +722,57 @@ io.on("connection", (socket) => {
           break;
         }
 
+        case "server/personalGroupChatOpened": {
+          console.log("Group Chat Opened");
+          let conversationId = action.data.conversationId;
+          let senderId = action.data.senderId;
+          //state that user has opened the chat
+          app.locals[action.data.senderId] = conversationId;
+          let { groupId, realConversationId } = conversationId.split("-");
+          //get all users email with sender too
+          let usersEmail = realConversationId.split(" ");
+          //exluce sender
+          usersEmail = usersEmail.filter((val) => val != senderId);
+          //do it in paralel and get data of all users
+          let { users, admin } = await Promise.all([
+            usersEmail.map(async (email) => {
+              const userData = await User.findOneLight(email);
+              return userData;
+            }),
+            await User.findOneLight(senderId),
+          ]);
+
+          io.to(conversationId).emit("action", {
+            type: "setGroupConversationSeen",
+            data: {
+              conversationId: conversationId,
+              seen: true,
+            },
+          });
+
+          socket.emit("action", {
+            type: "setIsConversationReadGroups",
+            data: {
+              conversationId: conversationId,
+              isRead: true,
+            },
+          });
+
+          //get conversation and mark the last message as read
+          const conv = ConvGroup.updateLastMessage(
+            conversationId,
+            senderId,
+            true
+          );
+          if (conv === false) {
+            throw new Error(
+              "something went wrong with updating the last message"
+            );
+          }
+
+          break;
+        }
+
         /* The above code is a case statement in a JavaScript switch statement. It is checking if the
         action type is "server/personalChatClosed". If it is, it logs the senderId from the action
         data to the console, deletes the senderId property from the app.locals object, and breaks
