@@ -723,7 +723,7 @@ io.on("connection", (socket) => {
         }
 
         case "server/personalGroupChatOpened": {
-          console.log("Group Chat Opened");
+          console.log("Group Chat Opened", action.data);
           let conversationId = action.data.conversationId;
           let senderId = action.data.senderId;
           //state that user has opened the chat
