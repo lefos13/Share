@@ -784,6 +784,12 @@ io.on("connection", (socket) => {
           break;
         }
 
+        case "server/personalGroupChatClosed": {
+          console.log("personalGroupChatClosed data: ", action.data);
+          delete app.locals[action.data.senderId];
+          break;
+        }
+
         /* The above code is handling the "AppInBackground" action. It sets the background status of
         the user to true and sends notifications to the other user(s) in the conversation if the
         user is in the background. It retrieves all conversations involving the user and sets the
@@ -861,37 +867,65 @@ io.on("connection", (socket) => {
           app.locals[user.email] = action.data.conversationId;
           // I NEED TO MARK THE LAST MESSAGE AS READ AND SEEN
           //get conversation and mark the last message as read
-          let mails = conversationId.split(" ");
-          // const con = await Conv.checkIfExists(mails[0],mails[1]);
-          let other = mails[0] == user.email ? mails[1] : mails[0];
-          const otherUser = await User.findOneLight(other);
-          let socketList = await io.fetchSockets();
-          let online = false;
-          _.forEach(socketList, (val) => {
-            if (val.id == otherUser.socketId) online = true;
-          });
-          if (online)
-            io.to(otherUser.socketId).emit("action", {
-              type: "setConversationSeen",
+          if (conversationId.includes("-")) {
+            let realConversationId = conversationId.split("-")[1];
+            io.to(conversationId).emit("action", {
+              type: "setGroupConversationSeen",
               data: {
                 conversationId: conversationId,
                 seen: true,
               },
             });
+            socket.emit("action", {
+              type: "setIsConversationReadGroups",
+              data: {
+                conversationId: conversationId,
+                isRead: true,
+              },
+            });
 
-          socket.emit("action", {
-            type: "setIsConversationRead",
-            data: {
-              conversationId: conversationId,
-              isRead: true,
-            },
-          });
-
-          const conv = Conv.updateLastMessage(conversationId, user.email);
-          if (conv === false) {
-            throw new Error(
-              "something went wrong with updating the last message"
+            const conv = ConvGroup.updateLastMessage(
+              realConversationId,
+              user.email,
+              true
             );
+            if (conv === false) {
+              throw new Error(
+                "something went wrong with updating the last message"
+              );
+            }
+          } else {
+            let mails = conversationId.split(" ");
+            // const con = await Conv.checkIfExists(mails[0],mails[1]);
+            let other = mails[0] == user.email ? mails[1] : mails[0];
+            const otherUser = await User.findOneLight(other);
+            let socketList = await io.fetchSockets();
+            let online = false;
+            _.forEach(socketList, (val) => {
+              if (val.id == otherUser.socketId) online = true;
+            });
+            if (online)
+              io.to(otherUser.socketId).emit("action", {
+                type: "setConversationSeen",
+                data: {
+                  conversationId: conversationId,
+                  seen: true,
+                },
+              });
+
+            socket.emit("action", {
+              type: "setIsConversationRead",
+              data: {
+                conversationId: conversationId,
+                isRead: true,
+              },
+            });
+            const conv = Conv.updateLastMessage(conversationId, user.email);
+            if (conv === false) {
+              throw new Error(
+                "something went wrong with updating the last message"
+              );
+            }
           }
 
           break;
