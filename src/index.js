@@ -435,10 +435,10 @@ io.on("connection", (socket) => {
       }
       const groupConvs = await ConvGroup.findAllByEmail(user.email);
       groupConvs.forEach((conv) => {
-        io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
+        io.to(conv.groupId + "-" + conv.convid).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
-            conversationId: conv.groupId + "-" + conv.conversationId,
+            conversationId: conv.groupId + "-" + conv.convid,
             isUserOnline: false,
           },
         });
@@ -825,10 +825,10 @@ io.on("connection", (socket) => {
           }
           const groupConvs = await ConvGroup.findAllByEmail(sender);
           groupConvs.forEach((conv) => {
-            io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
+            io.to(conv.groupId + "-" + conv.convid).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
-                conversationId: conv.groupId + "-" + conv.conversationId,
+                conversationId: conv.groupId + "-" + conv.convid,
                 isUserOnline: false,
               },
             });
@@ -863,10 +863,10 @@ io.on("connection", (socket) => {
           }
           const groupConvs = await ConvGroup.findAllByEmail(sender);
           groupConvs.forEach((conv) => {
-            io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
+            io.to(conv.groupId + "-" + conv.convid).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
-                conversationId: conv.groupId + "-" + conv.conversationId,
+                conversationId: conv.groupId + "-" + conv.convid,
                 isUserOnline: true,
               },
             });
