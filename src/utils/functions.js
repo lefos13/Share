@@ -786,8 +786,8 @@ const returnAllMembers = async (group) => {
     let allData = {
       members: [...group.members, adminData],
     };
-    allData.members = (await insertDataToMembers(allData)).members;
-    return allData.members;
+    group.members = (await insertDataToMembers(group)).members;
+    return group.members;
   } catch (error) {
     console.log(error);
     return error;
