@@ -103,6 +103,7 @@ const extractConvid = async (group) => {
  */
 const insertDataToMembers = async (group) => {
   if (IsJsonString(group.members)) {
+    console.log("GROUP MEMBERS: ", group.members);
     group.members = JSON.parse(group.members);
   }
 
