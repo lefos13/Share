@@ -433,6 +433,16 @@ io.on("connection", (socket) => {
 
         //delete states of user conversations
       }
+      const groupConvs = await ConvGroup.findAllByEmail(user.email);
+      groupConvs.forEach((conv) => {
+        io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
+          type: "setIsConversationUserOnlineGroups",
+          data: {
+            conversationId: conv.conversationId,
+            isUserOnline: false,
+          },
+        });
+      });
       if (app.locals[user.email] != null) {
         delete app.locals[user.email];
       }
@@ -813,6 +823,16 @@ io.on("connection", (socket) => {
               },
             });
           }
+          const groupConvs = await ConvGroup.findAllByEmail(sender);
+          groupConvs.forEach((conv) => {
+            io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
+              type: "setIsConversationUserOnlineGroups",
+              data: {
+                conversationId: conv.conversationId,
+                isUserOnline: false,
+              },
+            });
+          });
 
           break;
         }
@@ -841,6 +861,16 @@ io.on("connection", (socket) => {
               },
             });
           }
+          const groupConvs = await ConvGroup.findAllByEmail(sender);
+          groupConvs.forEach((conv) => {
+            io.to(conv.groupId + "-" + conv.conversationId).emit("action", {
+              type: "setIsConversationUserOnlineGroups",
+              data: {
+                conversationId: conv.conversationId,
+                isUserOnline: true,
+              },
+            });
+          });
           break;
         }
 
@@ -1231,13 +1261,6 @@ io.on("connection", (socket) => {
         const groupConvs = await ConvGroup.findAllByEmail(action.data.email);
         let groupConversations = await Promise.all(
           groupConvs.map(async (conv) => {
-            io.to(conv.convid).emit("setIsConversationUserOnlineGroups", {
-              data: {
-                conversationId: conv.convid,
-                isUserOnline: true,
-              },
-            });
-
             const group = await Group.findOne(conv.groupId);
             if (group === false) throw new Error("Group not found");
 
@@ -1269,6 +1292,14 @@ io.on("connection", (socket) => {
               messagesLeft: false,
               pending: true,
             };
+
+            io.to(data.conversationId).emit("action", {
+              type: "setIsConversationUserOnlineGroups",
+              data: {
+                conversationId: conv.conversationId,
+                isUserOnline: true,
+              },
+            });
             //join the room for conversation
             socket.join(data.conversationId);
 
@@ -1332,6 +1363,7 @@ io.on("connection", (socket) => {
           })
           //logic for messages and flags
         );
+
         console.log(
           "Emitting all the group conversations, length:",
           groupConversations.length
