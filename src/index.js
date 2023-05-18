@@ -366,6 +366,7 @@ const {
   checkImagePath,
   insertAver,
   sendMessageGroup,
+  returnAllMembers,
 } = require("./utils/functions");
 const { destroyPerArrayIds } = require("./database/PostInterested");
 const { findOne } = require("./database/Group");
@@ -1172,7 +1173,7 @@ io.on("connection", (socket) => {
               average: ratingData.average,
               count: ratingData.count,
               isGroupInterest: false,
-              members: null,
+              members: [],
               isUserOnline: false,
               expiresIn: null,
               messages: [],
@@ -1202,6 +1203,9 @@ io.on("connection", (socket) => {
               })
             );
 
+            //get all the members of the group
+            data.members = await returnAllMembers(group);
+            console.log("MEMBERS AFTER ALL DATA ARE INSERTED WITH ADMIN TOO!");
             if (conv.messages !== null) {
               console.log("Messages", conv.messages !== null);
               if (IsJsonString(conv.messages))

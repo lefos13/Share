@@ -118,7 +118,7 @@ const insertDataToMembers = async (group) => {
         fullname: memberFullname.fullname,
         average: ratingData.average,
         count: ratingData.count,
-        imagePath,
+        imagePath: imagePath,
       };
     })
   );
@@ -771,8 +771,29 @@ const insertAver = async (user) => {
   }
 };
 
+const returnAllMembers = async (group) => {
+  try {
+    group.members = IsJsonString(group.members)
+      ? JSON.parse(group.members)
+      : group.members;
+    const admin = await User.findOneLight(group.admin);
+
+    let adminData = {
+      email: admin.email,
+      pending: false,
+    };
+    group.members.push(adminData);
+    group.members = (await insertDataToMembers(group)).members;
+    return group.members;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
 module.exports = {
   toNotifyTheUnverified,
+  returnAllMembers,
   sendMessage,
   encryptMessages,
   decryptMessages,
