@@ -782,9 +782,11 @@ const returnAllMembers = async (group) => {
       email: admin.email,
       pending: false,
     };
-    group.members.push(adminData);
-    group.members = (await insertDataToMembers(group)).members;
-    return group.members;
+    let allData = {
+      members: [...group.members, adminData],
+    };
+    allData.members = (await insertDataToMembers(allData)).members;
+    return allData.members;
   } catch (error) {
     console.log(error);
     return error;

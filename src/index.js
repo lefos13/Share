@@ -1205,7 +1205,10 @@ io.on("connection", (socket) => {
 
             //get all the members of the group
             data.members = await returnAllMembers(group);
-            console.log("MEMBERS AFTER ALL DATA ARE INSERTED WITH ADMIN TOO!");
+            console.log(
+              "MEMBERS AFTER ALL DATA ARE INSERTED WITH ADMIN TOO!",
+              group.groupId
+            );
             if (conv.messages !== null) {
               console.log("Messages", conv.messages !== null);
               if (IsJsonString(conv.messages))
