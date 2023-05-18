@@ -782,11 +782,13 @@ const returnAllMembers = async (group) => {
     let adminData = {
       email: admin.email,
       pending: false,
-    };
-    let allData = {
-      members: [...group.members, adminData],
+      fullname: admin.fullname,
+      imagePath: (await checkImagePath(admin.email))
+        ? "images/" + admin.email + ".jpeg"
+        : null,
     };
     group.members = (await insertDataToMembers(group)).members;
+    group.members = [...group.members, adminData];
     return group.members;
   } catch (error) {
     console.log(error);
