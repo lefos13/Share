@@ -129,7 +129,7 @@ const sendUpdatedGroupChatData = async (groupId) => {
         data.members = await returnAllMembers(group);
 
         if (groupChat.messages !== null) {
-          if (IsJsonString(groupChat.messages))
+          if (isJsonString(groupChat.messages))
             groupChat.messages = JSON.parse(groupChat.messages);
           groupChat.messages.sort((a, b) => {
             return new Date(b.createdAt) - new Date(a.createdAt);
@@ -204,7 +204,7 @@ const extractConvid = async (group) => {
   try {
     let convId = group.admin;
     let members = group.members;
-    if (await IsJsonString(members)) {
+    if (await isJsonString(members)) {
       members = JSON.parse(members);
     }
     console.log(
@@ -230,7 +230,7 @@ const extractConvid = async (group) => {
  * `count`, and `imagePath` for each member.
  */
 const insertDataToMembers = async (group) => {
-  if (IsJsonString(group.members)) {
+  if (isJsonString(group.members)) {
     console.log("GROUP MEMBERS: ", group.members);
     group.members = JSON.parse(group.members);
   }
@@ -459,12 +459,12 @@ const determineLang = async (req) => {
 /**
  * The function checks if a given string is a valid JSON string.
  * @param str - The parameter `str` is a string that is being checked to see if it is a valid JSON
- * string. The function `IsJsonString` uses the `JSON.parse()` method to attempt to parse the string as
+ * string. The function `isJsonString` uses the `JSON.parse()` method to attempt to parse the string as
  * JSON. If the parsing is successful, the function returns `true`, indicating that the
- * @returns The function `IsJsonString` is returning a boolean value. It returns `true` if the input
+ * @returns The function `isJsonString` is returning a boolean value. It returns `true` if the input
  * string can be parsed as a valid JSON object, and `false` otherwise.
  */
-const IsJsonString = async (str) => {
+const isJsonString = async (str) => {
   try {
     JSON.parse(str);
     return true;
@@ -940,7 +940,7 @@ const insertAver = async (user) => {
 
 const returnAllMembers = async (group) => {
   try {
-    // group.members = IsJsonString(group.members)
+    // group.members = isJsonString(group.members)
     //   ? JSON.parse(group.members)
     //   : group.members;
     const admin = await User.findOneLight(group.admin);
@@ -1479,7 +1479,7 @@ module.exports = {
   sendMessage,
   encryptMessages,
   decryptMessages,
-  IsJsonString,
+  isJsonString,
   sendReport,
   webSendReport,
   toNotifyOwner,

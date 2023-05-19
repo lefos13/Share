@@ -217,7 +217,7 @@ const updateDataOfGroup = async (group) => {
     imagePath: adminUser.imagePath,
   };
   group.admin = adminObject;
-  if (fun.IsJsonString(group.members)) {
+  if (fun.isJsonString(group.members)) {
     group.members = JSON.parse(group.members);
   }
 
@@ -496,7 +496,7 @@ const acceptInvitation = async (req) => {
     }
 
     let members = group.members;
-    if (fun.IsJsonString(members)) members = JSON.parse(members);
+    if (fun.isJsonString(members)) members = JSON.parse(members);
     let isChatStillPending = false;
     members.forEach((member) => {
       if (member.pending === true) {
@@ -576,7 +576,7 @@ const declineInvitation = async (req) => {
       }
 
       let members = newGroupData.members;
-      if (fun.IsJsonString(members)) members = JSON.parse(members);
+      if (fun.isJsonString(members)) members = JSON.parse(members);
       let isChatStillPending = false;
       members.forEach((member) => {
         if (member.pending === true) {

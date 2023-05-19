@@ -16,7 +16,7 @@ const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const Groups = require("./Group");
 const Post = require("./Post");
-const { IsJsonString } = require("../utils/functions");
+const { isJsonString } = require("../utils/functions");
 const moment = require("moment");
 // ==== code for db
 
@@ -257,7 +257,7 @@ const countVerifiedEnchanced = async (postid) => {
           throw new Error("Group not found");
         }
         //count members of the group
-        if (IsJsonString(groupData.members)) {
+        if (isJsonString(groupData.members)) {
           groupData.members = JSON.parse(groupData.members);
         }
         countOfUsers += groupData.members.length + 1;

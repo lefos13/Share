@@ -358,7 +358,7 @@ let io = require("socket.io")(server);
 
 const Users = require("./modules/user");
 const {
-  IsJsonString,
+  isJsonString,
   encryptMessages,
   decryptMessages,
   sendMessage,
@@ -1213,7 +1213,7 @@ io.on("connection", (socket) => {
 
         if (u.messages !== null) {
           // order
-          let toJson = IsJsonString(u.messages);
+          let toJson = isJsonString(u.messages);
 
           if (toJson) u.messages = JSON.parse(u.messages);
           u.messages.sort((a, b) => {
@@ -1331,7 +1331,7 @@ io.on("connection", (socket) => {
               group.groupId
             );
             if (conv.messages !== null) {
-              if (IsJsonString(conv.messages))
+              if (isJsonString(conv.messages))
                 conv.messages = JSON.parse(conv.messages);
               conv.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);

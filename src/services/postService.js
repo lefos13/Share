@@ -13,7 +13,7 @@ const fun = require("../utils/functions");
 const {
   insertAver,
   applyFilters,
-  IsJsonString,
+  isJsonString,
   determineLang,
   determineExpirationDate,
   checkImagePath,
@@ -412,7 +412,7 @@ const interested = async (req) => {
             }
 
             if (chat.messages !== null) {
-              if (IsJsonString(chat.messages)) {
+              if (isJsonString(chat.messages)) {
                 chat.messages = JSON.parse(chat.messages);
               }
               chat.messages.sort((a, b) => {
@@ -626,7 +626,7 @@ const searchPosts = async (req) => {
     for await (fnd of found.rows) {
       fnd.dataValues.isFavourite = false;
 
-      if (IsJsonString(fnd.moreplaces)) {
+      if (isJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
 
@@ -766,7 +766,7 @@ const getPostsUser = async (req) => {
       };
     }
     for await (post of finalarr) {
-      if (IsJsonString(post.moreplaces)) {
+      if (isJsonString(post.moreplaces)) {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
 
@@ -869,7 +869,7 @@ const getPostPerId = async (req) => {
     } else if (post == null) {
       return { status: 404 };
     }
-    if (IsJsonString(post.moreplaces)) {
+    if (isJsonString(post.moreplaces)) {
       post.moreplaces = JSON.parse(post.moreplaces);
     }
 
@@ -955,7 +955,7 @@ const getInterestedPerUser = async (req) => {
       //IF YOU FOUND SUCH A POST
       if (post != null) {
         // PARSE THE MOREPLACES IF THERE IS ANY
-        if (IsJsonString(post.moreplaces)) {
+        if (isJsonString(post.moreplaces)) {
           post.moreplaces = JSON.parse(post.moreplaces);
         }
         //NULIFY THE ISFAVOURITE VALUE (WE DONT NEED IT HERE)
@@ -1048,7 +1048,7 @@ const getIntPost = async (req) => {
     if (posts === false) {
       throw new Error("Error at finding the requested post");
     }
-    if (IsJsonString(posts.moreplaces)) {
+    if (isJsonString(posts.moreplaces)) {
       posts.moreplaces = JSON.parse(posts.moreplaces);
     }
     posts = await fun.fixAllDates(posts);
@@ -1683,7 +1683,7 @@ const verInterested = async (req) => {
       }
 
       if (chat.messages !== null) {
-        if (IsJsonString(chat.messages)) {
+        if (isJsonString(chat.messages)) {
           chat.messages = JSON.parse(chat.messages);
         }
         chat.messages.sort((a, b) => {
@@ -1802,7 +1802,7 @@ const verInterested = async (req) => {
     }
 
     if (chat.messages !== null) {
-      if (IsJsonString(chat.messages)) {
+      if (isJsonString(chat.messages)) {
         chat.messages = JSON.parse(chat.messages);
       }
       chat.messages.sort((a, b) => {
@@ -2033,7 +2033,7 @@ const getFavourites = async (req) => {
 
     let allResults = [];
     for await (post of allFavourites) {
-      if (fun.IsJsonString(post.moreplaces)) {
+      if (fun.isJsonString(post.moreplaces)) {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
       post = await fun.fixAllDates(post);
@@ -2110,7 +2110,7 @@ const feedScreen = async (req) => {
 
     for await (fnd of found.rows) {
       fnd.dataValues.isFavourite = false;
-      if (IsJsonString(fnd.moreplaces)) {
+      if (isJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
       fnd = await fun.fixAllDates(fnd);
@@ -2237,7 +2237,7 @@ const feedAll = async (req) => {
 
     for await (fnd of found.rows) {
       fnd.dataValues.isFavourite = false;
-      if (IsJsonString(fnd.moreplaces)) {
+      if (isJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
       fnd = await fun.fixAllDates(fnd);
