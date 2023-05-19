@@ -222,7 +222,7 @@ const updateDataOfGroup = async (group) => {
   try {
     group.members = JSON.parse(group.members);
   } catch (error) {
-    console.error("Already a JSON object");
+    // console.error("Already a JSON object");
   }
 
   for await (let member of group.members) {
