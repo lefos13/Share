@@ -363,7 +363,6 @@ const {
   decryptMessages,
   sendMessage,
   getLang,
-  checkImagePath,
   insertAver,
   sendMessageGroup,
   returnAllMembers,
@@ -1381,6 +1380,26 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+/**
+ * The function checks if an image file exists in a specific directory based on the email parameter.
+ * @param email - The email parameter is a string that represents the email address of a user. It is
+ * used to check if an image file with the name "{email}.jpeg" exists in the "./uploads/" directory.
+ * @returns The function `checkImagePath` returns a boolean value. It returns `true` if a file with the
+ * name `email + ".jpeg"` exists in the `./uploads/` directory, and `false` otherwise. If an error
+ * occurs while checking for the file, the function also returns `false`.
+ */
+const checkImagePath = async (email) => {
+  try {
+    if (fs.existsSync("./uploads/" + email + ".jpeg")) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+};
 
 /* The above code is exporting an object named `io` from a JavaScript module. The `io` object is
 assigned to the `ioObject` constant and then exported using the `module.exports` syntax. This code

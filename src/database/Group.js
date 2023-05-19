@@ -29,7 +29,6 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   },
 });
 
-const fun = require("../utils/functions");
 /**
  * This function creates a new group and returns true if successful, otherwise it returns false and
  * logs an error.
@@ -139,7 +138,7 @@ const getAsGuest = async (email) => {
     //loop through groups knowing the index of array
     for await (let group of groups) {
       // loop through members of the group
-      if (fun.isJsonString(group.members)) {
+      if (isJsonString(group.members)) {
         group.members = JSON.parse(group.members);
       }
       //check equality of emails and if pending = false
@@ -398,7 +397,7 @@ const getPendingUsers = async (groupId) => {
     }).catch((err) => {
       throw err;
     });
-    if (fun.isJsonString(users.members)) {
+    if (isJsonString(users.members)) {
       users.members = JSON.parse(users.members);
     }
     //loop through all the members of the group
@@ -455,7 +454,7 @@ const isGroupMember = async (postid, groupId) => {
     });
     const postOwner = post.email;
     //Parse the group members
-    if (fun.isJsonString(group.members)) {
+    if (isJsonString(group.members)) {
       group.members = JSON.parse(group.members);
     }
     //loop through all the members of the group
@@ -469,6 +468,23 @@ const isGroupMember = async (postid, groupId) => {
   } catch (err) {
     console.error(err);
     return new Error(err);
+  }
+};
+
+/**
+ * The function checks if a given string is a valid JSON string.
+ * @param str - The parameter `str` is a string that is being checked to see if it is a valid JSON
+ * string. The function `isJsonString` uses the `JSON.parse()` method to attempt to parse the string as
+ * JSON. If the parsing is successful, the function returns `true`, indicating that the
+ * @returns The function `isJsonString` is returning a boolean value. It returns `true` if the input
+ * string can be parsed as a valid JSON object, and `false` otherwise.
+ */
+const isJsonString = async (str) => {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
   }
 };
 module.exports = {
