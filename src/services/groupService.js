@@ -431,12 +431,33 @@ const leaveGroup = async (req) => {
         postid: interestData,
       };
     }
+    let groupChatData = await ConvGroup.findOneByGroupId(groupId);
+    if (groupChatData instanceof Error) {
+      throw new Error("Group Not Found");
+    }
     // remove a member from a group
     let response = await Group.leaveGroup(groupId, extra);
-    if (response === false) {
-      throw new Error("Group Member Deletion Failed");
+    if (response instanceof Error) {
+      throw response;
+    } else if (response === "Left") {
+      //Change members in group chat
+      const responseRemoval = await ConvGroup.removeMembers(groupId);
+      if (responseRemoval instanceof Error) {
+        throw responseRemoval;
+      }
+      //Send events to group for changes
+      fun.sendUpdatedGroupChatData(groupId);
+      return { status: 200, message: msg.leftGroup };
+    } else if (response === "Destroyed") {
+      //Destroy chat of group
+      let chatDeleted = await ConvGroup.deleteOneByGroupId(groupId);
+      if (chatDeleted instanceof Error) {
+        throw chatDeleted;
+      }
+      //Send events to group for removal
+      fun.sendRemovedGroupChatData(groupId + "-" + groupChatData.convid);
+      return { status: 200, message: msg.leftGroup };
     }
-    return { status: 200, message: msg.leftGroup };
   } catch (error) {
     console.error(error);
     return { status: 500 };
@@ -532,24 +553,51 @@ const declineInvitation = async (req) => {
     let invitedEmail = req.body.extra;
     let msg = await fun.determineLang(req);
     let groupId = req.body.groupId;
+    let groupChatData = await ConvGroup.findOneByGroupId(groupId);
     // decline invitation
     let group = await Group.declineInvitation(groupId, invitedEmail);
     if (group === false) {
       throw new Error("Invitation Declination Failed");
-    }
-    let members = group.members;
-    if (fun.IsJsonString(members)) members = JSON.parse(members);
-    let isChatStillPending = false;
-    members.forEach((member) => {
-      if (member.pending === true) {
-        isChatStillPending = true;
+    } else if (group === "Updated") {
+      //update the group chat
+      const responseRemoval = await ConvGroup.removeMembers(
+        groupId,
+        invitedEmail
+      );
+      if (responseRemoval instanceof Error) {
+        throw responseRemoval;
       }
-    });
+      //Send events to group for changes
+      fun.sendUpdatedGroupChatData(groupId);
 
-    if (!isChatStillPending) {
-      console.log("GROUP CHAT IS NOT PENDING ANYMORE");
-      //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE
+      let newGroupData = await Group.findOne(groupId);
+      if (newGroupData === false) {
+        throw new Error("Group Not Found");
+      }
+
+      let members = newGroupData.members;
+      if (fun.IsJsonString(members)) members = JSON.parse(members);
+      let isChatStillPending = false;
+      members.forEach((member) => {
+        if (member.pending === true) {
+          isChatStillPending = true;
+        }
+      });
+
+      if (!isChatStillPending) {
+        console.log("GROUP CHAT IS NOT PENDING ANYMORE");
+        //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE
+      }
+    } else if (group === "Destroyed") {
+      //Destroy chat of group
+      let chatDeleted = await ConvGroup.deleteOneByGroupId(groupId);
+      if (chatDeleted instanceof Error) {
+        throw chatDeleted;
+      }
+      //Send events to group for removal
+      fun.sendRemovedGroupChatData(groupId + "-" + groupChatData.convid);
     }
+
     return { status: 200, message: msg.invitationDeclined };
   } catch (error) {
     console.error(error);

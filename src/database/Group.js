@@ -290,6 +290,7 @@ const leaveGroup = async (groupId, email) => {
         .catch((err) => {
           throw err;
         });
+      return "Left";
     } else {
       //destroy the group
       await Groups.destroy({
@@ -299,11 +300,11 @@ const leaveGroup = async (groupId, email) => {
       }).catch((err) => {
         throw err;
       });
+      return "Destroyed";
     }
-    return true;
   } catch (error) {
     console.error(error);
-    return false;
+    return new Error("Leaving group failed");
   }
 };
 
@@ -368,14 +369,21 @@ const declineInvitation = async (groupId, email) => {
     //remove member form the list of members of the group
     group.members = group.members.filter((member) => member.email !== email);
 
-    await group
-      .update({
-        members: group.members,
-      })
-      .catch((err) => {
+    if (group.members.length > 0) {
+      await group
+        .update({
+          members: group.members,
+        })
+        .catch((err) => {
+          throw err;
+        });
+      return "Updated";
+    } else {
+      group.destroy().catch((err) => {
         throw err;
       });
-    return group;
+      return "Destroyed";
+    }
   } catch (error) {
     console.error(error);
     return false;

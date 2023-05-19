@@ -9,6 +9,7 @@ const PostInt = require("../database/PostInterested");
 const ToReview = require("../database/ToReview");
 const Notification = require("../database/Notifications");
 const ConvUsers = require("../database/ConvUsers");
+const ConvGroups = require("../database/ConvGroups");
 
 const bcrypt = require("bcrypt");
 var otpGenerator = require("otp-generator");
@@ -96,27 +97,78 @@ const moreMessages = async (req) => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    let counter = 0;
-    let key;
-    _.forEach(allMessages, (mes) => {
-      if (mes._id === message._id) {
-        counter++;
-        key = counter;
-        return false;
-      }
-      counter++;
-    });
+    let counter;
+    const index = _.findIndex(allMessages, { _id: message._id });
+    if (index !== -1) {
+      counter = index + 1;
+    } else {
+      throw new Error("Error at finding the message");
+    }
 
     //PAGINATION
-    var skipcount = counter;
-    var takecount =
-      allMessages.length - counter > 20 ? 20 : allMessages.length - counter;
+    const skipCount = counter;
+    const remainingMessages = allMessages.length - counter;
+    const takeCount = remainingMessages > 20 ? 20 : remainingMessages;
 
-    var finalMessages = _.take(_.drop(allMessages, skipcount), takecount);
+    let finalMessages = _.take(_.drop(allMessages, skipCount), takeCount);
 
-    if (allowCrypto) finalMessages = await decryptMessages(finalMessages);
-    //check if the are more messages after those
-    let messagesLeft = allMessages.length - counter > 20 ? true : false;
+    if (allowCrypto) {
+      finalMessages = await decryptMessages(finalMessages);
+    }
+
+    const messagesLeft = remainingMessages > 20;
+
+    return {
+      status: 200,
+      data: {
+        finalMessages: finalMessages,
+        messagesLeft: messagesLeft,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
+const moreMessagesGroups = async (req) => {
+  try {
+    let data = req.body.data;
+    let message = data.lastMessage;
+    //extract real conversationId
+    const groupId = data.conversationId.split("-")[0];
+
+    const conv = await ConvGroups.findOneByGroupId(groupId);
+    if (conv === false) {
+      throw new Error("Error at finding the conversation");
+    }
+
+    let allMessages = conv.messages;
+    allMessages = JSON.parse(allMessages);
+    allMessages.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    let counter;
+    const index = _.findIndex(allMessages, { _id: message._id });
+    if (index !== -1) {
+      counter = index + 1;
+    } else {
+      throw new Error("Error at finding the message");
+    }
+
+    //PAGINATION
+    const skipCount = counter;
+    const remainingMessages = allMessages.length - counter;
+    const takeCount = remainingMessages > 20 ? 20 : remainingMessages;
+
+    let finalMessages = _.take(_.drop(allMessages, skipCount), takeCount);
+
+    if (allowCrypto) {
+      finalMessages = await decryptMessages(finalMessages);
+    }
+
+    const messagesLeft = remainingMessages > 20;
 
     return {
       status: 200,
@@ -191,4 +243,5 @@ module.exports = {
   moreMessages,
   sendReport,
   getTerms,
+  moreMessagesGroups,
 };

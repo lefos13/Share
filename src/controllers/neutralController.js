@@ -35,6 +35,20 @@ const getTerms = async (req, res) => {
   }
 };
 
+const moreMessagesGroups = async (req, res) => {
+  try {
+    let msg = await determineLang(req);
+    const data = await neutralService.moreMessagesGroups(req);
+    if (data.status != 200) throw msg;
+    res.json({
+      messages: data.data.finalMessages,
+      messagesLeft: data.data.messagesLeft,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.errorMessage });
+  }
+};
+
 const moreMessages = async (req, res) => {
   try {
     let msg = await determineLang(req);
@@ -98,4 +112,5 @@ module.exports = {
   moreMessages,
   sendReport,
   getTerms,
+  moreMessagesGroups,
 };

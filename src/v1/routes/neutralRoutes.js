@@ -62,6 +62,13 @@ router.post(
   neutralController.moreMessages
 );
 
+router.post(
+  "/moreMessagesGroups",
+  [authenticateToken],
+  cors(corsOptions),
+  neutralController.moreMessagesGroups
+);
+
 router.get(
   "/getNotifications",
   [authenticateToken],

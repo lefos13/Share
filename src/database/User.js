@@ -130,6 +130,13 @@ const findOneUserQuery = async (query) => {
   }
 };
 
+/**
+ * This is an asynchronous function that finds a user by their email and returns their information
+ * excluding sensitive data.
+ * @param email - The email of the user that needs to be found in the database.
+ * @returns The function `findOneLight` returns either the user object (with certain attributes
+ * excluded) if it is found in the database, or `false` if there is an error or the user is not found.
+ */
 const findOneLight = async (email) => {
   try {
     const user = await Users.findOne({

@@ -13,9 +13,6 @@ admin.initializeApp({
 
 var _ = require("lodash");
 
-const Review = require("../database/Review");
-const Notification = require("../database/Notifications");
-
 const {
   EMAIL,
   PASSEMAIL,
@@ -54,6 +51,12 @@ const FcmToken = require("../modules/fcmtoken");
 const { response } = require("express");
 const fs = require("fs");
 
+const ConvGroups = require("../database/ConvGroups");
+const Review = require("../database/Review");
+const Notification = require("../database/Notifications");
+const User = require("../database/User");
+const Group = require("../database/Group");
+
 const crypto = require("crypto");
 const User = require("../database/User");
 const { reject } = require("lodash");
@@ -61,7 +64,133 @@ const e = require("express");
 const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
+const socket = require("../index");
 
+/**
+ * This function sends updated group chat data to all members of a group.
+ * @param groupId - The ID of the group chat that needs to be updated.
+ * @returns The function does not have a return statement, but it may return an Error object if an
+ * error occurs.
+ */
+const sendUpdatedGroupChatData = async (groupId) => {
+  const io = socket.io;
+  try {
+    let groupChat = await ConvGroups.deleteOneByGroupId(groupId);
+    if (groupChat instanceof Error) {
+      throw groupChat;
+    }
+
+    let group = await Group.findOne(groupId);
+
+    let emails = groupChat.convid.split(" ");
+    await Promise.all(
+      emails.map(async (email) => {
+        let user = await User.findOneLight(email);
+        let ratingData = await insertAver(user);
+
+        const data = {
+          conversationId: group.groupId + "-" + groupChat.convid,
+          socketId: user.socketId,
+          username: group.groupName,
+          photo: (await checkImagePath(user.email))
+            ? `images/${user.email}.jpeg`
+            : null,
+          email: user.email,
+          average: ratingData.average,
+          count: ratingData.count,
+          isGroupInterest: false,
+          members: [],
+          isUserOnline: false,
+          expiresIn: null,
+          messages: [],
+          isRead: true,
+          lastMessage: null,
+          lastMessageTime: null,
+          isLastMessageMine: false,
+          messagesLeft: false,
+          pending: true,
+        };
+
+        //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
+        let emailsToCheck = groupChat.convid.split(" ");
+        emailsToCheck.filter((email) => email !== user.email);
+        let socketList = await io.fetchSockets();
+        await Promise.all(
+          emailsToCheck.map(async (email) => {
+            let userData = await User.findOneLight(email);
+            for (const soc of socketList) {
+              if (soc.id == userData.socketId) {
+                data.isUserOnline = true;
+                break;
+              }
+            }
+          })
+        );
+        //get all the members of the group
+        data.members = await returnAllMembers(group);
+
+        if (groupChat.messages !== null) {
+          if (IsJsonString(groupChat.messages))
+            groupChat.messages = JSON.parse(groupChat.messages);
+          groupChat.messages.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+          data.messagesLeft = groupChat.messages.length > 20;
+          const finalMessages = _.take(
+            _.drop(groupChat.messages, 0),
+            data.messagesLeft ? 20 : groupChat.messages.length
+          );
+
+          data.messages = await decryptMessages(finalMessages);
+
+          data.lastMessage = finalMessages[0].text;
+          data.isLastMessageMine = data.messages[0].user._id == user.email;
+          data.lastMessageTime = moment(finalMessages[0].createdAt).format(
+            "DD-MM-YYYY HH:mm"
+          );
+          if (data.isLastMessageMine) {
+            data.isRead = true;
+          } else {
+            // check if the user has read it in the past
+            data.isRead = finalMessages[0].isRead;
+          }
+        }
+        io.to(user.socketId).emit("action", {
+          type: "onGroupConversationUpdated",
+          conversation: data,
+        });
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    return new Error("getting group chat data failed");
+  }
+};
+
+/**
+ * This function sends a message to a specific group conversation indicating that the conversation has
+ * been removed.
+ * @param convid - The parameter `convid` is likely an identifier or reference to a group conversation
+ * that is being removed. It is used to emit a socket event to all clients connected to the
+ * conversation, notifying them that the conversation has been removed.
+ * @returns If there is an error, the function will return a new Error object with the message "getting
+ * group chat data failed". If there is no error, the function does not return anything (implicitly
+ * returns undefined).
+ */
+const sendRemovedGroupChatData = async (convid) => {
+  const io = socket.io;
+  try {
+    io.to(convid).emit("action", {
+      type: "onGroupConversationRemoved",
+      data: {
+        conversation: convid,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return new Error("getting group chat data failed");
+  }
+};
 /**
  * The function extracts the conversation ID from a group object in JavaScript.
  * @param group - The `group` parameter is an object that contains information about a group
@@ -817,11 +946,13 @@ const returnAllMembers = async (group) => {
     //   ? JSON.parse(group.members)
     //   : group.members;
     const admin = await User.findOneLight(group.admin);
-
+    const ratingData = await insertAver(admin);
     let adminData = {
       email: admin.email,
       pending: false,
       fullname: admin.fullname,
+      average: ratingData.average,
+      count: ratingData.count,
       imagePath: (await checkImagePath(admin.email))
         ? "images/" + admin.email + ".jpeg"
         : null,
@@ -1428,4 +1559,6 @@ module.exports = {
   insertDataToMembers,
   extractConvid,
   sendMessageGroup,
+  sendRemovedGroupChatData,
+  sendUpdatedGroupChatData,
 };

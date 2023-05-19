@@ -189,6 +189,39 @@ const findAllByEmail = async (email) => {
     );
   }
 };
+
+/**
+ * The function removes a member's email from a conversation in a database.
+ * @param groupId - The ID of the conversation group from which the member needs to be removed.
+ * @param email - The email of the member that needs to be removed from the conversation group.
+ * @returns a boolean value of `true` if the operation is successful, and an `Error` object if there is
+ * an error inside the function.
+ */
+const removeMembers = async (groupId, email) => {
+  try {
+    let results = await ConvGroups.findOne({
+      where: {
+        groupId: groupId,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    let conversationId = results.convid;
+    let emails = conversationId.split(" ");
+    emails = emails.filter((e) => e !== email);
+    const newConversationId = emails.join(" ");
+
+    await results.update({ convid: newConversationId }).catch((e) => {
+      throw e;
+    });
+    return true;
+  } catch (error) {
+    console.log(error);
+    return new Error(
+      "Error inside removeMembers function of ConvGroups database layer!"
+    );
+  }
+};
 module.exports = {
   saveOne,
   findOneByGroupId,
@@ -196,4 +229,5 @@ module.exports = {
   findAllByEmail,
   addMessage,
   updateLastMessage,
+  removeMembers,
 };

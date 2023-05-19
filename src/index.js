@@ -1331,14 +1331,12 @@ io.on("connection", (socket) => {
               group.groupId
             );
             if (conv.messages !== null) {
-              console.log("Messages", conv.messages !== null);
               if (IsJsonString(conv.messages))
                 conv.messages = JSON.parse(conv.messages);
-              console.log("Messages 1", conv.messages !== null);
               conv.messages.sort((a, b) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
               });
-              console.log("Messages 2", conv.messages !== null);
+
               data.messagesLeft = conv.messages.length > 20;
 
               const finalMessages = _.take(
