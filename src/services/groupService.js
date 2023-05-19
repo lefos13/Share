@@ -217,8 +217,10 @@ const updateDataOfGroup = async (group) => {
     imagePath: adminUser.imagePath,
   };
   group.admin = adminObject;
-  if (fun.isJsonString(group.members) === true) {
+  try {
     group.members = JSON.parse(group.members);
+  } catch (error) {
+    console.error("Already a JSON object");
   }
 
   for await (let member of group.members) {
