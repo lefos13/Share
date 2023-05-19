@@ -1444,14 +1444,6 @@ module.exports = {
       return false;
     }
   },
-  IsJsonString: (str) => {
-    try {
-      JSON.parse(str);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  },
   /* The above code is a JavaScript function that handles push notifications for a ride-sharing
   application. It takes in a post object and a message as parameters. The function first searches
   for all requests that have the same start and end coordinates as the post and gathers the emails
