@@ -18,7 +18,7 @@ const Groups = require("../modules/group");
 const { HOST, USERR, PASS, DATABASEE } = process.env;
 const { Op } = require("sequelize");
 const { Sequelize, DataTypes, fn } = require("sequelize");
-const { IsJsonString } = require("../utils/functions");
+
 const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
@@ -29,6 +29,7 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   },
 });
 
+const { IsJsonString } = require("../utils/functions");
 /**
  * This function creates a new group and returns true if successful, otherwise it returns false and
  * logs an error.
