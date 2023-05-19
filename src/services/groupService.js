@@ -217,7 +217,7 @@ const updateDataOfGroup = async (group) => {
     imagePath: adminUser.imagePath,
   };
   group.admin = adminObject;
-  if (fun.isJsonString(group.members)) {
+  if (fun.isJsonString(group.members) === true) {
     group.members = JSON.parse(group.members);
   }
 

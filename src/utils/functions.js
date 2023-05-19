@@ -464,7 +464,7 @@ const determineLang = async (req) => {
  * @returns The function `isJsonString` is returning a boolean value. It returns `true` if the input
  * string can be parsed as a valid JSON object, and `false` otherwise.
  */
-const isJsonString = async (str) => {
+const isJsonString = (str) => {
   try {
     JSON.parse(str);
     return true;
