@@ -964,6 +964,515 @@ const returnAllMembers = async (group) => {
   }
 };
 
+const sendReport = async (text, email) => {
+  try {
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: EMAIL,
+        pass: PASSEMAIL,
+      },
+    });
+
+    // send mail with defined transport object
+    info = await transporter.sendMail({
+      from: `Report`,
+      to: EMAIL, // list of receivers
+      subject: "Report from the App", // Subject line
+      text: text + " by " + email, // plain text body
+    });
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+};
+
+const webSendReport = async (text, email, name, number) => {
+  try {
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: EMAIL,
+        pass: PASSEMAIL,
+      },
+    });
+
+    // send mail with defined transport object
+    info = await transporter.sendMail({
+      from: `Report`,
+      to: EMAIL, // list of receivers
+      subject: "Report from the App", // Subject line
+      text: "All data sent:",
+      html:
+        "<br>Comment: " +
+        text +
+        "<br>Email: " +
+        email +
+        "<br>Fullname: " +
+        name +
+        "<br>Phone number: " +
+        number, // plain text body
+    });
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+};
+
+const toNotifyOwner = async (emailToNotify, emailAction, postid, liked) => {
+  try {
+    const user = await Users.findOne({
+      where: {
+        email: emailAction,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    const userToNotify = await User.findOneLight(emailToNotify);
+
+    let msg = await getLang(userToNotify.lastLang);
+
+    const fcmData = await FcmToken.findOne({
+      where: {
+        email: emailToNotify,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    let postString = postid.toString();
+    let data;
+    let message;
+    let fcmToken = fcmData != null ? fcmData.fcmToken : null;
+    if (liked === true) {
+      data = {
+        type: "receiveInterest",
+        postid: postString,
+        email: emailAction,
+        fullname: user.fullname,
+      };
+
+      message = {
+        data: data,
+        token: fcmToken,
+        notification: {
+          title: msg.firebase.not_owner_title,
+          body:
+            msg.firebase.not_ver_body0 +
+            user.fullname +
+            msg.firebase.liked_post,
+        },
+      };
+    } else {
+      data = {
+        type: "user_disliked",
+        postid: postString,
+        email: emailAction,
+        fullname: user.fullname,
+      };
+
+      message = {
+        data: data,
+        token: fcmToken,
+        notification: {
+          title: msg.firebase.dislike_title,
+          body:
+            msg.firebase.not_ver_body0 +
+            user.fullname +
+            msg.firebase.dislike_body,
+        },
+      };
+    }
+    // Insert notification to history
+    let curTime = moment();
+    let imagePath = null;
+    if (await checkImagePath(user.email)) {
+      imagePath = "images/" + user.email + ".jpeg";
+    }
+    const notificationToInsert = {
+      imagePath: imagePath,
+      date: curTime,
+      type: data.type,
+      postid: data.postid,
+      email: data.email,
+      fullName: data.fullname,
+      ownerEmail: emailToNotify,
+      title: message.notification.title,
+      message: message.notification.body,
+      isRead: false,
+    };
+    Notification.createOne(notificationToInsert).then((data) => {
+      console.log("Notification inserted: ", data);
+    });
+
+    let toSend = false;
+
+    if (fcmData != null) {
+      await verifyFCMToken(fcmData.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
+    } else {
+      throw "User hasnt the app anymore!";
+    }
+
+    if (toSend !== false) {
+      // Send notification through firebase
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      // fcmData.destroy();
+      throw "User has uninstalled the app!";
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const toNotifyTheVerified = async (email, postid, ownerEmail, convId) => {
+  try {
+    let postIdString = postid.toString();
+    const user = await Users.findOne({
+      where: {
+        email: ownerEmail,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    let fcmToken = await FcmToken.findOne({
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    const toNotifyUser = await Users.findOne({
+      where: {
+        email: email,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    const msg = await getLang(toNotifyUser.lastLang);
+    let fcmTok = fcmToken != null ? fcmToken.fcmToken : null;
+    let message = {
+      data: {
+        type: "receiveApproval",
+        postid: postIdString,
+        email: user.email, // owner email
+        fullname: user.fullname, // owner email
+        conversationId: convId,
+      },
+      token: fcmTok,
+      notification: {
+        title: msg.firebase.not_ver_title,
+        body:
+          msg.firebase.not_ver_body0 +
+          user.fullname +
+          msg.firebase.not_ver_body,
+      },
+    };
+    // Insert notification to history
+    let curTime = moment();
+    let imagePath = null;
+    if (await checkImagePath(user.email)) {
+      imagePath = "images/" + user.email + ".jpeg";
+    }
+    const notificationToInsert = {
+      imagePath: imagePath,
+      date: curTime,
+      type: message.data.type,
+      postid: message.data.postid,
+      email: message.data.email,
+      fullName: message.data.fullname,
+      ownerEmail: toNotifyUser.email,
+      title: message.notification.title,
+      message: message.notification.body,
+      isRead: false,
+    };
+    Notification.createOne(notificationToInsert).then((data) => {
+      console.log("Notification inserted: ", data);
+    });
+
+    let toSend = false;
+    if (fcmToken != null) {
+      await verifyFCMToken(fcmToken.fcmToken)
+        .then(() => {
+          toSend = true;
+        })
+        .catch(() => {
+          toSend = false;
+        });
+    } else {
+      throw "User hasnt the app anymore!";
+    }
+
+    if (toSend !== false) {
+      admin
+        .messaging()
+        .send(message)
+        .then((response) => {
+          console.log("Success: ", response);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } else {
+      // fcmToken.destroy();
+      throw "User has uninstalled the app!";
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const applyFilters = async (data, array) => {
+  try {
+    //filter for available seats
+    if (data.seats != null) {
+      array = _.filter(array, (obj) => {
+        return obj.post.numseats >= parseInt(data.seats);
+      });
+    }
+
+    //filter for driver's rating
+    if (data.driverRating != null) {
+      array = _.filter(array, (obj) => {
+        return obj.user.average >= parseInt(data.driverRating);
+      });
+    }
+
+    if (data.age != null) {
+      // afairese ta post twn xrhstwn pou einai panw apo data.age_end
+
+      array = _.filter(array, (obj) => {
+        let calcAge;
+        if (obj.user.age != null) {
+          let splitted = obj.user.age.split("/");
+          let ageDate = moment()
+            .set("year", parseInt(splitted[2]))
+            .set("month", parseInt(splitted[1]) - 1)
+            .set("date", parseInt(splitted[0]));
+
+          calcAge = moment().diff(ageDate, "years");
+        }
+
+        return calcAge <= data.age_end;
+      });
+      // afairese ta post twn xrhstwn pou einai katw apo data.age
+      array = _.filter(array, (obj) => {
+        let calcAge;
+        if (obj.user.age != null) {
+          let splitted = obj.user.age.split("/");
+          let ageDate = moment()
+            .set("year", parseInt(splitted[2]))
+            .set("month", parseInt(splitted[1]) - 1)
+            .set("date", parseInt(splitted[0]));
+
+          calcAge = moment().diff(ageDate, "years");
+        }
+        return calcAge >= data.age;
+      });
+    }
+
+    if (data.car != null) {
+      //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
+      array = _.filter(array, (obj) => {
+        return obj.user.car == data.car;
+      });
+    }
+
+    if (data.cardate != null) {
+      //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
+      array = _.filter(array, (obj) => {
+        data.cardate = parseInt(data.cardate, 10);
+        obj.user.cardate = parseInt(obj.user.cardate, 10);
+        return parseInt(obj.user.cardate) >= data.cardate;
+      });
+    }
+
+    if (data.gender != null) {
+      //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
+      array = _.filter(array, (obj) => {
+        return obj.user.gender == data.gender;
+      });
+    }
+
+    if (data.withReturn != null) {
+      console.log("FILTERING FOR RETURN DATE!");
+      //afairese ta post twn xrhstwn pou den exoun epistrofh
+      array = _.filter(array, (obj) => {
+        //check if post has return dates
+        if (obj.post.withReturn == false) return false;
+
+        let postStartDate = moment(obj.post.returnStartDate);
+        let postEndDate =
+          obj.post.returnEndDate != null
+            ? moment(obj.post.returnEndDate)
+            : null;
+        let searchStartDate = moment(data.returnStartDate);
+        let searchEndDate =
+          data.returnEndDate != null
+            ? moment(data.returnEndDate)
+            : moment(data.returnStartDate).add(1, "months");
+
+        // case that the post has only a startreturndate
+        if (data.returnEndDate == null) {
+          if (postEndDate == null) {
+            if (postStartDate.isSame(searchStartDate)) return true;
+          }
+
+          if (postEndDate != null) {
+            if (
+              searchStartDate.isBetween(postStartDate, postEndDate, null, "[]")
+            ) {
+              return true;
+            }
+          }
+        } else {
+          if (postEndDate == null) {
+            if (
+              postStartDate.isBetween(
+                searchStartDate,
+                searchEndDate,
+                null,
+                "[]"
+              )
+            )
+              return true;
+          }
+
+          if (postEndDate != null) {
+            if (
+              postStartDate.isBetween(
+                searchStartDate,
+                searchEndDate,
+                null,
+                "[]"
+              ) ||
+              postEndDate.isBetween(searchStartDate, searchEndDate, null, "[]")
+            ) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      });
+    }
+    if (data.petAllowed != null) {
+      array = _.filter(array, (obj) => {
+        return obj.post.petAllowed == data.petAllowed;
+      });
+    }
+    return array;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const pushNotifications = async (post, msg) => {
+  try {
+    let arrayToNotify = [];
+    // GATHER ALL THE REQUESTS WITH THE SPECIFIC STARTCOORD AND THE ENDCOORD OF THE POST THAT HAS BEEN CREATED
+    const allRequests = await SearchPost.findAll({
+      where: {
+        startcoord: post.startcoord,
+        endcoord: post.endcoord,
+        email: { [Op.ne]: post.email },
+      },
+    }).catch((err) => {
+      console.error("Inside function that pushes notifications, threw error!");
+      throw err;
+    });
+
+    // FLAG TO SEND OR NOT THE NOTIFICATION
+    let toSendNotification = false;
+
+    if (allRequests.length > 0) {
+      // CASE THAT THE POST HAS THE RIGHT ENDPLACE OF A REQUEST
+      // GATHER THE USERS TO BE INFORMED
+      toSendNotification = true;
+      for await (req of allRequests) {
+        arrayToNotify.push(req.email);
+      }
+    }
+
+    // IF THE POST HASN'T THE ENDPLACE OF THE REQUESTS, CHECK FOR MOREPLACES IF THEY INCLUDE THE ENDPLACE OF THE REQUEST ----
+    const allRequests2 = await SearchPost.findAll({
+      where: {
+        startcoord: post.startcoord,
+        email: { [Op.ne]: post.email },
+      },
+    }).catch((err) => {
+      console.error("Inside function that pushes notifications, threw error!");
+      throw err;
+    });
+
+    // IF THE ENDPLACE OF A REQUEST IS INSIDE THE MOREPLACES, GATHER THE USERS THAT I NEED TO NOTIFY
+    if (allRequests2.length > 0) {
+      for await (req of allRequests2) {
+        let moreplaces = post.moreplaces;
+
+        for await (place of moreplaces) {
+          if (place.placecoords == req.endcoord) {
+            toSendNotification = true;
+            // array with the users that need to be informed that a post of their request has been created
+            arrayToNotify.push(req.email);
+          }
+        }
+      }
+    }
+
+    // HERE YOU SEND THE NOTIFICATIONS
+    if (toSendNotification) {
+      // Data for the notification, postid and the array of users
+      newRide(post.postid, arrayToNotify, post.email, msg);
+    }
+  } catch (err) {
+    console.error("Error inside try and catch!!!!!", err);
+  }
+};
+
+const fixAllDates = async (fnd) => {
+  fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(RFC_ONLYM);
+  if (fnd.enddate != null) {
+    fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(RFC_ONLYM);
+  }
+  fnd.dataValues.date = moment(fnd.dataValues.date).format(RFC_H);
+  if (fnd.returnStartDate != null) {
+    fnd.dataValues.returnStartDate = moment(
+      fnd.dataValues.returnStartDate
+    ).format(RFC_ONLYM);
+  }
+  if (fnd.returnEndDate != null) {
+    fnd.dataValues.returnEndDate = moment(fnd.dataValues.returnEndDate).format(
+      RFC_ONLYM
+    );
+  }
+
+  return fnd;
+};
+
 module.exports = {
   toNotifyTheUnverified,
   returnAllMembers,
@@ -971,576 +1480,15 @@ module.exports = {
   encryptMessages,
   decryptMessages,
   IsJsonString,
-  /* The above code is defining an asynchronous function called `sendReport` that takes in two
-  parameters: `text` and `email`. The function uses the `nodemailer` library to create a reusable
-  transporter object that uses the Gmail service and the provided email and password for
-  authentication. The function then sends an email with the provided `text` and `email` parameters
-  as the body of the email to the email address specified in the `to` field. If the email is sent
-  successfully, the function returns `true`, otherwise it returns `false`. */
-  sendReport: async (text, email) => {
-    try {
-      // create reusable transporter object using the default SMTP transport
-      let transporter = nodemailer.createTransport({
-        service: "Gmail",
-        auth: {
-          user: EMAIL,
-          pass: PASSEMAIL,
-        },
-      });
-
-      // send mail with defined transport object
-      info = await transporter.sendMail({
-        from: `Report`,
-        to: EMAIL, // list of receivers
-        subject: "Report from the App", // Subject line
-        text: text + " by " + email, // plain text body
-      });
-
-      return true;
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
-  },
-  /* The above code is defining an asynchronous function called `webSendReport` that sends an email
-  report with data provided as parameters. It uses the nodemailer library to create a reusable
-  transporter object and sends an email with the provided data to a specified email address. The
-  function returns a boolean value indicating whether the email was sent successfully or not. */
-  webSendReport: async (text, email, name, number) => {
-    try {
-      // create reusable transporter object using the default SMTP transport
-      let transporter = nodemailer.createTransport({
-        service: "Gmail",
-        auth: {
-          user: EMAIL,
-          pass: PASSEMAIL,
-        },
-      });
-
-      // send mail with defined transport object
-      info = await transporter.sendMail({
-        from: `Report`,
-        to: EMAIL, // list of receivers
-        subject: "Report from the App", // Subject line
-        text: "All data sent:",
-        html:
-          "<br>Comment: " +
-          text +
-          "<br>Email: " +
-          email +
-          "<br>Fullname: " +
-          name +
-          "<br>Phone number: " +
-          number, // plain text body
-      });
-
-      return true;
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
-  },
-
-  /* The above code is a JavaScript function that sends a notification to a user's device using
-  Firebase Cloud Messaging (FCM). The function takes in parameters such as the email of the user to
-  notify, the email of the user who performed an action (like or dislike) on a post, the post ID,
-  and whether the action was a like or dislike. The function retrieves the necessary data from the
-  database, constructs a message to be sent through FCM, and inserts a notification into the
-  database. The function also checks if the user has uninstalled the app before attempting to send
-  the notification. */
-  toNotifyOwner: async (emailToNotify, emailAction, postid, liked) => {
-    try {
-      const user = await Users.findOne({
-        where: {
-          email: emailAction,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-
-      const userToNotify = await User.findOneLight(emailToNotify);
-
-      let msg = await getLang(userToNotify.lastLang);
-
-      const fcmData = await FcmToken.findOne({
-        where: {
-          email: emailToNotify,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-      let postString = postid.toString();
-      let data;
-      let message;
-      let fcmToken = fcmData != null ? fcmData.fcmToken : null;
-      if (liked === true) {
-        data = {
-          type: "receiveInterest",
-          postid: postString,
-          email: emailAction,
-          fullname: user.fullname,
-        };
-
-        message = {
-          data: data,
-          token: fcmToken,
-          notification: {
-            title: msg.firebase.not_owner_title,
-            body:
-              msg.firebase.not_ver_body0 +
-              user.fullname +
-              msg.firebase.liked_post,
-          },
-        };
-      } else {
-        data = {
-          type: "user_disliked",
-          postid: postString,
-          email: emailAction,
-          fullname: user.fullname,
-        };
-
-        message = {
-          data: data,
-          token: fcmToken,
-          notification: {
-            title: msg.firebase.dislike_title,
-            body:
-              msg.firebase.not_ver_body0 +
-              user.fullname +
-              msg.firebase.dislike_body,
-          },
-        };
-      }
-      // Insert notification to history
-      let curTime = moment();
-      let imagePath = null;
-      if (await checkImagePath(user.email)) {
-        imagePath = "images/" + user.email + ".jpeg";
-      }
-      const notificationToInsert = {
-        imagePath: imagePath,
-        date: curTime,
-        type: data.type,
-        postid: data.postid,
-        email: data.email,
-        fullName: data.fullname,
-        ownerEmail: emailToNotify,
-        title: message.notification.title,
-        message: message.notification.body,
-        isRead: false,
-      };
-      Notification.createOne(notificationToInsert).then((data) => {
-        console.log("Notification inserted: ", data);
-      });
-
-      let toSend = false;
-
-      if (fcmData != null) {
-        await verifyFCMToken(fcmData.fcmToken)
-          .then(() => {
-            toSend = true;
-          })
-          .catch(() => {
-            toSend = false;
-          });
-      } else {
-        throw "User hasnt the app anymore!";
-      }
-
-      if (toSend !== false) {
-        // Send notification through firebase
-        admin
-          .messaging()
-          .send(message)
-          .then((response) => {
-            console.log("Success: ", response);
-          })
-          .catch((err) => {
-            throw err;
-          });
-      } else {
-        // fcmData.destroy();
-        throw "User has uninstalled the app!";
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  },
-
-  /* The above code is a JavaScript function that sends a notification to a user with a verified email
-  address. The function takes in four parameters: email, postid, ownerEmail, and convId. It first
-  retrieves the user and fcmToken from the database using the ownerEmail and email parameters
-  respectively. It then constructs a message object with data and notification properties, and sends
-  it to the user's device using Firebase Cloud Messaging (FCM). The function also inserts the
-  notification into the database for future reference. If the user has uninstalled the app or the
-  FCM token is invalid, an error is */
-  toNotifyTheVerified: async (email, postid, ownerEmail, convId) => {
-    try {
-      let postIdString = postid.toString();
-      const user = await Users.findOne({
-        where: {
-          email: ownerEmail,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-
-      let fcmToken = await FcmToken.findOne({
-        where: {
-          email: email,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-      const toNotifyUser = await Users.findOne({
-        where: {
-          email: email,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-
-      const msg = await getLang(toNotifyUser.lastLang);
-      let fcmTok = fcmToken != null ? fcmToken.fcmToken : null;
-      let message = {
-        data: {
-          type: "receiveApproval",
-          postid: postIdString,
-          email: user.email, // owner email
-          fullname: user.fullname, // owner email
-          conversationId: convId,
-        },
-        token: fcmTok,
-        notification: {
-          title: msg.firebase.not_ver_title,
-          body:
-            msg.firebase.not_ver_body0 +
-            user.fullname +
-            msg.firebase.not_ver_body,
-        },
-      };
-      // Insert notification to history
-      let curTime = moment();
-      let imagePath = null;
-      if (await checkImagePath(user.email)) {
-        imagePath = "images/" + user.email + ".jpeg";
-      }
-      const notificationToInsert = {
-        imagePath: imagePath,
-        date: curTime,
-        type: message.data.type,
-        postid: message.data.postid,
-        email: message.data.email,
-        fullName: message.data.fullname,
-        ownerEmail: toNotifyUser.email,
-        title: message.notification.title,
-        message: message.notification.body,
-        isRead: false,
-      };
-      Notification.createOne(notificationToInsert).then((data) => {
-        console.log("Notification inserted: ", data);
-      });
-
-      let toSend = false;
-      if (fcmToken != null) {
-        await verifyFCMToken(fcmToken.fcmToken)
-          .then(() => {
-            toSend = true;
-          })
-          .catch(() => {
-            toSend = false;
-          });
-      } else {
-        throw "User hasnt the app anymore!";
-      }
-
-      if (toSend !== false) {
-        admin
-          .messaging()
-          .send(message)
-          .then((response) => {
-            console.log("Success: ", response);
-          })
-          .catch((err) => {
-            throw err;
-          });
-      } else {
-        // fcmToken.destroy();
-        throw "User has uninstalled the app!";
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  },
-
+  sendReport,
+  webSendReport,
+  toNotifyOwner,
+  toNotifyTheVerified,
   newRide,
-
-  /* The above code is defining an asynchronous function called "insertAver" that takes a user object
-  as a parameter. The function queries a database table called "Review" to find all records that
-  match the email of the user object. It then calculates the average rating of all the matching
-  records and returns an object with the average rating and the count of matching records. If there
-  are no matching records, it returns an object with an average rating of 0 and a count of 0. */
   insertAver,
-
-  /* The above code is a function called `applyFilters` that takes in two parameters: `data` and
- `array`. It applies various filters to the `array` based on the values of `data` and returns the
- filtered `array`. The filters include filtering for available seats, driver's rating, age range,
- car type, car date, gender, return date, and pet allowance. The function uses the lodash library
- for filtering and the moment library for date manipulation. */
-  applyFilters: async (data, array) => {
-    try {
-      //filter for available seats
-      if (data.seats != null) {
-        array = _.filter(array, (obj) => {
-          return obj.post.numseats >= parseInt(data.seats);
-        });
-      }
-
-      //filter for driver's rating
-      if (data.driverRating != null) {
-        array = _.filter(array, (obj) => {
-          return obj.user.average >= parseInt(data.driverRating);
-        });
-      }
-
-      if (data.age != null) {
-        // afairese ta post twn xrhstwn pou einai panw apo data.age_end
-
-        array = _.filter(array, (obj) => {
-          let calcAge;
-          if (obj.user.age != null) {
-            let splitted = obj.user.age.split("/");
-            let ageDate = moment()
-              .set("year", parseInt(splitted[2]))
-              .set("month", parseInt(splitted[1]) - 1)
-              .set("date", parseInt(splitted[0]));
-
-            calcAge = moment().diff(ageDate, "years");
-          }
-
-          return calcAge <= data.age_end;
-        });
-        // afairese ta post twn xrhstwn pou einai katw apo data.age
-        array = _.filter(array, (obj) => {
-          let calcAge;
-          if (obj.user.age != null) {
-            let splitted = obj.user.age.split("/");
-            let ageDate = moment()
-              .set("year", parseInt(splitted[2]))
-              .set("month", parseInt(splitted[1]) - 1)
-              .set("date", parseInt(splitted[0]));
-
-            calcAge = moment().diff(ageDate, "years");
-          }
-          return calcAge >= data.age;
-        });
-      }
-
-      if (data.car != null) {
-        //afairese ta post twn xrhstwn pou den exoun to dhlwmeno amaksi
-        array = _.filter(array, (obj) => {
-          return obj.user.car == data.car;
-        });
-      }
-
-      if (data.cardate != null) {
-        //afairese ta post twn xrhstwn pou den exoun thn katallhlh xronologia amaksiou
-        array = _.filter(array, (obj) => {
-          data.cardate = parseInt(data.cardate, 10);
-          obj.user.cardate = parseInt(obj.user.cardate, 10);
-          return parseInt(obj.user.cardate) >= data.cardate;
-        });
-      }
-
-      if (data.gender != null) {
-        //afairese ta post twn xrhstwn pou den exoun to katallhlo fulo
-        array = _.filter(array, (obj) => {
-          return obj.user.gender == data.gender;
-        });
-      }
-
-      if (data.withReturn != null) {
-        console.log("FILTERING FOR RETURN DATE!");
-        //afairese ta post twn xrhstwn pou den exoun epistrofh
-        array = _.filter(array, (obj) => {
-          //check if post has return dates
-          if (obj.post.withReturn == false) return false;
-
-          let postStartDate = moment(obj.post.returnStartDate);
-          let postEndDate =
-            obj.post.returnEndDate != null
-              ? moment(obj.post.returnEndDate)
-              : null;
-          let searchStartDate = moment(data.returnStartDate);
-          let searchEndDate =
-            data.returnEndDate != null
-              ? moment(data.returnEndDate)
-              : moment(data.returnStartDate).add(1, "months");
-
-          // case that the post has only a startreturndate
-          if (data.returnEndDate == null) {
-            if (postEndDate == null) {
-              if (postStartDate.isSame(searchStartDate)) return true;
-            }
-
-            if (postEndDate != null) {
-              if (
-                searchStartDate.isBetween(
-                  postStartDate,
-                  postEndDate,
-                  null,
-                  "[]"
-                )
-              ) {
-                return true;
-              }
-            }
-          } else {
-            if (postEndDate == null) {
-              if (
-                postStartDate.isBetween(
-                  searchStartDate,
-                  searchEndDate,
-                  null,
-                  "[]"
-                )
-              )
-                return true;
-            }
-
-            if (postEndDate != null) {
-              if (
-                postStartDate.isBetween(
-                  searchStartDate,
-                  searchEndDate,
-                  null,
-                  "[]"
-                ) ||
-                postEndDate.isBetween(
-                  searchStartDate,
-                  searchEndDate,
-                  null,
-                  "[]"
-                )
-              ) {
-                return true;
-              }
-            }
-          }
-
-          return false;
-        });
-      }
-      if (data.petAllowed != null) {
-        array = _.filter(array, (obj) => {
-          return obj.post.petAllowed == data.petAllowed;
-        });
-      }
-      return array;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  },
-  /* The above code is a JavaScript function that handles push notifications for a ride-sharing
-  application. It takes in a post object and a message as parameters. The function first searches
-  for all requests that have the same start and end coordinates as the post and gathers the emails
-  of the users who made those requests. If there are no requests with the same end coordinates, the
-  function searches for requests with the same start coordinates and checks if their end coordinates
-  are included in the post's "moreplaces" array. If there are any requests that match, the function
-  gathers the emails of those users as well. Finally, if */
-  pushNotifications: async (post, msg) => {
-    try {
-      let arrayToNotify = [];
-      // GATHER ALL THE REQUESTS WITH THE SPECIFIC STARTCOORD AND THE ENDCOORD OF THE POST THAT HAS BEEN CREATED
-      const allRequests = await SearchPost.findAll({
-        where: {
-          startcoord: post.startcoord,
-          endcoord: post.endcoord,
-          email: { [Op.ne]: post.email },
-        },
-      }).catch((err) => {
-        console.error(
-          "Inside function that pushes notifications, threw error!"
-        );
-        throw err;
-      });
-
-      // FLAG TO SEND OR NOT THE NOTIFICATION
-      let toSendNotification = false;
-
-      if (allRequests.length > 0) {
-        // CASE THAT THE POST HAS THE RIGHT ENDPLACE OF A REQUEST
-        // GATHER THE USERS TO BE INFORMED
-        toSendNotification = true;
-        for await (req of allRequests) {
-          arrayToNotify.push(req.email);
-        }
-      }
-
-      // IF THE POST HASN'T THE ENDPLACE OF THE REQUESTS, CHECK FOR MOREPLACES IF THEY INCLUDE THE ENDPLACE OF THE REQUEST ----
-      const allRequests2 = await SearchPost.findAll({
-        where: {
-          startcoord: post.startcoord,
-          email: { [Op.ne]: post.email },
-        },
-      }).catch((err) => {
-        console.error(
-          "Inside function that pushes notifications, threw error!"
-        );
-        throw err;
-      });
-
-      // IF THE ENDPLACE OF A REQUEST IS INSIDE THE MOREPLACES, GATHER THE USERS THAT I NEED TO NOTIFY
-      if (allRequests2.length > 0) {
-        for await (req of allRequests2) {
-          let moreplaces = post.moreplaces;
-
-          for await (place of moreplaces) {
-            if (place.placecoords == req.endcoord) {
-              toSendNotification = true;
-              // array with the users that need to be informed that a post of their request has been created
-              arrayToNotify.push(req.email);
-            }
-          }
-        }
-      }
-
-      // HERE YOU SEND THE NOTIFICATIONS
-      if (toSendNotification) {
-        // Data for the notification, postid and the array of users
-        newRide(post.postid, arrayToNotify, post.email, msg);
-      }
-    } catch (err) {
-      console.error("Error inside try and catch!!!!!", err);
-    }
-  },
-  /* The above code is a JavaScript function that takes an object called `fnd` as an argument and
-  formats its date properties using the Moment.js library. It formats the `startdate`, `enddate`,
-  `date`, `returnStartDate`, and `returnEndDate` properties of the `fnd` object into RFC 3339
-  compliant date strings. The function then returns the modified `fnd` object. */
-  fixAllDates: async (fnd) => {
-    fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(
-      RFC_ONLYM
-    );
-    if (fnd.enddate != null) {
-      fnd.dataValues.enddate = moment(fnd.dataValues.enddate).format(RFC_ONLYM);
-    }
-    fnd.dataValues.date = moment(fnd.dataValues.date).format(RFC_H);
-    if (fnd.returnStartDate != null) {
-      fnd.dataValues.returnStartDate = moment(
-        fnd.dataValues.returnStartDate
-      ).format(RFC_ONLYM);
-    }
-    if (fnd.returnEndDate != null) {
-      fnd.dataValues.returnEndDate = moment(
-        fnd.dataValues.returnEndDate
-      ).format(RFC_ONLYM);
-    }
-
-    return fnd;
-  },
+  applyFilters,
+  pushNotifications,
+  fixAllDates,
   determineLang,
   getLang,
   determineExpirationDate,

@@ -29,7 +29,7 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   },
 });
 
-const { IsJsonString } = require("../utils/functions");
+const fun = require("../utils/functions");
 /**
  * This function creates a new group and returns true if successful, otherwise it returns false and
  * logs an error.
@@ -139,7 +139,7 @@ const getAsGuest = async (email) => {
     //loop through groups knowing the index of array
     for await (let group of groups) {
       // loop through members of the group
-      if (IsJsonString(group.members)) {
+      if (fun.IsJsonString(group.members)) {
         group.members = JSON.parse(group.members);
       }
       //check equality of emails and if pending = false
@@ -398,7 +398,7 @@ const getPendingUsers = async (groupId) => {
     }).catch((err) => {
       throw err;
     });
-    if (IsJsonString(users.members)) {
+    if (fun.IsJsonString(users.members)) {
       users.members = JSON.parse(users.members);
     }
     //loop through all the members of the group
@@ -455,7 +455,7 @@ const isGroupMember = async (postid, groupId) => {
     });
     const postOwner = post.email;
     //Parse the group members
-    if (IsJsonString(group.members)) {
+    if (fun.IsJsonString(group.members)) {
       group.members = JSON.parse(group.members);
     }
     //loop through all the members of the group
