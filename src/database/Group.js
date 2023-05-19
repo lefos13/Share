@@ -29,8 +29,6 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   },
 });
 
-const fun = require("../utils/functions");
-
 /**
  * This function creates a new group and returns true if successful, otherwise it returns false and
  * logs an error.

@@ -584,7 +584,6 @@ const newRide = async (postid, emailArray, postOwner) => {
  * @param senderEmail - The email address of the user who is sending the message.
  * @param conversationId - The ID of the conversation between the sender and receiver of the message.
  */
-
 const sendMessageGroup = async (
   messageSent,
   userEmail,
