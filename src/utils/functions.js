@@ -58,7 +58,6 @@ const User = require("../database/User");
 const Group = require("../database/Group");
 
 const crypto = require("crypto");
-const User = require("../database/User");
 const { reject } = require("lodash");
 const e = require("express");
 const algorithm = "aes-256-cbc";
