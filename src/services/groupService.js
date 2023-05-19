@@ -134,7 +134,7 @@ const createGroup = async (req) => {
         pending: true,
       };
       //get members data
-      data.members = await returnAllMembers(group);
+      data.members = await fun.returnAllMembers(group);
       //send user the chat data
       console.log("EMITTING NEW GROUP CHAT TO ADMIN", adminData.socketId);
       io.to(adminData.socketId).emit("action", {
