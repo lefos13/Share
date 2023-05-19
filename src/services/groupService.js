@@ -122,7 +122,7 @@ const createGroup = async (req) => {
         average: ratingData.average,
         count: ratingData.count,
         isGroupInterest: false,
-        members: null,
+        members: [],
         isUserOnline: false,
         expiresIn: null,
         messages: [],
@@ -133,6 +133,8 @@ const createGroup = async (req) => {
         messagesLeft: false,
         pending: true,
       };
+      //get members data
+      data.members = await returnAllMembers(group);
       //send user the chat data
       console.log("EMITTING NEW GROUP CHAT TO ADMIN", adminData.socketId);
       io.to(adminData.socketId).emit("action", {
@@ -362,7 +364,7 @@ const deleteGroup = async (req) => {
     io.to(groupChat.groupId + "-" + groupChat.convid).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
-        conversation: groupChat.convid,
+        conversation: groupChat.groupId + "-" + groupChat.convid,
       },
     });
     //delete chat of group
