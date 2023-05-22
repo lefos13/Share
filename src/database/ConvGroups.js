@@ -211,9 +211,17 @@ const removeMembers = async (groupId, email) => {
     emails = emails.filter((e) => e !== email);
     const newConversationId = emails.join(" ");
 
-    await results.update({ convid: newConversationId }).catch((e) => {
-      throw e;
+    const responseOnUpdate = await ConvGroups.update(
+      { convid: newConversationId },
+      {
+        where: {
+          groupId: groupId,
+        },
+      }
+    ).catch((err) => {
+      throw err;
     });
+    console.log("UPDATED QUERY", responseOnUpdate);
     return true;
   } catch (error) {
     console.log(error);
