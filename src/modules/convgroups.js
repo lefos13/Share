@@ -25,20 +25,18 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
 const ConvGroups = sequelize.define(
   "convgroups",
   {
+    groupId: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      allowNull: true,
+      defaultValue: null,
+    },
     convid: {
       type: DataTypes.STRING,
-      primaryKey: true,
-      unique: true,
       allowNull: false,
     },
     messages: {
       type: DataTypes.TEXT,
-      allowNull: true,
-      defaultValue: null,
-    },
-    groupId: {
-      type: DataTypes.BIGINT,
-      primaryKey: true,
       allowNull: true,
       defaultValue: null,
     },
