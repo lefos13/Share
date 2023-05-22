@@ -375,11 +375,13 @@ const declineInvitation = async (groupId, email) => {
         .catch((err) => {
           throw err;
         });
+      console.log("GROUP CHAT UPDATED");
       return "Updated";
     } else {
       group.destroy().catch((err) => {
         throw err;
       });
+      console.log("GROUP CHAT DELETED");
       return "Destroyed";
     }
   } catch (error) {

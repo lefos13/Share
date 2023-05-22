@@ -700,6 +700,7 @@ const declineInvitation = async (req) => {
       //   throw chatDeleted;
       // }
       //Send events to group for removal
+      console.log("DECLINE INVITATION DECIDED TO DELETE THE CHAT");
       fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
     }
 
