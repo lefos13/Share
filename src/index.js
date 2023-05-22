@@ -1308,7 +1308,10 @@ io.on("connection", (socket) => {
               emails.map(async (email) => {
                 let userData = await User.findOneLight(email);
                 for (const soc of socketList) {
-                  if (soc.id == userData.socketId) {
+                  if (
+                    soc.id == userData.socketId &&
+                    app.locals.bg[userData.email] == null
+                  ) {
                     data.isUserOnline = true;
                     break;
                   }
