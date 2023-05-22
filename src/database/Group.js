@@ -388,6 +388,11 @@ const declineInvitation = async (groupId, email) => {
   }
 };
 
+/**
+ * This function retrieves pending users from a specified group.
+ * @param groupId - The ID of the group for which we want to get the pending users.
+ * @returns either `true`, `"ok"`, or `false`.
+ */
 const getPendingUsers = async (groupId) => {
   try {
     const users = await Groups.findOne({
