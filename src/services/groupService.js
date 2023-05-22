@@ -695,10 +695,10 @@ const declineInvitation = async (req) => {
       }
     } else if (group === "Destroyed") {
       //Destroy chat of group
-      let chatDeleted = await ConvGroup.deleteOneByGroupId(groupId);
-      if (chatDeleted instanceof Error) {
-        throw chatDeleted;
-      }
+      // let chatDeleted = await ConvGroup.deleteOneByGroupId(groupId);
+      // if (chatDeleted instanceof Error) {
+      //   throw chatDeleted;
+      // }
       //Send events to group for removal
       fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
     }

@@ -599,15 +599,6 @@ io.on("connection", (socket) => {
           action.data.message.seen = false;
           let socketList = await io.fetchSockets(); //get all sockets
 
-          socket.broadcast.to(action.data.conversationId).emit("action", {
-            type: "private_message_groups",
-            data: {
-              ...action.data,
-              conversationId: conversationId,
-              senderEmail: fromEmail,
-            },
-          });
-
           //send notification for offline or background user
           for await (email of userEmails) {
             let userData = await User.findOneLight(email);
@@ -622,6 +613,14 @@ io.on("connection", (socket) => {
                 },
               });
             }
+            io.to(userData.socketId).emit("action", {
+              type: "private_message_groups",
+              data: {
+                ...action.data,
+                conversationId: conversationId,
+                senderEmail: fromEmail,
+              },
+            });
 
             //check if online or in background
             let online = false;
