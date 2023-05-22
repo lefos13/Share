@@ -19,7 +19,7 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   //   useUTC: false, // for reading from database
   // },
   timezone: "+02:00", // for writing to database
-  logging: false,
+  logging: true,
 });
 
 const ConvGroups = sequelize.define(
