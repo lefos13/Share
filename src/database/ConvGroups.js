@@ -221,7 +221,7 @@ const removeMembers = async (groupId, email) => {
     // ).catch((err) => {
     //   throw err;
     // });
-    console.log("UPDATED QUERY", responseOnUpdate);
+    // console.log("UPDATED QUERY", responseOnUpdate);
     return true;
   } catch (error) {
     console.log(error);
