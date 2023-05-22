@@ -586,8 +586,8 @@ io.on("connection", (socket) => {
           const fromEmail = action.data.senderEmail; //this is my id
           let dataForNotification = action.data.message;
 
-          const realGroupId = action.data.conversationId.split("-")[0];
-          const realConversationId = action.data.conversationId.split("-")[1];
+          const realGroupId = action.data.conversationId.split(",")[0];
+          const realConversationId = action.data.conversationId.split(",")[1];
           console.log("Real Group Id: ", realGroupId);
           console.log("Real Conversation Id: ", realConversationId);
 
@@ -732,7 +732,7 @@ io.on("connection", (socket) => {
           let senderId = action.data.senderId;
           //state that user has opened the chat
           app.locals[action.data.senderId] = conversationId;
-          let realConversationId = conversationId.split("-")[1];
+          let realConversationId = conversationId.split(",")[1];
           //get all users email with sender too
           let usersEmail = realConversationId.split(" ");
           //exluce sender
@@ -877,8 +877,8 @@ io.on("connection", (socket) => {
           app.locals[user.email] = action.data.conversationId;
           // I NEED TO MARK THE LAST MESSAGE AS READ AND SEEN
           //get conversation and mark the last message as read
-          if (conversationId.includes("-")) {
-            let realConversationId = conversationId.split("-")[1];
+          if (conversationId.includes(",")) {
+            let realConversationId = conversationId.split(",")[1];
             io.to(conversationId).emit("action", {
               type: "setGroupConversationSeen",
               data: {
@@ -1268,7 +1268,7 @@ io.on("connection", (socket) => {
             if (ratingData === false) throw new Error("Rating not found");
 
             const data = {
-              conversationId: group.groupId + "-" + conv.convid,
+              conversationId: group.groupId + "," + conv.convid,
               socketId: adminData.socketId,
               username: group.groupName,
               photo: (await checkImagePath(adminData.email))
@@ -1424,7 +1424,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
         countOnlineUsers++;
       }
     }
-    const conversationId = conv.groupId + "-" + conv.convid;
+    const conversationId = conv.groupId + "," + conv.convid;
     if (countOnlineUsers < 2) {
       io.to(conversationId).emit("action", {
         type: "setIsConversationUserOnlineGroups",

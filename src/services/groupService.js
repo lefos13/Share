@@ -104,14 +104,14 @@ const createGroup = async (req) => {
             "ADMIN FOUND ONLINE AND THE RIGHT SOCKET IS IN DB",
             socket.id === adminData.socketId
           );
-          socket.join(groupChat.groupId + "-" + groupChat.convid);
+          socket.join(groupChat.groupId + "," + groupChat.convid);
           break;
         }
       }
       const ratingData = await insertAver(adminData);
       //prepare data for group chat
       const data = {
-        conversationId: groupChat.groupId + "-" + groupChat.convid,
+        conversationId: groupChat.groupId + "," + groupChat.convid,
         socketId: adminData.socketId,
         username: group.groupName,
         photo: (await fun.checkImagePath(adminData.email))
@@ -371,10 +371,10 @@ const deleteGroup = async (req) => {
     }
 
     //inform users that a group chat has been deleted
-    io.to(groupChat.groupId + "-" + groupChat.convid).emit("action", {
+    io.to(groupChat.groupId + "," + groupChat.convid).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
-        conversation: groupChat.groupId + "-" + groupChat.convid,
+        conversation: groupChat.groupId + "," + groupChat.convid,
       },
     });
     //delete chat of group
@@ -469,7 +469,7 @@ const leaveGroup = async (req) => {
         throw chatDeleted;
       }
       //Send events to group for removal
-      fun.sendRemovedGroupChatData(groupId + "-" + groupChatData.convid);
+      fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
       return { status: 200, message: msg.leftGroup };
     }
   } catch (error) {
@@ -543,7 +543,7 @@ const acceptInvitation = async (req) => {
           if (ratingData === false) throw new Error("Rating not found");
 
           const data = {
-            conversationId: group.groupId + "-" + groupChat.convid,
+            conversationId: group.groupId + "," + groupChat.convid,
             socketId: adminData.socketId,
             username: group.groupName,
             photo: (await fun.checkImagePath(adminData.email))
@@ -700,7 +700,7 @@ const declineInvitation = async (req) => {
         throw chatDeleted;
       }
       //Send events to group for removal
-      fun.sendRemovedGroupChatData(groupId + "-" + groupChatData.convid);
+      fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
     }
 
     return { status: 200, message: msg.invitationDeclined };

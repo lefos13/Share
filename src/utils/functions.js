@@ -88,7 +88,7 @@ const sendUpdatedGroupChatData = async (groupId) => {
         let ratingData = await insertAver(user);
 
         const data = {
-          conversationId: group.groupId + "-" + groupChat.convid,
+          conversationId: group.groupId + "," + groupChat.convid,
           socketId: user.socketId,
           username: group.groupName,
           photo: (await checkImagePath(user.email))

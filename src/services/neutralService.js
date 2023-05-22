@@ -136,7 +136,7 @@ const moreMessagesGroups = async (req) => {
     let data = req.body.data;
     let message = data.lastMessage;
     //extract real conversationId
-    const groupId = data.conversationId.split("-")[0];
+    const groupId = data.conversationId.split(",")[0];
 
     const conv = await ConvGroups.findOneByGroupId(groupId);
     if (conv === false) {
