@@ -1359,6 +1359,8 @@ io.on("connection", (socket) => {
           //logic for messages and flags
         );
 
+        groupConversations = groupConversations.filter((conv) => conv !== null);
+
         console.log(
           "Emitting all the group conversations, length:",
           groupConversations.length
