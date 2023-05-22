@@ -14,7 +14,6 @@ const { insertAver } = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 const fun = require("../utils/functions");
-const path = require("path");
 const socket = require("../index");
 
 // API /createGroup
@@ -547,7 +546,7 @@ const acceptInvitation = async (req) => {
             conversationId: group.groupId + "-" + groupChat.convid,
             socketId: adminData.socketId,
             username: group.groupName,
-            photo: (await checkImagePath(adminData.email))
+            photo: (await fun.checkImagePath(adminData.email))
               ? `images/${adminData.email}.jpeg`
               : null,
             email: adminData.email,
