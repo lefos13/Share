@@ -432,16 +432,10 @@ io.on("connection", (socket) => {
 
         //delete states of user conversations
       }
-      const groupConvs = await ConvGroup.findAllByEmail(user.email);
-      groupConvs.forEach((conv) => {
-        socket.broadcast.to(conv.groupId + "-" + conv.convid).emit("action", {
-          type: "setIsConversationUserOnlineGroups",
-          data: {
-            conversationId: conv.groupId + "-" + conv.convid,
-            isUserOnline: false,
-          },
-        });
-      });
+
+      const sockets = await io.fetchSockets();
+      await sendEventsGroupOnline(user, sockets, 0);
+
       if (app.locals[user.email] != null) {
         delete app.locals[user.email];
       }
@@ -823,18 +817,9 @@ io.on("connection", (socket) => {
               },
             });
           }
-          const groupConvs = await ConvGroup.findAllByEmail(sender);
-          groupConvs.forEach((conv) => {
-            socket.broadcast
-              .to(conv.groupId + "-" + conv.convid)
-              .emit("action", {
-                type: "setIsConversationUserOnlineGroups",
-                data: {
-                  conversationId: conv.groupId + "-" + conv.convid,
-                  isUserOnline: false,
-                },
-              });
-          });
+          const sockets = await io.fetchSockets();
+          const senderData = await User.findOneLight(sender);
+          await sendEventsGroupOnline(senderData, sockets, 0);
 
           break;
         }
@@ -863,18 +848,9 @@ io.on("connection", (socket) => {
               },
             });
           }
-          const groupConvs = await ConvGroup.findAllByEmail(sender);
-          groupConvs.forEach((conv) => {
-            socket.broadcast
-              .to(conv.groupId + "-" + conv.convid)
-              .emit("action", {
-                type: "setIsConversationUserOnlineGroups",
-                data: {
-                  conversationId: conv.groupId + "-" + conv.convid,
-                  isUserOnline: true,
-                },
-              });
-          });
+          const sockets = await io.fetchSockets();
+          const senderData = await User.findOneLight(sender);
+          await sendEventsGroupOnline(senderData, sockets, 1);
           break;
         }
 
@@ -1407,3 +1383,42 @@ is likely part of a larger project that uses the `io` object for some purpose, s
 WebSocket server or handling real-time communication between clients and a server. */
 const ioObject = io;
 module.exports.io = ioObject;
+async function sendEventsGroupOnline(user, sockets, withSelf) {
+  const groupConvs = await ConvGroup.findAllByEmail(user.email);
+  for await (let conv of groupConvs) {
+    const emails = conv.convid
+      .split(" ")
+      .filter((email) => email !== user.email);
+    const users = await Promise.all(
+      emails.map(async (email) => await User.findOneLight(email))
+    );
+    let countOnlineUsers = withSelf;
+
+    for await (const socket of sockets) {
+      if (
+        users.some((user) => user.socketId === socket.id) &&
+        !app.locals.bg[user.email]
+      ) {
+        countOnlineUsers++;
+      }
+    }
+    const conversationId = conv.groupId + "-" + conv.convid;
+    if (countOnlineUsers < 2) {
+      io.to(conversationId).emit("action", {
+        type: "setIsConversationUserOnlineGroups",
+        data: {
+          conversationId,
+          isUserOnline: false,
+        },
+      });
+    } else {
+      io.to(conversationId).emit("action", {
+        type: "setIsConversationUserOnlineGroups",
+        data: {
+          conversationId,
+          isUserOnline: true,
+        },
+      });
+    }
+  }
+}

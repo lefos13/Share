@@ -24,12 +24,16 @@ const moment = require("moment");
 const checkIfInterestExists = async (groupId) => {
   try {
     const found = await PostInterested.findAll({ where: { groupId } });
-    const interest = found.find(async (interest) => {
-      const post = await Post.findExpired(interest.postid, moment());
-      return post !== null;
-    });
-    return interest ? interest.postid : null;
+    let flagOfExistingPost = null;
+    for await (const interest of found) {
+      const postData = await Post.findExpired(interest.postid, moment());
+      if (postData !== null) {
+        flagOfExistingPost = postData.postid;
+      }
+    }
+    return flagOfExistingPost;
   } catch (error) {
+    console.error(error);
     return new Error(error);
   }
 };

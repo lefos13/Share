@@ -347,6 +347,12 @@ const deleteGroup = async (req) => {
     if (interested instanceof Error) {
       throw interested;
     } else if (interested != null) {
+      console.log(
+        "FOUND POST THAT IS ACTIVE WITH POSTID " +
+          interested +
+          " WITH AN INSTEREST OF THIS GROUP ID,",
+        groupId
+      );
       return {
         status: 405,
         message: msg.notAllowedToDelete,
