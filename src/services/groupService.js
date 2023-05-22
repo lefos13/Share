@@ -359,14 +359,19 @@ const deleteGroup = async (req) => {
         postid: interested,
       };
     }
+    //inform users that a group chat has been deleted
+    let groupChat = await ConvGroup.findOneByGroupId(groupId);
+    if (groupChat instanceof Error) {
+      throw groupChat;
+    }
 
     // delete a group
     let response = await Group.destroy(admin, groupId);
     if (response === false) {
       throw new Error("Group Deletion Failed");
     }
+
     //inform users that a group chat has been deleted
-    let groupChat = await ConvGroup.findOneByGroupId(groupId);
     io.to(groupChat.groupId + "-" + groupChat.convid).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
