@@ -74,7 +74,7 @@ const socket = require("../index");
 const sendUpdatedGroupChatData = async (groupId) => {
   const io = socket.io;
   try {
-    let groupChat = await ConvGroups.deleteOneByGroupId(groupId);
+    let groupChat = await ConvGroups.findOneByGroupId(groupId);
     if (groupChat instanceof Error) {
       throw groupChat;
     }

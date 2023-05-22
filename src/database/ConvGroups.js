@@ -211,16 +211,16 @@ const removeMembers = async (groupId, email) => {
     emails = emails.filter((e) => e !== email);
     const newConversationId = emails.join(" ");
 
-    // const responseOnUpdate = await ConvGroups.update(
-    //   { convid: newConversationId },
-    //   {
-    //     where: {
-    //       groupId: groupId,
-    //     },
-    //   }
-    // ).catch((err) => {
-    //   throw err;
-    // });
+    const responseOnUpdate = await ConvGroups.update(
+      { convid: newConversationId },
+      {
+        where: {
+          groupId: groupId,
+        },
+      }
+    ).catch((err) => {
+      throw err;
+    });
     // console.log("UPDATED QUERY", responseOnUpdate);
     return true;
   } catch (error) {
