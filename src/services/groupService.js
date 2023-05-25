@@ -10,7 +10,12 @@ const Notification = require("../database/Notifications");
 const ConvUsers = require("../database/ConvUsers");
 const Group = require("../database/Group");
 const ConvGroup = require("../database/ConvGroups");
-const { insertAver } = require("../utils/functions");
+const {
+  insertAver,
+  onGroupRequestReceived,
+  onGroupRequestAccepted,
+  onGroupRequestDeclined,
+} = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
 const fun = require("../utils/functions");
@@ -71,6 +76,9 @@ const createGroup = async (req) => {
 
     //send events for new group
     newGroupChat(admin, groupChat);
+
+    //send notifications to members of group
+    onGroupRequestReceived(groupCreated);
 
     // Get all groups
     const results = await getGroupsOfUser(extra);
@@ -551,7 +559,7 @@ const acceptInvitation = async (req) => {
       (val) => val.id === userInvited.socketId
     );
     userSocket.join(groupChat.convid);
-
+    onGroupRequestAccepted(group, userInvited);
     if (!isChatStillPending) {
       console.log("GROUP CHAT IS NOT PENDING ANYMORE");
       //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE
@@ -708,6 +716,14 @@ const declineInvitation = async (req) => {
           isChatStillPending = true;
         }
       });
+
+      const userDeclined = await User.findOneLight(invitedEmail);
+      if (userDeclined === false) {
+        throw new Error(
+          "Error at finding initiatior of service " + invitedEmail
+        );
+      }
+      onGroupRequestDeclined(group, userDeclined);
 
       if (!isChatStillPending) {
         console.log("GROUP CHAT IS NOT PENDING ANYMORE");

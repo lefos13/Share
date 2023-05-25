@@ -61,6 +61,12 @@
   "noMessages": "No messages yet!",
   "hasVerified": "You can't delete this ride! You have to dissaprove any interested users!",
   "firebase": {
+    "reqJoinGroup": "Group invitation",
+    "createdGroup": " created a group and invited you to be a member!",
+    "reqJoinGroupAccepted": "Group invitation has been accepted!",
+    "reqJoinGroupAcceptedBody": " accepted your invitation to join your group!",
+    "reqJoinGroupDeclined": "Group invitation has been declined!",
+    "reqJoinGroupDeclinedBody": " declined your invitation to join your group!",
     "not_ver_title": "Travel approval",
     "not_ver_body": " has approved you. You can travel together!",
     "unver_title": "Travel disapproval",

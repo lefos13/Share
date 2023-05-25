@@ -42,11 +42,7 @@ const RFC_H = "DD/MM/YYYY HH:mm";
 const RFC_ONLYM = "DD/MM/YYYY";
 
 const Users = require("../modules/user");
-const Posts = require("../modules/post");
-const PostInterested = require("../modules/postinterested");
-const Reviews = require("../modules/review");
 const SearchPost = require("../modules/searchPost");
-const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const { response } = require("express");
 const fs = require("fs");
@@ -64,6 +60,277 @@ const algorithm = "aes-256-cbc";
 const key = KEYCRYPTO;
 const iv = Buffer.from(IVHEX, "hex");
 const socket = require("../index");
+
+/**
+ * This function sends a notification to all members of a group when a request to join the group is
+ * received.
+ * @param group - The `group` parameter is an object that represents a group. It contains information
+ * about the group, such as its members and admin.
+ */
+const onGroupRequestReceived = async (group) => {
+  try {
+    // Get the members of the group
+    const members = group.members;
+    // Find the admin of the group
+    const admin = await User.findOneLight(group.admin);
+    // If the admin is not found, throw an error
+    if (admin === false) {
+      throw new Error("Admin searching went wrong");
+    }
+    // Array to hold all notification messages
+    const allMessages = [];
+    // Iterate over all the members and create notification messages
+    await Promise.all(
+      members.map(async (email) => {
+        // Find the user by email
+        let user = await User.findOneLight(email);
+        // If user is not found, throw an error
+        if (user === false) {
+          throw new Error("User searching went wrong");
+        }
+        // Find the FCM token of the user
+        let userToken = await FcmToken.findOne({
+          where: { email: user.email },
+        }).catch((err) => {
+          throw err;
+        });
+        // Get the last language used by the user
+        let msg = await getLang(user.lastLang);
+        // Determine whether a token exists for the user
+        let fcmTok = userToken != null ? userToken.fcmToken : null;
+        // Create the message object
+        let message = {
+          data: {
+            type: "onGroupRequestReceived",
+            postid: null,
+            email: admin.email, // owner email
+            fullname: admin.fullname, // owner email
+          },
+          token: fcmTok,
+          notification: {
+            title: msg.firebase.reqJoinGroup,
+            body:
+              msg.firebase.not_ver_body0 +
+              admin.fullname +
+              msg.firebase.request_part2,
+          },
+        };
+        // Get the current time
+        let curTime = moment();
+        // Get the path for the admin profile image if it exists
+        let imagePath = null;
+        if (await checkImagePath(admin.email)) {
+          imagePath = "images/" + admin.email + ".jpeg";
+        }
+        // Create the notification object
+        const notificationToInsert = {
+          imagePath: imagePath,
+          date: curTime,
+          type: message.data.type,
+          postid: message.data.postid,
+          email: message.data.email,
+          fullName: message.data.fullname,
+          ownerEmail: user.email,
+          title: message.notification.title,
+          message: message.notification.body,
+          isRead: false,
+        };
+        // Insert the notification into the database
+        Notification.createOne(notificationToInsert).then((data) => {
+          console.log("Notification inserted: ", data);
+        });
+        // Verify the FCM token and add the message to the array of messages to send
+        if (userToken != null) {
+          await verifyFCMToken(userToken.fcmToken).then(() => {
+            allMessages.push(message);
+          });
+        }
+      })
+    );
+    // Log the number of notifications to send
+    console.log("All notifications to send count: ", allMessages.length);
+    // If there are notifications to send, send them using the admin messaging service
+    if (allMessages.length > 0) {
+      admin
+        .messaging()
+        .sendAll(allMessages)
+        .then((response) => {
+          console.log("Success: " + response);
+        })
+        .catch((err) => {
+          console.error("Error to send massive notifications: " + err);
+        });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+/**
+ * This function sends a notification to the admin and inserts a notification into the database when a
+ * group request is accepted.
+ * @param group - The group object that contains information about the group.
+ * @param memberAccepted - The member who has had their group request accepted.
+ */
+const onGroupRequestAccepted = async (group, memberAccepted) => {
+  try {
+    const admin = await User.findOneLight(group.admin);
+    if (admin === false) {
+      throw new Error("Admin searching went wrong");
+    }
+    let adminToken = await FcmToken.findOne({
+      where: { email: admin.email },
+    }).catch((err) => {
+      throw err;
+    });
+
+    let msg = await getLang(admin.lastLang);
+
+    let fcmTok = adminToken != null ? adminToken.fcmToken : null;
+    let message = {
+      data: {
+        type: "onGroupRequestAccepted",
+        postid: null,
+        email: memberAccepted.email, // owner email
+        fullname: memberAccepted.fullname, // owner email
+      },
+      token: fcmTok,
+      notification: {
+        title: msg.firebase.reqJoinGroupAccepted,
+        body:
+          msg.firebase.not_ver_body0 +
+          memberAccepted.fullname +
+          msg.firebase.reqJoinGroupAcceptedBody,
+      },
+    };
+
+    let curTime = moment();
+    let imagePath = null;
+    if (await checkImagePath(memberAccepted.email)) {
+      imagePath = "images/" + memberAccepted.email + ".jpeg";
+    }
+    const notificationToInsert = {
+      imagePath: imagePath,
+      date: curTime,
+      type: message.data.type,
+      postid: message.data.postid,
+      email: message.data.email,
+      fullName: message.data.fullname,
+      ownerEmail: admin.email,
+      title: message.notification.title,
+      message: message.notification.body,
+      isRead: false,
+    };
+
+    Notification.createOne(notificationToInsert).then((data) => {
+      console.log("Notification inserted: ", data);
+    });
+
+    if (adminToken != null) {
+      await verifyFCMToken(adminToken.fcmToken).then(() => {
+        admin
+          .messaging()
+          .send(message)
+          .then((response) => {
+            console.log("Send notification for accept request: ", response);
+          })
+          .catch((err) => {
+            throw err;
+          });
+      });
+    } else {
+      throw "ADMIN FCM TOKEN NOT FOUND";
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+/**
+ * The function sends a push notification to the admin of a group when a member's request to join the
+ * group is declined.
+ * @param group - The group object for which the request to join has been declined.
+ * @param memberDeclined - An object containing information about the member whose request to join the
+ * group was declined. It has the following properties:
+ */
+const onGroupRequestDeclined = async (group, memberDeclined) => {
+  try {
+    // Find the admin of the group
+    const admin = await User.findOneLight(group.admin);
+    // Throw an error if admin is not found
+    if (admin === false) {
+      throw new Error("Admin searching went wrong");
+    }
+    // Find the FCM token of the admin
+    let adminToken = await FcmToken.findOne({
+      where: { email: admin.email },
+    }).catch((err) => {
+      throw err;
+    });
+    // Get the language of the admin
+    let msg = await getLang(admin.lastLang);
+    // Get the FCM token of the admin, if available
+    let fcmTok = adminToken != null ? adminToken.fcmToken : null;
+    // Prepare the message to be sent as push notification
+    let message = {
+      data: {
+        type: "onGroupRequestDeclined",
+        postid: null,
+        email: memberDeclined.email, // owner email
+        fullname: memberDeclined.fullname, // owner email
+      },
+      token: fcmTok,
+      notification: {
+        title: msg.firebase.reqJoinGroupDeclined,
+        body:
+          msg.firebase.not_ver_body0 +
+          memberDeclined.fullname +
+          msg.firebase.reqJoinGroupDeclinedBody,
+      },
+    };
+    // Get the current time and the path of the user's image, if available
+    let curTime = moment();
+    let imagePath = null;
+    if (await checkImagePath(memberDeclined.email)) {
+      imagePath = "images/" + memberDeclined.email + ".jpeg";
+    }
+    // Create a notification object to be added to the database
+    const notificationToInsert = {
+      imagePath: imagePath,
+      date: curTime,
+      type: message.data.type,
+      postid: message.data.postid,
+      email: message.data.email,
+      fullName: message.data.fullname,
+      ownerEmail: admin.email,
+      title: message.notification.title,
+      message: message.notification.body,
+      isRead: false,
+    };
+    // Add the notification to the database
+    Notification.createOne(notificationToInsert).then((data) => {
+      console.log("Notification inserted: ", data);
+    });
+    // Send the push notification if the admin has an FCM token
+    if (adminToken != null) {
+      await verifyFCMToken(adminToken.fcmToken).then(() => {
+        admin
+          .messaging()
+          .send(message)
+          .then((response) => {
+            console.log("Send notification for accept request: ", response);
+          })
+          .catch((err) => {
+            throw err;
+          });
+      });
+    } else {
+      throw "ADMIN FCM TOKEN NOT FOUND";
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 /**
  * This function sends updated group chat data to all members of a group.
@@ -1534,6 +1801,9 @@ const fixAllDates = async (fnd) => {
 };
 
 module.exports = {
+  onGroupRequestReceived,
+  onGroupRequestAccepted,
+  onGroupRequestDeclined,
   toNotifyTheUnverified,
   returnAllMembers,
   sendMessage,
