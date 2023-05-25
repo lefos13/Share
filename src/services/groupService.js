@@ -134,8 +134,25 @@ const createGroup = async (req) => {
       };
       //get members data
       data.members = await fun.returnAllMembers(group);
+      //Check if other users of group are online
+      let emails = groupChat.split(" ");
+      emails = emails.filter((email) => email !== adminData.email);
+      emails = await Promise.all(
+        emails.map(async (email) => await User.findOneLight(email))
+      );
+      await Promise.all(
+        emails.map(async (email) => {
+          const socket = socketList.find(
+            (socket) => socket.id === email.socketId
+          );
+          if (socket) {
+            console.log(`FOUND ONLINE USER ${email.email}`);
+            data.isUserOnline = true;
+          }
+        })
+      );
+
       //send user the chat data
-      console.log("EMITTING NEW GROUP CHAT TO ADMIN", adminData.socketId);
       io.to(adminData.socketId).emit("action", {
         type: "onGroupConversationAdded",
         data: {
