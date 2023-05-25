@@ -559,7 +559,9 @@ const acceptInvitation = async (req) => {
       (val) => val.id === userInvited.socketId
     );
     userSocket.join(groupChat.convid);
+
     onGroupRequestAccepted(group, userInvited);
+
     if (!isChatStillPending) {
       console.log("GROUP CHAT IS NOT PENDING ANYMORE");
       //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE

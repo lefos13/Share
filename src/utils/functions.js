@@ -178,7 +178,7 @@ const onGroupRequestAccepted = async (group, memberAccepted) => {
       throw new Error("Admin searching went wrong");
     }
     let adminToken = await FcmToken.findOne({
-      where: { email: admin.email },
+      where: { email: adminData.email },
     }).catch((err) => {
       throw err;
     });
