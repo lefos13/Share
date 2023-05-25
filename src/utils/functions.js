@@ -251,10 +251,10 @@ const onGroupRequestAccepted = async (group, memberAccepted) => {
  * @param memberDeclined - An object containing information about the member whose request to join the
  * group was declined. It has the following properties:
  */
-const onGroupRequestDeclined = async (admin, memberDeclined) => {
+const onGroupRequestDeclined = async (adminEmail, memberDeclined) => {
   try {
     // Find the admin of the group
-    const adminData = await User.findOneLight(admin);
+    const adminData = await User.findOneLight(adminEmail);
     // Throw an error if admin is not found
     if (adminData === false) {
       throw new Error("Admin searching went wrong");
