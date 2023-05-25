@@ -135,7 +135,7 @@ const createGroup = async (req) => {
       //get members data
       data.members = await fun.returnAllMembers(group);
       //Check if other users of group are online
-      let emails = groupChat.split(" ");
+      let emails = groupChat.convid.split(" ");
       emails = emails.filter((email) => email !== adminData.email);
       emails = await Promise.all(
         emails.map(async (email) => await User.findOneLight(email))
