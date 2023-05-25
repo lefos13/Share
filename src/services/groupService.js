@@ -633,7 +633,7 @@ const acceptInvitation = async (req) => {
               },
             });
           } else {
-            socket.emit("action", {
+            io.to(adminData.socketId).emit("action", {
               type: "onGroupConversationPendingUpdated",
               data: {
                 conversationId: data.conversationId,
