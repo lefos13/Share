@@ -575,18 +575,17 @@ const acceptInvitation = async (req) => {
 
           const socketList = await io.fetchSockets();
 
-          const socket = socketList.find((soc) => soc.id === user.socketId);
+          const socket = socketList.find(
+            (soc) => soc.id === userInvited.socketId
+          );
+          if (socket != null) {
+            console.log(
+              `User invited ${userInvited.email} joined the room of group ${group.groupId}`
+            );
+            //join the room for conversation
+            socket.join(data.conversationId);
+          }
 
-          socket.broadcast.to(data.conversationId).emit("action", {
-            type: "setIsConversationUserOnlineGroups",
-            data: {
-              conversationId: data.conversationId,
-              isUserOnline: true,
-            },
-          });
-
-          //join the room for conversation
-          socket.join(data.conversationId);
           let emails = groupChat.convid
             .split(" ")
             .filter((email) => email !== user.email);
@@ -594,14 +593,12 @@ const acceptInvitation = async (req) => {
           await Promise.all(
             emails.map(async (email) => {
               let userData = await User.findOneLight(email);
-              for (const soc of socketList) {
-                if (
-                  soc.id == userData.socketId &&
-                  req.app.locals.bg[userData.email] == null
-                ) {
-                  data.isUserOnline = true;
-                  break;
-                }
+              if (
+                socketList.find((soc) => soc.id == userData.socketId) &&
+                !req.app.locals.bg[userData.email]
+              ) {
+                console.log(`User ${userData.email} is online`);
+                data.isUserOnline = true;
               }
             })
           );
