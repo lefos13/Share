@@ -719,14 +719,6 @@ const declineInvitation = async (req) => {
         }
       });
 
-      const userDeclined = await User.findOneLight(invitedEmail);
-      if (userDeclined === false) {
-        throw new Error(
-          "Error at finding initiatior of service " + invitedEmail
-        );
-      }
-      onGroupRequestDeclined(group, userDeclined);
-
       if (!isChatStillPending) {
         console.log("GROUP CHAT IS NOT PENDING ANYMORE");
         //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE
@@ -833,6 +825,11 @@ const declineInvitation = async (req) => {
       console.log("DECLINE INVITATION DECIDED TO DELETE THE CHAT");
       fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
     }
+    const userDeclined = await User.findOneLight(invitedEmail);
+    if (userDeclined === false) {
+      throw new Error("Error at finding initiatior of service " + invitedEmail);
+    }
+    onGroupRequestDeclined(group, userDeclined);
 
     return { status: 200, message: msg.invitationDeclined };
   } catch (error) {
