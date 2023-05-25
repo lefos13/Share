@@ -102,7 +102,6 @@ const onGroupRequestReceived = async (group) => {
         let message = {
           data: {
             type: "onGroupRequestReceived",
-            postid: null,
             email: adminData.email, // owner email
             fullname: adminData.fullname, // owner email
           },
@@ -112,7 +111,7 @@ const onGroupRequestReceived = async (group) => {
             body:
               msg.firebase.not_ver_body0 +
               adminData.fullname +
-              msg.firebase.request_part2,
+              msg.firebase.createdGroup,
           },
         };
         // Get the current time
@@ -127,7 +126,7 @@ const onGroupRequestReceived = async (group) => {
           imagePath: imagePath,
           date: curTime,
           type: message.data.type,
-          postid: message.data.postid,
+          postid: null,
           email: message.data.email,
           fullName: message.data.fullname,
           ownerEmail: user.email,
@@ -190,7 +189,6 @@ const onGroupRequestAccepted = async (group, memberAccepted) => {
     let message = {
       data: {
         type: "onGroupRequestAccepted",
-        postid: null,
         email: memberAccepted.email, // owner email
         fullname: memberAccepted.fullname, // owner email
       },
@@ -213,7 +211,7 @@ const onGroupRequestAccepted = async (group, memberAccepted) => {
       imagePath: imagePath,
       date: curTime,
       type: message.data.type,
-      postid: message.data.postid,
+      postid: null,
       email: message.data.email,
       fullName: message.data.fullname,
       ownerEmail: adminData.email,
@@ -275,7 +273,6 @@ const onGroupRequestDeclined = async (group, memberDeclined) => {
     let message = {
       data: {
         type: "onGroupRequestDeclined",
-        postid: null,
         email: memberDeclined.email, // owner email
         fullname: memberDeclined.fullname, // owner email
       },
@@ -299,7 +296,7 @@ const onGroupRequestDeclined = async (group, memberDeclined) => {
       imagePath: imagePath,
       date: curTime,
       type: message.data.type,
-      postid: message.data.postid,
+      postid: null,
       email: message.data.email,
       fullName: message.data.fullname,
       ownerEmail: adminData.email,
