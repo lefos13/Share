@@ -459,8 +459,16 @@ const leaveGroup = async (req) => {
       if (responseRemoval instanceof Error) {
         throw responseRemoval;
       }
-      //Send events to group for changes
-      fun.sendUpdatedGroupChatData(groupId);
+      let userThatLeft = await User.findOneByUserName(extra);
+      //send event to user that group chat is removed from him/her
+      io.to(userThatLeft.socketId).emit("action", {
+        type: "onGroupConversationRemoved",
+        data: {
+          conversation: groupChatData.groupId + "," + groupChatData.convid,
+        },
+      });
+      //Send events to group for changes to rest of group
+      fun.sendUpdatedGroupChatData(groupId, false);
       return { status: 200, message: msg.leftGroup };
     } else if (response === "Destroyed") {
       //Destroy chat of group
@@ -672,8 +680,6 @@ const declineInvitation = async (req) => {
       if (responseRemoval instanceof Error) {
         throw responseRemoval;
       }
-      //Send events to group for changes
-      fun.sendUpdatedGroupChatData(groupId);
 
       let newGroupData = await Group.findOne(groupId);
       if (newGroupData === false) {
@@ -692,6 +698,98 @@ const declineInvitation = async (req) => {
       if (!isChatStillPending) {
         console.log("GROUP CHAT IS NOT PENDING ANYMORE");
         //EMIT EVENTS THAT GROUP CHAT IS NOT PENDING ANYMORE
+        const groupChat = await ConvGroup.findOneByGroupId(groupId);
+        const group = await Group.findOne(groupId);
+        let userEmails = groupChat.convid.split(" ");
+        await Promise.all(
+          userEmails.map(async (email) => {
+            const user = await User.findOneLight(email);
+            if (user === false) {
+              throw new Error("Error at finding a user");
+            }
+            const adminData = await User.findOneLight(group.admin);
+            if (adminData === false) throw new Error("Admin not found");
+            const ratingData = await insertAver(adminData);
+            if (ratingData === false) throw new Error("Rating not found");
+
+            const data = {
+              conversationId: group.groupId + "," + groupChat.convid,
+              socketId: adminData.socketId,
+              username: group.groupName,
+              photo: (await fun.checkImagePath(adminData.email))
+                ? `images/${adminData.email}.jpeg`
+                : null,
+              email: adminData.email,
+              average: ratingData.average,
+              count: ratingData.count,
+              isGroupInterest: false,
+              members: [],
+              isUserOnline: false,
+              expiresIn: null,
+              messages: [],
+              isRead: true,
+              lastMessage: null,
+              lastMessageTime: null,
+              isLastMessageMine: false,
+              messagesLeft: false,
+              pending: false,
+            };
+            const socketList = await io.fetchSockets();
+
+            const socket = socketList.find((soc) => soc.id === user.socketId);
+            socket.broadcast.to(data.conversationId).emit("action", {
+              type: "setIsConversationUserOnlineGroups",
+              data: {
+                conversationId: data.conversationId,
+                isUserOnline: true,
+              },
+            });
+            //join the room for conversation
+            socket.join(data.conversationId);
+            let emails = groupChat.convid
+              .split(" ")
+              .filter((email) => email !== user.email);
+            await Promise.all(
+              emails.map(async (email) => {
+                let userData = await User.findOneLight(email);
+                for (const soc of socketList) {
+                  if (
+                    soc.id == userData.socketId &&
+                    req.app.locals.bg[userData.email] == null
+                  ) {
+                    data.isUserOnline = true;
+                    break;
+                  }
+                }
+              })
+            );
+            //get all the members of the group
+            data.members = await fun.returnAllMembers(group);
+
+            if (user.email != group.admin) {
+              socket.emit("action", {
+                type: "onGroupConversationAdded",
+                data: {
+                  conversation: data,
+                },
+              });
+            } else {
+              socket.emit("action", {
+                type: "onGroupConversationPendingUpdated",
+                data: {
+                  conversationId: data.conversationId,
+                  pending: false,
+                },
+              });
+            }
+          })
+        );
+      } else {
+        //inform admin that the group chat is changed
+        fun.sendUpdatedGroupChatData(
+          groupId + "," + groupChatData.convid,
+          true
+        );
       }
     } else if (group === "Destroyed") {
       //Destroy chat of group

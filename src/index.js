@@ -1423,8 +1423,10 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
         countOnlineUsers++;
       }
     }
+    console.log(`ONLINE USERS OF GROUP:${conv.groupId} IS ${countOnlineUsers}`);
     const conversationId = conv.groupId + "," + conv.convid;
     if (countOnlineUsers < 2) {
+      console.log("MAKE IT OFFLINE!");
       io.to(conversationId).emit("action", {
         type: "setIsConversationUserOnlineGroups",
         data: {
@@ -1433,6 +1435,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
         },
       });
     } else {
+      console.log("MAKE IT ONLINE!");
       io.to(conversationId).emit("action", {
         type: "setIsConversationUserOnlineGroups",
         data: {

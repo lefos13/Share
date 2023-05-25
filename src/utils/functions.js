@@ -71,95 +71,155 @@ const socket = require("../index");
  * @returns The function does not have a return statement, but it may return an Error object if an
  * error occurs.
  */
-const sendUpdatedGroupChatData = async (groupId) => {
+const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
   const io = socket.io;
   try {
-    let groupChat = await ConvGroups.findOneByGroupId(groupId);
-    if (groupChat instanceof Error) {
-      throw groupChat;
-    }
+    //send events to all
+    if (!onlyAdmin) {
+      let groupChat = await ConvGroups.findOneByGroupId(groupId);
+      if (groupChat instanceof Error) {
+        throw groupChat;
+      }
 
-    let group = await Group.findOne(groupId);
+      let group = await Group.findOne(groupId);
 
-    let emails = groupChat.convid.split(" ");
-    await Promise.all(
-      emails.map(async (email) => {
-        let user = await User.findOneLight(email);
-        let ratingData = await insertAver(user);
+      let emails = groupChat.convid.split(" ");
+      await Promise.all(
+        emails.map(async (email) => {
+          let user = await User.findOneLight(email);
+          let ratingData = await insertAver(user);
 
-        const data = {
-          conversationId: group.groupId + "," + groupChat.convid,
-          socketId: user.socketId,
-          username: group.groupName,
-          photo: (await checkImagePath(user.email))
-            ? `images/${user.email}.jpeg`
-            : null,
-          email: user.email,
-          average: ratingData.average,
-          count: ratingData.count,
-          isGroupInterest: false,
-          members: [],
-          isUserOnline: false,
-          expiresIn: null,
-          messages: [],
-          isRead: true,
-          lastMessage: null,
-          lastMessageTime: null,
-          isLastMessageMine: false,
-          messagesLeft: false,
-          pending: true,
-        };
+          const data = {
+            conversationId: group.groupId + "," + groupChat.convid,
+            socketId: user.socketId,
+            username: group.groupName,
+            photo: (await checkImagePath(user.email))
+              ? `images/${user.email}.jpeg`
+              : null,
+            email: user.email,
+            average: ratingData.average,
+            count: ratingData.count,
+            isGroupInterest: false,
+            members: [],
+            isUserOnline: false,
+            expiresIn: null,
+            messages: [],
+            isRead: true,
+            lastMessage: null,
+            lastMessageTime: null,
+            isLastMessageMine: false,
+            messagesLeft: false,
+            pending: true,
+          };
 
-        //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
-        let emailsToCheck = groupChat.convid.split(" ");
-        emailsToCheck.filter((email) => email !== user.email);
-        let socketList = await io.fetchSockets();
-        await Promise.all(
-          emailsToCheck.map(async (email) => {
-            let userData = await User.findOneLight(email);
-            for (const soc of socketList) {
-              if (soc.id == userData.socketId) {
-                data.isUserOnline = true;
-                break;
+          //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
+          let emailsToCheck = groupChat.convid.split(" ");
+          emailsToCheck.filter((email) => email !== user.email);
+          let socketList = await io.fetchSockets();
+          await Promise.all(
+            emailsToCheck.map(async (email) => {
+              let userData = await User.findOneLight(email);
+              for (const soc of socketList) {
+                if (soc.id == userData.socketId) {
+                  data.isUserOnline = true;
+                  break;
+                }
               }
+            })
+          );
+          //get all the members of the group
+          data.members = await returnAllMembers(group);
+
+          if (groupChat.messages !== null) {
+            if (isJsonString(groupChat.messages))
+              groupChat.messages = JSON.parse(groupChat.messages);
+            groupChat.messages.sort((a, b) => {
+              return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+            data.messagesLeft = groupChat.messages.length > 20;
+            const finalMessages = _.take(
+              _.drop(groupChat.messages, 0),
+              data.messagesLeft ? 20 : groupChat.messages.length
+            );
+
+            data.messages = await decryptMessages(finalMessages);
+
+            data.lastMessage = finalMessages[0].text;
+            data.isLastMessageMine = data.messages[0].user._id == user.email;
+            data.lastMessageTime = moment(finalMessages[0].createdAt).format(
+              "DD-MM-YYYY HH:mm"
+            );
+            if (data.isLastMessageMine) {
+              data.isRead = true;
+            } else {
+              // check if the user has read it in the past
+              data.isRead = finalMessages[0].isRead;
             }
-          })
-        );
-        //get all the members of the group
-        data.members = await returnAllMembers(group);
-
-        if (groupChat.messages !== null) {
-          if (isJsonString(groupChat.messages))
-            groupChat.messages = JSON.parse(groupChat.messages);
-          groupChat.messages.sort((a, b) => {
-            return new Date(b.createdAt) - new Date(a.createdAt);
-          });
-          data.messagesLeft = groupChat.messages.length > 20;
-          const finalMessages = _.take(
-            _.drop(groupChat.messages, 0),
-            data.messagesLeft ? 20 : groupChat.messages.length
-          );
-
-          data.messages = await decryptMessages(finalMessages);
-
-          data.lastMessage = finalMessages[0].text;
-          data.isLastMessageMine = data.messages[0].user._id == user.email;
-          data.lastMessageTime = moment(finalMessages[0].createdAt).format(
-            "DD-MM-YYYY HH:mm"
-          );
-          if (data.isLastMessageMine) {
-            data.isRead = true;
-          } else {
-            // check if the user has read it in the past
-            data.isRead = finalMessages[0].isRead;
           }
-        }
-        io.to(user.socketId).emit("action", {
-          type: "onGroupConversationUpdated",
-          conversation: data,
-        });
-      })
-    );
+          io.to(user.socketId).emit("action", {
+            type: "onGroupConversationUpdated",
+            conversation: data,
+          });
+        })
+      );
+    } else {
+      //send to admin only
+      let groupChat = await ConvGroups.findOneByGroupId(groupId);
+      if (groupChat instanceof Error) {
+        throw groupChat;
+      }
+
+      const group = await Group.findOne(groupId);
+
+      const admin = await User.findOneLight(group.admin);
+      const ratingData = await insertAver(admin);
+      const data = {
+        conversationId: group.groupId + "," + groupChat.convid,
+        socketId: admin.socketId,
+        username: group.groupName,
+        photo: (await checkImagePath(admin.email))
+          ? `images/${admin.email}.jpeg`
+          : null,
+        email: admin.email,
+        average: ratingData.average,
+        count: ratingData.count,
+        isGroupInterest: false,
+        members: [],
+        isUserOnline: false,
+        expiresIn: null,
+        messages: [],
+        isRead: true,
+        lastMessage: null,
+        lastMessageTime: null,
+        isLastMessageMine: false,
+        messagesLeft: false,
+        pending: true,
+      };
+
+      //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
+      let emailsToCheck = groupChat.convid.split(" ");
+      emailsToCheck.filter((email) => email !== admin.email);
+      let socketList = await io.fetchSockets();
+      await Promise.all(
+        emailsToCheck.map(async (email) => {
+          let userData = await User.findOneLight(email);
+          for (const soc of socketList) {
+            if (soc.id == userData.socketId) {
+              data.isUserOnline = true;
+              break;
+            }
+          }
+        })
+      );
+
+      //get all the members of the group
+      data.members = await returnAllMembers(group);
+
+      io.to(admin.socketId).emit("action", {
+        type: "onGroupConversationUpdated",
+        conversation: data,
+      });
+    }
   } catch (error) {
     console.log(error);
     return new Error("getting group chat data failed");
