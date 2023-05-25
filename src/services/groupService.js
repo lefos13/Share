@@ -691,8 +691,10 @@ const declineInvitation = async (req) => {
     let msg = await fun.determineLang(req);
     let groupId = req.body.groupId;
     let groupChatData = await ConvGroup.findOneByGroupId(groupId);
+    let groupData = await Group.findOne(groupId);
     // decline invitation
     let group = await Group.declineInvitation(groupId, invitedEmail);
+
     if (group === false) {
       throw new Error("Invitation Declination Failed");
     } else if (group === "Updated") {
@@ -829,7 +831,7 @@ const declineInvitation = async (req) => {
     if (userDeclined === false) {
       throw new Error("Error at finding initiatior of service " + invitedEmail);
     }
-    onGroupRequestDeclined(group, userDeclined);
+    onGroupRequestDeclined(groupData.admin, userDeclined);
 
     return { status: 200, message: msg.invitationDeclined };
   } catch (error) {
