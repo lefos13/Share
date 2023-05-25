@@ -81,9 +81,9 @@ const onGroupRequestReceived = async (group) => {
     const allMessages = [];
     // Iterate over all the members and create notification messages
     await Promise.all(
-      members.map(async (email) => {
+      members.map(async (member) => {
         // Find the user by email
-        let user = await User.findOneLight(email);
+        let user = await User.findOneLight(member.email);
         // If user is not found, throw an error
         if (user === false) {
           throw new Error("User searching went wrong");
