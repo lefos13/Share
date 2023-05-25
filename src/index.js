@@ -582,6 +582,7 @@ io.on("connection", (socket) => {
         }
 
         case "server/private_message_groups": {
+          console.log("CONVERSATION ID message: ", action.data.conversationId);
           const conversationId = action.data.conversationId; // this is the receipient id
           const fromEmail = action.data.senderEmail; //this is my id
           let dataForNotification = action.data.message;
@@ -655,7 +656,7 @@ io.on("connection", (socket) => {
           else messages.push(action.data.message);
           // let blabla = await decryptMessages(messages);
           const addedMessage = await ConvGroup.addMessage(
-            realConversationId,
+            realGroupId,
             messages[0]
           );
           if (addedMessage == false) {

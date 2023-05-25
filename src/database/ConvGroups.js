@@ -51,11 +51,11 @@ const updateLastMessage = async (convid, email, seen) => {
  * @returns The function does not have an explicit return statement, but it may return `false` if an
  * error is caught in the try-catch block.
  */
-const addMessage = async (convid, message) => {
+const addMessage = async (groupId, message) => {
   try {
     let results = await ConvGroups.findOne({
       where: {
-        convid: convid,
+        groupId: groupId,
       },
     }).catch((err) => {
       throw err;
