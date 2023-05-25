@@ -72,9 +72,9 @@ const onGroupRequestReceived = async (group) => {
     // Get the members of the group
     const members = group.members;
     // Find the admin of the group
-    const admin = await User.findOneLight(group.admin);
+    const adminData = await User.findOneLight(group.admin);
     // If the admin is not found, throw an error
-    if (admin === false) {
+    if (adminData === false) {
       throw new Error("Admin searching went wrong");
     }
     // Array to hold all notification messages
@@ -103,15 +103,15 @@ const onGroupRequestReceived = async (group) => {
           data: {
             type: "onGroupRequestReceived",
             postid: null,
-            email: admin.email, // owner email
-            fullname: admin.fullname, // owner email
+            email: adminData.email, // owner email
+            fullname: adminData.fullname, // owner email
           },
           token: fcmTok,
           notification: {
             title: msg.firebase.reqJoinGroup,
             body:
               msg.firebase.not_ver_body0 +
-              admin.fullname +
+              adminData.fullname +
               msg.firebase.request_part2,
           },
         };
@@ -119,8 +119,8 @@ const onGroupRequestReceived = async (group) => {
         let curTime = moment();
         // Get the path for the admin profile image if it exists
         let imagePath = null;
-        if (await checkImagePath(admin.email)) {
-          imagePath = "images/" + admin.email + ".jpeg";
+        if (await checkImagePath(adminData.email)) {
+          imagePath = "images/" + adminData.email + ".jpeg";
         }
         // Create the notification object
         const notificationToInsert = {
@@ -174,8 +174,8 @@ const onGroupRequestReceived = async (group) => {
  */
 const onGroupRequestAccepted = async (group, memberAccepted) => {
   try {
-    const admin = await User.findOneLight(group.admin);
-    if (admin === false) {
+    const adminData = await User.findOneLight(group.admin);
+    if (adminData === false) {
       throw new Error("Admin searching went wrong");
     }
     let adminToken = await FcmToken.findOne({
@@ -184,7 +184,7 @@ const onGroupRequestAccepted = async (group, memberAccepted) => {
       throw err;
     });
 
-    let msg = await getLang(admin.lastLang);
+    let msg = await getLang(adminData.lastLang);
 
     let fcmTok = adminToken != null ? adminToken.fcmToken : null;
     let message = {
@@ -216,7 +216,7 @@ const onGroupRequestAccepted = async (group, memberAccepted) => {
       postid: message.data.postid,
       email: message.data.email,
       fullName: message.data.fullname,
-      ownerEmail: admin.email,
+      ownerEmail: adminData.email,
       title: message.notification.title,
       message: message.notification.body,
       isRead: false,
@@ -256,19 +256,19 @@ const onGroupRequestAccepted = async (group, memberAccepted) => {
 const onGroupRequestDeclined = async (group, memberDeclined) => {
   try {
     // Find the admin of the group
-    const admin = await User.findOneLight(group.admin);
+    const adminData = await User.findOneLight(group.admin);
     // Throw an error if admin is not found
-    if (admin === false) {
+    if (adminData === false) {
       throw new Error("Admin searching went wrong");
     }
     // Find the FCM token of the admin
     let adminToken = await FcmToken.findOne({
-      where: { email: admin.email },
+      where: { email: adminData.email },
     }).catch((err) => {
       throw err;
     });
     // Get the language of the admin
-    let msg = await getLang(admin.lastLang);
+    let msg = await getLang(adminData.lastLang);
     // Get the FCM token of the admin, if available
     let fcmTok = adminToken != null ? adminToken.fcmToken : null;
     // Prepare the message to be sent as push notification
@@ -302,7 +302,7 @@ const onGroupRequestDeclined = async (group, memberDeclined) => {
       postid: message.data.postid,
       email: message.data.email,
       fullName: message.data.fullname,
-      ownerEmail: admin.email,
+      ownerEmail: adminData.email,
       title: message.notification.title,
       message: message.notification.body,
       isRead: false,
