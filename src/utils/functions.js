@@ -353,6 +353,15 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
           let user = await User.findOneLight(email);
           let ratingData = await insertAver(user);
 
+          //CHECK IF THERE ARE PEDNING USERS IN THE GROUP
+          const checkIfPending = await Group.getPendingUsers(groupChat.groupId);
+          let flagPending = false;
+          if (checkIfPending === false)
+            throw new Error("Pending users not found");
+          else if (checkIfPending === true) {
+            flagPending = true;
+          }
+
           const data = {
             conversationId: group.groupId + "," + groupChat.convid,
             socketId: user.socketId,
@@ -373,7 +382,7 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
             lastMessageTime: null,
             isLastMessageMine: false,
             messagesLeft: false,
-            pending: true,
+            pending: flagPending,
           };
 
           //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
@@ -391,6 +400,7 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
               }
             })
           );
+
           //get all the members of the group
           data.members = await returnAllMembers(group);
 
@@ -437,6 +447,13 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
 
       const admin = await User.findOneLight(group.admin);
       const ratingData = await insertAver(admin);
+      //CHECK IF THERE ARE PEDNING USERS IN THE GROUP
+      const checkIfPending = await Group.getPendingUsers(groupChat.groupId);
+      let flagPending = false;
+      if (checkIfPending === false) throw new Error("Pending users not found");
+      else if (checkIfPending === true) {
+        flagPending = true;
+      }
       const data = {
         conversationId: group.groupId + "," + groupChat.convid,
         socketId: admin.socketId,
@@ -457,7 +474,7 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
         lastMessageTime: null,
         isLastMessageMine: false,
         messagesLeft: false,
-        pending: true,
+        pending: flagPending,
       };
 
       //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
@@ -1714,6 +1731,13 @@ const applyFilters = async (data, array) => {
   }
 };
 
+/**
+ * This function sends push notifications to users based on certain conditions and data from a
+ * database.
+ * @param post - an object containing information about a post that has been created, including
+ * startcoord, endcoord, email, moreplaces, and postid.
+ * @param msg - The message to be sent in the notification.
+ */
 const pushNotifications = async (post, msg) => {
   try {
     let arrayToNotify = [];
@@ -1777,6 +1801,15 @@ const pushNotifications = async (post, msg) => {
   }
 };
 
+/**
+ * The function formats various date values using the Moment.js library.
+ * @param fnd - fnd is likely an object that contains data values related to dates, such as startdate,
+ * enddate, date, returnStartDate, and returnEndDate. The function fixAllDates uses the moment library
+ * to format these dates into specific formats (RFC_ONLYM and RFC_H) and returns the updated f
+ * @returns The function `fixAllDates` is returning the `fnd` object with its `startdate`, `enddate`,
+ * `date`, `returnStartDate`, and `returnEndDate` properties formatted as per the `RFC_ONLYM` and
+ * `RFC_H` formats using the `moment` library.
+ */
 const fixAllDates = async (fnd) => {
   fnd.dataValues.startdate = moment(fnd.dataValues.startdate).format(RFC_ONLYM);
   if (fnd.enddate != null) {
