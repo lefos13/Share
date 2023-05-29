@@ -484,7 +484,7 @@ const leaveGroup = async (req) => {
       if (responseRemoval instanceof Error) {
         throw responseRemoval;
       }
-      let userThatLeft = await User.findOneByUserName(extra);
+      let userThatLeft = await User.findOneLight(extra);
       //send event to user that group chat is removed from him/her
       io.to(userThatLeft.socketId).emit("action", {
         type: "onGroupConversationRemoved",
