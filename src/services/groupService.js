@@ -686,6 +686,7 @@ const acceptInvitation = async (req) => {
  * there is an error, it will return a status code of 500.
  */
 const declineInvitation = async (req) => {
+  const io = socket.io;
   try {
     let invitedEmail = req.body.extra;
     let msg = await fun.determineLang(req);
