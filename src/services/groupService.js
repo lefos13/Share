@@ -456,6 +456,7 @@ const changeName = async (req) => {
  * group. If there is an error, it will return an object with a status code of 500.
  */
 const leaveGroup = async (req) => {
+  const io = socket.io;
   try {
     let extra = req.body.extra;
     let msg = await fun.determineLang(req);
