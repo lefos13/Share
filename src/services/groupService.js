@@ -559,7 +559,9 @@ const acceptInvitation = async (req) => {
     const userSocket = socketList.find(
       (val) => val.id === userInvited.socketId
     );
-    userSocket.join(groupChat.convid);
+    if (userSocket != null) {
+      userSocket.join(groupChat.convid);
+    }
 
     onGroupRequestAccepted(group, userInvited);
 
@@ -637,6 +639,9 @@ const acceptInvitation = async (req) => {
             group.groupId
           );
           if (user.email != group.admin) {
+            console.log(
+              `SENDING NEW GROUP CHAT TO USER ${user.email} OF GROUP ${group.groupId}`
+            );
             socket.emit("action", {
               type: "onGroupConversationAdded",
               data: {
