@@ -416,13 +416,15 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
             pending: flagPending,
           };
 
-          data.isLastMessageMine = data.messages[0].user._id == user.email;
+          if (groupChat.messages !== null) {
+            data.isLastMessageMine = data.messages[0].user._id == user.email;
 
-          if (data.isLastMessageMine) {
-            data.isRead = true;
-          } else {
-            // check if the user has read it in the past
-            data.isRead = finalMessages[0].isRead;
+            if (data.isLastMessageMine) {
+              data.isRead = true;
+            } else {
+              // check if the user has read it in the past
+              data.isRead = finalMessages[0].isRead;
+            }
           }
 
           //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
