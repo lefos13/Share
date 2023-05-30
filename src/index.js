@@ -1315,8 +1315,6 @@ io.on("connection", (socket) => {
                     console.log(`User ${userData.email} is online`);
                     data.isUserOnline = true;
                     break;
-                  } else {
-                    console.log(`User ${userData.email} is offline`);
                   }
                 }
               })

@@ -627,8 +627,6 @@ const acceptInvitation = async (req) => {
               ) {
                 console.log(`User ${userData.email} is ONLINE`);
                 data.isUserOnline = true;
-              } else {
-                console.log(`User ${userData.email} is OFFILNE`);
               }
             })
           );
@@ -793,8 +791,6 @@ const declineInvitation = async (req) => {
                     console.log(`User ${userData.email} is ONLINE`);
                     data.isUserOnline = true;
                     break;
-                  } else {
-                    console.log(`User ${userData.email} is OFFILNE`);
                   }
                 }
               })

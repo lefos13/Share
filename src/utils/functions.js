@@ -401,10 +401,6 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
                   );
                   data.isUserOnline = true;
                   break;
-                } else {
-                  console.log(
-                    `User ${userData.email} is Offline with no bg checking`
-                  );
                 }
               }
             })
@@ -500,10 +496,6 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
               );
               data.isUserOnline = true;
               break;
-            } else {
-              console.log(
-                `User ${userData.email} is Offline with no bg checking`
-              );
             }
           }
         })
