@@ -733,7 +733,7 @@ io.on("connection", (socket) => {
           //state that user has opened the chat
           app.locals[action.data.senderId] = conversationId;
           let realConversationId = conversationId.split(",")[1];
-          const groupId = realConversationId.split(",")[0];
+          const groupId = conversationId.split(",")[0];
           //get all users email with sender too
           let usersEmail = realConversationId.split(" ");
           //exluce sender
@@ -880,7 +880,7 @@ io.on("connection", (socket) => {
           //get conversation and mark the last message as read
           if (conversationId.includes(",")) {
             let realConversationId = conversationId.split(",")[1];
-            const groupId = realConversationId.split(",")[0];
+            const groupId = conversationId.split(",")[0];
             io.to(groupId).emit("action", {
               type: "setGroupConversationSeen",
               data: {
