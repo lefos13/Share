@@ -423,7 +423,7 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
               data.isRead = true;
             } else {
               // check if the user has read it in the past
-              data.isRead = finalMessages[0].isRead;
+              data.isRead = data.messages[0].isRead;
             }
           }
 
