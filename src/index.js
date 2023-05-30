@@ -1292,6 +1292,8 @@ io.on("connection", (socket) => {
               pending: flagPending,
             };
 
+            //join the room for conversation
+            socket.join(group.groupId);
             socket.broadcast.to(group.groupId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
@@ -1299,8 +1301,6 @@ io.on("connection", (socket) => {
                 isUserOnline: true,
               },
             });
-            //join the room for conversation
-            socket.join(group.groupid);
 
             let emails = conv.convid.split(" ");
             emails = emails.filter((e) => e !== action.data.email);
