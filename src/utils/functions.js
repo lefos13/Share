@@ -348,7 +348,7 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
       let group = await Group.findOne(groupId);
 
       const adminData = await User.findOneLight(group.admin);
-      let ratingData = await insertAver(group.admin);
+      let ratingData = await insertAver(adminData);
 
       let emails = groupChat.convid.split(" ");
       await Promise.all(
