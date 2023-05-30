@@ -1429,12 +1429,15 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
           countOnlineUsers++;
         }
       }
-      // console.log(
-      //   `ONLINE USERS OF GROUP:${conv.groupId} IS ${countOnlineUsers}`
-      // );
+      /* The above code is a commented out console.log statement in JavaScript. It is printing a
+      message to the console that includes the group ID and the number of online users in that
+      group. However, the code is currently commented out, so it will not be executed. */
+      console.log(
+        `ONLINE USERS OF GROUP:${conv.groupId} IS ${countOnlineUsers}`
+      );
       const conversationId = conv.groupId + "," + conv.convid;
       if (countOnlineUsers < 2) {
-        // console.log("MAKE IT OFFLINE!");
+        console.log("MAKE IT OFFLINE!");
         io.to(conversationId).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
@@ -1443,7 +1446,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
           },
         });
       } else {
-        // console.log("MAKE IT ONLINE!");
+        console.log("MAKE IT ONLINE!");
         io.to(conversationId).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
