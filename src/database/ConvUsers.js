@@ -8,6 +8,30 @@ const ConvUsers = require("../modules/convusers");
 const { Op } = require("sequelize");
 const moment = require("moment");
 
+/**
+ * This function deletes multiple records from a database table based on a given group ID.
+ * @param groupId - The `groupId` parameter is a unique identifier for a group of users in a chat
+ * application. It is used to identify and delete all conversations associated with that group.
+ * @returns a boolean value of `true` if the deletion of ConvUsers records with the specified `groupId`
+ * is successful. If there is an error, it returns a new `Error` object with the message "couldnt
+ * delete chats by group id".
+ */
+const deleteManyByGroupId = async (groupId) => {
+  try {
+    let results = await ConvUsers.destroy({
+      where: {
+        groupId: groupId,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return new Error("couldnt delete chats by group id");
+  }
+};
+
 const saveOne = async (data) => {
   try {
     let results = await ConvUsers.create(data).catch((err) => {
@@ -254,4 +278,5 @@ module.exports = {
   findOne,
   updateLastMessage,
   updateGroupId,
+  deleteManyByGroupId,
 };

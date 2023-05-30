@@ -407,6 +407,11 @@ const deleteGroup = async (req) => {
     if (chatDeleted === false) {
       throw new Error("Chat Deletion Failed");
     }
+    //delete all personal (group) chats by groupId
+    let personalChatsDeleted = await ConvUsers.deleteManyByGroupId(groupId);
+    if (personalChatsDeleted instanceof Error) {
+      throw personalChatsDeleted;
+    }
 
     return { status: 200, message: msg.groupDeleted };
   } catch (error) {
