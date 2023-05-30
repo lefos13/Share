@@ -396,7 +396,7 @@ const deleteGroup = async (req) => {
     }
 
     //inform users that a group chat has been deleted
-    io.to(groupChat.groupId + "," + groupChat.convid).emit("action", {
+    io.to(groupChat.groupId).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
         conversation: groupChat.groupId + "," + groupChat.convid,
@@ -447,7 +447,7 @@ const changeName = async (req) => {
     if (groupChat instanceof Error) {
       throw groupChat;
     }
-    io.to(groupChat.groupId + "," + groupChat.convid).emit("action", {
+    io.to(groupChat.groupId).emit("action", {
       type: "onGroupConversationNameChanged",
       data: {
         conversationId: groupChat.groupId + "," + groupChat.convid,
@@ -786,7 +786,7 @@ const declineInvitation = async (req) => {
             const socketList = await io.fetchSockets();
 
             const socket = socketList.find((soc) => soc.id === user.socketId);
-            socket.broadcast.to(data.conversationId).emit("action", {
+            socket.broadcast.to(group.groupId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
                 conversationId: data.conversationId,

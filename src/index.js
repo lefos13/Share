@@ -733,6 +733,7 @@ io.on("connection", (socket) => {
           //state that user has opened the chat
           app.locals[action.data.senderId] = conversationId;
           let realConversationId = conversationId.split(",")[1];
+          const groupId = realConversationId.split(",")[0];
           //get all users email with sender too
           let usersEmail = realConversationId.split(" ");
           //exluce sender
@@ -746,7 +747,7 @@ io.on("connection", (socket) => {
             await User.findOneLight(senderId),
           ]);
 
-          io.to(conversationId).emit("action", {
+          io.to(groupId).emit("action", {
             type: "setGroupConversationSeen",
             data: {
               conversationId: conversationId,
@@ -879,7 +880,8 @@ io.on("connection", (socket) => {
           //get conversation and mark the last message as read
           if (conversationId.includes(",")) {
             let realConversationId = conversationId.split(",")[1];
-            io.to(conversationId).emit("action", {
+            const groupId = realConversationId.split(",")[0];
+            io.to(groupId).emit("action", {
               type: "setGroupConversationSeen",
               data: {
                 conversationId: conversationId,
@@ -1290,7 +1292,7 @@ io.on("connection", (socket) => {
               pending: flagPending,
             };
 
-            socket.broadcast.to(data.conversationId).emit("action", {
+            socket.broadcast.to(group.groupId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
                 conversationId: data.conversationId,
@@ -1438,7 +1440,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
       const conversationId = conv.groupId + "," + conv.convid;
       if (countOnlineUsers < 2) {
         console.log("MAKE IT OFFLINE!");
-        io.to(conversationId).emit("action", {
+        io.to(conv.groupId).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
             conversationId,
@@ -1447,7 +1449,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
         });
       } else {
         console.log("MAKE IT ONLINE!");
-        io.to(conversationId).emit("action", {
+        io.to(conv.groupId).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
             conversationId,

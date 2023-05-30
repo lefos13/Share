@@ -528,7 +528,8 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
 const sendRemovedGroupChatData = async (convid) => {
   const io = socket.io;
   try {
-    io.to(convid).emit("action", {
+    const groupId = convid.split(",")[0];
+    io.to(groupId).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
         conversation: convid,
