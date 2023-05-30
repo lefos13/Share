@@ -1298,7 +1298,7 @@ io.on("connection", (socket) => {
               },
             });
             //join the room for conversation
-            socket.join(data.conversationId);
+            socket.join(group.groupid);
 
             let emails = conv.convid.split(" ");
             emails = emails.filter((e) => e !== action.data.email);

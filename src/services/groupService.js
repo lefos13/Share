@@ -112,7 +112,7 @@ const createGroup = async (req) => {
             "ADMIN FOUND ONLINE AND THE RIGHT SOCKET IS IN DB",
             socket.id === adminData.socketId
           );
-          socket.join(groupChat.groupId + "," + groupChat.convid);
+          socket.join(groupChat.groupId);
           break;
         }
       }
@@ -510,6 +510,7 @@ const leaveGroup = async (req) => {
           conversation: groupChatData.groupId + "," + groupChatData.convid,
         },
       });
+
       //Send events to group for changes to rest of group
       fun.sendUpdatedGroupChatData(groupId, false);
       return { status: 200, message: msg.leftGroup };
@@ -577,7 +578,7 @@ const acceptInvitation = async (req) => {
       (val) => val.id === userInvited.socketId
     );
     if (userSocket != null) {
-      userSocket.join(groupChat.convid);
+      userSocket.join(groupChat.groupId);
     }
 
     onGroupRequestAccepted(group, userInvited);
@@ -625,10 +626,10 @@ const acceptInvitation = async (req) => {
           const socket = socketList.find((soc) => soc.id === user.socketId);
           if (socket != null) {
             console.log(
-              `User invited ${user.email} joined the room of group ${group.groupId}`
+              `User invited ${user.email} joined the room of group ${group.groupId} with id ${data.conversationId}`
             );
             //join the room for conversation
-            socket.join(data.conversationId);
+            socket.join(group.groupId);
           }
 
           let emails = groupChat.convid
@@ -793,7 +794,7 @@ const declineInvitation = async (req) => {
               },
             });
             //join the room for conversation
-            socket.join(data.conversationId);
+            socket.join(group.groupId);
             let emails = groupChat.convid
               .split(" ")
               .filter((email) => email !== user.email);
