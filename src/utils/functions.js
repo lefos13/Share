@@ -351,22 +351,48 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
       let ratingData = await insertAver(adminData);
 
       let emails = groupChat.convid.split(" ");
+      //CHECK IF THERE ARE PEDNING USERS IN THE GROUP
+      const checkIfPending = await Group.getPendingUsers(groupChat.groupId);
+      let flagPending = false;
+      if (checkIfPending === false) throw new Error("Pending users not found");
+      else if (checkIfPending === true) {
+        flagPending = true;
+      }
+      let decryptedMessages = [];
+      let messagesLeft = false;
+      let lastMessage = null;
+      let lastMessageTime = null;
+      if (groupChat.messages !== null) {
+        if (isJsonString(groupChat.messages))
+          groupChat.messages = JSON.parse(groupChat.messages);
+        groupChat.messages.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        messagesLeft = groupChat.messages.length > 20;
+
+        const finalMessages = _.take(
+          _.drop(groupChat.messages, 0),
+          messagesLeft ? 20 : groupChat.messages.length
+        );
+
+        decryptedMessages = await decryptMessages(finalMessages);
+
+        lastMessage = finalMessages[0].text;
+
+        lastMessageTime = moment(finalMessages[0].createdAt).format(
+          "DD-MM-YYYY HH:mm"
+        );
+      }
+
+      //get members
+      const members = await returnAllMembers(group);
       await Promise.all(
         emails.map(async (email) => {
           let user = await User.findOneLight(email);
           console.log(
             `GETTING DATA FOR USER ${user.email} TO UPDATE THE GROUP CHAT`
           );
-
-          //CHECK IF THERE ARE PEDNING USERS IN THE GROUP
-          const checkIfPending = await Group.getPendingUsers(groupChat.groupId);
-          let flagPending = false;
-          if (checkIfPending === false)
-            throw new Error("Pending users not found");
-          else if (checkIfPending === true) {
-            flagPending = true;
-          }
-
           const data = {
             conversationId: group.groupId + "," + groupChat.convid,
             socketId: adminData.socketId,
@@ -378,17 +404,26 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
             average: ratingData.average,
             count: ratingData.count,
             isGroupInterest: false,
-            members: [],
+            members: members,
             isUserOnline: false,
             expiresIn: null,
-            messages: [],
+            messages: decryptedMessages,
             isRead: true,
-            lastMessage: null,
-            lastMessageTime: null,
+            lastMessage: lastMessage,
+            lastMessageTime: lastMessageTime,
             isLastMessageMine: false,
-            messagesLeft: false,
+            messagesLeft: messagesLeft,
             pending: flagPending,
           };
+
+          data.isLastMessageMine = data.messages[0].user._id == user.email;
+
+          if (data.isLastMessageMine) {
+            data.isRead = true;
+          } else {
+            // check if the user has read it in the past
+            data.isRead = finalMessages[0].isRead;
+          }
 
           //CHECK IF OTHER USERS OF GROUP CHAT IS ONLINE
           let emailsToCheck = groupChat.convid.split(" ");
@@ -409,37 +444,6 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
             })
           );
 
-          //get all the members of the group
-          data.members = await returnAllMembers(group);
-          console.log("ALL NEW MEMBERS OF GROUP CHAT: ", data.members);
-          if (groupChat.messages !== null) {
-            if (isJsonString(groupChat.messages))
-              groupChat.messages = JSON.parse(groupChat.messages);
-            groupChat.messages.sort((a, b) => {
-              return new Date(b.createdAt) - new Date(a.createdAt);
-            });
-
-            data.messagesLeft = groupChat.messages.length > 20;
-
-            const finalMessages = _.take(
-              _.drop(groupChat.messages, 0),
-              data.messagesLeft ? 20 : groupChat.messages.length
-            );
-
-            data.messages = await decryptMessages(finalMessages);
-
-            data.lastMessage = finalMessages[0].text;
-            data.isLastMessageMine = data.messages[0].user._id == user.email;
-            data.lastMessageTime = moment(finalMessages[0].createdAt).format(
-              "DD-MM-YYYY HH:mm"
-            );
-            if (data.isLastMessageMine) {
-              data.isRead = true;
-            } else {
-              // check if the user has read it in the past
-              data.isRead = finalMessages[0].isRead;
-            }
-          }
           io.to(user.socketId).emit("action", {
             type: "onGroupConversationUpdated",
             conversation: data,
