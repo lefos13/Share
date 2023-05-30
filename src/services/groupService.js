@@ -481,7 +481,7 @@ const leaveGroup = async (req) => {
       throw response;
     } else if (response === "Left") {
       //Change members in group chat
-      const responseRemoval = await ConvGroup.removeMembers(groupId);
+      const responseRemoval = await ConvGroup.removeMembers(groupId, extra);
       if (responseRemoval instanceof Error) {
         throw responseRemoval;
       }
