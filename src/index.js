@@ -1291,7 +1291,7 @@ io.on("connection", (socket) => {
             };
 
             //join the room for conversation
-            socket.join(group.groupId);
+            socket.join(group.groupId.toString());
             socket.broadcast.to(group.groupId).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
