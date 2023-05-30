@@ -738,15 +738,10 @@ io.on("connection", (socket) => {
           let usersEmail = realConversationId.split(" ");
           //exluce sender
           usersEmail = usersEmail.filter((val) => val != senderId);
-          //do it in paralel and get data of all users
-          let { users, admin } = await Promise.all([
-            usersEmail.map(async (email) => {
-              const userData = await User.findOneLight(email);
-              return userData;
-            }),
-            await User.findOneLight(senderId),
-          ]);
 
+          console.log(
+            `Emiting to room ${groupId} that conversation has been read`
+          );
           io.to(groupId).emit("action", {
             type: "setGroupConversationSeen",
             data: {
@@ -881,6 +876,9 @@ io.on("connection", (socket) => {
           if (conversationId.includes(",")) {
             let realConversationId = conversationId.split(",")[1];
             const groupId = conversationId.split(",")[0];
+            console.log(
+              `Emiting to room ${groupId} that conversation has been read`
+            );
             io.to(groupId).emit("action", {
               type: "setGroupConversationSeen",
               data: {
