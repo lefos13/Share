@@ -1312,8 +1312,11 @@ io.on("connection", (socket) => {
                     soc.id == userData.socketId &&
                     app.locals.bg[userData.email] == null
                   ) {
+                    console.log(`User ${userData.email} is online`);
                     data.isUserOnline = true;
                     break;
+                  } else {
+                    console.log(`User ${userData.email} is offline`);
                   }
                 }
               })
