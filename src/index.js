@@ -1412,7 +1412,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
       const emails = conv.convid
         .split(" ")
         .filter((email) => email !== user.email);
-      console.log("USERS TO CHECK IF ONLINE", emails.join(","));
+      // console.log("USERS TO CHECK IF ONLINE", emails.join(","));
       const users = await Promise.all(
         emails.map(async (email) => await User.findOneLight(email))
       );
@@ -1428,12 +1428,12 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
           countOnlineUsers++;
         }
       }
-      console.log(
-        `ONLINE USERS OF GROUP:${conv.groupId} IS ${countOnlineUsers}`
-      );
+      // console.log(
+      //   `ONLINE USERS OF GROUP:${conv.groupId} IS ${countOnlineUsers}`
+      // );
       const conversationId = conv.groupId + "," + conv.convid;
       if (countOnlineUsers < 2) {
-        console.log("MAKE IT OFFLINE!");
+        // console.log("MAKE IT OFFLINE!");
         io.to(conversationId).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
@@ -1442,7 +1442,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
           },
         });
       } else {
-        console.log("MAKE IT ONLINE!");
+        // console.log("MAKE IT ONLINE!");
         io.to(conversationId).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
