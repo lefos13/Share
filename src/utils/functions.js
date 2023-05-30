@@ -534,7 +534,7 @@ const sendRemovedGroupChatData = async (convid) => {
   const io = socket.io;
   try {
     const groupId = convid.split(",")[0];
-    io.to(groupId).emit("action", {
+    io.to(groupId.toString()).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
         conversation: convid,

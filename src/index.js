@@ -742,7 +742,7 @@ io.on("connection", (socket) => {
           console.log(
             `Emiting to room ${groupId} that conversation has been read`
           );
-          io.to(groupId).emit("action", {
+          io.to(groupId.toString()).emit("action", {
             type: "setGroupConversationSeen",
             data: {
               conversationId: conversationId,
@@ -879,7 +879,7 @@ io.on("connection", (socket) => {
             console.log(
               `Emiting to room ${groupId} that conversation has been read`
             );
-            io.to(groupId).emit("action", {
+            io.to(groupId.toString()).emit("action", {
               type: "setGroupConversationSeen",
               data: {
                 conversationId: conversationId,
@@ -1292,7 +1292,7 @@ io.on("connection", (socket) => {
 
             //join the room for conversation
             socket.join(group.groupId.toString());
-            socket.broadcast.to(group.groupId).emit("action", {
+            socket.broadcast.to(group.groupId.toString()).emit("action", {
               type: "setIsConversationUserOnlineGroups",
               data: {
                 conversationId: data.conversationId,
@@ -1438,7 +1438,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
       const conversationId = conv.groupId + "," + conv.convid;
       if (countOnlineUsers < 2) {
         console.log("MAKE IT OFFLINE!");
-        io.to(conv.groupId).emit("action", {
+        io.to(conv.groupId.toString()).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
             conversationId,
@@ -1447,7 +1447,7 @@ async function sendEventsGroupOnline(user, sockets, withSelf) {
         });
       } else {
         console.log("MAKE IT ONLINE!");
-        io.to(conv.groupId).emit("action", {
+        io.to(conv.groupId.toString()).emit("action", {
           type: "setIsConversationUserOnlineGroups",
           data: {
             conversationId,
