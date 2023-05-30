@@ -605,12 +605,10 @@ const acceptInvitation = async (req) => {
 
           const socketList = await io.fetchSockets();
 
-          const socket = socketList.find(
-            (soc) => soc.id === userInvited.socketId
-          );
+          const socket = socketList.find((soc) => soc.id === user.socketId);
           if (socket != null) {
             console.log(
-              `User invited ${userInvited.email} joined the room of group ${group.groupId}`
+              `User invited ${user.email} joined the room of group ${group.groupId}`
             );
             //join the room for conversation
             socket.join(data.conversationId);

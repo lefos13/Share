@@ -186,7 +186,7 @@ const getAllInvitedTo = async (email) => {
       group.members = JSON.parse(group.members);
 
       for await (let member of group.members) {
-        console.log("User Checking: ", member);
+        // console.log("User Checking: ", member);
         // if the member is the current user
         if (member.email === email && member.pending === true) {
           // console.log("Found user in members list with pending invite");
