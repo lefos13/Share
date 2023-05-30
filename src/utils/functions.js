@@ -354,6 +354,9 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
       await Promise.all(
         emails.map(async (email) => {
           let user = await User.findOneLight(email);
+          console.log(
+            `GETTING DATA FOR USER ${user.email} TO UPDATE THE GROUP CHAT`
+          );
 
           //CHECK IF THERE ARE PEDNING USERS IN THE GROUP
           const checkIfPending = await Group.getPendingUsers(groupChat.groupId);
@@ -410,12 +413,14 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
           data.members = await returnAllMembers(group);
           console.log("ALL NEW MEMBERS OF GROUP CHAT: ", data.members);
           if (groupChat.messages !== null) {
-            if (isJsonString(groupChat.messages))
-              groupChat.messages = JSON.parse(groupChat.messages);
+            if (isJsonString(conv.messages))
+              conv.messages = JSON.parse(conv.messages);
             groupChat.messages.sort((a, b) => {
               return new Date(b.createdAt) - new Date(a.createdAt);
             });
+
             data.messagesLeft = groupChat.messages.length > 20;
+
             const finalMessages = _.take(
               _.drop(groupChat.messages, 0),
               data.messagesLeft ? 20 : groupChat.messages.length
