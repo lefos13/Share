@@ -1407,43 +1407,50 @@ const ioObject = io;
 module.exports.io = ioObject;
 async function sendEventsGroupOnline(user, sockets, withSelf) {
   const groupConvs = await ConvGroup.findAllByEmail(user.email);
-  for await (let conv of groupConvs) {
-    const emails = conv.convid
-      .split(" ")
-      .filter((email) => email !== user.email);
-    const users = await Promise.all(
-      emails.map(async (email) => await User.findOneLight(email))
-    );
-    let countOnlineUsers = withSelf;
+  await Promise.all(
+    groupConvs.map(async (conv) => {
+      const emails = conv.convid
+        .split(" ")
+        .filter((email) => email !== user.email);
+      console.log("USERS TO CHECK IF ONLINE", emails.join(","));
+      const users = await Promise.all(
+        emails.map(async (email) => await User.findOneLight(email))
+      );
+      let countOnlineUsers = withSelf;
 
-    for await (const socket of sockets) {
-      if (
-        users.some((user) => user.socketId === socket.id) &&
-        !app.locals.bg[user.email]
-      ) {
-        countOnlineUsers++;
+      for await (const socket of sockets) {
+        if (
+          users.some(
+            (data) =>
+              data.socketId === socket.id && app.locals.bg[data.email] == null
+          )
+        ) {
+          countOnlineUsers++;
+        }
       }
-    }
-    console.log(`ONLINE USERS OF GROUP:${conv.groupId} IS ${countOnlineUsers}`);
-    const conversationId = conv.groupId + "," + conv.convid;
-    if (countOnlineUsers < 2) {
-      console.log("MAKE IT OFFLINE!");
-      io.to(conversationId).emit("action", {
-        type: "setIsConversationUserOnlineGroups",
-        data: {
-          conversationId,
-          isUserOnline: false,
-        },
-      });
-    } else {
-      console.log("MAKE IT ONLINE!");
-      io.to(conversationId).emit("action", {
-        type: "setIsConversationUserOnlineGroups",
-        data: {
-          conversationId,
-          isUserOnline: true,
-        },
-      });
-    }
-  }
+      console.log(
+        `ONLINE USERS OF GROUP:${conv.groupId} IS ${countOnlineUsers}`
+      );
+      const conversationId = conv.groupId + "," + conv.convid;
+      if (countOnlineUsers < 2) {
+        console.log("MAKE IT OFFLINE!");
+        io.to(conversationId).emit("action", {
+          type: "setIsConversationUserOnlineGroups",
+          data: {
+            conversationId,
+            isUserOnline: false,
+          },
+        });
+      } else {
+        console.log("MAKE IT ONLINE!");
+        io.to(conversationId).emit("action", {
+          type: "setIsConversationUserOnlineGroups",
+          data: {
+            conversationId,
+            isUserOnline: true,
+          },
+        });
+      }
+    })
+  );
 }
