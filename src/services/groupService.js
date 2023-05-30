@@ -396,7 +396,10 @@ const deleteGroup = async (req) => {
     }
 
     //inform users that a group chat has been deleted
-    io.to(groupChat.groupId.toString()).emit("action", {
+    console.log(
+      `Sending in room ${groupId.toString()} that chat has been deleted`
+    );
+    io.to(groupId.toString()).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
         conversation: groupChat.groupId + "," + groupChat.convid,

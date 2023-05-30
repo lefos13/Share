@@ -413,8 +413,8 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
           data.members = await returnAllMembers(group);
           console.log("ALL NEW MEMBERS OF GROUP CHAT: ", data.members);
           if (groupChat.messages !== null) {
-            if (isJsonString(conv.messages))
-              conv.messages = JSON.parse(conv.messages);
+            if (isJsonString(groupChat.messages))
+              groupChat.messages = JSON.parse(groupChat.messages);
             groupChat.messages.sort((a, b) => {
               return new Date(b.createdAt) - new Date(a.createdAt);
             });
@@ -515,7 +515,7 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return new Error("getting group chat data failed");
   }
 };
@@ -534,6 +534,7 @@ const sendRemovedGroupChatData = async (convid) => {
   const io = socket.io;
   try {
     const groupId = convid.split(",")[0];
+
     io.to(groupId.toString()).emit("action", {
       type: "onGroupConversationRemoved",
       data: {
