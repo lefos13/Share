@@ -134,6 +134,22 @@ const interested = async (req) => {
       } else if (pendingUsers === false) {
         throw new Error("Something went wrong with finding the pending users");
       }
+      //CHECK HOW MANY POSITIONS THE RIDE HAS
+      const post = await Post.findOne(data.postid);
+      if (post === false) {
+        throw new Error("Something went wrong with finding the post");
+      }
+      const numOfSeats = post.numseats;
+      const group = await Groups.findOne(data.groupId);
+      if (group instanceof Error)
+        throw new Error("Something went wrong with finding the group");
+
+      if (numOfSeats < group.members.length + 1) {
+        return {
+          status: 405,
+          message: msg.groupHasTooManyMembers,
+        };
+      }
     } else data.groupId = null;
     //prepare the data to be inserted into the database
     var row = {

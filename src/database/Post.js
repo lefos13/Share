@@ -87,6 +87,15 @@ const isPostOwner = async (row) => {
   }
 };
 
+/**
+ * This is an asynchronous function that finds a post by its ID and returns it, or returns false if
+ * there is an error.
+ * @param postid - The parameter `postid` is the unique identifier of a post that is being searched for
+ * in the database table `Posts`. The function `findOne` uses this parameter to search for a specific
+ * post in the database and returns the post object if it exists, or `false` if it does not.
+ * @returns The function `findOne` returns either the `postForFunction` object if the `Posts.findOne`
+ * query is successful, or `false` if there is an error caught in the `try-catch` block.
+ */
 const findOne = async (postid) => {
   try {
     const postForFunction = await Posts.findOne({

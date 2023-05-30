@@ -431,6 +431,7 @@ const deleteGroup = async (req) => {
  * status code will be 500.
  */
 const changeName = async (req) => {
+  const io = socket.io;
   try {
     let extra = req.body.extra;
     let msg = await fun.determineLang(req);
@@ -442,6 +443,17 @@ const changeName = async (req) => {
     if (response === false) {
       throw new Error("Group Name Change Failed");
     }
+    let groupChat = await ConvGroup.findOneByGroupId(groupId);
+    if (groupChat instanceof Error) {
+      throw groupChat;
+    }
+    io.to(groupChat.groupId + "," + groupChat.convid).emit("action", {
+      type: "onGroupConversationNameChanged",
+      data: {
+        conversationId: groupChat.groupId + "," + groupChat.convid,
+        newName: newGroupName,
+      },
+    });
     return { status: 200, message: msg.groupNameChanged };
   } catch (error) {
     console.error(error);
