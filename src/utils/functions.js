@@ -396,8 +396,15 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
               let userData = await User.findOneLight(email);
               for (const soc of socketList) {
                 if (soc.id == userData.socketId) {
+                  console.log(
+                    `User ${userData.email} is Online with no bg checking`
+                  );
                   data.isUserOnline = true;
                   break;
+                } else {
+                  console.log(
+                    `User ${userData.email} is Offline with no bg checking`
+                  );
                 }
               }
             })
@@ -488,8 +495,15 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
           let userData = await User.findOneLight(email);
           for (const soc of socketList) {
             if (soc.id == userData.socketId) {
+              console.log(
+                `User ${userData.email} is Online with no bg checking`
+              );
               data.isUserOnline = true;
               break;
+            } else {
+              console.log(
+                `User ${userData.email} is Offline with no bg checking`
+              );
             }
           }
         })

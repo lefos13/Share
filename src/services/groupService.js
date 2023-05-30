@@ -625,8 +625,10 @@ const acceptInvitation = async (req) => {
                 socketList.find((soc) => soc.id == userData.socketId) &&
                 !req.app.locals.bg[userData.email]
               ) {
-                console.log(`User ${userData.email} is online`);
+                console.log(`User ${userData.email} is ONLINE`);
                 data.isUserOnline = true;
+              } else {
+                console.log(`User ${userData.email} is OFFILNE`);
               }
             })
           );
@@ -788,8 +790,11 @@ const declineInvitation = async (req) => {
                     soc.id == userData.socketId &&
                     req.app.locals.bg[userData.email] == null
                   ) {
+                    console.log(`User ${userData.email} is ONLINE`);
                     data.isUserOnline = true;
                     break;
+                  } else {
+                    console.log(`User ${userData.email} is OFFILNE`);
                   }
                 }
               })
