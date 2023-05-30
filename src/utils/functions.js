@@ -347,11 +347,13 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
 
       let group = await Group.findOne(groupId);
 
+      const adminData = await User.findOneLight(group.admin);
+      let ratingData = await insertAver(group.admin);
+
       let emails = groupChat.convid.split(" ");
       await Promise.all(
         emails.map(async (email) => {
           let user = await User.findOneLight(email);
-          let ratingData = await insertAver(user);
 
           //CHECK IF THERE ARE PEDNING USERS IN THE GROUP
           const checkIfPending = await Group.getPendingUsers(groupChat.groupId);
@@ -364,12 +366,12 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
 
           const data = {
             conversationId: group.groupId + "," + groupChat.convid,
-            socketId: user.socketId,
+            socketId: adminData.socketId,
             username: group.groupName,
-            photo: (await checkImagePath(user.email))
-              ? `images/${user.email}.jpeg`
+            photo: (await checkImagePath(adminData.email))
+              ? `images/${adminData.email}.jpeg`
               : null,
-            email: user.email,
+            email: adminData.email,
             average: ratingData.average,
             count: ratingData.count,
             isGroupInterest: false,
@@ -403,7 +405,7 @@ const sendUpdatedGroupChatData = async (groupId, onlyAdmin) => {
 
           //get all the members of the group
           data.members = await returnAllMembers(group);
-
+          console.log("ALL NEW MEMBERS OF GROUP CHAT: ", data.members);
           if (groupChat.messages !== null) {
             if (isJsonString(groupChat.messages))
               groupChat.messages = JSON.parse(groupChat.messages);
