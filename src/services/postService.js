@@ -51,9 +51,8 @@ const socket = require("../index");
 const createNewPost = async (data, req) => {
   try {
     const msg = await determineLang(req);
-    const postToInsert = {
-      ...data,
-    };
+    const { image, ...postToInsert } = data;
+
     let message = null;
     //Check if the user has done more than three posts current day.
     const counter = await Post.countPosts(postToInsert.email);
@@ -61,19 +60,31 @@ const createNewPost = async (data, req) => {
     if (counter < 3) {
       //do it
       const newPost = await Post.createNewPost(postToInsert, msg);
-      if (newPost !== false)
+      if (newPost !== false) {
+        if (data.image.includes("postimages")) {
+          //create new image file from the existing
+          console.log("CASE OF REPOSTING WITH IMAGE");
+        } else {
+          console.log(`CASE OF PLAIN POSTING WITH IMAGE`);
+          //create new image file from the base64 string
+          const base64 = image;
+          const buffer = Buffer.from(base64, "base64");
+          fs.writeFileSync("postImages/" + newPost.postid + ".jpeg", buffer);
+        }
+
         message = {
           status: 200,
           data: msg.createRideSuc,
           postid: newPost.postid,
         };
-      else message = { status: 500 };
+      } else throw new Error("Post failed to be created");
     } else {
       message = {
         status: 405,
         data: msg.threeRides,
       };
     }
+
     return message;
   } catch (error) {
     console.error(error);
