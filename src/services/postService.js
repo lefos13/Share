@@ -60,7 +60,7 @@ const createNewPost = async (data, req) => {
 
     if (counter < 3) {
       //do it
-      if (postToInsert.image != null) {
+      if (!postToInsert.hasOwnProperty("image")) {
         console.log("DATA TO INSERT TO POST HAS NO IMAGE FIELD");
         const newPost = await Post.createNewPost(postToInsert, msg);
         if (newPost !== false) {
