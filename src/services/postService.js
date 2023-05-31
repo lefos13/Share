@@ -10,6 +10,7 @@ const LastSearch = require("../database/LastSearch");
 const ConvUsers = require("../database/ConvUsers");
 const Groups = require("../database/Group");
 const fun = require("../utils/functions");
+const fs = require("fs");
 const {
   insertAver,
   applyFilters,
