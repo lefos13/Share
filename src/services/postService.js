@@ -60,17 +60,20 @@ const createNewPost = async (data, req) => {
 
     if (counter < 3) {
       //do it
-      const newPost = await Post.createNewPost(postToInsert, msg);
-      if (newPost !== false) {
-        if (data.image.includes("postimages")) {
-          //create new image file from the existing
-          console.log("CASE OF REPOSTING WITH IMAGE");
-        } else {
-          console.log(`CASE OF PLAIN POSTING WITH IMAGE`);
-          //create new image file from the base64 string
-          const base64 = image;
-          const buffer = Buffer.from(base64, "base64");
-          fs.writeFileSync("postImages/" + newPost.postid + ".jpeg", buffer);
+      if (postToInsert.image != null) {
+        console.log("DATA TO INSERT TO POST HAS NO IMAGE FIELD");
+        const newPost = await Post.createNewPost(postToInsert, msg);
+        if (newPost !== false) {
+          if (data.image.includes("postimages")) {
+            //create new image file from the existing
+            console.log("CASE OF REPOSTING WITH IMAGE");
+          } else {
+            console.log(`CASE OF PLAIN POSTING WITH IMAGE`);
+            //create new image file from the base64 string
+            const base64 = image;
+            const buffer = Buffer.from(base64, "base64");
+            fs.writeFileSync("postImages/" + newPost.postid + ".jpeg", buffer);
+          }
         }
 
         message = {
