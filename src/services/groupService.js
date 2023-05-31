@@ -661,12 +661,14 @@ const acceptInvitation = async (req) => {
             console.log(
               `SENDING NEW GROUP CHAT TO USER ${user.email} OF GROUP ${group.groupId}`
             );
-            socket.emit("action", {
-              type: "onGroupConversationAdded",
-              data: {
-                conversation: data,
-              },
-            });
+            if (socket != null) {
+              socket.emit("action", {
+                type: "onGroupConversationAdded",
+                data: {
+                  conversation: data,
+                },
+              });
+            }
           } else {
             io.to(adminData.socketId).emit("action", {
               type: "onGroupConversationPendingUpdated",
