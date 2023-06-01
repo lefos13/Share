@@ -105,6 +105,11 @@ const Posts = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null,
+    },
   },
   {
     freezeTableName: true,

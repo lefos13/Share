@@ -5,7 +5,7 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "slodevolos@hotmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -470,17 +470,17 @@ Accept-Language: EN
 }
 
 ###service pou sou epistrefei lista me posts (paginated ana 20 kai ordered me vasi imeromhnia)
-POST http://157.230.18.246:3000/posts/searchposts
+POST https://ouride.gr/test/posts/searchposts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDYtMDFUMDk6MDY6MjkuNDMzWiIsImlhdCI6MTY4NTYxMDM4OSwiZXhwIjoxNjkwNzk0Mzg5fQ.mDV_SjeU8qGhWLIzm7DhJH6_fUMht_a3R9lg6wNTpYI
 Accept-Language: EN
 
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "ασδ",
+        "startplace": "Athens",
         "startcoord": "1234",
-        "endplace": "δσα",
+        "endplace": "Volos",
         "endcoord": "3215",
         "startdate": null,
         "enddate": null,
