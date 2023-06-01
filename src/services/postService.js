@@ -52,7 +52,7 @@ const socket = require("../index");
 const createNewPost = async (data, req) => {
   try {
     const msg = await determineLang(req);
-    const { image, ...postToInsert } = data;
+    let { image, ...postToInsert } = data;
 
     let message = null;
     //Check if the user has done more than three posts current day.
@@ -62,18 +62,9 @@ const createNewPost = async (data, req) => {
       //do it
       if (!postToInsert.hasOwnProperty("image")) {
         console.log("DATA TO INSERT TO POST HAS NO IMAGE FIELD");
-        const newPost = await Post.createNewPost(postToInsert, msg);
-        if (newPost !== false) {
-          if (data.image.includes("postimages")) {
-            //create new image file from the existing
-            console.log("CASE OF REPOSTING WITH IMAGE");
-          } else {
-            console.log(`CASE OF PLAIN POSTING WITH IMAGE`);
-            //create new image file from the base64 string
-            const base64 = image;
-            const buffer = Buffer.from(base64, "base64");
-            fs.writeFileSync("postImages/" + newPost.postid + ".jpeg", buffer);
-          }
+        const newPost = await Post.createNewPost(postToInsert, image, msg);
+        if (newPost === false) {
+          throw new Error("Post failed to be created");
         }
 
         message = {

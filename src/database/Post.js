@@ -16,6 +16,7 @@ const Reviews = require("../modules/review");
 const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
+const fs = require("fs");
 const moment = require("moment");
 
 const getAllPosts = () => {
@@ -48,15 +49,38 @@ const countPosts = async (user) => {
 };
 
 // *** ADD ***
-const createNewPost = async (data, msg) => {
+const createNewPost = async (data, image, msg) => {
   try {
-    //get current date
     var postdate = moment();
     data.date = postdate;
 
     const post = await Posts.create(data).catch((err) => {
       throw err;
     });
+    if (image.includes("postimages")) {
+      //create new image file from the existing
+      console.log("CASE OF REPOSTING WITH IMAGE");
+      const array = image.split("/");
+      const oldPostId = array.split(".")[0];
+      fs.copyFile(
+        "postImages/" + oldPostId + ".jpeg",
+        "postImages/" + post.postid + ".jpeg",
+        (err) => {
+          throw err;
+        }
+      );
+    } else if (image == null) {
+      console.log("POSTING WITH NO IMAGE");
+    } else {
+      console.log(`CASE OF PLAIN POSTING WITH IMAGE`);
+      const postid = post.postid;
+      //create new image file from the base64 string
+      const base64 = image;
+      const buffer = Buffer.from(base64, "base64");
+      fs.writeFileSync("postImages/" + postid + ".jpeg", buffer);
+      await post.update({ image: "postimages/" + postid + ".jpeg" });
+    }
+    //get current date
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //Firebase newRide notification
