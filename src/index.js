@@ -41,7 +41,7 @@ app.use("/images", express.static("uploads"));
 app.use("/termsPolicies", express.static("termsPolicies"));
 app.use("/web", express.static("static-page"));
 app.use("/web2", express.static("static-page/site-vue/hello-world/dist"));
-app.use("postimages", express.static("postImages"));
+app.use("/postimages", express.static("postImages"));
 app.get("/", (req, res) => {
   try {
     // const webPage = readFileSync(__dirname + "/static-page/site-vue/hello-world/dist/index.html");

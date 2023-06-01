@@ -478,9 +478,9 @@ Accept-Language: EN
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "Athens",
+        "startplace": "Αθήνα",
         "startcoord": "1234",
-        "endplace": "Volos",
+        "endplace": "Βόλος",
         "endcoord": "3215",
         "startdate": null,
         "enddate": null,
