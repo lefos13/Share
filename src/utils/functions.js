@@ -592,31 +592,40 @@ const extractConvid = async (group) => {
  * `count`, and `imagePath` for each member.
  */
 const insertDataToMembers = async (group) => {
-  if (isJsonString(group.members)) {
-    console.log("GROUP MEMBERS: ", group.members);
-    group.members = JSON.parse(group.members);
+  try {
+    if (isJsonString(group.members)) {
+      console.log("GROUP MEMBERS: ", group.members);
+      group.members = JSON.parse(group.members);
+    }
+
+    const updatedMembers = await Promise.all(
+      group.members.map(async (member) => {
+        const memberFullname = await User.findOneLight(member.email);
+        if (memberFullname === false)
+          throw new Error("Error at finding the user");
+        const ratingData = await insertAver(member);
+        if(ratingData === false) throw new Error("Error at finding the user");
+        const hasImagePath = await checkImagePath(member.email);
+        const imagePath = hasImagePath ? `images/${member.email}.jpeg` : null;
+
+        return {
+          ...member,
+          fullname: memberFullname.fullname,
+          average: ratingData.average,
+          count: ratingData.count,
+          imagePath: imagePath,
+        };
+      })
+    );
+    return {
+      ...group,
+      members: updatedMembers,
+    };
+  } catch (error) {
+    console.error(error);
+    return new Error("Something went wrong at inserting data to members");
   }
-
-  const updatedMembers = await Promise.all(
-    group.members.map(async (member) => {
-      const memberFullname = await User.findOneLight(member.email);
-      const ratingData = await insertAver(member);
-      const hasImagePath = await checkImagePath(member.email);
-      const imagePath = hasImagePath ? `images/${member.email}.jpeg` : null;
-
-      return {
-        ...member,
-        fullname: memberFullname.fullname,
-        average: ratingData.average,
-        count: ratingData.count,
-        imagePath: imagePath,
-      };
-    })
-  );
-  return {
-    ...group,
-    members: updatedMembers,
-  };
+  
 };
 /**
  * The function checks if an image file exists in a specific directory based on the email parameter.
@@ -1259,6 +1268,14 @@ const toNotifyTheUnverified = async (unverifiedEmail, postid, ownerEmail) => {
   }
 };
 
+/**
+ * The function calculates the average rating and count of reviews for a given user.
+ * @param user - The `user` parameter is an object that contains the email of the user for whom we want
+ * to calculate the average rating.
+ * @returns The function `insertAver` returns an object with two properties: `average` and `count`. The
+ * value of `average` is either the average rating of a user's reviews (rounded to one decimal place)
+ * or 0 if the user has no reviews. The value of `count` is the number of reviews the user has.
+ */
 const insertAver = async (user) => {
   try {
     //define the query for the db call
@@ -1300,6 +1317,15 @@ const insertAver = async (user) => {
   }
 };
 
+/**
+ * The function returns all members of a group, including the group admin's data and their average
+ * rating.
+ * @param group - The "group" parameter is an object that likely contains information about a group,
+ * such as its members and admin. The function "returnAllMembers" is designed to retrieve and format
+ * data about all members of this group, including the admin.
+ * @returns The function `returnAllMembers` returns the `group.members` array with additional data for
+ * the admin user. If there is an error, it returns the error object.
+ */
 const returnAllMembers = async (group) => {
   try {
     // group.members = isJsonString(group.members)

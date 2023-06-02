@@ -5,7 +5,7 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "slodevolos@hotmail.com"
     }
 }
 
@@ -211,14 +211,14 @@ Accept-Language: EN
 ###
 
 #service epistrefei lista me posts enos xrhsth
-POST http://157.230.18.246:3000/posts/getPostsUser
+POST https://ouride.gr/test/posts/getPostsUser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNi0wMVQwOToyMzo0NC4wODhaIiwiaWF0IjoxNjg1NjExNDI0LCJleHAiOjE2OTA3OTU0MjR9.A-rQP0_c3s4f6j9g4rcp-rfY4X7Hra3fjcgY_yTYhio
 Accept-Language: EN
 
 {
     "data": {
-        "email": "user0@gmail.com",
+        "email": "slodevolos@hotmail.com",
         "page": 1
     }
 }
@@ -387,9 +387,9 @@ Accept-Language: EN
 
 ###
 #service that returns all the favourites of one user
-GET http://157.230.18.246:3000/posts/getFavourites
+GET https://ouride.gr/test/posts/getFavourites
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNi0wMVQwOToyMjozMy44MjBaIiwiaWF0IjoxNjg1NjExMzUzLCJleHAiOjE2OTA3OTUzNTN9.5EaQhKojztNEZrb5vUymKlKMQd6QFczAPD3zq1ZHCjU
 Accept-Language: EN
 
 
@@ -478,9 +478,9 @@ Accept-Language: EN
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "Αθήνα",
+        "startplace": "Athens",
         "startcoord": "1234",
-        "endplace": "Βόλος",
+        "endplace": "Thessaloniki",
         "endcoord": "3215",
         "startdate": null,
         "enddate": null,
@@ -500,14 +500,14 @@ Accept-Language: EN
 }
 
 ### feed Screen
-POST http://157.230.18.246:3000/posts/feedScreen
+POST https://ouride.gr/test/posts/feedScreen
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE1VDEzOjQ3OjM4LjEwM1oiLCJpYXQiOjE2NzExMTIwNTgsImV4cCI6MTY3NjI5NjA1OH0.CEbcQhtCWuuap7g2XCljelexze18A-hPRCJJnD3W0qQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDYtMDFUMDk6MDY6MjkuNDMzWiIsImlhdCI6MTY4NTYxMDM4OSwiZXhwIjoxNjkwNzk0Mzg5fQ.mDV_SjeU8qGhWLIzm7DhJH6_fUMht_a3R9lg6wNTpYI
 Accept-Language: EN
 
 {
     "data": {
-        "startplace": "ασδ",
+        "startplace": "Αθήνα",
         "startcoord": "123",
         "page": 1
     }
@@ -564,9 +564,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 Accept-Language: EN
 
 ###
-POST https://ouride.gr/posts/feedAll
+POST https://ouride.gr/test/posts/feedAll
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDYtMDFUMDk6MDY6MjkuNDMzWiIsImlhdCI6MTY4NTYxMDM4OSwiZXhwIjoxNjkwNzk0Mzg5fQ.mDV_SjeU8qGhWLIzm7DhJH6_fUMht_a3R9lg6wNTpYI
 Accept-Language: EN
 
 {

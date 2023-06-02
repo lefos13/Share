@@ -469,8 +469,8 @@ io.on("connection", (socket) => {
           console.log("call server Join!!!");
 
           const initiator = await User.findOneLight(action.data.email);
-          if (initiator == null) {
-            break;
+          if (initiator === false) {
+            throw new Error("Error at finding the user");
           }
 
           let msg = await getLang(initiator.lastLang);
@@ -1128,7 +1128,8 @@ io.on("connection", (socket) => {
         for await (u of otherUsers) {
           const us = await Users.findOne({ where: { email: u.mail } }).catch(
             (err) => {
-              throw err;
+              console.error(err);
+              throw new Error("Something went wrong with finding the user");
             }
           );
           //inform the current user of that conversation, that the user that just logged in is online
@@ -1168,6 +1169,7 @@ io.on("connection", (socket) => {
             data.isGroupInterest = true;
             const group = await findOne(u.groupId);
             if (group === false) {
+              throw new Error("Error finding group");
             }
             //Check if the user is the admin of the group
             if (group.admin !== action.data.email) {
@@ -1308,6 +1310,7 @@ io.on("connection", (socket) => {
             await Promise.all(
               emails.map(async (email) => {
                 let userData = await User.findOneLight(email);
+                if (userData === false) throw new Error("Error finding user");
                 for (const soc of socketList) {
                   if (
                     soc.id == userData.socketId &&

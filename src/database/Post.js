@@ -61,7 +61,7 @@ const createNewPost = async (data, image, msg) => {
       //create new image file from the existing
       console.log("CASE OF REPOSTING WITH IMAGE");
       const array = image.split("/");
-      const oldPostId = array.split(".")[0];
+      const oldPostId = array[1].split(".")[0];
       fs.copyFile(
         "postImages/" + oldPostId + ".jpeg",
         "postImages/" + post.postid + ".jpeg",
