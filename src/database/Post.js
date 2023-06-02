@@ -66,9 +66,11 @@ const createNewPost = async (data, image, msg) => {
         "postImages/" + oldPostId + ".jpeg",
         "postImages/" + post.postid + ".jpeg",
         (err) => {
-          throw err;
+          if (err) throw err;
+          console.log("Image was copied to destination.txt");
         }
       );
+      await post.update({ image: "postimages/" + post.postid + ".jpeg" });
     } else if (image == null) {
       console.log("POSTING WITH NO IMAGE");
     } else {
