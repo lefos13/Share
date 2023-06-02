@@ -12,6 +12,8 @@ const ConvUsers = require("../database/ConvUsers");
 const LastSearch = require("../database/LastSearch");
 const Notification = require("../database/Notifications");
 const SearchPost = require("../database/Request");
+const Group = require("../database/Group");
+const GroupServices = require("../services/groupService");
 const bcrypt = require("bcrypt");
 var otpGenerator = require("otp-generator");
 const saltRounds = 10;
@@ -861,6 +863,42 @@ const deleteUser = async (req) => {
     const deletedChat = await ConvUsers.deleteAll(email);
     if (!deletedChat) throw new Error("Error at deleting the chats!");
 
+    //leave from all the groups that the user is in
+    const allGroups = await Group.getAll(email);
+    if (allGroups === false) throw new Error("Error at finding all the groups");
+    await Promise.all(
+      allGroups.map(async (group) => {
+        const request = {
+          body: {
+            extra: email,
+            groupId: group.groupId,
+          },
+          headers: {
+            "accept-language": "GR",
+          },
+        };
+        if (group.admin !== email) {
+          const response = await GroupServices.leaveGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has left the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        } else {
+          const response = await GroupServices.deleteGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has deleted the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        }
+      })
+    );
+
     //get all active posts of user
     const allPosts = await Post.findAllActive(email, curDate);
     if (allPosts === false) {
@@ -936,6 +974,41 @@ const permDeleteUser = async (req) => {
     const chats = await ConvUsers.findAll(email);
     dataToBackUp.chatsofUser = chats;
     _.invokeMap(chats, "destroy");
+
+    const allGroups = await Group.getAll(email);
+    if (allGroups === false) throw new Error("Error at finding all the groups");
+    await Promise.all(
+      allGroups.map(async (group) => {
+        const request = {
+          body: {
+            extra: email,
+            groupId: group.groupId,
+          },
+          headers: {
+            "accept-language": "GR",
+          },
+        };
+        if (group.admin !== email) {
+          const response = await GroupServices.leaveGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has left the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        } else {
+          const response = await GroupServices.deleteGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has deleted the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        }
+      })
+    );
 
     //get fcmToken
     const fcmToken = await FcmToken.findOne({

@@ -1195,6 +1195,10 @@ const deletePost = async (req) => {
     } else if (results == 0) {
       return { status: 404, message: msg.noRide };
     }
+    //delete the image of the post if exists
+    if (fs.existsSync(`postImages/${data.postid}.jpeg`)) {
+      fs.unlinkSync(`postImages/${data.postid}.jpeg`);
+    }
     //delete the interested people of this post
     let intRes = await PostInterested.detroyAllPerPost(data.postid);
     if (intRes === null) {
