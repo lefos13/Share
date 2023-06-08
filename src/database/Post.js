@@ -57,7 +57,9 @@ const createNewPost = async (data, image, msg) => {
     const post = await Posts.create(data).catch((err) => {
       throw err;
     });
-    if (image.includes("postimages")) {
+    if (image == null) {
+      console.log("POSTING WITH NO IMAGE");
+    } else if (image.includes("postimages")) {
       //create new image file from the existing
       console.log("CASE OF REPOSTING WITH IMAGE");
       const array = image.split("/");
@@ -71,8 +73,6 @@ const createNewPost = async (data, image, msg) => {
         }
       );
       await post.update({ image: "postimages/" + post.postid + ".jpeg" });
-    } else if (image == null) {
-      console.log("POSTING WITH NO IMAGE");
     } else {
       console.log(`CASE OF PLAIN POSTING WITH IMAGE`);
       const postid = post.postid;
