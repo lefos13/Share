@@ -979,7 +979,7 @@ const sendMessageGroup = async (
     });
 
     let data = {
-      type: "groupChatReceivedMessage",
+      type: "chatGroupReceivedMessage",
       conversationId: conversationId,
       message: messageSent.toString(),
     };

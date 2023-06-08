@@ -791,13 +791,19 @@ const declineInvitation = async (req) => {
             const socketList = await io.fetchSockets();
 
             const socket = socketList.find((soc) => soc.id === user.socketId);
-            socket.broadcast.to(group.groupId.toString()).emit("action", {
-              type: "setIsConversationUserOnlineGroups",
-              data: {
-                conversationId: data.conversationId,
-                isUserOnline: true,
-              },
-            });
+            if (socket != null) {
+              socket.broadcast.to(group.groupId.toString()).emit("action", {
+                type: "setIsConversationUserOnlineGroups",
+                data: {
+                  conversationId: data.conversationId,
+                  isUserOnline: true,
+                },
+              });
+            } else {
+              console.log(
+                `User ${user.email} is NOT ONLINE. Socket wasnt found`
+              );
+            }
             //join the room for conversation
             socket.join(group.groupId.toString());
             let emails = groupChat.convid
