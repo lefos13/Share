@@ -17,6 +17,8 @@ const createGroup = async (req, res) => {
 
     if (data.status === 200) {
       res.status(200).json({ message: data.message, data: data.data });
+    } else if (data.status === 405) {
+      res.status(405).json({ message: data.message });
     } else {
       throw msg;
     }
