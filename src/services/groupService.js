@@ -41,6 +41,17 @@ const createGroup = async (req) => {
     const members = users.map((user) => ({ ...user, pending: true }));
 
     // Create the group
+    const countGroups = await Group.countGroups(extra);
+    if (countGroups instanceof Error) {
+      throw new Error(
+        `There was an error counting the groups of the user ${admin}`
+      );
+    } else if (countGroups > 2) {
+      return {
+        status: 405,
+        message: msg.group_limit,
+      };
+    }
     const groupCreated = await Group.create({
       admin,
       members,

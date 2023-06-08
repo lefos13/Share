@@ -29,6 +29,20 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   },
 });
 
+const countGroups = async (email) => {
+  try {
+    const groups = await Groups.count({
+      where: {
+        admin: email,
+      },
+    });
+    return groups;
+  } catch (error) {
+    console.log(`Inside countGroups of group database layer: ${error}`);
+    return new Error("Something went wrong inside counting groups");
+  }
+};
+
 /**
  * This function creates a new group and returns true if successful, otherwise it returns false and
  * logs an error.
@@ -495,6 +509,7 @@ const isJsonString = async (str) => {
   }
 };
 module.exports = {
+  countGroups,
   isGroupMember,
   findOne,
   getPendingUsers,
