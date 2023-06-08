@@ -836,12 +836,16 @@ const declineInvitation = async (req) => {
               });
             } else {
               socket.emit("action", {
-                type: "onGroupConversationPendingUpdated",
-                data: {
-                  conversationId: data.conversationId,
-                  pending: false,
-                },
+                type: "onGroupConversationUpdated",
+                conversation: data,
               });
+              // socket.emit("action", {
+              //   type: "onGroupConversationPendingUpdated",
+              //   data: {
+              //     conversationId: data.conversationId,
+              //     pending: false,
+              //   },
+              // });
             }
           })
         );
