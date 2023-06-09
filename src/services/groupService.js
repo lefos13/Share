@@ -688,6 +688,14 @@ const acceptInvitation = async (req) => {
                 pending: false,
               },
             });
+
+            io.to(adminData.socketId).emit("action", {
+              type: "setIsConversationUserOnlineGroups",
+              data: {
+                conversationId: data.conversationId,
+                isUserOnline: data.isUserOnline,
+              },
+            });
           }
         })
       );
