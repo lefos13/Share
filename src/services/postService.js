@@ -150,6 +150,11 @@ const interested = async (req) => {
       if (group instanceof Error)
         throw new Error("Something went wrong with finding the group");
 
+      console.log(
+        `Number of seats: ${numOfSeats} and number of members: ${
+          group.members.length + 1
+        }`
+      );
       if (numOfSeats < group.members.length + 1) {
         return {
           status: 405,
