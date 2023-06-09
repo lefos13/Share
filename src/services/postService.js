@@ -150,6 +150,7 @@ const interested = async (req) => {
       if (group instanceof Error)
         throw new Error("Something went wrong with finding the group");
 
+      group.members = JSON.parse(group.members);
       console.log(
         `Number of seats: ${numOfSeats} and number of members: ${
           group.members.length + 1
