@@ -534,6 +534,11 @@ const leaveGroup = async (req) => {
       if (chatDeleted instanceof Error) {
         throw chatDeleted;
       }
+
+      let personalChatsDeleted = await ConvUsers.deleteManyByGroupId(groupId);
+      if (personalChatsDeleted instanceof Error) {
+        throw new Error("Personal Chats Deletion Failed");
+      }
       //Send events to group for removal
       fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
       return { status: 200, message: msg.leftGroup };
