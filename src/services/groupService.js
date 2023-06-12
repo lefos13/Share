@@ -522,6 +522,7 @@ const leaveGroup = async (req) => {
     }
     // remove a member from a group
     let response = await Group.leaveGroup(groupId, extra);
+    console.log(`Response from leaveGroup: ${response}`);
     if (response instanceof Error) {
       throw response;
     } else if (response === "Left") {
@@ -556,7 +557,7 @@ const leaveGroup = async (req) => {
       //Send events to group for removal
       fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
       return { status: 200, message: msg.leftGroup };
-    } else if (response === "Destroyed_failed") {
+    } else if (response === "Destroy_failed") {
       return { status: 405, message: msg.notAllowedToLeaveConv };
     }
   } catch (error) {

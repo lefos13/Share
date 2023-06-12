@@ -73,6 +73,7 @@ const leaveGroup = async (req, res) => {
     } else if (data.status === 500) throw msg;
     else res.status(200).json({ message: data.message });
   } catch (error) {
+    console.error("Controller leaveGroup unhandled error!");
     res.status(500).json({ message: error.errorMessage });
   }
 };
