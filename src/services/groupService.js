@@ -557,8 +557,7 @@ const leaveGroup = async (req) => {
       fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
       return { status: 200, message: msg.leftGroup };
     } else if (response === "Destroyed_failed") {
-      return { status: 406,
-      message: msg.notAllowedToLeaveConv };
+      return { status: 405, message: msg.notAllowedToLeaveConv };
     }
   } catch (error) {
     console.error(error);
