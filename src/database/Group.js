@@ -12,6 +12,7 @@ const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const Groups = require("../modules/group");
+const Convs = require("./ConvUsers");
 // ==== code for db
 
 //
@@ -304,15 +305,23 @@ const leaveGroup = async (groupId, email) => {
         });
       return "Left";
     } else {
-      //destroy the group
-      await Groups.destroy({
-        where: {
-          groupId: groupId,
-        },
-      }).catch((err) => {
-        throw err;
-      });
-      return "Destroyed";
+      //check if there are any non-expired conversations for this group
+      const foundConversations = await Convs.findOneByGroupId(groupId);
+      if (foundConversations instanceof Error)
+        throw new Error("getting the conversations of the group failed");
+      else if (foundConversations == null) {
+        //destroy the group
+        await Groups.destroy({
+          where: {
+            groupId: groupId,
+          },
+        }).catch((err) => {
+          throw err;
+        });
+        return "Destroyed";
+      } else {
+        return "Destroy_failed";
+      }
     }
   } catch (error) {
     console.error(error);

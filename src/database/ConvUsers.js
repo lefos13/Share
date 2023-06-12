@@ -8,6 +8,23 @@ const ConvUsers = require("../modules/convusers");
 const { Op } = require("sequelize");
 const moment = require("moment");
 
+
+const findOneByGroupId = async (groupId) => {
+  try {
+    const results = await ConvUsers.findOne({
+      where: {
+        groupId: groupId,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return results;
+  } catch (error) {
+    console.error(error);
+    return new Error("Something went wrong inside findOneByGroupId");
+  }
+};
 /**
  * This function deletes multiple records from a database table based on a given group ID.
  * @param groupId - The `groupId` parameter is a unique identifier for a group of users in a chat
@@ -279,4 +296,5 @@ module.exports = {
   updateLastMessage,
   updateGroupId,
   deleteManyByGroupId,
+  findOneByGroupId,
 };

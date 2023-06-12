@@ -394,6 +394,20 @@ const deleteGroup = async (req) => {
         postid: interested,
       };
     }
+    //check if there is a non expired conversation with this group
+    const conversation = await ConvUsers.findOneByGroupId(groupId);
+    if (conversation instanceof Error) {
+      throw new Error("Finding conversation failed");
+    } else if (conversation != null) {
+      console.log(
+        `WARNING: conversation found for groupId ${groupId} so admin cannot delete it`
+      );
+      return {
+        status: 405,
+        message: msg.notAllowedToDeleteConv,
+      };
+    }
+
     //inform users that a group chat has been deleted
     let groupChat = await ConvGroup.findOneByGroupId(groupId);
     if (groupChat instanceof Error) {
@@ -542,6 +556,9 @@ const leaveGroup = async (req) => {
       //Send events to group for removal
       fun.sendRemovedGroupChatData(groupId + "," + groupChatData.convid);
       return { status: 200, message: msg.leftGroup };
+    } else if (response === "Destroyed_failed") {
+      return { status: 406,
+      message: msg.notAllowedToLeaveConv };
     }
   } catch (error) {
     console.error(error);
