@@ -8,6 +8,47 @@ const ConvUsers = require("../modules/convusers");
 const { Op } = require("sequelize");
 const moment = require("moment");
 
+
+const findOneByGroupId = async (groupId) => {
+  try {
+    const results = await ConvUsers.findOne({
+      where: {
+        groupId: groupId,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+
+    return results;
+  } catch (error) {
+    console.error(error);
+    return new Error("Something went wrong inside findOneByGroupId");
+  }
+};
+/**
+ * This function deletes multiple records from a database table based on a given group ID.
+ * @param groupId - The `groupId` parameter is a unique identifier for a group of users in a chat
+ * application. It is used to identify and delete all conversations associated with that group.
+ * @returns a boolean value of `true` if the deletion of ConvUsers records with the specified `groupId`
+ * is successful. If there is an error, it returns a new `Error` object with the message "couldnt
+ * delete chats by group id".
+ */
+const deleteManyByGroupId = async (groupId) => {
+  try {
+    let results = await ConvUsers.destroy({
+      where: {
+        groupId: groupId,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return new Error("couldnt delete chats by group id");
+  }
+};
+
 const saveOne = async (data) => {
   try {
     let results = await ConvUsers.create(data).catch((err) => {
@@ -141,13 +182,24 @@ const updateExpireDate = async (convObj, expiresIn) => {
   try {
     let tesDate = moment(convObj.expiresIn);
     if (tesDate > expiresIn) {
-      return "0";
+      return tesDate;
     } else {
       await convObj.update({ expiresIn: expiresIn }).catch((err) => {
         throw err;
       });
+      return expiresIn;
     }
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
+const updateGroupId = async (convObj, newGroupId) => {
+  try {
+    await convObj.update({ groupId: newGroupId }).catch((err) => {
+      throw err;
+    });
     return true;
   } catch (error) {
     console.error(error);
@@ -160,7 +212,9 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
     let convid = false;
     if (convObj != null)
       if (moment(convObj.expiresIn).isSame(expiresIn, "day")) {
-        console.log("Dates for chat destruction are same! Deletetion is moving on...");
+        console.log(
+          "Dates for chat destruction are same! Deletetion is moving on..."
+        );
         convid = convObj.convid;
         await convObj.destroy().catch((err) => {
           throw err;
@@ -173,11 +227,12 @@ const deleteIfExpiresEqual = async (convObj, expiresIn) => {
   }
 };
 
-const updateDate = async (convid, date) => {
+const updateDate = async (convid, date, newGroupId) => {
   try {
     const updated = await ConvUsers.update(
       {
         expiresIn: date,
+        groupId: newGroupId,
       },
       {
         where: {
@@ -239,4 +294,7 @@ module.exports = {
   saveOne,
   findOne,
   updateLastMessage,
+  updateGroupId,
+  deleteManyByGroupId,
+  findOneByGroupId,
 };

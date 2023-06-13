@@ -12,6 +12,8 @@ const ConvUsers = require("../database/ConvUsers");
 const LastSearch = require("../database/LastSearch");
 const Notification = require("../database/Notifications");
 const SearchPost = require("../database/Request");
+const Group = require("../database/Group");
+const GroupServices = require("../services/groupService");
 const bcrypt = require("bcrypt");
 var otpGenerator = require("otp-generator");
 const saltRounds = 10;
@@ -65,24 +67,27 @@ var CryptoJS = require("react-native-crypto-js");
 // create User service
 const createNewUser = async (req) => {
   try {
-    let msg = await determineLang(req);
-    var data = req.body.data;
+    const msg = await determineLang(req);
+    const data = req.body.data;
     console.log(data);
-    let photo = data.photo;
-    //Calculate age
 
-    //===========
+    // Extract photo from data and remove it from the object
+    const { photo, ...userData } = data;
 
-    data["verified"] = true;
-    data["photo"] = 1;
-    let salt = await bcrypt.genSalt(saltRounds);
-    data.password = await bcrypt.hash(data.password, salt);
-    console.log("NEW USER FULLNAME: ", data.fullname);
-    const final = await User.register(data, msg);
-    if (final.status == 200) {
-      let base64 = photo;
+    // Hash the user's password
+    const salt = await bcrypt.genSalt(saltRounds);
+    userData.password = await bcrypt.hash(userData.password, salt);
+
+    console.log("NEW USER FULLNAME: ", userData.fullname);
+
+    // Register the user
+    const final = await User.register(userData, msg);
+
+    if (final.status === 200) {
+      // Save the user's photo
+      const base64 = photo;
       const buffer = Buffer.from(base64, "base64");
-      fs.writeFileSync("uploads/" + data.email + ".jpeg", buffer);
+      fs.writeFileSync("uploads/" + userData.email + ".jpeg", buffer);
     }
 
     return final;
@@ -94,25 +99,24 @@ const createNewUser = async (req) => {
 
 const updateOneUser = async (req) => {
   try {
-    // console.log("data for update!:", req.body.data);
-    let msg = await determineLang(req);
-    let photo = req.body.data.photo;
-    let data = req.body.data;
-    let email = req.body.extra;
+    const msg = await determineLang(req);
+    const { photo, ...userData } = req.body.data;
+    const email = req.body.extra;
 
-    const res = await User.updateUser(data, email);
-    if (res === false) {
-      throw new Error("Error at updating profile");
+    const res = await User.updateUser(userData, email);
+    if (!res) {
+      throw new Error("Failed to update profile");
     }
-    if (photo != null) {
-      let base64 = photo;
-      let buffer = Buffer.from(base64, "base64");
-      fs.writeFileSync("uploads/" + email + ".jpeg", buffer);
+
+    if (photo) {
+      const base64 = photo;
+      const buffer = Buffer.from(base64, "base64");
+      fs.writeFileSync(`uploads/${email}.jpeg`, buffer);
     }
 
     return { status: 200, message: msg.updateProfile };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return { status: 500 };
   }
 };
@@ -859,6 +863,42 @@ const deleteUser = async (req) => {
     const deletedChat = await ConvUsers.deleteAll(email);
     if (!deletedChat) throw new Error("Error at deleting the chats!");
 
+    //leave from all the groups that the user is in
+    const allGroups = await Group.getAll(email);
+    if (allGroups === false) throw new Error("Error at finding all the groups");
+    await Promise.all(
+      allGroups.map(async (group) => {
+        const request = {
+          body: {
+            extra: email,
+            groupId: group.groupId,
+          },
+          headers: {
+            "accept-language": "GR",
+          },
+        };
+        if (group.admin !== email) {
+          const response = await GroupServices.leaveGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has left the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        } else {
+          const response = await GroupServices.deleteGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has deleted the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        }
+      })
+    );
+
     //get all active posts of user
     const allPosts = await Post.findAllActive(email, curDate);
     if (allPosts === false) {
@@ -935,6 +975,41 @@ const permDeleteUser = async (req) => {
     dataToBackUp.chatsofUser = chats;
     _.invokeMap(chats, "destroy");
 
+    const allGroups = await Group.getAll(email);
+    if (allGroups === false) throw new Error("Error at finding all the groups");
+    await Promise.all(
+      allGroups.map(async (group) => {
+        const request = {
+          body: {
+            extra: email,
+            groupId: group.groupId,
+          },
+          headers: {
+            "accept-language": "GR",
+          },
+        };
+        if (group.admin !== email) {
+          const response = await GroupServices.leaveGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has left the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        } else {
+          const response = await GroupServices.deleteGroup(request);
+          if (response.status === 500) {
+            throw new Error("Error at leaving a group");
+          } else {
+            console.log(
+              `User: ${email} has deleted the group: ${group.groupId} due to deactivation of account!`
+            );
+          }
+        }
+      })
+    );
+
     //get fcmToken
     const fcmToken = await FcmToken.findOne({
       where: {
@@ -984,7 +1059,78 @@ const permDeleteUser = async (req) => {
   }
 };
 
+//Service that do integration of the controller searchUsers
+const searchUsers = async (req) => {
+  try {
+    let msg = await determineLang(req);
+    let email = req.body.extra;
+    let curDate = moment();
+    let data = req.body;
+    // console.log(data);
+    // console.log(data.data);
+    // console.log(req.body);
+    // console.log(req);
+
+    //get all users based on the fullname that client sent inside data
+    const allUsers = await User.findUsersByFullname(data.fullName, email);
+    if (allUsers === false) {
+      throw new Error("error at finding all the users");
+    }
+
+    //for each user insert average rating data
+    for await (let user of allUsers) {
+      let res = await insertAver(user);
+      user.dataValues.average = res.average;
+      user.dataValues.count = res.count;
+      // check if image of user exists
+      if (await checkImagePath(user.email)) {
+        user.dataValues.imagePath = "images/" + user.email + ".jpeg";
+      } else {
+        user.dataValues.imagePath = null;
+      }
+    }
+
+    //return the list of the users
+    //if allUsers is empty return 404
+    let count = allUsers.length;
+    if (allUsers.length === 0) {
+      return { status: 404, message: msg.noUsers };
+    } else {
+      //paginate the list of users
+      let skipcount = 0;
+      let takecount = 10;
+      if (data.page > 1) skipcount = data.page * 10 - 10;
+      let finalarr = _.take(_.drop(allUsers, skipcount), takecount);
+      let mod = count % 10;
+      let totallength = 1;
+      mod == 0
+        ? (totallength = count / 10)
+        : (totallength = count / 10 - mod / 10 + 1);
+
+      if (data.page > totallength) {
+        return {
+          status: 404,
+          message: msg.paginationLimit,
+        };
+      }
+      return {
+        status: 200,
+        data: {
+          users: finalarr,
+          totalPages: totallength,
+          totalLength: count,
+          pageLength: finalarr.length,
+        },
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return { status: 500 };
+  }
+};
+
 module.exports = {
+  searchUsers,
   permDeleteUser,
   deleteUser,
   createNewUser,

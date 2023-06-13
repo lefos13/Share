@@ -8,11 +8,13 @@ const Review = require("../database/Review");
 const ToReview = require("../database/ToReview");
 const LastSearch = require("../database/LastSearch");
 const ConvUsers = require("../database/ConvUsers");
+const Groups = require("../database/Group");
 const fun = require("../utils/functions");
+const fs = require("fs");
 const {
   insertAver,
   applyFilters,
-  IsJsonString,
+  isJsonString,
   determineLang,
   determineExpirationDate,
   checkImagePath,
@@ -51,29 +53,34 @@ const socket = require("../index");
 const createNewPost = async (data, req) => {
   try {
     const msg = await determineLang(req);
-    const postToInsert = {
-      ...data,
-    };
+    let { image, ...postToInsert } = data;
+
     let message = null;
     //Check if the user has done more than three posts current day.
     const counter = await Post.countPosts(postToInsert.email);
 
     if (counter < 3) {
       //do it
-      const newPost = await Post.createNewPost(postToInsert, msg);
-      if (newPost !== false)
+      if (!postToInsert.hasOwnProperty("image")) {
+        console.log("DATA TO INSERT TO POST HAS NO IMAGE FIELD");
+        const newPost = await Post.createNewPost(postToInsert, image, msg);
+        if (newPost === false) {
+          throw new Error("Post failed to be created");
+        }
+
         message = {
           status: 200,
           data: msg.createRideSuc,
           postid: newPost.postid,
         };
-      else message = { status: 500 };
+      } else throw new Error("Post failed to be created");
     } else {
       message = {
         status: 405,
         data: msg.threeRides,
       };
     }
+
     return message;
   } catch (error) {
     console.error(error);
@@ -81,12 +88,24 @@ const createNewPost = async (data, req) => {
   }
 };
 
+/**
+ * This is an async function that handles a user's interest in a post, including creating or deleting
+ * an interest, sending notifications, and updating chat expiration dates.
+ * @param req - The `req` parameter is an object that represents the HTTP request made to the server.
+ * It contains information such as the request method, headers, body, and URL.
+ * @returns The function `interested` returns a promise that resolves to an object with properties
+ * `status`, `body`, and `message`. The `status` property indicates the status code of the response,
+ * the `body` property contains the data returned by the function, and the `message` property contains
+ * a message describing the result of the operation. If an error occurs, the function returns a promise
+ * that resolves to
+ */
 const interested = async (req) => {
   try {
     const io = socket.io;
     let extra = req.body.extra;
 
     let data = req.body.data;
+    console.log("Log for groupId: ", data);
 
     let msg = await determineLang(req);
     if (data.email == null) {
@@ -97,8 +116,58 @@ const interested = async (req) => {
 
     let dateOfInterest = moment();
 
+    //check if there is a property groupId in the data of body
+    if (data.groupId != null) {
+      //check if a member of the group is the owner of the post
+      const isGroupMember = await Groups.isGroupMember(
+        data.postid,
+        data.groupId
+      );
+      if (isGroupMember instanceof Error) throw isGroupMember;
+      else if (isGroupMember === true) {
+        throw {
+          status: 405,
+          message: msg.ownerPartOfGroup,
+        }; //abstract case
+      }
+
+      //check if the group has any pending users
+      const pendingUsers = await Groups.getPendingUsers(data.groupId);
+      if (pendingUsers === true) {
+        return {
+          status: 405,
+          message: msg.groupHasPendingUsers,
+        };
+      } else if (pendingUsers === false) {
+        throw new Error("Something went wrong with finding the pending users");
+      }
+      //CHECK HOW MANY POSITIONS THE RIDE HAS
+      const post = await Post.findOne(data.postid);
+      if (post === false) {
+        throw new Error("Something went wrong with finding the post");
+      }
+      const numOfSeats = post.numseats;
+      const group = await Groups.findOne(data.groupId);
+      if (group instanceof Error)
+        throw new Error("Something went wrong with finding the group");
+
+      group.members = JSON.parse(group.members);
+      console.log(
+        `Number of seats: ${numOfSeats} and number of members: ${
+          group.members.length + 1
+        }`
+      );
+      if (numOfSeats < group.members.length + 1) {
+        return {
+          status: 405,
+          message: msg.groupHasTooManyMembers,
+        };
+      }
+    } else data.groupId = null;
+    //prepare the data to be inserted into the database
     var row = {
       email: data.email,
+      groupId: data.groupId,
       postid: data.postid,
       date: dateOfInterest,
       note: data.note,
@@ -117,6 +186,10 @@ const interested = async (req) => {
       }; //abstract case
     }
 
+    /* The above code is using the `findOne` method of the `PostInterested` model to find a specific
+    interest record based on the email and postid provided in the `row` object. It then checks if
+    the returned value is `false`, and if so, throws an error indicating that something went wrong
+    with finding the interest. */
     const interest = await PostInterested.findOne(row.email, row.postid);
     if (interest === false) {
       throw new Error("Something went wrong with finding the interested");
@@ -137,6 +210,12 @@ const interested = async (req) => {
           message: msg.tenInterest,
         };
       } else {
+        /* The above code is creating an interest for a post and sending a notification to the owner of
+        the post using Firebase. It first creates the interest using the
+        `PostInterested.createInterest()` function and throws an error if the creation fails. It
+        then retrieves the post using the `Post.findOne()` function and sends a notification to the
+        owner using the `fun.toNotifyOwner()` function. Finally, it returns a response object with a
+        status code, body, and message to the controller. */
         //CASE THAT INTEREST IS TO BE CREATED
         const inter = await PostInterested.createInterest(row);
 
@@ -179,6 +258,10 @@ const interested = async (req) => {
         return { status: 200, message: msg.cancelInterest };
       } else {
         //chat exists
+        //CHECK IF CHAT HAS A GROUPID
+        let groupId = chat.groupId !== null ? chat.groupId : null;
+        let makeGroupId =
+          interest.groupId === groupId ? null : interest.groupId;
         //CHECK IF THERE IS ANY OLDER VERIFICATION OF THE USERS
         let curDate = moment();
         //find all active posts of passenger
@@ -212,6 +295,7 @@ const interested = async (req) => {
             postListPassenger
           );
 
+        // let allDates = [];
         let expirationDates = [];
         if (allVerPassenger.length > 0) {
           // get the expiration dates
@@ -220,6 +304,10 @@ const interested = async (req) => {
               if (val.postid == postv.postid) {
                 let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
+                // allDates.push({
+                //   date: expires,
+                //   groupId: val.groupId != null ? val.groupId : null,
+                // });
               }
             }
           }
@@ -232,6 +320,10 @@ const interested = async (req) => {
               if (val.postid == postv.postid) {
                 let expires = await determineExpirationDate(postv);
                 expirationDates.push(expires);
+                // allDates.push({
+                //   date: expires,
+                //   groupId: val.groupId != null ? val.groupId : null,
+                // });
               }
             }
           }
@@ -244,10 +336,20 @@ const interested = async (req) => {
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
-
+          // let groupId = false;
+          //loop through allDates and define isGroup if the date is equal to the maximum date
+          // _.forEach(allDates, (d) => {
+          //   if (moment(d.date).isSame(maxDate)) {
+          //     groupId = d.groupId;
+          //   }
+          // });
           //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
 
-          let updated = await ConvUsers.updateDate(chat.convid, maxDate);
+          let updated = await ConvUsers.updateDate(
+            chat.convid,
+            maxDate,
+            makeGroupId
+          );
           if (updated === false)
             throw new Error("Didnt update the conv expiration date");
           //EMIT THE EXPIRATION DATE CHANGE
@@ -268,6 +370,129 @@ const interested = async (req) => {
               expiresIn: maxDate.format("YYYY-MM-DD"),
             },
           });
+
+          //Update chats if chat becomes personal
+          if (groupId !== null && makeGroupId === null) {
+            console.log("CHAT BECOMES PERSONAL");
+            //gather data for the conversation
+            const [ratingDataPassenger, ratingDataDriver] = await Promise.all([
+              insertAver(driver),
+              insertAver(passenger),
+            ]);
+            const dataForPassenger = {
+              conversationId: chat.convid,
+              socketId: passenger.socketId,
+              username: driver.fullname,
+              photo: (await checkImagePath(driver.email))
+                ? `images/${driver.email}.jpeg`
+                : null,
+              email: driver.email,
+              average: ratingDataDriver.average,
+              count: ratingDataDriver.count,
+              isGroupInterest: false,
+              members: null,
+              isUserOnline: false,
+              expiresIn: chat.expiresIn,
+              messages: [],
+              isRead: true,
+              lastMessage: null,
+              lastMessageTime: null,
+              isLastMessageMine: false,
+              messagesLeft: false,
+            };
+
+            const dataForDriver = {
+              conversationId: chat.convid,
+              socketId: driver.socketId,
+              username: passenger.fullname,
+              photo: (await checkImagePath(passenger.email))
+                ? `images/${passenger.email}.jpeg`
+                : null,
+              email: passenger.email,
+              average: ratingDataPassenger.average,
+              count: ratingDataPassenger.count,
+              isGroupInterest: false,
+              members: null,
+              isUserOnline: false,
+              expiresIn: chat.expiresIn,
+              messages: [],
+              isRead: true,
+              lastMessage: null,
+              lastMessageTime: null,
+              isLastMessageMine: false,
+              messagesLeft: false,
+            };
+
+            let socketList = await io.fetchSockets();
+
+            const passengerSocket = socketList.find(
+              (val) => val.id === passenger.socketId
+            );
+            const driverSocket = socketList.find(
+              (val) => val.id === driver.socketId
+            );
+
+            if (passengerSocket) {
+              dataForDriver.isUserOnline = true;
+            }
+
+            if (driverSocket) {
+              dataForPassenger.isUserOnline = true;
+            }
+
+            if (chat.messages !== null) {
+              if (isJsonString(chat.messages)) {
+                chat.messages = JSON.parse(chat.messages);
+              }
+              chat.messages.sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+              });
+              const messagesLeft = chat.messages.length > 20;
+              //Paginate the messages and send the last 20 of them
+              const finalMessages = _.take(
+                _.drop(chat.messages, 0),
+                messagesLeft ? 20 : chat.messages.length
+              );
+              const decryptedMessages = await fun.decryptMessages(
+                finalMessages
+              );
+
+              dataForPassenger.messagesLeft = messagesLeft;
+              dataForPassenger.messages = decryptedMessages;
+              dataForPassenger.lastMessage = finalMessages[0].text;
+              dataForPassenger.isLastMessageMine =
+                finalMessages[0].user._id === passenger.email;
+              dataForPassenger.isRead = dataForPassenger.isLastMessageMine
+                ? true
+                : finalMessages[0].isRead;
+              dataForPassenger.lastMessageTime = moment(
+                finalMessages[0].createdAt
+              ).format("DD-MM-YYYY HH:mm");
+
+              dataForDriver.messagesLeft = messagesLeft;
+              dataForDriver.messages = decryptedMessages;
+              dataForDriver.lastMessage = finalMessages[0].text;
+              dataForDriver.isLastMessageMine =
+                finalMessages[0].user._id === driver.mail;
+              dataForDriver.isRead = dataForDriver.isLastMessageMine
+                ? true
+                : finalMessages[0].isRead;
+              dataForDriver.lastMessageTime = moment(
+                finalMessages[0].createdAt
+              ).format("DD-MM-YYYY HH:mm");
+            }
+
+            //send the data to the user
+            io.to(driver.socketId).emit("action", {
+              type: "onConversationUpdated",
+              conversation: dataForDriver,
+            });
+            //send the data to the user
+            io.to(passenger.socketId).emit("action", {
+              type: "onConversationUpdated",
+              conversation: dataForPassenger,
+            });
+          }
         }
         if (toDelete) {
           const deletedChat = await ConvUsers.deleteIfExpiresEqual(
@@ -316,6 +541,15 @@ const interested = async (req) => {
   }
 };
 
+/**
+ * This function searches for posts based on user input and applies filters to the results before
+ * returning them.
+ * @param req - The request object containing information about the HTTP request made to the server. It
+ * includes properties such as the request method, headers, body, and query parameters.
+ * @returns an object with properties "status", "body", and "message". The "status" property indicates
+ * the status code of the response, the "body" property contains the data returned by the function, and
+ * the "message" property contains a message related to the response.
+ */
 const searchPosts = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -421,7 +655,7 @@ const searchPosts = async (req) => {
     for await (fnd of found.rows) {
       fnd.dataValues.isFavourite = false;
 
-      if (IsJsonString(fnd.moreplaces)) {
+      if (isJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
 
@@ -449,11 +683,15 @@ const searchPosts = async (req) => {
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(data.email, fnd.postid);
 
+      let isGroupInterested = false;
       if (interested == null) {
         flag = false;
       } else {
         flag = true;
         if (interested.isVerified == true) isApproved = true;
+        interested.groupId != null
+          ? (isGroupInterested = true)
+          : (isGroupInterested = false);
       }
       let imagePath = null;
       if (await checkImagePath(fnd.email)) {
@@ -464,6 +702,7 @@ const searchPosts = async (req) => {
         imagePath: imagePath,
         post: fnd,
         interested: flag,
+        isGroupInterested: isGroupInterested,
         isApproved: isApproved,
       };
       array.push(results);
@@ -513,6 +752,16 @@ const searchPosts = async (req) => {
   }
 };
 
+/**
+ * This function retrieves posts of a user and returns them with pagination and additional information
+ * such as user data and interested status.
+ * @param req - The request object containing information about the HTTP request made to the server. It
+ * includes data such as the request headers, body, and parameters.
+ * @returns an object with a "status" property and a "data" property. The "status" property indicates
+ * the status code of the response (200 for success, 404 for not found, 500 for server error), while
+ * the "data" property contains the actual data returned by the function (an array of postUser objects,
+ * the total number of pages, the total length of the
+ */
 const getPostsUser = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -546,7 +795,7 @@ const getPostsUser = async (req) => {
       };
     }
     for await (post of finalarr) {
-      if (IsJsonString(post.moreplaces)) {
+      if (isJsonString(post.moreplaces)) {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
 
@@ -628,6 +877,15 @@ const getPostsUser = async (req) => {
   }
 };
 
+/**
+ * This function retrieves a post and its associated user information, including reviews and images,
+ * based on a given post ID and user email.
+ * @param req - The "req" parameter is an object that contains information about the HTTP request being
+ * made, including the request body and query parameters.
+ * @returns an object with a `status` property and a `data` property. The `status` property indicates
+ * the status of the response (200 for success, 404 for not found, 500 for error), and the `data`
+ * property contains an object with properties `imagePath`, `interested`, `post`, and `user`.
+ */
 const getPostPerId = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -640,7 +898,7 @@ const getPostPerId = async (req) => {
     } else if (post == null) {
       return { status: 404 };
     }
-    if (IsJsonString(post.moreplaces)) {
+    if (isJsonString(post.moreplaces)) {
       post.moreplaces = JSON.parse(post.moreplaces);
     }
 
@@ -655,6 +913,14 @@ const getPostPerId = async (req) => {
     }
     // if the searcher is interested then true
     postInt == null ? (interested = false) : (interested = true);
+
+    let isGroupInterested = false;
+    //check if the insterest is by a group
+    if (postInt != null) {
+      postInt.groupId != null
+        ? (isGroupInterested = true)
+        : (isGroupInterested = false);
+    }
 
     // find creator of post
     const user = await User.findOneLight(post.email);
@@ -682,6 +948,7 @@ const getPostPerId = async (req) => {
     const response = {
       imagePath: image,
       interested: interested,
+      isGroupInterested: isGroupInterested,
       post: post,
       user: user,
     };
@@ -717,7 +984,7 @@ const getInterestedPerUser = async (req) => {
       //IF YOU FOUND SUCH A POST
       if (post != null) {
         // PARSE THE MOREPLACES IF THERE IS ANY
-        if (IsJsonString(post.moreplaces)) {
+        if (isJsonString(post.moreplaces)) {
           post.moreplaces = JSON.parse(post.moreplaces);
         }
         //NULIFY THE ISFAVOURITE VALUE (WE DONT NEED IT HERE)
@@ -767,11 +1034,16 @@ const getInterestedPerUser = async (req) => {
           image = "images/" + user.email + ".jpeg";
         }
 
+        let isGroupInterested = false;
+        if (postI.groupId != null) {
+          isGroupInterested = true;
+        }
         // SUM UP THE RESULTS AND PUSH THEM INTO AN ARRAY
         let results = {
           user: user,
           imagePath: image,
           post: tempPost,
+          isGroupInterested: isGroupInterested,
           interested: true,
           isApproved: postI.isVerified,
         };
@@ -805,7 +1077,7 @@ const getIntPost = async (req) => {
     if (posts === false) {
       throw new Error("Error at finding the requested post");
     }
-    if (IsJsonString(posts.moreplaces)) {
+    if (isJsonString(posts.moreplaces)) {
       posts.moreplaces = JSON.parse(posts.moreplaces);
     }
     posts = await fun.fixAllDates(posts);
@@ -837,6 +1109,14 @@ const getIntPost = async (req) => {
           user.dataValues.isVerified = one.isVerified;
           user.dataValues.piid = one.piid;
           user.dataValues.note = one.note;
+          if (one.groupId != null) {
+            user.dataValues.isGroupInterested = true;
+            let groupData = await Groups.findOne(one.groupId);
+            groupData = await fun.insertDataToMembers(groupData);
+            user.dataValues.members = groupData.members;
+          } else {
+            user.dataValues.isGroupInterested = false;
+          }
 
           allUsers.push(user);
         } else {
@@ -922,6 +1202,10 @@ const deletePost = async (req) => {
     } else if (results == 0) {
       return { status: 404, message: msg.noRide };
     }
+    //delete the image of the post if exists
+    if (fs.existsSync(`postImages/${data.postid}.jpeg`)) {
+      fs.unlinkSync(`postImages/${data.postid}.jpeg`);
+    }
     //delete the interested people of this post
     let intRes = await PostInterested.detroyAllPerPost(data.postid);
     if (intRes === null) {
@@ -955,6 +1239,14 @@ const deleteInterested = async (req) => {
   }
 };
 
+/**
+ * This function verifies or unverifies a user's interest in a post and performs various actions based
+ * on the verification status.
+ * @param req - The "req" parameter is an object that represents the HTTP request made to the server.
+ * It contains information such as the request method, headers, and body.
+ * @returns an object with various properties depending on the execution of the function. The
+ * properties include status, message, chatCreated, conversationId, convDeleted.
+ */
 const verInterested = async (req) => {
   try {
     var data = req.body.data;
@@ -970,7 +1262,9 @@ const verInterested = async (req) => {
       return { status: 404, message: msg.noUserThatliked };
 
     //GETTING THE SUM OF THE VERIFIED
-    const allIntersted = await PostInterested.countVerified(data.postid);
+    const allIntersted = await PostInterested.countVerifiedEnchanced(
+      data.postid
+    );
     if (allIntersted === null) {
       throw new Error("Error at getting the count of the verified");
     }
@@ -985,7 +1279,9 @@ const verInterested = async (req) => {
     const post = await Post.findOne(data.postid);
     if (post === false) throw new Error("Error at finding the post");
 
+    //IF THE OCCUPIED POSITIONS ARE LESS THAN THE NUMBER OF Seats OR THE USER IS VERIFIED
     if (allIntersted < post.numseats || results.isVerified == true) {
+      //IF THE USER IS NOT VERIFIED
       if (results.isVerified === false) {
         const updated = await PostInterested.updateVerify(results);
         if (!updated) throw new Error("Error at update verify flag");
@@ -1001,44 +1297,41 @@ const verInterested = async (req) => {
 
         //If there is no possible review, create a new one
         if (toReviewExists == null) {
-          if (post.enddate == null) {
-            const reviewMade = await ToReview.createOne(
-              post.email,
-              results.email,
-              post.startdate,
-              results.piid
-            );
-            if (reviewMade === false)
-              throw new Error("Error at creating possible review");
-          } else {
-            const reviewMade = await ToReview.createOne(
-              post.email,
-              results.email,
-              post.enddate,
-              results.piid
-            );
-            if (reviewMade === false)
-              throw new Error("Error at creating possible review");
+          const enddate =
+            post.enddate == null
+              ? moment(post.startdate)
+              : moment(post.enddate);
+          const reviewMade = await ToReview.createOne(
+            post.email,
+            results.email,
+            enddate,
+            results.piid
+          );
+          if (reviewMade === false) {
+            throw new Error("Error creating possible review");
           }
         } else {
           //if a review is done already check if the driver and the passenger have the right emails.
 
           //if the possibleReview has the post owner as the passenger, change the row so that the owner become the driver
           // and the interested user become the passenger.
+          const enddate =
+            post.enddate == null
+              ? moment(post.startdate)
+              : moment(post.enddate);
+          const objEndDate = moment(toReviewExists.endDate);
+          const crDate = moment();
+          const forceChange = objEndDate.isBefore(crDate);
+          /* The above code is checking if a review already exists for a driver's email address and if
+          it does, it checks if the end date of the review is before or the same as a given end
+          date. If it is, it either reverses the review and updates it with new information or
+          creates a new review with the given end date and information. If a review does not exist
+          for the driver's email address, it creates a new review with the given end date and
+          information. */
           if (
             toReviewExists.driverEmail != post.email &&
             toReviewExists.driverEmail == results.email
           ) {
-            let enddate;
-            post.enddate == null
-              ? (enddate = moment(post.startdate))
-              : (enddate = moment(post.enddate));
-
-            let objEndDate = moment(toReviewExists.endDate);
-
-            let crDate = moment();
-            let forceChange = objEndDate.isBefore(crDate);
-
             if (enddate.isSameOrBefore(objEndDate) || forceChange) {
               const reversed = await ToReview.reverseUsers(
                 toReviewExists,
@@ -1047,28 +1340,20 @@ const verInterested = async (req) => {
                 results.piid,
                 enddate
               );
-              if (reversed === false)
-                throw new Error("error at reversing and updating to review");
+              if (reversed === false) {
+                throw new Error("Error reversing and updating to review");
+              }
             }
           } else {
-            let enddate;
-            post.enddate == null
-              ? (enddate = moment(post.startdate))
-              : (enddate = moment(post.enddate));
-
-            let objEndDate = moment(toReviewExists.endDate);
-
-            let crDate = moment();
-            let forceChange = objEndDate.isBefore(crDate);
-
             if (enddate.isSameOrBefore(objEndDate) || forceChange) {
               const reversed = await ToReview.newReview(
                 toReviewExists,
                 enddate,
                 data.piid
               );
-              if (reversed === false)
-                throw new Error("error at reversing and updating to review");
+              if (reversed === false) {
+                throw new Error("Error reversing and updating to review");
+              }
             }
           }
 
@@ -1080,7 +1365,9 @@ const verInterested = async (req) => {
               data.piid,
               post.enddate
             );
-            if (!updated) throw new Error("Error at resseting the flags");
+            if (!updated) {
+              throw new Error("Error resetting the flags");
+            }
           }
         }
 
@@ -1096,24 +1383,59 @@ const verInterested = async (req) => {
           throw new Error("Error at finding if chat Exists");
 
         if (chatExists != null) {
-          //chat exists from older post so the expireDate is to be updates if it is older than current expire date
-
-          const updated = await ConvUsers.updateExpireDate(
+          console.log("Updating the existing chat");
+          let groupId = results.groupId != null ? results.groupId : null;
+          //chat exists from older post so the expireDate is to be updated if it is older than current expire date
+          console.log("Group Id:", groupId);
+          const newDate = await ConvUsers.updateExpireDate(
             chatExists,
             expiresIn
           );
-          if (updated === false) {
+          console.log("Chat expiration date update response:", newDate);
+          if (!newDate) {
             throw new Error("Error at updating the existing chat");
-          } else if (updated === "0") {
+          } else if (moment(newDate).isSame(expiresIn, "day")) {
+            console.log("Chat expiration date wasnt updated");
             chatCreated = null;
           }
+          const [driver, passenger] = await Promise.all([
+            User.findOneLight(post.email),
+            User.findOneLight(results.email),
+          ]);
+          //update chat to group if the group id is not null
+          if (groupId != null) {
+            const groupUpdate = await ConvUsers.updateGroupId(
+              chatExists,
+              groupId
+            );
+            const newChatData = await ConvUsers.checkIfExists(
+              post.email,
+              results.email
+            );
+            sendEventsForBecomingGroup(
+              groupId,
+              newChatData,
+              passenger,
+              driver,
+              io
+            );
+          }
+
+          //CHANGE THE EXPIRATION DATE AND ISGROUP FLAG TO THE OLDER ONE AND DO NOT DELETE THE CHAT
+          await updateExpirationDates(
+            chatExists,
+            moment(newDate),
+            io,
+            driver,
+            passenger
+          );
         } else {
           //chat doesn't exist at all so a new one is created
-
           const chatMade = await ConvUsers.saveOne({
             convid: post.email + " " + results.email,
             expiresIn: expiresIn,
             messages: null,
+            groupId: results.groupId != null ? results.groupId : null,
           });
           if (chatMade === false)
             throw new Error("Error at creating new chat between the users");
@@ -1141,231 +1463,55 @@ const verInterested = async (req) => {
         }
 
         // ====== check if the unverification should destroy the possible review =======
-
-        // get the toReview object between those two users
-        const toReviewExists = await ToReview.findIfExists(
-          post.email,
-          results.email
-        );
-        if (toReviewExists === false)
-          throw new Error("Error at finding the toreview");
-
-        // if driver is owner check all older posts and decide if you need to update the flags or deny review
-        if (toReviewExists.driverEmail === post.email) {
-          // const denied = await ToReview.denyReview(toReviewExists);
-          // if (denied)
-          //   throw new Error("Error at denieing review for both users!");
-          const allActiveDriver = await Post.findAllActive(
-            toReviewExists.driverEmail,
-            moment()
-          );
-          if (allActiveDriver.length > 0) {
-            let allPostIds = [];
-            _.forEach(allActiveDriver, (val) => {
-              allPostIds.push(val.postid);
-            });
-            const allVerified = await PostInterested.findAllVerifedPerPost(
-              toReviewExists.passengerEmail,
-              allPostIds
-            );
-            if (allVerified.length > 0) {
-              //Check the enddates of active verifed posts and get the oldest
-              let dates = [];
-              for await (let val of allVerified) {
-                let tempPost = await Post.findOne(val.postid);
-                tempPost.enddate != null
-                  ? dates.push({ d: tempPost.enddate, p: val.piid })
-                  : dates.push({ d: tempPost.startdate, p: val.piid });
-              }
-
-              let newdates = dates.map((d) => moment(d.d));
-              let minDate = moment.min(newdates);
-              let piid;
-              _.forEach(dates, (d) => {
-                if (moment(d.d).isSame(minDate)) {
-                  piid = d.p;
-                }
-              });
-              dateToCompare = minDate;
-
-              const newToReview = await ToReview.newReview(
-                toReviewExists,
-                minDate,
-                piid
-              );
-              if (!newToReview)
-                throw new Error(
-                  "Error at updating the toreview object with older data"
-                );
-            }
-          }
-        }
-
-        const activePassengerPosts = await Post.findAllActive(
-          results.email,
-          moment()
-        );
-
-        let passengerPostsIds = [];
-        if (activePassengerPosts.length > 0) {
-          _.forEach(activePassengerPosts, (val) => {
-            passengerPostsIds.push(val.postid);
-          });
-
-          const allVerifiedOfDriver =
-            await PostInterested.findAllVerifedPerPost(
-              post.email,
-              passengerPostsIds
-            );
-
-          if (allVerifiedOfDriver.length > 0) {
-            let dates = [];
-            for await (let val of allVerifiedOfDriver) {
-              let tempPost = await Post.findOne(val.postid);
-              tempPost.enddate != null
-                ? dates.push({ d: tempPost.enddate, p: val.piid })
-                : dates.push({ d: tempPost.startdate, p: val.piid });
-            }
-
-            let newDates = dates.map((d) => moment(d.d));
-            let minDate = moment.min(newDates);
-            let greater = false;
-            if (dateToCompare !== null) {
-              greater = minDate.isSameOrAfter(dateToCompare);
-            }
-            if (!greater) {
-              let piid;
-              _.forEach(dates, (d) => {
-                if (moment(d.d).isSame(minDate)) {
-                  piid = d.p;
-                }
-              });
-              let passenger = await PostInterested.findOneById(piid);
-              let driver =
-                passenger.email == toReviewExists.passengerEmail
-                  ? toReviewExists.driverEmail
-                  : toReviewExists.passengerEmail;
-
-              // minDate = minDate.format("YYYY-MM-DD")
-              const newToReview = await ToReview.newReviewAndReverse(
-                toReviewExists,
-                driver,
-                passenger.email,
-                minDate,
-                piid
-              );
-              if (!newToReview)
-                throw new Error("error at updating the toreview object");
-            }
-          } else if (dateToCompare == null) {
-            const destroyed = await ToReview.denyReview(toReviewExists);
-            if (destroyed === false)
-              throw new Error("Error at destroying the possible review");
-          }
-        } else if (dateToCompare == null) {
-          const destroyed = await ToReview.denyReview(toReviewExists);
-          if (destroyed === false)
-            throw new Error("Error at destroying the possible review");
-        }
-
-        fun.toNotifyTheUnverified(results.email, post.postid, post.email);
+        await handleToReviews(post, results, dateToCompare);
 
         //=================== DELETE THE CHAT CASE  ....
         let expiresIn = await determineExpirationDate(post);
         console.log("Date to check for the destruction of chat:", expiresIn);
         const chat = await ConvUsers.checkIfExists(results.email, post.email);
 
+        //CHECK IF CHAT HAS A GROUPID
+        let groupId = chat.groupId !== null ? chat.groupId : null;
+        let makeGroupId = results.groupId === groupId ? null : groupId;
+
         if (chat === false) throw new Error("error at finding existing chat");
 
         //CHECK IF THERE IS ANY OLDER VERIFICATION OF THE USERS
-        let curDate = moment();
-        //find all active posts of passenger
-        let allActivePassenger = await Post.findAllActive(
-          results.email,
-          curDate
-        );
-        //find all active posts of driver
-        let allActiveDriver = await Post.findAllActive(post.email, curDate);
-        let postListPassenger = [];
-        let postListDriver = [];
-        //get all the ids of passenger
-        _.forEach(allActivePassenger, (val) => {
-          postListPassenger.push(val.postid);
-        });
-        //get all the ids of driver
-        _.forEach(allActiveDriver, (val) => {
-          postListDriver.push(val.postid);
-        });
-        // find if the passenger is interested and verified to any of the posts of driver
-        let allVerPassenger = [];
-        if (postListDriver.length > 0)
-          allVerPassenger = await PostInterested.findAllVerifedPerPost(
-            results.email,
-            postListDriver
-          );
-        // find if the driver is interested and verified to any of the posts of passenger
-        let allVerDriver = [];
-        if (postListPassenger.length > 0)
-          allVerDriver = await PostInterested.findAllVerifedPerPost(
-            post.email,
-            postListPassenger
-          );
-
-        let expirationDates = [];
-        if (allVerPassenger.length > 0) {
-          // get the expiration dates
-          for await (let val of allVerPassenger) {
-            for await (let postv of allActiveDriver) {
-              if (val.postid == postv.postid) {
-                let expires = await determineExpirationDate(postv);
-                expirationDates.push(expires);
-              }
-            }
-          }
-        }
-        if (allVerDriver.length > 0) {
-          // get the expiration dates
-          for await (let val of allVerDriver) {
-            for await (let postv of allActivePassenger) {
-              if (val.postid == postv.postid) {
-                let expires = await determineExpirationDate(postv);
-                expirationDates.push(expires);
-              }
-            }
-          }
-        }
+        let expirationDates = await getExpirationsDates(results, post);
 
         let toDelete = true;
         if (expirationDates.length > 0) {
           toDelete = false;
 
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
-          expirationDates = expirationDates.map((d) => moment(d));
+          const expirationDatesParsed = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
+          // Update conversation expiration date and retrieve driver and passenger
+          const [updated, driver, passenger] = await Promise.all([
+            ConvUsers.updateDate(
+              chat.convid,
+              moment.max(expirationDatesParsed),
+              makeGroupId
+            ),
+            User.findOneLight(post.email),
+            User.findOneLight(results.email),
+          ]);
+          if (!updated) {
+            throw new Error("Failed to update conversation expiration date");
+          }
 
-          //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
+          //CHANGE THE EXPIRATION DATE AND ISGROUP FLAG TO THE OLDER ONE AND DO NOT DELETE THE CHAT
+          updateExpirationDates(chat, maxDate, io, driver, passenger);
 
-          let updated = await ConvUsers.updateDate(chat.convid, maxDate);
-          if (updated === false)
-            throw new Error("Didnt update the conv expiration date");
-          //EMIT THE EXPIRATION DATE CHANGE
-          let driver = await User.findOneLight(post.email);
-          io.to(driver.socketId).emit("action", {
-            type: "setExpirationDate",
-            data: {
-              conversationId: chat.convid,
-              expiresIn: maxDate.format("YYYY-MM-DD"),
-            },
-          });
-
-          let passenger = await User.findOneLight(results.email);
-          io.to(passenger.socketId).emit("action", {
-            type: "setExpirationDate",
-            data: {
-              conversationId: chat.convid,
-              expiresIn: maxDate.format("YYYY-MM-DD"),
-            },
-          });
+          //Update chats if chat becomes personal
+          sendEventsForUpdates(
+            groupId,
+            makeGroupId,
+            chat,
+            passenger,
+            driver,
+            io
+          );
         }
         console.log("TO DELETE", toDelete);
 
@@ -1415,6 +1561,454 @@ const verInterested = async (req) => {
   } catch (error) {
     console.error(error);
     return { status: 500 };
+  }
+
+  async function getExpirationsDates(results, post) {
+    const curDate = moment();
+    const [allActivePassenger, allActiveDriver] = await Promise.all([
+      Post.findAllActive(results.email, curDate),
+      Post.findAllActive(post.email, curDate),
+    ]);
+    const postListPassenger = allActivePassenger.map((val) => val.postid);
+    const postListDriver = allActiveDriver.map((val) => val.postid);
+
+    const allVerPassenger =
+      postListDriver.length > 0
+        ? await PostInterested.findAllVerifedPerPost(
+            results.email,
+            postListDriver
+          )
+        : [];
+    const allVerDriver =
+      postListPassenger.length > 0
+        ? await PostInterested.findAllVerifedPerPost(
+            post.email,
+            postListPassenger
+          )
+        : [];
+
+    let expirationDates = [];
+    // let allDates = [];
+    if (allVerPassenger.length > 0) {
+      // get the expiration dates
+      for await (let val of allVerPassenger) {
+        for await (let postv of allActiveDriver) {
+          if (val.postid == postv.postid) {
+            let expires = await determineExpirationDate(postv);
+            expirationDates.push(expires);
+            // allDates.push({
+            //   date: expires,
+            //   groupId: val.groupId != null ? val.groupId : null,
+            // });
+          }
+        }
+      }
+    }
+    if (allVerDriver.length > 0) {
+      // get the expiration dates
+      for await (let val of allVerDriver) {
+        for await (let postv of allActivePassenger) {
+          if (val.postid == postv.postid) {
+            let expires = await determineExpirationDate(postv);
+            expirationDates.push(expires);
+            // allDates.push({
+            //   date: expires,
+            //   groupId: val.groupId != null ? val.groupId : null,
+            // });
+          }
+        }
+      }
+    }
+    return expirationDates;
+  }
+
+  async function updateExpirationDates(chat, maxDate, io, driver, passenger) {
+    //EMIT THE EXPIRATION DATE CHANGE
+    io.to(driver.socketId).emit("action", {
+      type: "setExpirationDate",
+      data: {
+        conversationId: chat.convid,
+        expiresIn: maxDate.format("YYYY-MM-DD"),
+      },
+    });
+
+    io.to(passenger.socketId).emit("action", {
+      type: "setExpirationDate",
+      data: {
+        conversationId: chat.convid,
+        expiresIn: maxDate.format("YYYY-MM-DD"),
+      },
+    });
+  }
+
+  async function sendEventsForUpdates(
+    groupId,
+    makeGroupId,
+    chat,
+    passenger,
+    driver,
+    io
+  ) {
+    if (groupId !== null && makeGroupId === null) {
+      console.log("CHAT BECOMES PERSONAL");
+      //gather data for the conversation
+      const [ratingDataForDriver, ratingDataForPassenger] = await Promise.all([
+        insertAver(driver),
+        insertAver(passenger),
+      ]);
+      const dataForPassenger = {
+        conversationId: chat.convid,
+        socketId: passenger.socketId,
+        username: driver.fullname,
+        photo: (await checkImagePath(driver.email))
+          ? `images/${driver.email}.jpeg`
+          : null,
+        email: driver.email,
+        average: ratingDataForDriver.average,
+        count: ratingDataForDriver.count,
+        isGroupInterest: false,
+        members: null,
+        isUserOnline: false,
+        expiresIn: chat.expiresIn,
+        messages: [],
+        isRead: true,
+        lastMessage: null,
+        lastMessageTime: null,
+        isLastMessageMine: false,
+        messagesLeft: false,
+      };
+
+      const dataForDriver = {
+        conversationId: chat.convid,
+        socketId: driver.socketId,
+        username: passenger.fullname,
+        photo: (await checkImagePath(passenger.email))
+          ? `images/${passenger.email}.jpeg`
+          : null,
+        email: passenger.email,
+        average: ratingDataForPassenger.average,
+        count: ratingDataForPassenger.count,
+        isGroupInterest: false,
+        members: null,
+        isUserOnline: false,
+        expiresIn: chat.expiresIn,
+        messages: [],
+        isRead: true,
+        lastMessage: null,
+        lastMessageTime: null,
+        isLastMessageMine: false,
+        messagesLeft: false,
+      };
+
+      let socketList = await io.fetchSockets();
+
+      const passengerSocket = socketList.find(
+        (val) => val.id === passenger.socketId
+      );
+      const driverSocket = socketList.find((val) => val.id === driver.socketId);
+
+      if (passengerSocket) {
+        dataForDriver.isUserOnline = true;
+      }
+
+      if (driverSocket) {
+        dataForPassenger.isUserOnline = true;
+      }
+
+      if (chat.messages !== null) {
+        if (isJsonString(chat.messages)) {
+          chat.messages = JSON.parse(chat.messages);
+        }
+        chat.messages.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        const messagesLeft = chat.messages.length > 20;
+        //Paginate the messages and send the last 20 of them
+        const finalMessages = _.take(
+          _.drop(chat.messages, 0),
+          messagesLeft ? 20 : chat.messages.length
+        );
+        const decryptedMessages = await fun.decryptMessages(finalMessages);
+
+        dataForPassenger.messagesLeft = messagesLeft;
+        dataForPassenger.messages = decryptedMessages;
+        dataForPassenger.lastMessage = finalMessages[0].text;
+        dataForPassenger.isLastMessageMine =
+          finalMessages[0].user._id === passenger.email;
+        dataForPassenger.isRead = dataForPassenger.isLastMessageMine
+          ? true
+          : finalMessages[0].isRead;
+
+        dataForDriver.messagesLeft = messagesLeft;
+        dataForDriver.messages = decryptedMessages;
+        dataForDriver.lastMessage = finalMessages[0].text;
+        dataForDriver.isLastMessageMine =
+          finalMessages[0].user._id === driver.mail;
+        dataForDriver.isRead = dataForDriver.isLastMessageMine
+          ? true
+          : finalMessages[0].isRead;
+      }
+
+      //send the data to the user
+      io.to(driver.socketId).emit("action", {
+        type: "onConversationUpdated",
+        conversation: dataForDriver,
+      });
+      //send the data to the user
+      io.to(passenger.socketId).emit("action", {
+        type: "onConversationUpdated",
+        conversation: dataForPassenger,
+      });
+    }
+  }
+
+  async function sendEventsForBecomingGroup(
+    groupId,
+    chat,
+    passenger,
+    driver,
+    io
+  ) {
+    console.log("CHAT BECOMES GROUP");
+    //gather data for the conversation
+    const [ratingDataForDriver, ratingDataForPassenger] = await Promise.all([
+      insertAver(driver),
+      insertAver(passenger),
+    ]);
+    const dataForPassenger = {
+      conversationId: chat.convid,
+      socketId: passenger.socketId,
+      username: driver.fullname,
+      photo: (await checkImagePath(driver.email))
+        ? `images/${driver.email}.jpeg`
+        : null,
+      email: driver.email,
+      average: ratingDataForDriver.average,
+      count: ratingDataForDriver.count,
+      isGroupInterest: true,
+      members: null,
+      isUserOnline: false,
+      expiresIn: chat.expiresIn,
+      messages: [],
+      isRead: true,
+      lastMessage: null,
+      lastMessageTime: null,
+      isLastMessageMine: false,
+      messagesLeft: false,
+    };
+
+    const dataForDriver = {
+      conversationId: chat.convid,
+      socketId: driver.socketId,
+      username: passenger.fullname,
+      photo: (await checkImagePath(passenger.email))
+        ? `images/${passenger.email}.jpeg`
+        : null,
+      email: passenger.email,
+      average: ratingDataForPassenger.average,
+      count: ratingDataForPassenger.count,
+      isGroupInterest: true,
+      members: null,
+      isUserOnline: false,
+      expiresIn: chat.expiresIn,
+      messages: [],
+      isRead: true,
+      lastMessage: null,
+      lastMessageTime: null,
+      isLastMessageMine: false,
+      messagesLeft: false,
+    };
+
+    let socketList = await io.fetchSockets();
+
+    const passengerSocket = socketList.find(
+      (val) => val.id === passenger.socketId
+    );
+    const driverSocket = socketList.find((val) => val.id === driver.socketId);
+
+    if (passengerSocket) {
+      dataForDriver.isUserOnline = true;
+    }
+
+    if (driverSocket) {
+      dataForPassenger.isUserOnline = true;
+    }
+
+    if (chat.messages !== null) {
+      if (isJsonString(chat.messages)) {
+        chat.messages = JSON.parse(chat.messages);
+      }
+      chat.messages.sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+      const messagesLeft = chat.messages.length > 20;
+      //Paginate the messages and send the last 20 of them
+      const finalMessages = _.take(
+        _.drop(chat.messages, 0),
+        messagesLeft ? 20 : chat.messages.length
+      );
+      const decryptedMessages = await fun.decryptMessages(finalMessages);
+
+      dataForPassenger.messagesLeft = messagesLeft;
+      dataForPassenger.messages = decryptedMessages;
+      dataForPassenger.lastMessage = finalMessages[0].text;
+      dataForPassenger.isLastMessageMine =
+        finalMessages[0].user._id === passenger.email;
+      dataForPassenger.isRead = dataForPassenger.isLastMessageMine
+        ? true
+        : finalMessages[0].isRead;
+
+      dataForDriver.messagesLeft = messagesLeft;
+      dataForDriver.messages = decryptedMessages;
+      dataForDriver.lastMessage = finalMessages[0].text;
+      dataForDriver.isLastMessageMine =
+        finalMessages[0].user._id === driver.mail;
+      dataForDriver.isRead = dataForDriver.isLastMessageMine
+        ? true
+        : finalMessages[0].isRead;
+    }
+
+    const groupData = await Groups.findOne(groupId);
+    dataForDriver.members = (await fun.insertDataToMembers(groupData)).members;
+
+    //send the data to the user
+    io.to(driver.socketId).emit("action", {
+      type: "onConversationUpdated",
+      conversation: dataForDriver,
+    });
+    //send the data to the user
+    io.to(passenger.socketId).emit("action", {
+      type: "onConversationUpdated",
+      conversation: dataForPassenger,
+    });
+  }
+
+  async function handleToReviews(post, results, dateToCompare) {
+    const toReviewExists = await ToReview.findIfExists(
+      post.email,
+      results.email
+    );
+    if (toReviewExists === false)
+      throw new Error("Error at finding the toreview");
+
+    // if driver is owner check all older posts and decide if you need to update the flags or deny review
+    /* The code is checking if a review exists for a specific driver email and if there are any
+    active posts for that driver. If there are active posts, it retrieves all the verified posts
+    for a specific passenger email and checks the end dates of those posts to get the oldest
+    one. It then creates a new review object with the oldest post's end date and the
+    corresponding post interested ID. */
+    if (toReviewExists.driverEmail === post.email) {
+      const allActiveDriver = await Post.findAllActive(
+        toReviewExists.driverEmail,
+        moment()
+      );
+
+      if (allActiveDriver.length > 0) {
+        const allPostIds = allActiveDriver.map((val) => val.postid);
+        const allVerified = await PostInterested.findAllVerifedPerPost(
+          toReviewExists.passengerEmail,
+          allPostIds
+        );
+        if (allVerified.length > 0) {
+          //Check the enddates of active verifed posts and get the oldest
+          const dates = await Promise.all(
+            allVerified.map(async (val) => {
+              const tempPost = await Post.findOne(val.postid);
+              const date =
+                tempPost.enddate != null
+                  ? tempPost.enddate
+                  : tempPost.startdate;
+              return { d: date, p: val.piid };
+            })
+          );
+
+          let newdates = dates.map((d) => moment(d.d));
+          let minDate = moment.min(newdates);
+          const { piid } = dates.find((d) => moment(d.d).isSame(minDate));
+          dateToCompare = minDate;
+
+          const newToReview = await ToReview.newReview(
+            toReviewExists,
+            minDate,
+            piid
+          );
+          if (!newToReview)
+            throw new Error(
+              "Error at updating the toreview object with older data"
+            );
+        }
+      }
+    }
+
+    const activePassengerPosts = await Post.findAllActive(
+      results.email,
+      moment()
+    );
+
+    /* The above code is checking if there are any active passenger posts and if there are, it
+    retrieves all the verified interested passengers for those posts. It then checks if the
+    minimum date of those verified interested passengers is greater than or equal to a given
+    date to compare. If it is, it creates a new review object and updates the existing toReview
+    object with the new review. If the minimum date is not greater than or equal to the given
+    date to compare, it denies the review. If there are no active passenger posts, it also
+    denies the review. */
+    let passengerPostsIds = activePassengerPosts.map((val) => val.postid);
+    if (activePassengerPosts.length > 0) {
+      const allVerifiedOfDriver = await PostInterested.findAllVerifedPerPost(
+        post.email,
+        passengerPostsIds
+      );
+
+      if (allVerifiedOfDriver.length > 0) {
+        let dates = await Promise.all(
+          allVerifiedOfDriver.map(async (val) => {
+            let tempPost = await Post.findOne(val.postid);
+            let date = tempPost.enddate ?? tempPost.startdate;
+            return { d: date, p: val.piid };
+          })
+        );
+
+        let newDates = dates.map((d) => moment(d.d));
+        let minDate = moment.min(newDates);
+
+        if (!dateToCompare || minDate.isBefore(dateToCompare)) {
+          let piid;
+          _.forEach(dates, (d) => {
+            if (moment(d.d).isSame(minDate)) {
+              piid = d.p;
+            }
+          });
+
+          let passenger = await PostInterested.findOneById(piid);
+          let driver =
+            passenger.email == toReviewExists.passengerEmail
+              ? toReviewExists.driverEmail
+              : toReviewExists.passengerEmail;
+
+          const newToReview = await ToReview.newReviewAndReverse(
+            toReviewExists,
+            driver,
+            passenger.email,
+            minDate,
+            piid
+          );
+
+          if (!newToReview) {
+            throw new Error("Error at updating the toreview object");
+          }
+        }
+      } else if (dateToCompare == null) {
+        const destroyed = await ToReview.denyReview(toReviewExists);
+        if (destroyed === false)
+          throw new Error("Error at destroying the possible review");
+      }
+    } else if (dateToCompare == null) {
+      const destroyed = await ToReview.denyReview(toReviewExists);
+      if (destroyed === false)
+        throw new Error("Error at destroying the possible review");
+    }
+
+    fun.toNotifyTheUnverified(results.email, post.postid, post.email);
   }
 };
 
@@ -1472,7 +2066,7 @@ const getFavourites = async (req) => {
 
     let allResults = [];
     for await (post of allFavourites) {
-      if (fun.IsJsonString(post.moreplaces)) {
+      if (fun.isJsonString(post.moreplaces)) {
         post.moreplaces = JSON.parse(post.moreplaces);
       }
       post = await fun.fixAllDates(post);
@@ -1494,6 +2088,15 @@ const getFavourites = async (req) => {
   }
 };
 
+/**
+ * The function fetches and paginates a list of posts based on certain criteria and returns them along
+ * with user information and other details.
+ * @param req - The request object containing information about the HTTP request made to the server. It
+ * includes data such as the request headers, request body, and request method.
+ * @returns an object with properties `status`, `body`, and `message`. The `status` property indicates
+ * the status code of the response, the `body` property contains the data returned by the function, and
+ * the `message` property contains a message related to the response.
+ */
 const feedScreen = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -1501,6 +2104,12 @@ const feedScreen = async (req) => {
     let email = req.body.extra;
     let array = [];
     let curDate = moment();
+    /* The above code is defining a query object with a where clause that filters records based on
+    certain conditions. The conditions include checking if the startplace or startcoord properties
+    of the record match certain values, and if the startdate or enddate properties are greater than
+    or equal to the current date. The query also includes an order clause that sorts the results in
+    descending order based on the date property. The code uses the Sequelize library's Op object to
+    define the operators used in the query. */
     let query = {
       where: {
         // email: { [Op.ne]: email },
@@ -1534,7 +2143,7 @@ const feedScreen = async (req) => {
 
     for await (fnd of found.rows) {
       fnd.dataValues.isFavourite = false;
-      if (IsJsonString(fnd.moreplaces)) {
+      if (isJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
       fnd = await fun.fixAllDates(fnd);
@@ -1562,11 +2171,15 @@ const feedScreen = async (req) => {
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(email, fnd.postid);
 
+      let isGroupInterested = false;
       if (interested == null) {
         flag = false;
       } else {
         flag = true;
         if (interested.isVerified == true) isApproved = true;
+        interested.groupId != null
+          ? (isGroupInterested = true)
+          : (isGroupInterested = false);
       }
       let image = null;
       if (await checkImagePath(user.email)) {
@@ -1577,12 +2190,19 @@ const feedScreen = async (req) => {
         imagePath: image,
         post: fnd,
         interested: flag,
+        isGroupInterested: isGroupInterested,
         isApproved: isApproved,
       };
       array.push(results);
     }
 
     //PAGINATION
+    /* The above code is implementing pagination logic for an array of data. It calculates the number
+    of items to skip and take based on the requested page number and the number of items per page.
+    It then uses the Lodash library to extract the desired subset of data from the array. It also
+    calculates the total number of pages based on the length of the array and the number of items
+    per page. If the requested page number is greater than the total number of pages, it returns an
+    error message indicating that the pagination limit has been exceeded. */
     var skipcount = 0;
     var takecount = 10;
     if (data.page > 1) skipcount = data.page * 10 - 10;
@@ -1614,6 +2234,14 @@ const feedScreen = async (req) => {
   }
 };
 
+/**
+ * The function "feedAll" retrieves and paginates a list of posts from the database, along with
+ * associated user and interested status information.
+ * @param req - The request object containing information about the HTTP request made to the server.
+ * @returns an object with properties `status`, `body`, and `message`. The `status` property indicates
+ * the status code of the response, the `body` property contains the data returned by the function, and
+ * the `message` property contains a message related to the response.
+ */
 const feedAll = async (req) => {
   try {
     let msg = await determineLang(req);
@@ -1642,7 +2270,7 @@ const feedAll = async (req) => {
 
     for await (fnd of found.rows) {
       fnd.dataValues.isFavourite = false;
-      if (IsJsonString(fnd.moreplaces)) {
+      if (isJsonString(fnd.moreplaces)) {
         fnd.moreplaces = JSON.parse(fnd.moreplaces);
       }
       fnd = await fun.fixAllDates(fnd);
@@ -1670,11 +2298,15 @@ const feedAll = async (req) => {
       // check if the user is interested in the specific post
       let interested = await PostInterested.findOne(email, fnd.postid);
 
+      let isGroupInterested = false;
       if (interested == null) {
         flag = false;
       } else {
         flag = true;
         if (interested.isVerified == true) isApproved = true;
+        interested.groupId != null
+          ? (isGroupInterested = true)
+          : (isGroupInterested = false);
       }
       let image = null;
       if (await checkImagePath(user.email)) {
@@ -1685,6 +2317,7 @@ const feedAll = async (req) => {
         imagePath: image,
         post: fnd,
         interested: flag,
+        isGroupInterested: isGroupInterested,
         isApproved: isApproved,
       };
       array.push(results);

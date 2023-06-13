@@ -1,7 +1,7 @@
 // In src/v1/routes/neutralRoutes.js
 const express = require("express");
 
-const neutralController = require("../../controllers/neutralController");
+const groupController = require("../../controllers/groupController");
 const { authenticateToken } = require("../../middleware/auth");
 const router = express.Router();
 
@@ -35,64 +35,56 @@ const corsOptions = {
 
 //route to find a user
 router.post(
-  "/sendReport",
+  "/createGroup",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.sendReport
-);
-
-router.post(
-  "/webSendReport",
-  [],
-  cors(corsOptions),
-  neutralController.webSendReport
+  groupController.createGroup
 );
 
 router.get(
-  "/getTerms",
+  "/getGroups",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.getTerms
+  groupController.getGroups
 );
 
 router.post(
-  "/moreMessages",
+  "/deleteGroup",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.moreMessages
+  groupController.deleteGroup
 );
 
+//change group name route
 router.post(
-  "/moreMessagesGroups",
+  "/changeName",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.moreMessagesGroups
+  groupController.changeName
 );
 
-router.get(
-  "/getNotifications",
-  [authenticateToken],
-  cors(corsOptions),
-  neutralController.getNotifications
-);
-
+//remove member route (GUEST)
 router.post(
-  "/readNotification",
+  "/leaveGroup",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.readNotification
+  groupController.leaveGroup
 );
 
+//accept invitation route (GUEST)
 router.post(
-  "/deleteNotification",
+  "/acceptInvitation",
   [authenticateToken],
   cors(corsOptions),
-  neutralController.deleteNotification
+  groupController.acceptInvitation
 );
-// router.get(
-//   "/",
-//   [authenticateToken],
-//   cors(corsOptions),
-//   neutralController.getTerms
-// );
+
+//decline invitation route (GUEST)
+router.post(
+  "/declineInvitation",
+  [authenticateToken],
+  cors(corsOptions),
+  groupController.declineInvitation
+);
+
 module.exports = router;

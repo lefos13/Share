@@ -1,5 +1,4 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const { nextTick } = require("process");
 
 // enviroment variables
 const dotenv = require("dotenv");
@@ -7,11 +6,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 // get the values from the .env file
 
-const { HOST, USERR, PASS, DATABASE } = process.env;
-const sequelize = new Sequelize(DATABASE, USERR, PASS, {
+const { HOST, USERR, PASS, DATABASEE } = process.env;
+const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
-  logging: false,
   dialectOptions: {
     typeCast: function (field, next) {
       if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
@@ -21,56 +19,40 @@ const sequelize = new Sequelize(DATABASE, USERR, PASS, {
     },
   },
   timezone: "+02:00", // for writing to database
+  logging: false,
 });
 
-const PostInterested = sequelize.define(
-  "postinterested",
+const Groups = sequelize.define(
+  "groups",
   {
-    piid: {
+    groupId: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
       primaryKey: true,
       unique: true,
       autoIncrement: true,
     },
-    postid: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-    },
-    email: {
+    admin: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    date: {
+    members: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    groupName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    isCreated: {
       type: DataTypes.DATE,
-      allowNull: false,
     },
-    isVerified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    isNotified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    ownerNotified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    note: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    groupId: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null
-    }
   },
   {
     freezeTableName: true,
     timestamps: false,
+    logging: true,
   }
 );
 
-module.exports = PostInterested;
+module.exports = Groups;

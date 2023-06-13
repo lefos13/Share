@@ -16,6 +16,7 @@ const Reviews = require("../modules/review");
 const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
+const fs = require("fs");
 const moment = require("moment");
 
 const getAllPosts = () => {
@@ -48,15 +49,40 @@ const countPosts = async (user) => {
 };
 
 // *** ADD ***
-const createNewPost = async (data, msg) => {
+const createNewPost = async (data, image, msg) => {
   try {
-    //get current date
     var postdate = moment();
     data.date = postdate;
 
     const post = await Posts.create(data).catch((err) => {
       throw err;
     });
+    if (image == null) {
+      console.log("POSTING WITH NO IMAGE");
+    } else if (image.includes("postimages")) {
+      //create new image file from the existing
+      console.log("CASE OF REPOSTING WITH IMAGE");
+      const array = image.split("/");
+      const oldPostId = array[1].split(".")[0];
+      fs.copyFile(
+        "postImages/" + oldPostId + ".jpeg",
+        "postImages/" + post.postid + ".jpeg",
+        (err) => {
+          if (err) throw err;
+          console.log("Image was copied to destination.txt");
+        }
+      );
+      await post.update({ image: "postimages/" + post.postid + ".jpeg" });
+    } else {
+      console.log(`CASE OF PLAIN POSTING WITH IMAGE`);
+      const postid = post.postid;
+      //create new image file from the base64 string
+      const base64 = image;
+      const buffer = Buffer.from(base64, "base64");
+      fs.writeFileSync("postImages/" + postid + ".jpeg", buffer);
+      await post.update({ image: "postimages/" + postid + ".jpeg" });
+    }
+    //get current date
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //Firebase newRide notification
@@ -87,6 +113,15 @@ const isPostOwner = async (row) => {
   }
 };
 
+/**
+ * This is an asynchronous function that finds a post by its ID and returns it, or returns false if
+ * there is an error.
+ * @param postid - The parameter `postid` is the unique identifier of a post that is being searched for
+ * in the database table `Posts`. The function `findOne` uses this parameter to search for a specific
+ * post in the database and returns the post object if it exists, or `false` if it does not.
+ * @returns The function `findOne` returns either the `postForFunction` object if the `Posts.findOne`
+ * query is successful, or `false` if there is an error caught in the `try-catch` block.
+ */
 const findOne = async (postid) => {
   try {
     const postForFunction = await Posts.findOne({
@@ -406,6 +441,7 @@ const globalAllExpired = async () => {
     return false;
   }
 };
+
 module.exports = {
   globalAllExpired,
   destroyAllPerIds,

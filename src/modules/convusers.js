@@ -36,6 +36,11 @@ const ConvUsers = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    groupId: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+    },
   },
   {
     freezeTableName: true,

@@ -5,8 +5,7 @@ Accept-Language: EN
 
 {
     "data":{
-        "email": "U2FsdGVkX1/pbb7jtFn6tNb7hvlZdnpz9Ch3t3CwekGVGrEd8v1+RRhUHvFXLp3f",
-        "hasEncryption": true
+        "email": "slodevolos@hotmail.com"
     }
 }
 
@@ -212,14 +211,14 @@ Accept-Language: EN
 ###
 
 #service epistrefei lista me posts enos xrhsth
-POST http://157.230.18.246:3000/posts/getPostsUser
+POST https://ouride.gr/test/posts/getPostsUser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNi0wMVQwOToyMzo0NC4wODhaIiwiaWF0IjoxNjg1NjExNDI0LCJleHAiOjE2OTA3OTU0MjR9.A-rQP0_c3s4f6j9g4rcp-rfY4X7Hra3fjcgY_yTYhio
 Accept-Language: EN
 
 {
     "data": {
-        "email": "user0@gmail.com",
+        "email": "slodevolos@hotmail.com",
         "page": 1
     }
 }
@@ -274,14 +273,14 @@ language: EN
 
 ###
 #service epistrefei lista me endiaferomenous gia ena post
-POST http://157.230.18.246:3000/posts/getIntPost
+POST https://ouride.gr/test/posts/getIntPost
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0yMFQxMjozMTo0Ny41MTBaIiwiaWF0IjoxNjgxOTkzOTA3LCJleHAiOjE2ODcxNzc5MDd9.6Jhr9wCexRsClNgvfgj0eNB5UvG9nCJGohk-z-NFIFY
 Accept-Language: EN
 
 {
     "data": {
-        "postid": 1849,
+        "postid": 1999,
         "page": 1
     }
 }
@@ -303,14 +302,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQ
 
 ###
 // verify an insterested user to a post
-POST http://157.230.18.246:3000/posts/verInterested
+POST https://ouride.gr/test/posts/verInterested
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE5VDE1OjQ1OjE3LjU5OFoiLCJpYXQiOjE2NzE0NjQ3MTcsImV4cCI6MTY3NjY0ODcxN30.WBx6Yobse5TbkOypQ2w95x6_U1O5Ej_ch9jzGieCo08
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0yNVQwOTozMToyNy45OTBaIiwiaWF0IjoxNjgyNDE1MDg3LCJleHAiOjE2ODc1OTkwODd9.iBlDLTCxfojU3yhTz987uizpQblZPRd8W2vcHpeoPTc
 
 {
     "data": {
-        "postid": 1832,
-        "piid": 464
+        "postid": 1999,
+        "piid": 985
     }
 }
 
@@ -388,9 +387,9 @@ Accept-Language: EN
 
 ###
 #service that returns all the favourites of one user
-GET http://157.230.18.246:3000/posts/getFavourites
+GET https://ouride.gr/test/posts/getFavourites
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTExLTE5VDA5OjU5OjI1LjE2M1oiLCJpYXQiOjE2Njg4NTE5NjUsImV4cCI6MTY3NDAzNTk2NX0.8-Jkcj08ILR5zVGqp_hy-rcwPnfIax9pxatV0ybuMGo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNi0wMVQwOToyMjozMy44MjBaIiwiaWF0IjoxNjg1NjExMzUzLCJleHAiOjE2OTA3OTUzNTN9.5EaQhKojztNEZrb5vUymKlKMQd6QFczAPD3zq1ZHCjU
 Accept-Language: EN
 
 
@@ -471,17 +470,17 @@ Accept-Language: EN
 }
 
 ###service pou sou epistrefei lista me posts (paginated ana 20 kai ordered me vasi imeromhnia)
-POST http://157.230.18.246:3000/posts/searchposts
+POST https://ouride.gr/test/posts/searchposts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDYtMDFUMDk6MDY6MjkuNDMzWiIsImlhdCI6MTY4NTYxMDM4OSwiZXhwIjoxNjkwNzk0Mzg5fQ.mDV_SjeU8qGhWLIzm7DhJH6_fUMht_a3R9lg6wNTpYI
 Accept-Language: EN
 
 {
     "data": {
         "email": "lefterisevagelinos1996@gmail.com",
-        "startplace": "ασδ",
+        "startplace": "Athens",
         "startcoord": "1234",
-        "endplace": "δσα",
+        "endplace": "Thessaloniki",
         "endcoord": "3215",
         "startdate": null,
         "enddate": null,
@@ -501,14 +500,14 @@ Accept-Language: EN
 }
 
 ### feed Screen
-POST http://157.230.18.246:3000/posts/feedScreen
+POST https://ouride.gr/test/posts/feedScreen
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIyLTEyLTE1VDEzOjQ3OjM4LjEwM1oiLCJpYXQiOjE2NzExMTIwNTgsImV4cCI6MTY3NjI5NjA1OH0.CEbcQhtCWuuap7g2XCljelexze18A-hPRCJJnD3W0qQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDYtMDFUMDk6MDY6MjkuNDMzWiIsImlhdCI6MTY4NTYxMDM4OSwiZXhwIjoxNjkwNzk0Mzg5fQ.mDV_SjeU8qGhWLIzm7DhJH6_fUMht_a3R9lg6wNTpYI
 Accept-Language: EN
 
 {
     "data": {
-        "startplace": "ασδ",
+        "startplace": "Αθήνα",
         "startcoord": "123",
         "page": 1
     }
@@ -565,9 +564,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 Accept-Language: EN
 
 ###
-POST https://ouride.gr/posts/feedAll
+POST https://ouride.gr/test/posts/feedAll
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDYtMDFUMDk6MDY6MjkuNDMzWiIsImlhdCI6MTY4NTYxMDM4OSwiZXhwIjoxNjkwNzk0Mzg5fQ.mDV_SjeU8qGhWLIzm7DhJH6_fUMht_a3R9lg6wNTpYI
 Accept-Language: EN
 
 {
@@ -600,4 +599,93 @@ Accept-Language: EN
 
 {
     "notificationId": 25
+}
+
+###
+POST https://ouride.gr/test/users/searchUsers
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDMtMDVUMTM6MDk6MDEuNTM3WiIsImlhdCI6MTY3ODAyMTc0MSwiZXhwIjoxNjgzMjA1NzQxfQ.AGhm2z-PbohGOyyrZCmE5UH5RimJBcBY16sxfDiXXw0
+Accept-Language: EN
+
+{
+    "fullName": "giann",
+    "page": 1
+}
+
+###
+POST https://ouride.gr/test/groups/createGroup
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQwODowNjoxNy42MTZaIiwiaWF0IjoxNjgxMjAwMzc3LCJleHAiOjE2ODYzODQzNzd9.0YZmC9b8mx6iAiylujnRZjwZyat2d_tIdtkXZVvdta0
+Accept-Language: EN
+
+{
+    "groupName": "Lefos Group",
+    "users": [
+        {
+            "email": "lefterisevagelinos1996@gmail.com"
+        },
+        {
+            "email": "ouridecommunity@gmail.com"
+        },
+        {
+            "email": "panagiotafragoulh@gmail.com"
+        }
+    ]
+}
+
+###
+GET https://ouride.gr/test/groups/getGroups
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQxMDoxOToxNC4xOTNaIiwiaWF0IjoxNjgxMjA4MzU0LCJleHAiOjE2ODYzOTIzNTR9.MtApZa3nOBVssAhdbrJGrJCYENMfyHpCcl8JIVRD55M
+Accept-Language: EN
+
+###
+POST https://ouride.gr/test/groups/deleteGroup
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQwODowNjoxNy42MTZaIiwiaWF0IjoxNjgxMjAwMzc3LCJleHAiOjE2ODYzODQzNzd9.0YZmC9b8mx6iAiylujnRZjwZyat2d_tIdtkXZVvdta0
+Accept-Language: EN
+
+{
+    "groupId": 15
+}
+
+###
+POST https://ouride.gr/test/groups/changeName
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Accept-Language: EN
+
+{
+    "groupId": 17,
+    "name": "New Name"
+}
+
+###
+POST https://ouride.gr/test/groups/leaveGroup
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDQtMTBUMTE6MjM6MDAuOTg1WiIsImlhdCI6MTY4MTEyNTc4MCwiZXhwIjoxNjg2MzA5NzgwfQ.bQDNtPUC4Ka9juW0nDw3sP5XBTcbqOLFkwVu4ByRWbU
+Accept-Language: EN
+
+{
+    "groupId": 26
+}
+
+###
+POST https://ouride.gr/test/groups/acceptInvitation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQxMDoxOToxNC4xOTNaIiwiaWF0IjoxNjgxMjA4MzU0LCJleHAiOjE2ODYzOTIzNTR9.MtApZa3nOBVssAhdbrJGrJCYENMfyHpCcl8JIVRD55M
+Accept-Language: EN
+
+{
+    "groupId": 17
+}
+
+###
+POST https://ouride.gr/test/groups/declineInvitation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNC0xMVQxMDoxOToxNC4xOTNaIiwiaWF0IjoxNjgxMjA4MzU0LCJleHAiOjE2ODYzOTIzNTR9.MtApZa3nOBVssAhdbrJGrJCYENMfyHpCcl8JIVRD55M
+Accept-Language: EN
+
+{
+    "groupId": 17
 }

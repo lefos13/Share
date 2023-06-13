@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 sharetheride*
+postImages
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -106,6 +107,9 @@ dist
 
 #images
 uploads/
+
+#other
+.vscode
 
 #videos
 src\static-page\site-vue\hello-world\src\assets\video

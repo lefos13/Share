@@ -14,10 +14,29 @@ const Reviews = require("../modules/review");
 const SearchPost = require("../modules/searchPost");
 const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
+const Groups = require("./Group");
+const Post = require("./Post");
+const { isJsonString } = require("../utils/functions");
+const moment = require("moment");
 // ==== code for db
 
 // *** ADD ***
-
+const checkIfInterestExists = async (groupId) => {
+  try {
+    const found = await PostInterested.findAll({ where: { groupId } });
+    let flagOfExistingPost = null;
+    for await (const interest of found) {
+      const postData = await Post.findExpired(interest.postid, moment());
+      if (postData !== null) {
+        flagOfExistingPost = postData.postid;
+      }
+    }
+    return flagOfExistingPost;
+  } catch (error) {
+    console.error(error);
+    return new Error(error);
+  }
+};
 //function that count posts for a user the current day
 const findOne = async (email, postid) => {
   try {
@@ -220,6 +239,43 @@ const countVerified = async (postid) => {
   }
 };
 
+// count verified for specific postid
+const countVerifiedEnchanced = async (postid) => {
+  try {
+    //find all interests of this postid
+    const allIntersted = await PostInterested.findAll({
+      where: {
+        postid: postid,
+        isVerified: true,
+      },
+    }).catch((err) => {
+      throw err;
+    });
+    let countOfUsers = 0;
+    for await (const interested of allIntersted) {
+      //CHECK IF THE INTEREST IS OF A GROUP
+      if (interested.groupId != null) {
+        //get data of the group
+        let groupData = await Groups.findOne(interested.groupId);
+        if (groupData === false) {
+          throw new Error("Group not found");
+        }
+        //count members of the group
+        if (isJsonString(groupData.members)) {
+          groupData.members = JSON.parse(groupData.members);
+        }
+        countOfUsers += groupData.members.length + 1;
+      } else {
+        countOfUsers++;
+      }
+    }
+    return countOfUsers;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 const updateVerify = async (postInt) => {
   try {
     await postInt.update({ isVerified: true }).catch((err) => {
@@ -357,6 +413,7 @@ const destroyPerArrayIds = async (postids) => {
 // *** ADD ***
 
 module.exports = {
+  countVerifiedEnchanced,
   findAllVerifedPerPost,
   destroyPerArrayIds,
   findAllperUser,
@@ -377,4 +434,5 @@ module.exports = {
   updateVerify,
   resetFlags,
   getInterestedIfVerified,
+  checkIfInterestExists,
 };
