@@ -11,8 +11,8 @@ variables for the host, username, password, and database name. The `sequelize.de
 defining a model for a table called `convusers` with columns for `convid`, `expiresIn`, and
 `messages`. The `freezeTableName` and `timestamps` options are set to `true` and `false`,
 respectively. Finally, the `ConvUsers` model is exported for use in other parts of the application. */
-const { HOST, USERR, PASS, DATABASEE } = process.env;
-const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
+const { HOST, USERR, PASS, DATABASE } = process.env;
+const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
   // dialectOptions: {
