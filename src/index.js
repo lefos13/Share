@@ -288,13 +288,9 @@ app.use(
     pathRewrite: async function (path, req) {
       // const should_add_something = await httpRequestToDecideSomething(path);
       let lang = req.headers["accept-language"];
-      // if(lang == "GR")
 
-      // path = "input=volos&key=" + GOOGLE_KEY;
-
-      // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
-      // path += "&components=country:XX&types=(cities)&key=" + GOOGLE_KEY;
-      path += "&components=country:*&types=(cities)&key=" + GOOGLE_KEY;
+      // path += "&components=country:gr&types=(cities)&key=" + GOOGLE_KEY;
+      path += "&types=(cities)&key=" + GOOGLE_KEY;
       return path;
     },
   })
