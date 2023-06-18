@@ -286,7 +286,7 @@ Accept-Language: EN
 }
 ###
 
-GET https://ouride.gr/test/autocomplete/json?input=ath
+GET https://ouride.gr/test/autocomplete/json?input=athen
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wNi0xOFQxMjoyODo1MC44NDdaIiwiaWF0IjoxNjg3MDkxMzMwLCJleHAiOjE2OTIyNzUzMzB9.CXCu2I3ZlJICI-KpSNoqr1bY4RxLLJwK-GsPkT48xJo
 

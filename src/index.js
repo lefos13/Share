@@ -293,8 +293,8 @@ app.use(
       // path = "input=volos&key=" + GOOGLE_KEY;
 
       // path = "input=volos&key=AIzaSyA4hRBFRUrIE-XtMMb1Wp_CjiVWxue6nwY";
-      path += "&components=country:XX&types=(cities)&key=" + GOOGLE_KEY;
-      // path += "&components=country:gr&types=(cities)&key=" + GOOGLE_KEY;
+      // path += "&components=country:XX&types=(cities)&key=" + GOOGLE_KEY;
+      path += "&components=country:*&types=(cities)&key=" + GOOGLE_KEY;
       return path;
     },
   })
