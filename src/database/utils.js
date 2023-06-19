@@ -22,7 +22,16 @@ const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
 // ==== code for db
-const { checkImagePath, getVersion } = require("../utils/functions");
+
+const getVersion = async () => {
+  try {
+    let version = JSON.parse(fs.readFileSync("./clientVersions/versions.json"));
+    return version;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
 const getLang = async (lang) => {
   let msg;
