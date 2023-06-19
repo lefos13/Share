@@ -74,6 +74,8 @@ const login = async (req, res) => {
       message: results.message,
       user: results.user,
       forceUpdate: results.forceUpdate,
+      minimumAndroidVersion: results.minimumAndroidVersion,
+      minimumIosVersion: results.minimumIosVersion,
     });
   } catch (error) {
     res.status(500).json({ message: error.errorMessage });

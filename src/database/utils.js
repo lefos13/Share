@@ -22,7 +22,7 @@ const ToReview = require("../modules/toreview");
 const FcmToken = require("../modules/fcmtoken");
 const moment = require("moment");
 // ==== code for db
-const { checkImagePath } = require("../utils/functions");
+const { checkImagePath, getVersion } = require("../utils/functions");
 
 const getLang = async (lang) => {
   let msg;
@@ -95,11 +95,13 @@ const checkPass = async (result, user, fcmToken, email, msg) => {
       if (fs.existsSync("./uploads/" + data.email + ".jpeg")) {
         rest.photo = "images/" + data.email + ".jpeg";
       } else rest.photo = null;
+      const version = await getVersion();
       return {
         status: 200,
         message: msg.loginSuc,
         user: rest,
         forceUpdate: true,
+        ...version,
       };
     } else {
       return { status: 405, message: msg.loginFailed };
