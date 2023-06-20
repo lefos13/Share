@@ -342,14 +342,14 @@ const login = async (req) => {
             status: 200,
             message: msg.loginSuc,
             user: rest,
-            forceUpdate: true,
+            forceUpdate: false,
             ...versions,
           });
           return {
             status: 200,
             message: msg.loginSuc,
             user: rest,
-            forceUpdate: true,
+            forceUpdate: false,
             ...versions,
           };
         } else {
@@ -398,7 +398,7 @@ const loginThirdParty = async (req) => {
     let data = req.body.data;
     console.log("Data for google log in:", data);
     let userRegistered = false;
-    let forceUpdate = true;
+    let forceUpdate = false;
 
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;

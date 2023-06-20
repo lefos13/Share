@@ -109,7 +109,7 @@ const checkPass = async (result, user, fcmToken, email, msg) => {
         status: 200,
         message: msg.loginSuc,
         user: rest,
-        forceUpdate: true,
+        forceUpdate: false,
         ...version,
       };
     } else {
