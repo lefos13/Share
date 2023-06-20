@@ -799,6 +799,24 @@ const getLang = async (lang) => {
   return msg;
 };
 
+//get version variables from clientVersions/version.json
+/**
+ * This function reads and returns the contents of a JSON file containing client versions, or returns
+ * false if there is an error.
+ * @returns The `getVersion` function is returning a Promise that resolves to the parsed JSON object
+ * from the `versions.json` file if it is successfully read, or `false` if there is an error.
+ */
+const getVersion = async () => {
+  try {
+    let version = JSON.parse(fs.readFileSync("./clientVersions/versions.json"));
+    return version;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+
 /**
  * The function determines the language based on the accept-language header and returns the
  * corresponding JSON file.
@@ -1878,6 +1896,7 @@ const fixAllDates = async (fnd) => {
 };
 
 module.exports = {
+  getVersion,
   onGroupRequestReceived,
   onGroupRequestAccepted,
   onGroupRequestDeclined,

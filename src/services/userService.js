@@ -25,6 +25,7 @@ const {
   determineLang,
   backUpUser,
   checkImagePath,
+  getVersion,
 } = require("../utils/functions");
 const moment = require("moment");
 const _ = require("lodash");
@@ -335,11 +336,21 @@ const login = async (req) => {
             User.activateAccount(user.email);
           }
 
+          //get Versions of clients
+          const versions = await getVersion();
+          console.log("Response from login api", {
+            status: 200,
+            message: msg.loginSuc,
+            user: rest,
+            forceUpdate: true,
+            ...versions,
+          });
           return {
             status: 200,
             message: msg.loginSuc,
             user: rest,
             forceUpdate: true,
+            ...versions,
           };
         } else {
           // CHECK IF THE PASS IS RIGHT
@@ -429,6 +440,17 @@ const loginThirdParty = async (req) => {
         throw err;
       });
       //
+      const versions = await getVersion();
+      console.log("Respnse from second case of login third party api", {
+        status: 200,
+        response: {
+          user: rest,
+          message: msg.loginSuc,
+          forceUpdate: forceUpdate,
+          userRegistered: userRegistered,
+          ...versions,
+        },
+      });
       return {
         status: 200,
         response: {
@@ -436,6 +458,7 @@ const loginThirdParty = async (req) => {
           message: msg.loginSuc,
           forceUpdate: forceUpdate,
           userRegistered: userRegistered,
+          ...versions,
         },
       };
     } else {
@@ -455,14 +478,17 @@ const loginThirdParty = async (req) => {
         throw new Error("Error at creating/updating the fcmToken");
       }
       //
-
+      const versions = await getVersion();
       rest.isThirdPartyLogin = true;
       const response = {
         user: rest,
         message: msg.loginSuc,
         forceUpdate: forceUpdate,
         userRegistered: userRegistered,
+        ...versions,
       };
+
+      console.log("Response from loginThirdParty:", response);
 
       const updatedState = User.updateLoginState(rest.email, true);
       if (updatedState === false)
