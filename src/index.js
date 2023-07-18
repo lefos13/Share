@@ -463,11 +463,14 @@ io.on("connection", (socket) => {
         last 20 messages. If encryption is allowed, it decrypts */
         case "server/join":
           //log all data of the user
-          console.log("call server Join!!!");
+          console.log("USER TRYING TO JOIN THE SOCKET STREAM");
 
           const initiator = await User.findOneLight(action.data.email);
           if (initiator === false) {
             throw new Error("Error at finding the user");
+          } else if(initiator == null)
+          {
+            throw new Error("User not found to join the socket stream!");
           }
 
           let msg = await getLang(initiator.lastLang);
@@ -793,8 +796,8 @@ io.on("connection", (socket) => {
         user is in the background. It retrieves all conversations involving the user and sets the
         "isUserOnline" status to false for the other user(s) in each conversation. */
         case "server/AppInBackground": {
+          if(action.data.senderEmail == undefined) break;
           console.log("AppInBackground data: ", action.data.senderEmail);
-          let sender = action.data.senderEmail;
           app.locals.bg[sender] = true;
           //user should be offline right now.
           //notifications should be send if the user is in the background
@@ -824,6 +827,7 @@ io.on("connection", (socket) => {
         sender from the database, and sends a socket.io message to each conversation's other user to
         set their online status to true. */
         case "server/AppInForeground": {
+          if(action.data.senderEmail == undefined) break;
           console.log("AppInForeground data: ", action.data.senderEmail);
           let sender = action.data.senderEmail;
           //user should be again online
