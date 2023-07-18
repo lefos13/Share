@@ -68,9 +68,11 @@ var CryptoJS = require("react-native-crypto-js");
 // create User service
 const createNewUser = async (req) => {
   try {
+    console.log("Service createNewUser --- Headers of request: " + req.headers);
+    console.log("Email of new User: " + req.body.data.email);
     const msg = await determineLang(req);
     const data = req.body.data;
-    console.log(data);
+    data["lastLang"] = msg.lang;
 
     // Extract photo from data and remove it from the object
     const { photo, ...userData } = data;
@@ -78,8 +80,6 @@ const createNewUser = async (req) => {
     // Hash the user's password
     const salt = await bcrypt.genSalt(saltRounds);
     userData.password = await bcrypt.hash(userData.password, salt);
-
-    console.log("NEW USER FULLNAME: ", userData.fullname);
 
     // Register the user
     const final = await User.register(userData, msg);
@@ -396,12 +396,14 @@ const loginThirdParty = async (req) => {
   try {
     let msg = await determineLang(req);
     let data = req.body.data;
-    console.log("Data for google log in:", data);
+    console.log("Headers for thrid party login:", req.headers);
+    console.log("Data for third party log in:", data);
     let userRegistered = false;
     let forceUpdate = true;
 
     data["isThirdPartyLogin"] = true;
     data["photo"] = null;
+    data["lastLang"] = msg.lang;
     const user = await User.findOneUser(data.email);
     if (user === false) {
       throw new Error("Something went wrong with finding the user");
@@ -974,10 +976,13 @@ const deleteUser = async (req) => {
 
 const permDeleteUser = async (req) => {
   try {
+    
     let msg = await determineLang(req);
     let email = req.body.extra;
     let curDate = moment();
     let dataToBackUp = {};
+
+    console.log(`DELETING USER: ${email} FROM DATABASE AND ALL HIS DATA`);
 
     const user = await User.findOneUser(email);
     dataToBackUp.user = user;
@@ -1016,8 +1021,8 @@ const permDeleteUser = async (req) => {
         };
         if (group.admin !== email) {
           const response = await GroupServices.leaveGroup(request);
-          if (response.status === 500) {
-            throw new Error("Error at leaving a group");
+          if (response.status !== 200) {
+            console.error("Error at leaving a group");
           } else {
             console.log(
               `User: ${email} has left the group: ${group.groupId} due to deactivation of account!`
@@ -1025,8 +1030,8 @@ const permDeleteUser = async (req) => {
           }
         } else {
           const response = await GroupServices.deleteGroup(request);
-          if (response.status === 500) {
-            throw new Error("Error at leaving a group");
+          if (response.status !== 200) {
+            console.error("Error at DELETING a group OF USER");
           } else {
             console.log(
               `User: ${email} has deleted the group: ${group.groupId} due to deactivation of account!`
@@ -1077,7 +1082,7 @@ const permDeleteUser = async (req) => {
       fs.unlinkSync("uploads/" + dataToBackUp.user.email + ".jpeg");
     //backup all data of deleted user
     backUpUser(dataToBackUp);
-
+    console.log(`USER ${email} deleted Successfully!`);
     return { status: 200, response: { message: msg.permDeleteAccount } };
   } catch (error) {
     console.error(error);
