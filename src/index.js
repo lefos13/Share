@@ -798,6 +798,7 @@ io.on("connection", (socket) => {
         case "server/AppInBackground": {
           if(action.data.senderEmail == undefined) break;
           console.log("AppInBackground data: ", action.data.senderEmail);
+          let sender = action.data.senderEmail;
           app.locals.bg[sender] = true;
           //user should be offline right now.
           //notifications should be send if the user is in the background
