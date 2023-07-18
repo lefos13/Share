@@ -1078,8 +1078,10 @@ const permDeleteUser = async (req) => {
     _.invokeMap(potentialReviews, "destroy");
 
     //delete photo
-    if (dataToBackUp.user.photo != null)
-      fs.unlinkSync("uploads/" + dataToBackUp.user.email + ".jpeg");
+    const filePath = "uploads/" + dataToBackUp.user.email + ".jpeg";
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
     //backup all data of deleted user
     backUpUser(dataToBackUp);
     console.log(`USER ${email} deleted Successfully!`);
