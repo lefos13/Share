@@ -20,8 +20,15 @@ const createNewPost = async (req, res) => {
 };
 
 const updateOnePost = async (req, res) => {
-  const updatedPost = await postService.updateOnePost(req);
-  res.status(200).json({message: "Updated an existing post", data: updatedPost});
+  let msg = await determineLang(req);
+  try {
+    const results = await postService.updateOnePost(req);
+    if(results.status == 200)
+    res.status(200).json({message: results.message, data: results.data});
+    else throw results.errorStack;
+  } catch (error) {
+    res.status(500).json({ message: msg.errorMessage, errorStack: error });
+  }
 };
 
 const interested = async (req, res) => {

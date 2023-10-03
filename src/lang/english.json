@@ -102,5 +102,8 @@
   "groupHasTooManyMembers": "There is not enough seats for all the members of your group!",
   "group_limit": "You have reached the maximum number of groups that you can create!",
   "notAllowedToLeaveConv": "All conversations must expire so you can leave this group!",
-  "notAllowedToDeleteConv": "All conversations must expire so you can delete this group!"
+  "notAllowedToDeleteConv": "All conversations must expire so you can delete this group!",
+  "postMessages": {
+    "updated": "Your Ride has been successfully updated!"
+  }
 }

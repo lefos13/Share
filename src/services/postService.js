@@ -2374,17 +2374,14 @@ const updateOnePost = async (req, res) => {
         const buffer = Buffer.from(base64, "base64");
         fs.writeFileSync("postImages/" + postid + ".jpeg", buffer);
         await postData.update({ image: "postimages/" + postid + ".jpeg" });
-        return postData;
       }else{
-        console.log("NO IMAGE TO UPDATE...");
-        return postData;
+        console.log("NO IMAGE TO UPDATE...");       
       }
-    }
-    
-    
+      return {status:200, message: msg.postMessages.updated, data: postData};
+    }    
   } catch (error) {
     console.error(error);
-    return false;
+    return {status:500, errorStack: error};
   }
 }
 
