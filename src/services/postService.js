@@ -2356,13 +2356,29 @@ const feedAll = async (req) => {
 
 const updateOnePost = async (req, res) => {
   try {
+    const msg = await determineLang(req);
     console.log("UPDATING POST...");
     let postId = req.body.data.postId;
-    let newPostData = req.body.data.newData;
+    let {image, ...newPostData} = req.body.data.newData;
     let postData = await Post.findOne(postId);
-    let results = postData.update(newPostData).catch(err => {
-      throw err;
-    });
+    if(postData===false) {
+      throw new Error("Didn't find post");}
+    if(!newPostData.hasOwnProperty("image")){
+      newPostData.date = moment();
+      let results = postData.update(newPostData).catch(err => {
+        throw err;
+      });
+      if(newPostData.image != null) {
+        console.log("UPDATING IMAGE OF POST...");
+        const base64 = image;
+        const buffer = Buffer.from(base64, "base64");
+        fs.writeFileSync("postImages/" + postid + ".jpeg", buffer);
+        await postData.update({ image: "postimages/" + postid + ".jpeg" });
+      }else{
+        console.log("NO IMAGE TO UPDATE...");
+      }
+    }
+    
     console.log("Results of updated post: " + JSON.stringify(results));
     return true;
   } catch (error) {
