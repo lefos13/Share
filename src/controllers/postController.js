@@ -21,7 +21,7 @@ const createNewPost = async (req, res) => {
 
 const updateOnePost = (req, res) => {
   const updatedPost = postService.updateOnePost(req);
-  res.send("Update an existing post", updatedPost);
+  res.status(200).send("Update an existing post", updatedPost);
 };
 
 const deleteOnePost = (req, res) => {
