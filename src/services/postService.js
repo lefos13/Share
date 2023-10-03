@@ -2365,7 +2365,7 @@ const updateOnePost = async (req, res) => {
       throw new Error("Didn't find post");}
     if(!newPostData.hasOwnProperty("image")){
       newPostData.date = moment();
-      let results = postData.update(newPostData).catch(err => {
+      await postData.update(newPostData).catch(err => {
         throw err;
       });
       if(newPostData.image != null) {
@@ -2374,13 +2374,14 @@ const updateOnePost = async (req, res) => {
         const buffer = Buffer.from(base64, "base64");
         fs.writeFileSync("postImages/" + postid + ".jpeg", buffer);
         await postData.update({ image: "postimages/" + postid + ".jpeg" });
+        return postData;
       }else{
         console.log("NO IMAGE TO UPDATE...");
+        return postData;
       }
     }
     
-    console.log("Results of updated post: " + JSON.stringify(results));
-    return true;
+    
   } catch (error) {
     console.error(error);
     return false;
