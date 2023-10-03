@@ -2362,7 +2362,10 @@ const updateOnePost = async (req, res) => {
     let {image, ...newPostData} = req.body.data.newData;
     let postData = await Post.findOne(postId);
     if(postData===false) {
-      throw new Error("Didn't find post");}
+      throw new Error("Error at database level");}
+      else if(postData===null){
+        throw new Error("Post not found");
+      }
     if(!newPostData.hasOwnProperty("image")){
       newPostData.date = moment();
       await postData.update(newPostData).catch(err => {

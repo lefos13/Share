@@ -134,6 +134,7 @@ const findOne = async (postid) => {
 
     return postForFunction;
   } catch (error) {
+    console.log(error);
     return false;
   }
 };
