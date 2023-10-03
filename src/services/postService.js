@@ -2384,7 +2384,7 @@ const updateOnePost = async (req, res) => {
     }    
   } catch (error) {
     console.error(error);
-    return {status:500, errorStack: error};
+    return {status:500, errorStack: error.message};
   }
 }
 
