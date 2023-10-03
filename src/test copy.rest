@@ -706,7 +706,7 @@ Accept-Language: EN
             "endplace": "Thessaloniki",
             "endcoord": "40.6400629,22.9444191",
             "numseats": 2,
-            "startdate": "2023-03-30",
+            "startdate": "2023-03-16",
             "enddate": null,
             "returnStartDate": null,
             "returnEndDate": null,

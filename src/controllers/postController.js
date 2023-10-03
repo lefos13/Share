@@ -19,8 +19,8 @@ const createNewPost = async (req, res) => {
   }
 };
 
-const updateOnePost = (req, res) => {
-  const updatedPost = postService.updateOnePost(req);
+const updateOnePost = async (req, res) => {
+  const updatedPost = await postService.updateOnePost(req);
   res.status(200).json({message: "Updated an existing post", data: updatedPost});
 };
 
