@@ -21,12 +21,7 @@ const createNewPost = async (req, res) => {
 
 const updateOnePost = (req, res) => {
   const updatedPost = postService.updateOnePost(req);
-  res.status(200).send("Update an existing post", updatedPost);
-};
-
-const deleteOnePost = (req, res) => {
-  const deletedPost = postService.deleteOnePost();
-  res.send("Delete an existing workout");
+  res.status(200).json({message: "Update an existing post" + updatedPost});
 };
 
 const interested = async (req, res) => {
