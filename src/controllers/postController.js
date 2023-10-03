@@ -20,7 +20,7 @@ const createNewPost = async (req, res) => {
 };
 
 const updateOnePost = (req, res) => {
-  const updatedPost = postService.updateOnePost();
+  const updatedPost = postService.updateOnePost(req);
   res.send("Update an existing post", updatedPost);
 };
 

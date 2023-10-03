@@ -689,3 +689,41 @@ Accept-Language: EN
 {
     "groupId": 17
 }
+
+###
+POST https://ouride.gr/test/posts/editPost
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0xMC0wM1QxNDoxMjo1Mi4xNzhaIiwiaWF0IjoxNjk2MzQyMzcyLCJleHAiOjE3MDE1MjYzNzJ9._LnrgPVjwKCkCi-4mheIWKVWTEuqewzcyaV0jd7Ou1Q
+Accept-Language: EN
+
+{
+    "data": {
+        "postId": 2075,
+        "newData": {
+            "date": "2023-03-26",
+            "startplace": "Athens",
+            "startcoord": "37.9838096,23.7275388",
+            "endplace": "Thessaloniki",
+            "endcoord": "40.6400629,22.9444191",
+            "numseats": 2,
+            "startdate": "2023-03-26",
+            "enddate": null,
+            "returnStartDate": null,
+            "returnEndDate": null,
+            "withReturn": false,
+            "comment": "Αν δεν επικοινωνήσω σημαίνει ότι δεν υπάρχουν θέσεις.",
+            "petAllowed": true,
+            "isFavourite": false,
+            "moreplaces": [
+                {
+                        "place": "lamia",
+                        "placecoords": "3211"
+                },
+                {
+                        "place": "lamia",
+                        "placecoords": "3211"
+                }
+            ]
+        }
+    }
+}
