@@ -228,7 +228,6 @@ const getFavourites = async (req, res) => {
 module.exports = {
   createNewPost,
   updateOnePost,
-  deleteOnePost,
   interested,
   searchPosts,
   getPostsUser,
