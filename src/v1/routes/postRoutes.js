@@ -131,4 +131,6 @@ router.post(
   postController.feedAll
 );
 
+router.post("/editPost", [authenticateToken], cors(corsOptions), postController.updateOnePost);
+
 module.exports = router;

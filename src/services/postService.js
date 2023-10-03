@@ -2354,7 +2354,25 @@ const feedAll = async (req) => {
   }
 };
 
+const updateOnePost = async (req, res) => {
+  try {
+    console.log("UPDATING POST...");
+    let postId = req.body.data.postId;
+    let newPostData = req.body.data.newData;
+    let postData = await Post.findOne(postId);
+    let results = postData.update(newPostData).catch(err => {
+      throw err;
+    });
+    console.log("Results of updated post: " + JSON.stringify(results));
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
 module.exports = {
+  updateOnePost,
   createNewPost,
   interested,
   searchPosts,
