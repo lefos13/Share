@@ -2383,8 +2383,8 @@ const updateOnePost = async (req, res) => {
         console.log("UPDATING IMAGE OF POST...");
         const base64 = image;
         const buffer = Buffer.from(base64, "base64");
-        fs.writeFileSync("postImages/" + postid + ".jpeg", buffer);
-        await postData.update({ image: "postimages/" + postid + ".jpeg" });
+        fs.writeFileSync("postImages/" + postData.postid + ".jpeg", buffer);
+        await postData.update({ image: "postimages/" + postData.postid + ".jpeg" });
       }
       return {status:200, message: msg.postMessages.updated, data: postData};
     }    
