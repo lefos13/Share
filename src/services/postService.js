@@ -2355,7 +2355,48 @@ const feedAll = async (req) => {
   }
 };
 
+const updateOnePost = async (req, res) => {
+  try {
+    const msg = await determineLang(req);
+    console.log("UPDATING POST...");
+    let postId = req.body.data.postId;
+    let {image, date, ...newPostData} = req.body.data.newData;
+    let postData = await Post.findOne(postId);
+    if(postData===false) {
+      throw new Error("Error at database level");}
+      else if(postData===null){
+        throw new Error("Post not found");
+      }
+    if(!newPostData.hasOwnProperty("image")){
+      // newPostData.date = moment();
+      await postData.update(newPostData).catch(err => {
+        throw err;
+      });
+      if (image === null) {
+        //delete the image of the post if exists
+        if (fs.existsSync(`postImages/${postData.postid}.jpeg`)) {
+          fs.unlinkSync(`postImages/${postData.postid}.jpeg`);
+        }
+        await postData.update({ image: null });
+      } else if (image.includes("postimages")) {
+        console.log("Existing image is kept");
+      } else {
+        console.log("UPDATING IMAGE OF POST...");
+        const base64 = image;
+        const buffer = Buffer.from(base64, "base64");
+        fs.writeFileSync("postImages/" + postData.postid + ".jpeg", buffer);
+        await postData.update({ image: "postimages/" + postData.postid + ".jpeg" });
+      }
+      return {status:200, message: msg.postMessages.updated, data: postData};
+    }    
+  } catch (error) {
+    console.error(error);
+    return {status:500, errorStack: error.message};
+  }
+}
+
 module.exports = {
+  updateOnePost,
   createNewPost,
   interested,
   searchPosts,

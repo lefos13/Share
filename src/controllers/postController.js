@@ -19,14 +19,16 @@ const createNewPost = async (req, res) => {
   }
 };
 
-const updateOnePost = (req, res) => {
-  const updatedPost = postService.updateOnePost();
-  res.send("Update an existing workout");
-};
-
-const deleteOnePost = (req, res) => {
-  const deletedPost = postService.deleteOnePost();
-  res.send("Delete an existing workout");
+const updateOnePost = async (req, res) => {
+  let msg = await determineLang(req);
+  try {
+    const results = await postService.updateOnePost(req);
+    if(results.status == 200)
+    res.status(200).json({message: results.message, data: results.data});
+    else throw results.errorStack;
+  } catch (error) {
+    res.status(500).json({ message: msg.errorMessage, errorStack: error });
+  }
 };
 
 const interested = async (req, res) => {
@@ -233,7 +235,6 @@ const getFavourites = async (req, res) => {
 module.exports = {
   createNewPost,
   updateOnePost,
-  deleteOnePost,
   interested,
   searchPosts,
   getPostsUser,
