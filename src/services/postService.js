@@ -38,10 +38,9 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   },
 });
 
-const moment = require("moment-timezone");
-// const ConvUsers = require("../modules/convusers");
-moment.tz.setDefault("Europe/Athens");
-moment.locale("el");
+const moment = require("moment");
+// moment.tz.setDefault("Europe/Athens");
+// moment.locale("el");
 
 const RFC_H = "DD/MM/YYYY HH:mm";
 const RFC_ONLYM = "DD/MM/YYYY";
@@ -2359,16 +2358,16 @@ const updateOnePost = async (req, res) => {
     const msg = await determineLang(req);
     console.log("UPDATING POST...");
     let postId = req.body.data.postId;
-    let {image, date, ...newPostData} = req.body.data.newData;
+    let { image, date, ...newPostData } = req.body.data.newData;
     let postData = await Post.findOne(postId);
-    if(postData===false) {
-      throw new Error("Error at database level");}
-      else if(postData===null){
-        throw new Error("Post not found");
-      }
-    if(!newPostData.hasOwnProperty("image")){
+    if (postData === false) {
+      throw new Error("Error at database level");
+    } else if (postData === null) {
+      throw new Error("Post not found");
+    }
+    if (!newPostData.hasOwnProperty("image")) {
       // newPostData.date = moment();
-      await postData.update(newPostData).catch(err => {
+      await postData.update(newPostData).catch((err) => {
         throw err;
       });
       if (image === null) {
@@ -2384,15 +2383,17 @@ const updateOnePost = async (req, res) => {
         const base64 = image;
         const buffer = Buffer.from(base64, "base64");
         fs.writeFileSync("postImages/" + postData.postid + ".jpeg", buffer);
-        await postData.update({ image: "postimages/" + postData.postid + ".jpeg" });
+        await postData.update({
+          image: "postimages/" + postData.postid + ".jpeg",
+        });
       }
-      return {status:200, message: msg.postMessages.updated, data: postData};
-    }    
+      return { status: 200, message: msg.postMessages.updated, data: postData };
+    }
   } catch (error) {
     console.error(error);
-    return {status:500, errorStack: error.message};
+    return { status: 500, errorStack: error.message };
   }
-}
+};
 
 module.exports = {
   updateOnePost,
