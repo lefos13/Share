@@ -96,11 +96,15 @@ const runJobs = function () {
         if (posts.length > 0) {
           console.log(`found ${posts.length} posts`);
           //loop through all posts
-          posts.forEach((post) => {
+          posts.forEach(async (post) => {
             const driver = post.email;
             //get passengers
-            const postInterests = getAllVerifiedInterestsPerPost(post.postid);
-
+            const postInterests = await getAllVerifiedInterestsPerPost(
+              post.postid
+            );
+            console.log(
+              `Verified post interests: ${JSON.stringify(postInterests)}`
+            );
             if (postInterests.length > 0) {
               increaseAsValues(driver, "driver");
               //get all emails of verified passengers
