@@ -629,7 +629,7 @@ const getAllExpiredToday = async () => {
     }).catch((err) => {
       throw err;
     });
-
+    console.log("EXPIRED POSTS THAT WAS FOUND: " + JSON.stringify(posts));
     return posts;
   } catch (error) {
     console.log("Error at getAllExpiredToday: ", error);
