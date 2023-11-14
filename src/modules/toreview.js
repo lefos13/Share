@@ -14,7 +14,7 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   dialectOptions: {
     typeCast: function (field, next) {
       if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
-        return new Date(field.string() + "Z");
+        return new Date(field.string());
       }
       return next();
     },
