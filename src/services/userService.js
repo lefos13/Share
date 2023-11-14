@@ -701,49 +701,49 @@ const searchUser = async (req) => {
       imagePath = "images/" + found.email + ".jpeg";
     }
 
-    let peopleDriven = 0;
-    let ridesTaken = 0;
+    let peopleDriven = found.asDriver;
+    let ridesTaken = found.asPassenger;
 
-    //========= ridesTaken functionality ===========
-    let curDate = moment();
-    //Get all the interests that i am verified
-    const allInt = await PostInterested.findAllVerifed(data.email);
-    if (allInt === false) {
-      throw new Error(
-        "Something went wrong with findind all the verified interests"
-      );
-    }
-    //Count the posts that are expired
-    for await (int of allInt) {
-      let postExp = await Post.findExpired(int.postid, curDate);
-      if (postExp === false) {
-        throw new Error("Something went wrong with db function");
-      }
+    // //========= ridesTaken functionality ===========
+    // let curDate = moment();
+    // //Get all the interests that i am verified
+    // const allInt = await PostInterested.findAllVerifed(data.email);
+    // if (allInt === false) {
+    //   throw new Error(
+    //     "Something went wrong with findind all the verified interests"
+    //   );
+    // }
+    // //Count the posts that are expired
+    // for await (int of allInt) {
+    //   let postExp = await Post.findExpired(int.postid, curDate);
+    //   if (postExp === false) {
+    //     throw new Error("Something went wrong with db function");
+    //   }
 
-      if (postExp == null) {
-        ridesTaken++;
-      }
-    }
+    //   if (postExp == null) {
+    //     ridesTaken++;
+    //   }
+    // }
 
-    //ridesTaken --- END
+    // //ridesTaken --- END
 
-    //==========================
-    //peopleDriven functionality
+    // //==========================
+    // //peopleDriven functionality
 
-    //Get all my expired posts
-    const allExpired = await Post.findAllExpired(data.email, curDate);
-    if (allExpired === false) {
-      throw new Error("Something went wrong with db function");
-    }
+    // //Get all my expired posts
+    // const allExpired = await Post.findAllExpired(data.email, curDate);
+    // if (allExpired === false) {
+    //   throw new Error("Something went wrong with db function");
+    // }
 
-    //count all the interested users that are verifed
-    for await (post of allExpired) {
-      let count = await PostInterested.countVerified(post.postid);
-      if (count === false) {
-        throw new Error("Something went wrong with db function");
-      }
-      peopleDriven = peopleDriven + count;
-    }
+    // //count all the interested users that are verifed
+    // for await (post of allExpired) {
+    //   let count = await PostInterested.countVerified(post.postid);
+    //   if (count === false) {
+    //     throw new Error("Something went wrong with db function");
+    //   }
+    //   peopleDriven = peopleDriven + count;
+    // }
     //peopleDriven --- END
 
     const responseData = {
@@ -976,7 +976,6 @@ const deleteUser = async (req) => {
 
 const permDeleteUser = async (req) => {
   try {
-    
     let msg = await determineLang(req);
     let email = req.body.extra;
     let curDate = moment();
