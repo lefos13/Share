@@ -596,8 +596,8 @@ const globalAllExpired = async () => {
 const getAllExpiredToday = async () => {
   try {
     console.log("Getting all expired posts today");
-    let curDate = moment().format("YYYY-MM-DD");
-    let yesterday = moment().subtract(1, "day").format("YYYY-MM-DD");
+    let curDate = moment();
+    let yesterday = moment().subtract(1, "day");
     console.log(`Current date: ${curDate} and yesterday: ${yesterday}`);
 
     const posts = await Posts.findAll({
