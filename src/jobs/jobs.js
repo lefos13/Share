@@ -1,7 +1,11 @@
 const schedule = require("node-schedule");
 const Post = require("../database/Post");
 const Conv = require("../database/ConvUsers");
-const { destroyPerArrayIds } = require("../database/PostInterested");
+const { increaseAsValues } = require("../database/User");
+const {
+  destroyPerArrayIds,
+  getAllVerifiedInterestsPerPost,
+} = require("../database/PostInterested");
 const moment = require("moment");
 var _ = require("lodash");
 
@@ -89,8 +93,23 @@ const runJobs = function () {
         //get posts that expired today
         const posts = Post.getAllExpiredToday();
         //get users that are involved in the post
-        const driver = null;
-        const passengers = [];
+        if (posts.length > 0) {
+          console.log(`found ${posts.length} posts`);
+          //loop through all posts
+          posts.forEach((post) => {
+            const driver = post.email;
+            //get passengers
+            const postInterests = getAllVerifiedInterestsPerPost(post.postid);
+            if (postInterests.length > 0) {
+              increaseAsValues(driver, "driver");
+              //get all emails of verified passengers
+              postInterests.forEach((interest) => {
+                increaseAsValues(interest.email, "passenger");
+              });
+            }
+          });
+        }
+
         //check if there are any passengers and ignore those posts with no passengers
         const ifPassengers = null;
         //increase the number of asDriver and asPassenger values to the corresponding collumns in db
