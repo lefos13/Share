@@ -1,6 +1,6 @@
 const schedule = require("node-schedule");
 const Post = require("../database/Post");
-const Conv = require("./database/ConvUsers");
+const Conv = require("../database/ConvUsers");
 const { destroyPerArrayIds } = require("../database/PostInterested");
 const moment = require("moment");
 var _ = require("lodash");
