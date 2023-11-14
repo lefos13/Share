@@ -81,7 +81,8 @@ const runJobs = function () {
   );
 
   const addNewDriversPassengers = schedule.scheduleJob(
-    "30 0 * * *", //every 12:30 after midnight
+    // "30 0 * * *", //every 12:30 after midnight
+    "*/10 * * * * *",
     async () => {
       try {
         console.log(`Running cron job: addNewDriversPassengers`);
