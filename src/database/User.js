@@ -355,7 +355,7 @@ const findUserMinimal = async (email) => {
 
 const increaseAsValues = async (email, type) => {
   try {
-    let user = await Users.findOne({ email: email });
+    let user = await Users.findOne({ where: { email: email } });
     if (type == "driver") {
       let asDriverValue = user.asDriver;
       asDriverValue++;
