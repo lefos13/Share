@@ -406,6 +406,7 @@ const destroyPerArrayIds = async (postids) => {
 
 const getAllVerifiedInterestsPerPost = async (postid) => {
   try {
+    console.log(`post id ${postid}`);
     const postInterests = await PostInterested.findAll({
       where: {
         postid: postid,
