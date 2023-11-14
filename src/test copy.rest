@@ -8,6 +8,17 @@ Accept-Language: EN
         "email": "slodevolos@hotmail.com"
     }
 }
+###
+#service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
+POST https://ouride.gr/test/users/createtoken
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
 
 ###
 POST https://ouride.gr/test/neutral/sendReport
@@ -576,9 +587,9 @@ Accept-Language: EN
 }
 
 ###
-GET https://ouride.gr/neutral/getNotifications
+GET https://ouride.gr/test/neutral/getNotifications
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im91cmlkZWNvbW11bml0eUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wMy0yMVQxNTozNTo1My4yMzhaIiwiaWF0IjoxNjc5NDEyOTUzLCJleHAiOjE2ODQ1OTY5NTN9.oFq-0ZGNY6fGTFJHwuxpglUa0mZHIyM3J-vBaz94Nmc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTEtMTRUMjA6Mzk6MDkuODQzWiIsImlhdCI6MTY5OTk5NDM0OSwiZXhwIjoxNzA1MTc4MzQ5fQ.j4VeHEzJb4aGNQJ0C80VkHXER5lXMT1XlB-u9-P72cs
 Accept-Language: EN
 
 ###

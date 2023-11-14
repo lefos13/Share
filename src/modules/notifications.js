@@ -10,9 +10,14 @@ const { HOST, USERR, PASS, DATABASEE } = process.env;
 const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
   dialect: "mysql",
-  // dialectOptions: {
-  //   useUTC: false, // for reading from database
-  // },
+  dialectOptions: {
+    typeCast: function (field, next) {
+      if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
+        return new Date(field.string());
+      }
+      return next();
+    },
+  },
   timezone: "+02:00", // for writing to database
   logging: false,
 });
