@@ -602,32 +602,29 @@ const getAllExpiredToday = async () => {
 
     const posts = await Posts.findAll({
       where: {
-        [Op.and]: [
+        // [Op.and]: [
+        // {
+        //post is expired compared to current date
+        [Op.or]: [
+          { enddate: { [Op.lte]: curDate } },
           {
-            //post is expired compared to current date
-            [Op.or]: [
-              { enddate: { [Op.lte]: curDate } },
-              {
-                [Op.and]: [
-                  { enddate: null },
-                  { startdate: { [Op.lte]: curDate } },
-                ],
-              },
-            ],
-          },
-          {
-            //post wasnt expired yesterday
-            [Op.or]: [
-              { enddate: { [Op.gte]: yesterday } },
-              {
-                [Op.and]: [
-                  { enddate: null },
-                  { startdate: { [Op.gte]: yesterday } },
-                ],
-              },
-            ],
+            [Op.and]: [{ enddate: null }, { startdate: { [Op.lte]: curDate } }],
           },
         ],
+        // },
+        // {
+        //   //post wasnt expired yesterday
+        //   [Op.or]: [
+        //     { enddate: { [Op.gte]: yesterday } },
+        //     {
+        //       [Op.and]: [
+        //         { enddate: null },
+        //         { startdate: { [Op.gte]: yesterday } },
+        //       ],
+        //     },
+        //   ],
+        // },
+        // ],
       },
     }).catch((err) => {
       throw err;
