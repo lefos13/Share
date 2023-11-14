@@ -91,7 +91,7 @@ const runJobs = function () {
       try {
         console.log(`Running cron job: addNewDriversPassengers`);
         //get posts that expired today
-        const posts = Post.getAllExpiredToday();
+        const posts = await Post.getAllExpiredToday();
         //get users that are involved in the post
         if (posts.length > 0) {
           console.log(`found ${posts.length} posts`);
