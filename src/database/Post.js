@@ -606,11 +606,11 @@ const getAllExpiredToday = async () => {
           {
             //post is expired compared to current date
             [Op.or]: [
-              { enddate: { [Op.lte]: curDate } },
+              { enddate: { [Op.lt]: curDate } },
               {
                 [Op.and]: [
                   { enddate: null },
-                  { startdate: { [Op.lte]: curDate } },
+                  { startdate: { [Op.lt]: curDate } },
                 ],
               },
             ],
