@@ -618,11 +618,11 @@ const getAllExpiredToday = async () => {
           {
             //post wasnt expired yesterday
             [Op.or]: [
-              { enddate: { [Op.eq]: yesterday } },
+              { enddate: { [Op.gte]: yesterday } },
               {
                 [Op.and]: [
                   { enddate: null },
-                  { startdate: { [Op.eq]: yesterday } },
+                  { startdate: { [Op.gte]: yesterday } },
                 ],
               },
             ],
