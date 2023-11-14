@@ -58,23 +58,7 @@ app.get("/", (req, res) => {
 //cors of course
 const cors = require("cors");
 
-//jwt
-const jwt = require("jsonwebtoken");
-
 app.use(express.json());
-
-//middleware for handling multipart
-const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.originalname);
-  },
-});
-const upload = multer({ storage: storage });
 
 // enviroment variables
 const dotenv = require("dotenv");
@@ -83,14 +67,8 @@ dotenv.config();
 // get the values from the .env file
 const { HOST, USERR, PASS, DATABASEE, TOKEN_KEY, GOOGLE_KEY } = process.env;
 
-Date.prototype.addHours = function (h) {
-  this.setTime(this.getTime() + h * 60 * 60 * 1000);
-  return this;
-};
-
 //sequelize schema
-const { Sequelize, DataTypes, fn } = require("sequelize");
-const { nextTick } = require("process");
+const { Sequelize } = require("sequelize");
 const { Op } = require("sequelize");
 const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
   host: HOST,
@@ -114,17 +92,20 @@ const sequelize = new Sequelize(DATABASEE, USERR, PASS, {
 const ConvUsers = require("./modules/convusers");
 const Conv = require("./database/ConvUsers");
 const User = require("./database/User");
-const Post = require("./database/Post");
 const ConvGroup = require("./database/ConvGroups");
 const Group = require("./database/Group");
+
+//import jobs
+const { runJobs } = require("./jobs/jobs");
+console.log("initializing cron jobs...");
+runJobs();
 
 /* The above code is importing the `authenticateToken` function from a file located in the
 `./middleware/auth` directory. This function is likely used as middleware in a web application to
 authenticate user tokens before allowing access to certain routes or resources. */
 const { authenticateToken } = require("./middleware/auth");
-//ROUTES IMPORT
 
-// *** ADD ***
+//ROUTES IMPORT
 /* The above code is importing and using various routers for different endpoints in a Node.js
 application. Specifically, it is using routers for handling requests related to posts, users,
 requests, reviews, neutral items, last searches, and groups. These routers are defined in separate
@@ -148,78 +129,6 @@ app.use("/searches", v1LastSearchesRouter);
 app.use("/groups", v1GroupRouter);
 // === END OF ROUTES IMPORT
 checkconnection();
-
-const schedule = require("node-schedule");
-
-//run once a time to delete old posts from the database 45 0 * * *
-/* The above code is scheduling a job to run at 12:45 AM every day to delete all posts that are expired
-for more than 3 months. It first finds all the expired posts, then checks if any post is expired for
-more than 3 months. If it is, it deletes the post along with all those who were interested in it. It
-also writes the deleted post's data to a JSON file in the "deleted" folder. Finally, it destroys all
-the interested posts that were deleted along with the expired post. */
-const deleteOldPosts = schedule.scheduleJob("45 0 * * *", async function () {
-  // const deleteOldPosts = schedule.scheduleJob("*/1 * * * * *", async function () {
-  try {
-    //find all posts that are expired
-    let posts = await Post.globalAllExpired();
-
-    //check if any post is expired more than 3 months and delete it along with all those that was interested to them
-    let curDate = moment();
-    for await (let post of posts) {
-      let endDate =
-        post.enddate != null ? moment(post.enddate) : moment(post.startdate);
-
-      let months = curDate.diff(endDate, "months");
-      let postIds = [];
-      if (months >= 3) {
-        postIds.push(post.postid);
-
-        var json = JSON.stringify(post);
-        fs.writeFileSync(
-          "deleted/" + curDate + "_" + post.postid + ".json",
-          json,
-          "UTF-8"
-        );
-
-        post.destroy();
-      }
-
-      if (postIds.length > 0) {
-        let intDestroyed = await destroyPerArrayIds(postIds);
-      }
-    }
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-// */1 * * * * Every minute
-// */5 * * * * * Every 5 seconds
-// 30 0 * * * Every 12:30 after midnight
-/* The above code is scheduling a job to run every day at 12:30 AM. The job checks for expired
-conversations and deletes them from the database if any are found. It uses the Moment.js library to
-get the current time and date, and the Lodash library to iterate over the expired conversations and
-delete them. */
-const deleteConversations = schedule.scheduleJob(
-  "30 0 * * *", //every 12:30 after midnight
-  async function () {
-    try {
-      let curTime = moment().format("hh:mm:ss");
-
-      let dateToCheck = moment().format("YYYY-MM-DD");
-      const expired = await Conv.getAllExpired(dateToCheck);
-      if (expired.length > 0) {
-        _.forEach(expired, (val) => {
-          val.destroy().catch((err) => {
-            throw err;
-          });
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-);
 
 //cors configuration
 /* The above code is setting up CORS (Cross-Origin Resource Sharing) options for a server. It allows
@@ -468,8 +377,7 @@ io.on("connection", (socket) => {
           const initiator = await User.findOneLight(action.data.email);
           if (initiator === false) {
             throw new Error("Error at finding the user");
-          } else if(initiator == null)
-          {
+          } else if (initiator == null) {
             throw new Error("User not found to join the socket stream!");
           }
 
@@ -796,7 +704,7 @@ io.on("connection", (socket) => {
         user is in the background. It retrieves all conversations involving the user and sets the
         "isUserOnline" status to false for the other user(s) in each conversation. */
         case "server/AppInBackground": {
-          if(action.data.senderEmail == undefined) break;
+          if (action.data.senderEmail == undefined) break;
           console.log("AppInBackground data: ", action.data.senderEmail);
           let sender = action.data.senderEmail;
           app.locals.bg[sender] = true;
@@ -828,7 +736,7 @@ io.on("connection", (socket) => {
         sender from the database, and sends a socket.io message to each conversation's other user to
         set their online status to true. */
         case "server/AppInForeground": {
-          if(action.data.senderEmail == undefined) break;
+          if (action.data.senderEmail == undefined) break;
           console.log("AppInForeground data: ", action.data.senderEmail);
           let sender = action.data.senderEmail;
           //user should be again online
