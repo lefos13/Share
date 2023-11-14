@@ -106,8 +106,16 @@ const runJobs = function () {
               postInterests.forEach((interest) => {
                 increaseAsValues(interest.email, "passenger");
               });
+            } else {
+              console.log(
+                `Found no verified passengers for post ${post.postid}`
+              );
             }
           });
+        } else {
+          console.log(
+            `No posts found that expired today and was active yesterday`
+          );
         }
 
         //check if there are any passengers and ignore those posts with no passengers
