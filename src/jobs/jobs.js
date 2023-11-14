@@ -100,9 +100,7 @@ const runJobs = function () {
             const driver = post.email;
             //get passengers
             const postInterests = getAllVerifiedInterestsPerPost(post.postid);
-            console.log(
-              `Verified post interests: ${JSON.stringify(postInterests)}`
-            );
+
             if (postInterests.length > 0) {
               increaseAsValues(driver, "driver");
               //get all emails of verified passengers

@@ -413,7 +413,7 @@ const getAllVerifiedInterestsPerPost = async (postid) => {
         isVerified: true,
       },
     });
-
+    console.log(`Verified post interests: ${JSON.stringify(postInterests)}`);
     return postInterests;
   } catch (error) {
     console.log(`error at getAllVerifiedInterestsPerPost: ${error}`);
