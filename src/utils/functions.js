@@ -1014,6 +1014,12 @@ const sendMessageGroup = async (
       android: {
         priority: "high",
       },
+      webpush: {
+        headers: {
+          Urgency: "high",
+        },
+      },
+      priority: "high",
     };
     let curTime = moment();
     if (true) {
