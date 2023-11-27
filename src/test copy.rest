@@ -176,28 +176,28 @@ Accept-Language: EN
 ###
 
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
-POST http://157.230.18.246:3000/users/searchuser
+POST https://ouride.gr/test/users/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAxVDEzOjUzOjUxLjg1NFoiLCJpYXQiOjE2NzI1ODEyMzEsImV4cCI6MTY3Nzc2NTIzMX0.0i2FuAFq6zuyeqp5xif3vxm8v_zwPkTfe1fulWo0rls
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTEtMTRUMjA6Mzk6MDkuODQzWiIsImlhdCI6MTY5OTk5NDM0OSwiZXhwIjoxNzA1MTc4MzQ5fQ.j4VeHEzJb4aGNQJ0C80VkHXER5lXMT1XlB-u9-P72cs
 Accept-Language: EN
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "giannisfragoulis21@gmail.com"
     }
 }
 
 ###
 
 #get reviews
-POST http://157.230.18.246:3000/reviews/getReviews
+POST https://ouride.gr/test/reviews/getReviews
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTEtMTRUMjA6Mzk6MDkuODQzWiIsImlhdCI6MTY5OTk5NDM0OSwiZXhwIjoxNzA1MTc4MzQ5fQ.j4VeHEzJb4aGNQJ0C80VkHXER5lXMT1XlB-u9-P72cs
 Accept-Language: EN
 
 {
     "data": {
-        "email": "user0@gmail.com",
+        "email": "giannisfragoulis21@gmail.com",
         "page": 1
     }
 }

@@ -130,6 +130,18 @@ app.use("/groups", v1GroupRouter);
 // === END OF ROUTES IMPORT
 checkconnection();
 
+//REDIS CONFIGURATION
+const { createClient } = require("redis");
+const redisClient = createClient();
+redisClient.on("error", (err) => console.log(`Redis client error: ${err}`));
+await redisClient.connect();
+
+const redisTest = async () => {
+  await redisClient.set("blabla", "Edw nikos koukos apo vhf");
+  const nikos = redisClient.get("blabla");
+};
+redisTest();
+
 //cors configuration
 /* The above code is setting up CORS (Cross-Origin Resource Sharing) options for a server. It allows
 requests from any origin (as specified by the `whitelist` array), with credentials, and with certain
