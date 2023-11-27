@@ -134,7 +134,7 @@ checkconnection();
 const { createClient } = require("redis");
 const redisClient = createClient();
 redisClient.on("error", (err) => console.log(`Redis client error: ${err}`));
-await redisClient.connect();
+redisClient.connect();
 
 const redisTest = async () => {
   await redisClient.set("blabla", "Edw nikos koukos apo vhf");
