@@ -604,7 +604,7 @@ const insertDataToMembers = async (group) => {
         if (memberFullname === false)
           throw new Error("Error at finding the user");
         const ratingData = await insertAver(member);
-        if(ratingData === false) throw new Error("Error at finding the user");
+        if (ratingData === false) throw new Error("Error at finding the user");
         const hasImagePath = await checkImagePath(member.email);
         const imagePath = hasImagePath ? `images/${member.email}.jpeg` : null;
 
@@ -625,7 +625,6 @@ const insertDataToMembers = async (group) => {
     console.error(error);
     return new Error("Something went wrong at inserting data to members");
   }
-  
 };
 /**
  * The function checks if an image file exists in a specific directory based on the email parameter.
@@ -814,8 +813,7 @@ const getVersion = async () => {
     console.error(error);
     return false;
   }
-}
-
+};
 
 /**
  * The function determines the language based on the accept-language header and returns the
@@ -1013,6 +1011,9 @@ const sendMessageGroup = async (
           msg.firebase.sent +
           messageSent.text,
       },
+      android: {
+        priority: "high",
+      },
     };
     let curTime = moment();
     if (true) {
@@ -1076,6 +1077,7 @@ const sendMessageGroup = async (
         .catch((err) => {
           throw err;
         });
+      admin.messaging().sendToDevice();
     } else {
       throw "User has uninstalled the app!";
       // fcm.destroy();
