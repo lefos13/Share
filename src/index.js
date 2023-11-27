@@ -507,6 +507,7 @@ io.on("connection", (socket) => {
           console.log("CONVERSATION ID message: ", action.data.conversationId);
           const conversationId = action.data.conversationId; // this is the receipient id
           const fromEmail = action.data.senderEmail; //this is my id
+
           let dataForNotification = action.data.message;
 
           const realGroupId = action.data.conversationId.split(",")[0];
@@ -528,6 +529,10 @@ io.on("connection", (socket) => {
             if (app.locals[email] === conversationId && email !== fromEmail) {
               action.data.message.isRead = true;
               action.data.message.seen = true;
+              // if recepient is online and isnt the sender emit that the message is seen
+              console.log(
+                `CHAT LOGGER: if recepient is online and isnt the sender emit to ${conversationId} that the message is seen`
+              );
               socket.emit("action", {
                 type: "setGroupConversationSeen",
                 data: {
@@ -536,6 +541,9 @@ io.on("connection", (socket) => {
                 },
               });
             }
+            console.log(
+              `CHAT LOGGER: send to ${userData.email} the data of the message`
+            );
             io.to(userData.socketId).emit("action", {
               type: "private_message_groups",
               data: {
@@ -556,7 +564,7 @@ io.on("connection", (socket) => {
             //send notification for offline or background user
             if (!online || inBackground) {
               console.log(
-                "User is offline or in background so NOTIFICATION IS TO BE SENT"
+                "CHAT LOGGER: User is offline or in background so NOTIFICATION IS TO BE SENT"
               );
               await sendMessageGroup(
                 dataForNotification,
