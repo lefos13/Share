@@ -1077,7 +1077,6 @@ const sendMessageGroup = async (
         .catch((err) => {
           throw err;
         });
-      admin.messaging().sendToDevice();
     } else {
       throw "User has uninstalled the app!";
       // fcm.destroy();
