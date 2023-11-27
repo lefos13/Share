@@ -672,6 +672,7 @@ io.on("connection", (socket) => {
             senderId,
             true
           );
+          console.log("GROUP CHAT LOGGER: updateLastMessage returned: " + conv);
           if (conv === false) {
             throw new Error(
               "something went wrong with updating the last message"
