@@ -7,7 +7,7 @@ const ConvGroups = require("../modules/convgroups");
 
 const updateLastMessage = async (convid, email, seen) => {
   try {
-    console.log("UPDATING LAST MESSAGE AS SEEN AND READ");
+    console.log("UPDATING LAST MESSAGE AS SEEN AND READ IF I AM NOT THE OWNER");
     let results = await ConvGroups.findOne({
       where: {
         convid: convid,
@@ -230,6 +230,7 @@ const removeMembers = async (groupId, email) => {
     );
   }
 };
+
 module.exports = {
   saveOne,
   findOneByGroupId,

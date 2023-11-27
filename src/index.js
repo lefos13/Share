@@ -664,10 +664,23 @@ io.on("connection", (socket) => {
           app.locals[action.data.senderId] = conversationId;
           let realConversationId = conversationId.split(",")[1];
           const groupId = conversationId.split(",")[0];
-          //get all users email with sender too
-          let usersEmail = realConversationId.split(" ");
-          //exluce sender
-          usersEmail = usersEmail.filter((val) => val != senderId);
+
+          //get last message and check if sender has sent it
+          //get conversation and mark the last message as read
+          const conv = ConvGroup.updateLastMessage(
+            realConversationId,
+            senderId,
+            true
+          );
+          if (conv === false) {
+            throw new Error(
+              "something went wrong with updating the last message"
+            );
+          } else if (conv === 405) {
+            //initiator is the owner of last message
+            console.log("CHAT LOGGER: Owner of last message!");
+            break;
+          }
 
           console.log(
             `Emiting to room ${groupId} that conversation has been read`
@@ -687,18 +700,6 @@ io.on("connection", (socket) => {
               isRead: true,
             },
           });
-
-          //get conversation and mark the last message as read
-          const conv = ConvGroup.updateLastMessage(
-            realConversationId,
-            senderId,
-            true
-          );
-          if (conv === false) {
-            throw new Error(
-              "something went wrong with updating the last message"
-            );
-          }
 
           break;
         }
