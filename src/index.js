@@ -139,6 +139,7 @@ redisClient.connect();
 const redisTest = async () => {
   await redisClient.set("blabla", "Edw nikos koukos apo vhf");
   const nikos = redisClient.get("blabla");
+  console.log(`Redis key: ${nikos}`);
 };
 redisTest();
 
