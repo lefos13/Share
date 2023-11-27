@@ -1019,7 +1019,6 @@ const sendMessageGroup = async (
           Urgency: "high",
         },
       },
-      priority: "high",
     };
     let curTime = moment();
     if (true) {
