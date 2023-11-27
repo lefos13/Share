@@ -667,7 +667,7 @@ io.on("connection", (socket) => {
 
           //get last message and check if sender has sent it
           //get conversation and mark the last message as read
-          const conv = ConvGroup.updateLastMessage(
+          const conv = await ConvGroup.updateLastMessage(
             realConversationId,
             senderId,
             true
