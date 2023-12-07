@@ -39,10 +39,9 @@ const sequelize = new Sequelize(DATABASE, USERR, PASS, {
   },
 });
 
-const moment = require("moment-timezone");
-// const ConvUsers = require("../modules/convusers");
-moment.tz.setDefault("Europe/Athens");
-moment.locale("el");
+const moment = require("moment");
+// moment.tz.setDefault("Europe/Athens");
+// moment.locale("el");
 
 const RFC_H = "DD/MM/YYYY HH:mm";
 const RFC_ONLYM = "DD/MM/YYYY";
@@ -101,12 +100,18 @@ const createNewPost = async (data, req) => {
  */
 const interested = async (req) => {
   try {
+    //Import sockets
     const io = socket.io;
+
+    //Get the caller email
     let extra = req.body.extra;
 
+    //get data of request
     let data = req.body.data;
-    console.log("Log for groupId: ", data);
 
+    console.log(`Request data of interested: ${JSON.stringify(data)}`);
+
+    //Determine language based on locales
     let msg = await determineLang(req);
     if (data.email == null) {
       return { status: 401, message: msg.noEmail };
@@ -114,6 +119,7 @@ const interested = async (req) => {
     let curtime = moment().endOf("day").format("YYYY-MM-DD hh:mm:ss");
     let starttime = moment().startOf("day").format("YYYY-MM-DD hh:mm:ss");
 
+    //timestamb
     let dateOfInterest = moment();
 
     //check if there is a property groupId in the data of body
@@ -164,6 +170,7 @@ const interested = async (req) => {
         };
       }
     } else data.groupId = null;
+
     //prepare the data to be inserted into the database
     var row = {
       email: data.email,
@@ -176,7 +183,7 @@ const interested = async (req) => {
       ownerNotified: false,
     };
 
-    //CHECK IF THE CLIENT IS THE OWNER OF THE POST
+    //CHECK IF THE CLIENT IS THE OWNER OF THE POST (Unrealistic case)
     const isPostOwner = await Post.isPostOwner(row);
     if (isPostOwner === false) throw new Error("Db error");
     else if (isPostOwner > 0) {
@@ -194,7 +201,10 @@ const interested = async (req) => {
     if (interest === false) {
       throw new Error("Something went wrong with finding the interested");
     }
+
+    //Interest doesnt exist
     if (interest == null) {
+      // get how many interests the user has during the last day
       const count = await PostInterested.getCountOfUser(
         row.email,
         starttime,
@@ -239,6 +249,8 @@ const interested = async (req) => {
         };
       }
     } else {
+      //Interest already exists for the postid
+      
       //Potential expirition date of a chat
       let post = await Post.findOne(row.postid);
       let expiresIn = await determineExpirationDate(post);
@@ -251,13 +263,17 @@ const interested = async (req) => {
 
       fun.toNotifyOwner(post.email, extra, post.postid, false);
 
+      //handle potential review case
+      handlePotentialReview(post, interest, null)
+
       //check if there are a chat between those user
       const chat = await ConvUsers.checkIfExists(post.email, row.email);
       if (chat === false) throw new Error("error at finding existing chat");
       else if (chat == null) {
         return { status: 200, message: msg.cancelInterest };
       } else {
-        //chat exists
+        // ============== chat exists
+        console.log(`Deleting the chat between driver and passenger`);
         //CHECK IF CHAT HAS A GROUPID
         let groupId = chat.groupId !== null ? chat.groupId : null;
         let makeGroupId =
@@ -298,6 +314,7 @@ const interested = async (req) => {
         // let allDates = [];
         let expirationDates = [];
         if (allVerPassenger.length > 0) {
+          console.log("Found verified interest for the passenger");
           // get the expiration dates
           for await (let val of allVerPassenger) {
             for await (let postv of allActiveDriver) {
@@ -314,6 +331,7 @@ const interested = async (req) => {
         }
 
         if (allVerDriver.length > 0) {
+          console.log("Found verified interest for the driver");
           // get the expiration dates
           for await (let val of allVerDriver) {
             for await (let postv of allActivePassenger) {
@@ -332,7 +350,7 @@ const interested = async (req) => {
         let toDelete = true;
         if (expirationDates.length > 0) {
           toDelete = false;
-
+          console.log("FOUND expiration dates for this pair of users");
           //FIND THE LATEST EXPIRATION DATE IF THERE IS ANY
           expirationDates = expirationDates.map((d) => moment(d));
           let maxDate = moment.max(expirationDates);
@@ -343,8 +361,8 @@ const interested = async (req) => {
           //     groupId = d.groupId;
           //   }
           // });
-          //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
 
+          //CHANGE THE EXPIRATION DATE TO THE OLDER ONE AND DO NOT DELETE THE CHAT
           let updated = await ConvUsers.updateDate(
             chat.convid,
             maxDate,
@@ -352,6 +370,7 @@ const interested = async (req) => {
           );
           if (updated === false)
             throw new Error("Didnt update the conv expiration date");
+
           //EMIT THE EXPIRATION DATE CHANGE
           let driver = await User.findOneLight(post.email);
           io.to(driver.socketId).emit("action", {
@@ -494,6 +513,7 @@ const interested = async (req) => {
             });
           }
         }
+
         if (toDelete) {
           const deletedChat = await ConvUsers.deleteIfExpiresEqual(
             chat,
@@ -540,6 +560,142 @@ const interested = async (req) => {
     return { status: 500 };
   }
 };
+
+const handlePotentialReview = async (post, results, dateToCompare) => {
+  try {
+    const toReviewExists = await ToReview.findIfExists(
+      post.email,
+      results.email
+    );
+    if (toReviewExists === false)
+      throw new Error("Error at finding the toreview");
+
+    // if driver is owner check all older posts and decide if you need to update the flags or deny review
+    /* The code is checking if a review exists for a specific driver email and if there are any
+    active posts for that driver. If there are active posts, it retrieves all the verified posts
+    for a specific passenger email and checks the end dates of those posts to get the oldest
+    one. It then creates a new review object with the oldest post's end date and the
+    corresponding post interested ID. */
+    if (toReviewExists.driverEmail === post.email) {
+      const allActiveDriver = await Post.findAllActive(
+        toReviewExists.driverEmail,
+        moment()
+      );
+
+      if (allActiveDriver.length > 0) {
+        const allPostIds = allActiveDriver.map((val) => val.postid);
+        const allVerified = await PostInterested.findAllVerifedPerPost(
+          toReviewExists.passengerEmail,
+          allPostIds
+        );
+        if (allVerified.length > 0) {
+          //Check the enddates of active verifed posts and get the oldest
+          const dates = await Promise.all(
+            allVerified.map(async (val) => {
+              const tempPost = await Post.findOne(val.postid);
+              const date =
+                tempPost.enddate != null
+                  ? tempPost.enddate
+                  : tempPost.startdate;
+              return { d: date, p: val.piid };
+            })
+          );
+
+          let newdates = dates.map((d) => moment(d.d));
+          let minDate = moment.min(newdates);
+          const { piid } = dates.find((d) => moment(d.d).isSame(minDate));
+          dateToCompare = minDate;
+
+          const newToReview = await ToReview.newReview(
+            toReviewExists,
+            minDate,
+            piid
+          );
+          if (!newToReview)
+            throw new Error(
+              "Error at updating the toreview object with older data"
+            );
+        }
+      }
+    }else{
+      console.log(`No potential review found OR the driver isnt the owner of the post`);
+    }
+
+    const activePassengerPosts = await Post.findAllActive(
+      results.email,
+      moment()
+    );
+
+    /* The above code is checking if there are any active passenger posts and if there are, it
+    retrieves all the verified interested passengers for those posts. It then checks if the
+    minimum date of those verified interested passengers is greater than or equal to a given
+    date to compare. If it is, it creates a new review object and updates the existing toReview
+    object with the new review. If the minimum date is not greater than or equal to the given
+    date to compare, it denies the review. If there are no active passenger posts, it also
+    denies the review. */
+    let passengerPostsIds = activePassengerPosts.map((val) => val.postid);
+    if (activePassengerPosts.length > 0) {
+      console.log(`Found active passenger posts ${activePassengerPosts.length}`);
+      const allVerifiedOfDriver = await PostInterested.findAllVerifedPerPost(
+        post.email,
+        passengerPostsIds
+      );
+
+      if (allVerifiedOfDriver.length > 0) {
+        console.log(`found verified passenger posts ${allVerifiedOfDriver.length}`);
+        let dates = await Promise.all(
+          allVerifiedOfDriver.map(async (val) => {
+            let tempPost = await Post.findOne(val.postid);
+            let date = tempPost.enddate ?? tempPost.startdate;
+            return { d: date, p: val.piid };
+          })
+        );
+
+        let newDates = dates.map((d) => moment(d.d));
+        let minDate = moment.min(newDates);
+
+        if (!dateToCompare || minDate.isBefore(dateToCompare)) {
+          let piid;
+          _.forEach(dates, (d) => {
+            if (moment(d.d).isSame(minDate)) {
+              piid = d.p;
+            }
+          });
+
+          let passenger = await PostInterested.findOneById(piid);
+          let driver =
+            passenger.email == toReviewExists.passengerEmail
+              ? toReviewExists.driverEmail
+              : toReviewExists.passengerEmail;
+          console.log(`Create new potential review`);
+          const newToReview = await ToReview.newReviewAndReverse(
+            toReviewExists,
+            driver,
+            passenger.email,
+            minDate,
+            piid
+          );
+
+          if (!newToReview) {
+            throw new Error("Error at updating the toreview object");
+          }
+        }
+      } else if (dateToCompare == null) {
+        console.log(`No date to compare so denying potential review`);
+        const destroyed = await ToReview.denyReview(toReviewExists);
+        if (destroyed === false)
+          throw new Error("Error at destroying the possible review");
+      }
+    } else if (dateToCompare == null) {
+      console.log(`No active passenger posts and no dates to compare so denying potential review`);
+      const destroyed = await ToReview.denyReview(toReviewExists);
+      if (destroyed === false)
+        throw new Error("Error at destroying the possible review");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 /**
  * This function searches for posts based on user input and applies filters to the results before
@@ -2360,16 +2516,16 @@ const updateOnePost = async (req, res) => {
     const msg = await determineLang(req);
     console.log("UPDATING POST...");
     let postId = req.body.data.postId;
-    let {image, date, ...newPostData} = req.body.data.newData;
+    let { image, date, ...newPostData } = req.body.data.newData;
     let postData = await Post.findOne(postId);
-    if(postData===false) {
-      throw new Error("Error at database level");}
-      else if(postData===null){
-        throw new Error("Post not found");
-      }
-    if(!newPostData.hasOwnProperty("image")){
+    if (postData === false) {
+      throw new Error("Error at database level");
+    } else if (postData === null) {
+      throw new Error("Post not found");
+    }
+    if (!newPostData.hasOwnProperty("image")) {
       // newPostData.date = moment();
-      await postData.update(newPostData).catch(err => {
+      await postData.update(newPostData).catch((err) => {
         throw err;
       });
       if (image === null) {
@@ -2385,15 +2541,17 @@ const updateOnePost = async (req, res) => {
         const base64 = image;
         const buffer = Buffer.from(base64, "base64");
         fs.writeFileSync("postImages/" + postData.postid + ".jpeg", buffer);
-        await postData.update({ image: "postimages/" + postData.postid + ".jpeg" });
+        await postData.update({
+          image: "postimages/" + postData.postid + ".jpeg",
+        });
       }
-      return {status:200, message: msg.postMessages.updated, data: postData};
-    }    
+      return { status: 200, message: msg.postMessages.updated, data: postData };
+    }
   } catch (error) {
     console.error(error);
-    return {status:500, errorStack: error.message};
+    return { status: 500, errorStack: error.message };
   }
-}
+};
 
 module.exports = {
   updateOnePost,

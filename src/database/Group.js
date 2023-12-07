@@ -4,13 +4,7 @@
 
 // END OF SECTION (ENV VAR)
 
-const Users = require("../modules/user");
 const Posts = require("../modules/post");
-const PostInterested = require("../modules/postinterested");
-const Reviews = require("../modules/review");
-const SearchPost = require("../modules/searchPost");
-const ToReview = require("../modules/toreview");
-const FcmToken = require("../modules/fcmtoken");
 const Groups = require("../modules/group");
 const Convs = require("./ConvUsers");
 // ==== code for db

@@ -7,7 +7,7 @@ const ConvGroups = require("../modules/convgroups");
 
 const updateLastMessage = async (convid, email, seen) => {
   try {
-    console.log("UPDATING LAST MESSAGE AS SEEN AND READ");
+    console.log("UPDATING LAST MESSAGE AS SEEN AND READ IF I AM NOT THE OWNER");
     let results = await ConvGroups.findOne({
       where: {
         convid: convid,
@@ -25,6 +25,8 @@ const updateLastMessage = async (convid, email, seen) => {
         });
         // check if the last message is of the user that openned the chat
         if (messages[0].user._id == email) {
+          console.log("GROUP CHAT LOGGER: Initiatior is owner of last message");
+          return 405;
         } else {
           messages[0].isRead = true;
           messages[0].seen = true;
@@ -230,6 +232,7 @@ const removeMembers = async (groupId, email) => {
     );
   }
 };
+
 module.exports = {
   saveOne,
   findOneByGroupId,

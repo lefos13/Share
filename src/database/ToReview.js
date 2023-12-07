@@ -113,6 +113,15 @@ const setPassengerDone = async (possibleReview) => {
   }
 };
 
+/**
+ * The function `findIfExists` checks if a record exists in the `ToReview` table where either
+ * `driverEmail` or `passengerEmail` matches `email1` and `email2`.
+ * @param email1 - The first email address to check for existence in the database.
+ * @param email2 - The `email2` parameter is the second email address that is being checked for
+ * existence in the `ToReview` table.
+ * @returns The function `findIfExists` returns the value of `toReviewExists`, which is the result of
+ * the `ToReview.findOne` query.
+ */
 const findIfExists = async (email1, email2) => {
   try {
     const toReviewExists = await ToReview.findOne({

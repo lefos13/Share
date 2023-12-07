@@ -353,7 +353,32 @@ const findUserMinimal = async (email) => {
   }
 };
 
+const increaseAsValues = async (email, type) => {
+  try {
+    let user = await Users.findOne({ where: { email: email } });
+    if (type == "driver") {
+      let asDriverValue = user.asDriver;
+      asDriverValue++;
+      user.update({ asDriver: asDriverValue }).catch((err) => {
+        throw err;
+      });
+    } else if (type == "passenger") {
+      let asPassengerValue = user.asPassenger;
+      asPassengerValue++;
+      user.update({ asPassenger: asPassengerValue }).catch((err) => {
+        throw err;
+      });
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error at increaseAsValues: " + error);
+    return false;
+  }
+};
+
 module.exports = {
+  increaseAsValues,
   findUserMinimal,
   findUsersByFullname,
   updateOS,

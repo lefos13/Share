@@ -8,6 +8,17 @@ Accept-Language: EN
         "email": "slodevolos@hotmail.com"
     }
 }
+###
+#service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
+POST https://ouride.gr/test/users/createtoken
+Content-Type: application/json
+Accept-Language: EN
+
+{
+    "data":{
+        "email": "lefterisevagelinos1996@gmail.com"
+    }
+}
 
 ###
 POST https://ouride.gr/test/neutral/sendReport
@@ -165,28 +176,28 @@ Accept-Language: EN
 ###
 
 #service pou anazhtei kapoion xrhsth kai epistrefei ta stoixeia toy
-POST http://157.230.18.246:3000/users/searchuser
+POST https://ouride.gr/test/users/searchuser
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwQGdtYWlsLmNvbSIsImRhdGEiOiIyMDIzLTAxLTAxVDEzOjUzOjUxLjg1NFoiLCJpYXQiOjE2NzI1ODEyMzEsImV4cCI6MTY3Nzc2NTIzMX0.0i2FuAFq6zuyeqp5xif3vxm8v_zwPkTfe1fulWo0rls
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTEtMTRUMjA6Mzk6MDkuODQzWiIsImlhdCI6MTY5OTk5NDM0OSwiZXhwIjoxNzA1MTc4MzQ5fQ.j4VeHEzJb4aGNQJ0C80VkHXER5lXMT1XlB-u9-P72cs
 Accept-Language: EN
 
 {
     "data": {
-        "email": "lefterisevagelinos1996@gmail.com"
+        "email": "giannisfragoulis21@gmail.com"
     }
 }
 
 ###
 
 #get reviews
-POST http://157.230.18.246:3000/reviews/getReviews
+POST https://ouride.gr/test/reviews/getReviews
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjItMTEtMTJUMTI6MDU6NDMuMzcwWiIsImlhdCI6MTY2ODI1NDc0MywiZXhwIjoxNjczNDM4NzQzfQ.wxEeIB4y4AKffg7h6vEXvl3bHpejRb7vB56ZS1Oxd0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTEtMTRUMjA6Mzk6MDkuODQzWiIsImlhdCI6MTY5OTk5NDM0OSwiZXhwIjoxNzA1MTc4MzQ5fQ.j4VeHEzJb4aGNQJ0C80VkHXER5lXMT1XlB-u9-P72cs
 Accept-Language: EN
 
 {
     "data": {
-        "email": "user0@gmail.com",
+        "email": "giannisfragoulis21@gmail.com",
         "page": 1
     }
 }
@@ -566,7 +577,7 @@ Accept-Language: EN
 ###
 POST https://ouride.gr/test/posts/feedAll
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMDYtMDFUMDk6MDY6MjkuNDMzWiIsImlhdCI6MTY4NTYxMDM4OSwiZXhwIjoxNjkwNzk0Mzg5fQ.mDV_SjeU8qGhWLIzm7DhJH6_fUMht_a3R9lg6wNTpYI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNsb2Rldm9sb3NAaG90bWFpbC5jb20iLCJkYXRhIjoiMjAyMy0xMS0xNFQyMDowMDoxOC45ODZaIiwiaWF0IjoxNjk5OTkyMDE4LCJleHAiOjE3MDUxNzYwMTh9.TvOX65PoWxcSs_WB4AGXHO4TumrI55yBOkR5fyq_NsU
 Accept-Language: EN
 
 {
@@ -576,9 +587,9 @@ Accept-Language: EN
 }
 
 ###
-GET https://ouride.gr/neutral/getNotifications
+GET https://ouride.gr/test/neutral/getNotifications
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im91cmlkZWNvbW11bml0eUBnbWFpbC5jb20iLCJkYXRhIjoiMjAyMy0wMy0yMVQxNTozNTo1My4yMzhaIiwiaWF0IjoxNjc5NDEyOTUzLCJleHAiOjE2ODQ1OTY5NTN9.oFq-0ZGNY6fGTFJHwuxpglUa0mZHIyM3J-vBaz94Nmc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTEtMTRUMjA6Mzk6MDkuODQzWiIsImlhdCI6MTY5OTk5NDM0OSwiZXhwIjoxNzA1MTc4MzQ5fQ.j4VeHEzJb4aGNQJ0C80VkHXER5lXMT1XlB-u9-P72cs
 Accept-Language: EN
 
 ###

@@ -19,7 +19,7 @@ const sequelize = new Sequelize(DATABASE, USERR, PASS, {
         field.type == "TIMESTAMP" ||
         field.type == "DATE"
       ) {
-        return new Date(field.string() + "Z");
+        return new Date(field.string());
       }
       return next();
     },

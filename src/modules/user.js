@@ -84,6 +84,16 @@ const Users = sequelize.define(
       defaultValue: null,
       allowNull: true,
     },
+    asDriver: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    asPassenger: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

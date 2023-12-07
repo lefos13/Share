@@ -7,13 +7,7 @@
 // code for db
 const { Op } = require("sequelize");
 
-const Users = require("../modules/user");
-const Posts = require("../modules/post");
 const PostInterested = require("../modules/postinterested");
-const Reviews = require("../modules/review");
-const SearchPost = require("../modules/searchPost");
-const ToReview = require("../modules/toreview");
-const FcmToken = require("../modules/fcmtoken");
 const Groups = require("./Group");
 const Post = require("./Post");
 const { isJsonString } = require("../utils/functions");
@@ -410,10 +404,27 @@ const destroyPerArrayIds = async (postids) => {
   }
 };
 
+const getAllVerifiedInterestsPerPost = async (postid) => {
+  try {
+    console.log(`post id ${postid}`);
+    const postInterests = await PostInterested.findAll({
+      where: {
+        postid: postid,
+        isVerified: true,
+      },
+    });
+    return postInterests;
+  } catch (error) {
+    console.log(`error at getAllVerifiedInterestsPerPost: ${error}`);
+    return new Error("Error at Database Layer");
+  }
+};
+
 // *** ADD ***
 
 module.exports = {
   countVerifiedEnchanced,
+  getAllVerifiedInterestsPerPost,
   findAllVerifedPerPost,
   destroyPerArrayIds,
   findAllperUser,
