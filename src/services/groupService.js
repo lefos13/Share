@@ -1,12 +1,7 @@
 // In src/services/Userservice.js
 // *** ADD *** (methods for all the Users that access data in db)
 const User = require("../database/User");
-const Review = require("../database/Review");
-const Request = require("../database/Request");
-const Post = require("../database/Post");
 const PostInt = require("../database/PostInterested");
-const ToReview = require("../database/ToReview");
-const Notification = require("../database/Notifications");
 const ConvUsers = require("../database/ConvUsers");
 const Group = require("../database/Group");
 const ConvGroup = require("../database/ConvGroups");
@@ -16,8 +11,6 @@ const {
   onGroupRequestAccepted,
   onGroupRequestDeclined,
 } = require("../utils/functions");
-const moment = require("moment");
-const _ = require("lodash");
 const fun = require("../utils/functions");
 const socket = require("../index");
 

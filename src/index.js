@@ -118,6 +118,7 @@ const v1ReviewRouter = require("./v1/routes/reviewsRoutes");
 const v1NeutralRouter = require("./v1/routes/neutralRoutes");
 const v1LastSearchesRouter = require("./v1/routes/lastSearchRoutes");
 const v1GroupRouter = require("./v1/routes/groupRoutes");
+const v1LocationRouter = require("./v1/routes/locationsRoutes");
 const fs = require("fs");
 
 app.use("/reviews", v1ReviewRouter);
@@ -127,6 +128,7 @@ app.use("/users", v1UserRouter);
 app.use("/neutral", v1NeutralRouter);
 app.use("/searches", v1LastSearchesRouter);
 app.use("/groups", v1GroupRouter);
+app.use("/location", v1LocationRouter);
 // === END OF ROUTES IMPORT
 checkconnection();
 
