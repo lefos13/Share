@@ -8,7 +8,7 @@ module.exports = class CreateLocRequest {
         this.receivers = receivers;
       }
 
-    log(){
+    print(){
         console.log(`===Data of createlocrequest object===`);
         console.log(`groupName: ${this.groupName}`);
         console.log(`initiator: ${this.initiator}`);
