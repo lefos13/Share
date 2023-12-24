@@ -13,7 +13,7 @@ const createLocationGroup = async (req) => {
   const io = socket.io;
   try {
     const msg = await fun.determineLang(req);
-    const { extra, users, groupName } = req.body;
+    const { extra, ...requestData } = req.body;
     const initiator = extra;
 
     //create the location group
@@ -24,7 +24,7 @@ const createLocationGroup = async (req) => {
         createdAt: moment(),
     };
 
-    const locObj = new CreateLocRequest(mockLocationGroup.groupName, mockLocationGroup.initiator, mockLocationGroup.receivers)
+    const locObj = new CreateLocRequest(requestData.groupName, requestData.initiator, requestData.receivers)
     locObj.print()
 
     //check if there are any active posts for the initiator
