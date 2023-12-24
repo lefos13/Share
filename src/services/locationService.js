@@ -6,6 +6,7 @@ const _ = require("lodash");
 const fun = require("../utils/functions");
 const socket = require("../index");
 
+//Creation of a location group
 const createLocationGroup = async (req) => {
   const io = socket.io;
   try {
@@ -35,12 +36,13 @@ const createLocationGroup = async (req) => {
             //more user data here
           },
         ],
-        postId: "123", //ride based on which this group was created
         isActive: true, //if ride is currently active
         locationCoordsData: [{}, {}],
         createdAt: moment(),
       },
     };
+
+    //check if there are any active posts for the initiator
 
     //send notifications to receivers
     const results = "sending the notifications";
