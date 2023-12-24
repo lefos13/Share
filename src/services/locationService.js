@@ -6,6 +6,8 @@ const moment = require("moment");
 const _ = require("lodash");
 const fun = require("../utils/functions");
 const socket = require("../index");
+
+//import service request classes
 const CreateLocRequest = require("../classes/locations/createLocRequest")
 
 //Creation of a location group
@@ -15,13 +17,14 @@ const createLocationGroup = async (req) => {
     const msg = await fun.determineLang(req);
     const { extra, ...requestData } = req.body;
 
-    //create the location group
-    const locObj = new CreateLocRequest(requestData.groupName, requestData.initiator, requestData.receivers)
+    //validate the location group request
+    const locObj = new CreateLocRequest(requestData.locationName, requestData.initiator, requestData.receivers)
     locObj.print()
     if(locObj.errorRequest) throw new Error("Request constructor failed with bad request data");
 
+    //prepare database location group object
     const dbLocationGroup = {
-      groupName: locObj.groupName,
+      locationName: locObj.locationName,
       initiator: locObj.initiator.email,
       receivers: locObj.receivers,
       createdAt: moment(),
