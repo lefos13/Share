@@ -1,11 +1,11 @@
 #service poy ftiaxnei token ston xrhsth, enw an den einai verified stelnei email ston xrhsth kai to otp ston client gia epivevaiwsh
-POST http://192.168.2.20:3000/users/createtoken
+POST https://ouride.gr/test/users/createtoken
 Content-Type: application/json
 Accept-Language: EN
 
 {
     "data":{
-        "email": "user0@gmail.com"
+        "email": "lefterisevagelinos1996@gmail.com"
     }
 }
 
@@ -561,4 +561,14 @@ Accept-Language: EN
             "_id": "a92226e4-3a6b-4385-b302-c18397eea648"
             }
     }
+}
+
+### Locations
+POST https://ouride.gr/test/location/createLocationGroup
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTItMjRUMjA6MTk6MjMuODkzWiIsImlhdCI6MTcwMzQ0OTE2MywiZXhwIjoxNzA4NjMzMTYzfQ.FVbRQLVxz8J08HuYMFpAxfdPaDMCPIGyxO5oHkQPGR4
+Accept-Language: EN
+
+{
+
 }

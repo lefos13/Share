@@ -1,10 +1,12 @@
 // In src/services/Userservice.js
 // *** ADD *** (methods for all the Users that access data in db)
 const User = require("../database/User");
+const Location = require("../database/Locations");
 const moment = require("moment");
 const _ = require("lodash");
 const fun = require("../utils/functions");
 const socket = require("../index");
+const CreateLocRequest = require("../classes/locations/createLocRequest")
 
 //Creation of a location group
 const createLocationGroup = async (req) => {
@@ -42,6 +44,9 @@ const createLocationGroup = async (req) => {
       },
     };
 
+    const locObj = new CreateLocRequest(mockLocationGroup.groupName, mockLocationGroup.initiator, mockLocationGroup.receivers)
+    locObj.print()
+
     //check if there are any active posts for the initiator
 
     //send notifications to receivers
@@ -52,6 +57,8 @@ const createLocationGroup = async (req) => {
       asInitiator: {}, // people who I send my location to them
       asReceiver: {}, // people who send their locations to me
     };
+
+    return {status: 200}
   } catch (error) {
     console.error(error);
   }
