@@ -18,7 +18,6 @@ const createLocationGroup = async (req) => {
 
     //create the location group
     const mockLocationGroup = {
-      data: {
         locationGroupId: "1",
         groupName: "Location test group name",
         initiator: {
@@ -41,7 +40,6 @@ const createLocationGroup = async (req) => {
         isActive: true, //if ride is currently active
         locationCoordsData: [{}, {}],
         createdAt: moment(),
-      },
     };
 
     const locObj = new CreateLocRequest(mockLocationGroup.groupName, mockLocationGroup.initiator, mockLocationGroup.receivers)

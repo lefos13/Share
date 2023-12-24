@@ -563,7 +563,7 @@ Accept-Language: EN
     }
 }
 
-### Locations
+###Locations
 POST https://ouride.gr/test/location/createLocationGroup
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlcmlzZXZhZ2VsaW5vczE5OTZAZ21haWwuY29tIiwiZGF0YSI6IjIwMjMtMTItMjRUMjA6MTk6MjMuODkzWiIsImlhdCI6MTcwMzQ0OTE2MywiZXhwIjoxNzA4NjMzMTYzfQ.FVbRQLVxz8J08HuYMFpAxfdPaDMCPIGyxO5oHkQPGR4
