@@ -14,18 +14,23 @@ const createLocationGroup = async (req) => {
   try {
     const msg = await fun.determineLang(req);
     const { extra, ...requestData } = req.body;
-    const initiator = extra;
 
     //create the location group
-    const mockLocationGroup = {
-        locationGroupId: "1",
-        isActive: true, //if ride is currently active
-        locationCoordsData: [{}, {}],
-        createdAt: moment(),
-    };
-
     const locObj = new CreateLocRequest(requestData.groupName, requestData.initiator, requestData.receivers)
     locObj.print()
+    if(locObj.errorRequest) throw new Error("Request constructor failed with bad request data");
+
+    const dbLocationGroup = {
+      groupName: locObj.groupName,
+      initiator: locObj.initiator.email,
+      receivers: locObj.receivers,
+      createdAt: moment(),
+    };
+
+    const dbResponse = await Location.saveLocationGroup(dbLocationGroup);
+    if(!dbResponse){
+      throw new Error(`Creating location group failed at database layer`);
+    }
 
     //check if there are any active posts for the initiator
 
@@ -38,9 +43,10 @@ const createLocationGroup = async (req) => {
       asReceiver: {}, // people who send their locations to me
     };
 
-    return {status: 200}
+    return {status: 200, dbResponse: dbResponse.JSON()}
   } catch (error) {
     console.error(error);
+    return {status: 500}
   }
 };
 

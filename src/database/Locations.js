@@ -8,16 +8,14 @@ const Locations = require("../modules/locations");
 const { Op } = require("sequelize");
 
 
+
 /**
- * This function creates a new group and returns true if successful, otherwise it returns false and
- * logs an error.
+ * The function `saveLocationGroup` saves a location group in a database and returns the saved group,
+ * or false if there was an error.
  * @param data - The `data` parameter is an object that contains the information needed to create a new
- * group. It likely includes properties such as the group name, description, and members. The `Groups`
- * object is likely a model or schema for a database that stores information about groups. The `create`
- * method is
- * @returns The `create` function is returning a boolean value. If the `Groups.create` operation is
- * successful, it returns `true`. If there is an error, it catches the error and logs it to the
- * console, then returns `false`.
+ * location group.
+ * @returns The function `saveLocationGroup` returns the `group` object if the creation is successful.
+ * If there is an error, it returns `false`.
  */
 const saveLocationGroup = async (data) => {
   try {

@@ -47,6 +47,10 @@ const Locations = sequelize.define(
     isCreated: {
       type: DataTypes.DATE,
     },
+    locationCoords: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,
