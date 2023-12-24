@@ -1,16 +1,16 @@
 module.exports = class CreateLocRequest {
-  groupName;
+  locationName;
   initiator;
   receivers;
   errorRequest = false;
-  constructor(groupName, initiator, receivers) {
+  constructor(locationName, initiator, receivers) {
     try {
-        this.groupName = groupName;
-        this.initiator = initiator;
-        this.receivers = receivers;
+      this.locationName = locationName;
+      this.initiator = initiator;
+      this.receivers = receivers;
     } catch (error) {
-        console.log(`Constructor CreateLocRequest failed with error: ${error}`);
-        this.errorRequest = true;
+      console.log(`Constructor CreateLocRequest failed with error: ${error}`);
+      this.errorRequest = true;
     }
   }
 
@@ -20,7 +20,7 @@ module.exports = class CreateLocRequest {
   print() {
     console.log(`===Data of CreateLocRequest object===`);
     console.log(
-      `groupName: ${this.groupName}, initiator name: ${JSON.stringify(
+      `locationName: ${this.locationName}, initiator name: ${JSON.stringify(
         this.initiator
       )}, receivers: ${JSON.stringify(this.receivers)}`
     );

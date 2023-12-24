@@ -43,7 +43,7 @@ const createLocationGroup = async (req) => {
       asReceiver: {}, // people who send their locations to me
     };
 
-    return {status: 200, dbResponse: dbResponse.JSON()}
+    return {status: 200, dbResponse: dbResponse}
   } catch (error) {
     console.error(error);
     return {status: 500}
