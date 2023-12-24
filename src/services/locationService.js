@@ -19,24 +19,6 @@ const createLocationGroup = async (req) => {
     //create the location group
     const mockLocationGroup = {
         locationGroupId: "1",
-        groupName: "Location test group name",
-        initiator: {
-          fullname: "lefos evan",
-          email: "lefos@gmail.com",
-          //more user data here
-        },
-        receivers: [
-          {
-            fullname: "john frag",
-            email: "john@example.com",
-            //more user data here
-          },
-          {
-            fullname: "George pap",
-            email: "george@example.com",
-            //more user data here
-          },
-        ],
         isActive: true, //if ride is currently active
         locationCoordsData: [{}, {}],
         createdAt: moment(),

@@ -570,5 +570,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxlZnRlc
 Accept-Language: EN
 
 {
-
+    "groupName": "Location test group name",
+    "initiator": {
+        "fullname": "lefos evan",
+        "email": "lefos@gmail.com"
+    },
+    "receivers": [
+        {
+            "fullname": "john frag",
+            "email": "john@example.com"
+        },
+        {
+            "fullname": "George pap",
+            "email": "george@example.com"
+        }
+    ]
 }
