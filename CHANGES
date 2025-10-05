@@ -1,8 +1,0 @@
--fixed enddate in createpost
--Deleted isvisible from database and from the object of user
-
-- Notifications
-  postid comes as a STRING so you may need to parse it to INTEGER so you can call the api the right way.
-
-- isVisible
-  isVisible becomes true only for posts that their enddate is greater than the current date. Otherwise neither user can see the other user's phone.
